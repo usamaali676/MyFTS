@@ -1,1 +1,4 @@
 
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/ftbiz/myfts.firmtech.biz/
