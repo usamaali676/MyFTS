@@ -250,11 +250,40 @@
                                                 href="{{ route('role.edit', $item->id) }}" class="dropdown-item"><i
                                                     class="mdi mdi-pencil-outline me-2"></i><span>Edit</span></a>
                                                     {{-- <button type="button" class="btn btn-primary" id="confirm-color">Alert</button> --}}
-                                                    <a href="javascript:;" class="dropdown-item delete-record"><i class="mdi mdi-delete-outline me-2"></i><span>Delete</span></a>
+                                                    <a type="button"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#basicModal" class="dropdown-item delete-record" class="dropdown-item delete-record"><i class="mdi mdi-delete-outline me-2"></i><span>Delete</span></a>
                                         </div>
                                     </div>
                                 </td>
                             </tr>
+                            <div class="modal fade" id="basicModal" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                  <div class="modal-content">
+                                    <div class="modal-header">
+                                      <h4 class="modal-title" id="exampleModalLabel1">Are You Sure You Want to delete</h4>
+                                      <button
+                                        type="button"
+                                        class="btn-close"
+                                        data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                      <div class="row">
+                                        <div class="col mb-4 mt-2">
+                                            <p>Deleting this item is a permanent action and cannot be undone. Please confirm if you wish to continue, as all associated data will be lost.</p>
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                      <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                                        Close
+                                      </button>
+                                      <a href="{{ route('role.delete', $item->id) }}" type="button" class="btn btn-primary">Yes Proceed!</a>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
                             @endforeach
                         </tbody>
                         <tfoot>
