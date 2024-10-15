@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Helpers\GlobalHelper;
 use App\Models\Permission;
 use App\Models\Role;
+use App\Models\User;
 use Illuminate\Http\Request;
 use RealRashid\SweetAlert\Facades\Alert;
 
@@ -141,8 +142,25 @@ class RoleController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Role $role)
+    public function destroy($id)
     {
-        //
+        $role = Role::find($id);
+        dd($role);
+        if ($role->id == 1) {
+            Alert::error('error', 'Cannot delete the admin role');
+            return redirect()->route('role.index');
+        }
+        else {
+            $users = User::where('role_id', $role->id)->get();
+            if($users->count() > 0){
+                Alert::error('error', 'Cannot delete this role as it is assigned to '.$users->count().' user(s).');
+                return redirect()->route('role.index');
+            }
+            else{
+                $role->delete();
+                Alert::success('success', 'Role deleted successfully');
+                return redirect()->route('role.index');
+            }
+        }
     }
 }
