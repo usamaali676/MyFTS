@@ -30,12 +30,14 @@
       noCalendar: true
     });
   }
-
+  const currentTime = new Date();
   // Datetime
   if (flatpickrDateTime) {
     flatpickrDateTime.flatpickr({
       enableTime: true,
-      dateFormat: 'Y-m-d H:i'
+      dateFormat: 'Y-m-d H:i',
+      minDate: currentTime,
+
     });
   }
 

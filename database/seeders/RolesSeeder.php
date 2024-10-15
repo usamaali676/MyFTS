@@ -14,7 +14,7 @@ class RolesSeeder extends Seeder
      */
     public function run(): void
     {
-        $route = GlobalHelper::Permissions();
-        dd($route);
+        // $route = GlobalHelper::Permissions();
+        // dd($route);
     }
 }

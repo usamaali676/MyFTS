@@ -89,25 +89,25 @@
                 </li> --}}
             </ul>
         </li>
-        {{-- <li class="menu-item">
+        <li class="menu-item">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
-                <i class="menu-icon tf-icons mdi mdi-account-outline"></i>
-                <div data-i18n="Users">Users</div>
+                <i class="menu-icon tf-icons mdi mdi-table"></i>
+                <div data-i18n="Leads">Leads</div>
             </a>
             <ul class="menu-sub">
                 <li class="menu-item">
-                    <a href="{{ route('user.index') }}" class="menu-link">
+                    <a href="{{ route('lead.index') }}" class="menu-link">
                         <div data-i18n="View">View</div>
                     </a>
                 </li>
 
                 <li class="menu-item">
-                    <a href="javascript:void(0);" class="menu-link">
+                    <a href="{{ route('lead.create') }}" class="menu-link">
                         <div data-i18n="Create">Create</div>
                     </a>
                 </li>
             </ul>
-        </li> --}}
+        </li>
 
 
 
