@@ -76,6 +76,29 @@
     <!-- Core JS -->
     <!-- build:js assets/vendor/js/core.js -->
 
+    <div class="modal fade" id="basicModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="exampleModalLabel1">Are You Sure You Want to delete</h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col mb-4 mt-2">
+                            <p>Deleting this item is a permanent action and cannot be undone. Please confirm if you wish to continue, as all associated data will be lost.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                    <a id="deleteConfirmButton" href="#" type="button" class="btn btn-primary">Yes Proceed!</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     @include('layouts.partials.scripts')
     @include('sweetalert::alert', ['cdn' => "https://cdn.jsdelivr.net/npm/sweetalert2@9"])
 
@@ -91,5 +114,21 @@
     <!-- Page JS -->
     <script src="{{ asset('assets/js/dashboards-analytics.js') }}"></script>
     @yield('js')
+    <script>
+         document.addEventListener('DOMContentLoaded', function() {
+        const deleteButtons = document.querySelectorAll('.delete-record');
+        const deleteConfirmButton = document.getElementById('deleteConfirmButton');
+
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const itemId = this.getAttribute('data-id');
+
+                const routeName = this.getAttribute('data-route');
+                const deleteUrl = `{{ url('${routeName}/delete', 'id') }}`.replace('id', itemId);
+                deleteConfirmButton.setAttribute('href', deleteUrl);
+            });
+        });
+    });
+    </script>
   </body>
 </html>
