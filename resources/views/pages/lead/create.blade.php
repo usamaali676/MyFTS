@@ -117,7 +117,7 @@
                         <div class="mb-2">
                             <div class="input-group input-group-merge">
                                 <div class="form-floating form-floating-outline">
-                                    <input type="text" id="basic-default-email" name="email" class="form-control"
+                                    <input type="email" id="basic-default-email" name="email" class="form-control"
                                         placeholder="john.doe" aria-label="john.doe"
                                         aria-describedby="basic-default-email2">
                                     <label for="basic-default-email">Official Email</label>

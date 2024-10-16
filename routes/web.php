@@ -22,6 +22,8 @@ Route::controller(FrontController::class)
 // ->middleware(PermissionMiddelware::class)
 ->group(function () {
    Route::get('get_subcategory', 'get_subcategory')->name('get_subcategory');
+   Route::get('/search',  'search')->name('global_search');
+
 });
 
 Route::controller(RoleController::class)

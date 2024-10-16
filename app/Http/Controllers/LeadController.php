@@ -53,6 +53,7 @@ class LeadController extends Controller
             'lead_status' =>  $request->lead_status,
             'call_status' => $request->call_status,
             'call_back_time' => $formattedCallBackTime,
+            'created_by' => Auth::user()->id,
         ]);
         $lead->sub_categories()->attach($request->sub_category);
         Alert::Success('Success', "Lead Genrated Successfully");
@@ -105,6 +106,7 @@ class LeadController extends Controller
             'lead_status' =>  $request->lead_status,
             'call_status' => $request->call_status,
             'call_back_time' => $formattedCallBackTime,
+            'updated_by' => Auth::user()->id,
         ]);
         $lead->sub_categories()->sync($request->sub_category);
         Alert::Success('Success', "Lead Updated Successfully");
@@ -118,6 +120,8 @@ class LeadController extends Controller
     public function destroy($id)
     {
         $lead = Lead::find($id);
+        $lead->delete_by = Auth::user()->id;
+        $lead->save();
         $lead->delete();
         Alert::Success('Success', "Lead Deleted Successfully");
         return redirect()->route('lead.index');

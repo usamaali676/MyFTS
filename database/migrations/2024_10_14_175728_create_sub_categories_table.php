@@ -15,6 +15,10 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('business_category_id');
             $table->string('name');
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('updated_by')->nullable();
+            $table->unsignedBigInteger('deleted_by')->nullable();
+            $table->softDeletes();
             $table->foreign('business_category_id')->references('id')->on('business_categories');
             $table->timestamps();
         });
@@ -25,6 +29,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('sub_categories');
+        // Schema::dropIfExists('sub_categories');
+        Schema::create('sub_categories', function (Blueprint $table) {
+            $table->dropSoftDeletes();
+        });
     }
 };

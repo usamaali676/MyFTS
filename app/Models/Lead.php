@@ -4,11 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Lead extends Model
 {
     use HasFactory;
-    protected $fillable = [ 'category_id', 'saler_id', 'business_name_adv', 'business_number_adv',	'off_email', 'website_url' , 	'lead_status', 'call_status', 'call_back_time',
+    use SoftDeletes;
+    protected $dates = ['deleted_at'];
+    protected $fillable = [ 'category_id', 'saler_id', 'business_name_adv', 'business_number_adv',	'off_email', 'website_url' , 	'lead_status', 'call_status', 'call_back_time', 'created_by', 'updated_by', 'deleted_by'
     ];
 
     public function category() {
