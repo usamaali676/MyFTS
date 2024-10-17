@@ -227,9 +227,18 @@
         <div class="col-12">
             <!-- Role Table -->
             <div class="card">
+                @if ($errors->any())
+                <div class="alert alert-danger">
+                    <ul>
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+                @endif
                 <h5 class="card-header">Roles</h5>
                 <div class="card-datatable table-responsive">
-                    <table class="dt-responsive table table-bordered">
+                    <table id="recodetable" class="table table-bordered">
                         <thead>
                             <tr>
                                 <th></th>
@@ -274,6 +283,7 @@
             </div>
             <!--/ Role Table -->
         </div>
+
     </div>
     <!--/ Role cards -->
 
@@ -326,28 +336,28 @@
                                                     <div class="form-check me-3 me-lg-5">
                                                         <input class="form-check-input" type="checkbox"
                                                             name="permissions[{{ $perms }}][create]"
-                                                            id="create_{{ $perms }}" />
+                                                            id="create_{{ $perms }}"  />
                                                         <label class="form-check-label" for="create_{{ $perms }}">
                                                             Create </label>
                                                     </div>
                                                     <div class="form-check me-3 me-lg-5">
                                                         <input class="form-check-input" type="checkbox"
                                                             name="permissions[{{ $perms }}][view]"
-                                                            id="view_{{ $perms }}" />
+                                                            id="view_{{ $perms }}"  />
                                                         <label class="form-check-label" for="view_{{ $perms }}"> View
                                                         </label>
                                                     </div>
                                                     <div class="form-check me-3 me-lg-5">
                                                         <input class="form-check-input" type="checkbox"
                                                             name="permissions[{{ $perms }}][edit]"
-                                                            id="edit_{{ $perms }}" />
+                                                            id="edit_{{ $perms }}"  />
                                                         <label class="form-check-label" for="edit_{{ $perms }}"> Edit
                                                         </label>
                                                     </div>
                                                     <div class="form-check">
                                                         <input class="form-check-input" type="checkbox"
                                                             name="permissions[{{ $perms }}][delete]"
-                                                            id="delete_{{ $perms }}" />
+                                                            id="delete_{{ $perms }}"  />
                                                         <label class="form-check-label" for="delete_{{ $perms }}">
                                                             Delete </label>
                                                     </div>
@@ -413,7 +423,7 @@
 
     <!-- / Add Role Modal -->
     {{-- <div class="modal fade" id="basicModal" tabindex="-1" aria-hidden="true"> --}}
-        
+
     <!-- Edit Role Modal -->
    {{-- <div class="modal fade" id="editRoleModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered modal-add-new-role">
@@ -500,6 +510,13 @@
 });
 
 </script>
+
+<script src="{{ asset('assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js') }}"></script>
+<script>
+    $('#recodetable').DataTable();
+
+</script>
+
 {{-- <script>
     document.addEventListener('DOMContentLoaded', function() {
         const deleteButtons = document.querySelectorAll('.delete-record');

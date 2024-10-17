@@ -7,6 +7,7 @@ use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use RealRashid\SweetAlert\Facades\Alert;
 
 
@@ -48,20 +49,24 @@ class RoleController extends Controller
         // Create the role
         $role = Role::create([
             'name' => $request->modalRoleName,
+            'created_by' => Auth::user()->id,
         ]);
 
         // Save permissions
-        foreach ($request->permissions as $permName => $permData) {
-            Permission::create([
-                'role_id' => $role->id,
-                'name' => $permName,
-                'create' => isset($permData['create']),
-                'view' => isset($permData['view']),
-                'edit' => isset($permData['edit']),
-                'delete' => isset($permData['delete']),
-            ]);
+        if(isset($request->permissions)){
+            foreach ($request->permissions as $permName => $permData) {
+                Permission::create([
+                    'role_id' => $role->id,
+                    'name' => $permName,
+                    'create' => isset($permData['create']),
+                    'view' => isset($permData['view']),
+                    'edit' => isset($permData['edit']),
+                    'delete' => isset($permData['delete']),
+                ]);
+            }
         }
         return redirect()->back();
+
 
     }
 
@@ -112,27 +117,30 @@ class RoleController extends Controller
 
             // Update the role name
             $role->name = $request->modalRoleName;
+            $role->updated_by = Auth::user()->id;
             $role->save();
 
             // Update permissions
-            foreach ($request->permissions as $permName => $permData) {
-                $permission = Permission::where('role_id', $role->id)->where('name', $permName)->first();
-                if ($permission) {
-                    $permission->create = isset($permData['create']);
-                    $permission->view = isset($permData['view']);
-                    $permission->edit = isset($permData['edit']);
-                    $permission->delete = isset($permData['delete']);
-                    $permission->save();
-                } else {
-                    // If the permission does not exist, you might want to create it (optional)
-                    Permission::create([
-                        'role_id' => $role->id,
-                        'name' => $permName,
-                        'create' => isset($permData['create']),
-                        'view' => isset($permData['view']),
-                        'edit' => isset($permData['edit']),
-                        'delete' => isset($permData['delete']),
-                    ]);
+            if(isset($request->permissions)){
+                foreach ($request->permissions as $permName => $permData) {
+                    $permission = Permission::where('role_id', $role->id)->where('name', $permName)->first();
+                    if ($permission) {
+                        $permission->create = isset($permData['create']);
+                        $permission->view = isset($permData['view']);
+                        $permission->edit = isset($permData['edit']);
+                        $permission->delete = isset($permData['delete']);
+                        $permission->save();
+                    } else {
+                        // If the permission does not exist, you might want to create it (optional)
+                        Permission::create([
+                            'role_id' => $role->id,
+                            'name' => $permName,
+                            'create' => isset($permData['create']),
+                            'view' => isset($permData['view']),
+                            'edit' => isset($permData['edit']),
+                            'delete' => isset($permData['delete']),
+                        ]);
+                    }
                 }
             }
             Alert::success('success', "Role Update Successfully");
@@ -145,7 +153,7 @@ class RoleController extends Controller
     public function destroy($id)
     {
         $role = Role::find($id);
-        dd($role);
+        // dd($role);
         if ($role->id == 1) {
             Alert::error('error', 'Cannot delete the admin role');
             return redirect()->route('role.index');
@@ -157,6 +165,8 @@ class RoleController extends Controller
                 return redirect()->route('role.index');
             }
             else{
+                $role->deleted_by = Auth::user()->id;
+                $role->save();
                 $role->delete();
                 Alert::success('success', 'Role deleted successfully');
                 return redirect()->route('role.index');
