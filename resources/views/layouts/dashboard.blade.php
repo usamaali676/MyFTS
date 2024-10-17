@@ -130,6 +130,144 @@
         });
     });
     </script>
+    <script>
+        $('.navbar-nav').click(function (e) {
+            e.preventDefault();
+            $('.navbar-search-wrapper').removeClass('d-none')
+            // $('#global_search').onkeypress(function (e) {
+
+            // });
+            $('#global_search').keyup(function (e) {
+                let query = $(this).val().toLowerCase();
+                // alert(searchValue);
+                $.ajax({
+                    url: "{{ route('front.global_search') }}",
+                    type: 'GET',
+                    data: { query: query },
+                    dataType: "JSON",
+                    success: function (response) {
+                        // alert("Success")  ;
+                        // let searchData = JSON.parse(response);
+                        let searchData = response;
+
+                        console.log(searchData.leads);
+                        if(query.length > 0){
+                        $('.navbar-search-suggestion').addClass('d-block');
+                        }
+                        else {
+                            $('.navbar-search-suggestion').removeClass('d-block');
+                        }
+                        let usersearchResultHtml = '';
+                        let userappendvalue = '';
+                        if(searchData.users.length > 0) {
+
+                            searchData.users.forEach(item => {
+                                userappendvalue += '<a href="#"><div><span class="align-middle">'+ item.name + '</span></div></a>';
+                            });
+
+                        }
+                        else{
+                            userappendvalue += '<p class="py-2 mb-0"><i class="mdi mdi-alert-circle-outline me-2 mdi-14px"></i> No Results Found</p>'
+                            }
+                            usersearchResultHtml = '<div class="not-found px-3 py-2">\
+                                                    <h6 class="suggestions-header text-primary mb-2">Users</h6>\
+                                                    ' + userappendvalue + '\
+                                                </div>'
+
+                            $('.tt-dataset-users').html(usersearchResultHtml);
+
+                            let searchResultHtml = '';
+                            let appendvalue = '';
+                        if(searchData.role.length > 0){
+
+                            searchData.role.forEach(item => {
+                                appendvalue += '<a href="#"><div><span class="align-middle">'+ item.name + '</span></div></a>';
+                            });
+                        }
+                        else{
+                            appendvalue += '<p class="py-2 mb-0"><i class="mdi mdi-alert-circle-outline me-2 mdi-14px"></i> No Results Found</p>'
+                            }
+
+                            searchResultHtml = '<div class="not-found px-3 py-2">\
+                                                    <h6 class="suggestions-header text-primary mb-2">Roles</h6>\
+                                                    ' + appendvalue + '\
+                                                </div>'
+                            $('.tt-dataset-roles').html(searchResultHtml);
+
+
+                            let leadsearchResultHtml = '';
+                            let leadappendvalue = '';
+
+                        if(searchData.leads.length > 0){
+                            searchData.leads.forEach(item => {
+                                leadappendvalue += '<a href="#"><div><span class="align-middle">'+ item.business_name_adv + '</span></div></a>';
+                            });
+                        }
+                        else{
+                            leadappendvalue += '<p class="py-2 mb-0"><i class="mdi mdi-alert-circle-outline me-2 mdi-14px"></i> No Results Found</p>'
+                            }
+
+                            leadsearchResultHtml = '<div class="not-found px-3 py-2">\
+                                                    <h6 class="suggestions-header text-primary mb-2">Leads</h6>\
+                                                    ' + leadappendvalue + '\
+                                                </div>'
+                            $('.tt-dataset-leads').html(leadsearchResultHtml);
+
+
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error occurred: " + error);
+                    }
+                });
+            });
+            // alert("sdfjsdbf");
+        });
+
+//         $(document).click(function (e) {
+//     // Check if the click happened outside the .navbar-nav
+//     if (!$(e.target).closest('.navbar-nav').length) {
+//         $('.navbar-search-wrapper').addClass('d-none');
+//     }
+// });
+    </script>
+
+    {{-- <script>
+            window.Helpers.initSidebarToggle();
+
+var searchToggler = $('.search-toggler'),
+  searchInputWrapper = $('.search-input-wrapper'),
+  searchInput = $('.search-input'),
+  contentBackdrop = $('.content-backdrop');
+
+// Open search input on click of search icon
+if (searchToggler.length) {
+  searchToggler.on('click', function () {
+    if (searchInputWrapper.length) {
+      searchInputWrapper.toggleClass('d-none');
+      searchInput.focus();
+    }
+  });
+}
+
+// Open search on 'CTRL+/'
+$(document).on('keydown', function (event) {
+  let ctrlKey = event.ctrlKey,
+    slashKey = event.which === 191;
+
+  if (ctrlKey && slashKey) {
+    if (searchInputWrapper.length) {
+      searchInputWrapper.toggleClass('d-none');
+      searchInput.focus();
+    }
+  }
+});
+$('.navbar-search-suggestion').each(function () {
+        psSearch = new PerfectScrollbar($(this)[0], {
+          wheelPropagation: false,
+          suppressScrollX: true
+        });
+      });
+    </script> --}}
 
 
 {{-- <script>
@@ -312,7 +450,234 @@
 
 
     </script>
-    <script>
+
+    {{-- <script>
+$(function () {
+  // Initialize sidebar and other DOM elements
+  window.Helpers.initSidebarToggle();
+
+  var searchToggler = $('.search-toggler'),
+    searchInputWrapper = $('.search-input-wrapper'),
+    searchInput = $('.search-input'),
+    contentBackdrop = $('.content-backdrop');
+
+  // Toggle the search input when the search icon is clicked
+  if (searchToggler.length) {
+    searchToggler.on('click', function () {
+      if (searchInputWrapper.length) {
+        searchInputWrapper.toggleClass('d-none');
+        searchInput.focus();
+      }
+    });
+  }
+
+  // Search input toggles with 'CTRL+/' keypress
+  $(document).on('keydown', function (event) {
+    let ctrlKey = event.ctrlKey,
+      slashKey = event.which === 191;
+    if (ctrlKey && slashKey) {
+      if (searchInputWrapper.length) {
+        searchInputWrapper.toggleClass('d-none');
+        searchInput.focus();
+      }
+    }
+  });
+
+  // Adjust typeahead container width when search input gains focus
+  setTimeout(function () {
+    var twitterTypeahead = $('.twitter-typeahead');
+    searchInput.on('focus', function () {
+      if (searchInputWrapper.hasClass('container-xxl')) {
+        searchInputWrapper.find(twitterTypeahead).addClass('container-xxl');
+        twitterTypeahead.removeClass('container-fluid');
+      } else if (searchInputWrapper.hasClass('container-fluid')) {
+        searchInputWrapper.find(twitterTypeahead).addClass('container-fluid');
+        twitterTypeahead.removeClass('container-xxl');
+      }
+    });
+  }, 10);
+
+  if (searchInput.length) {
+    var filterConfig = function (data) {
+      return function findMatches(q, cb) {
+        let matches = [];
+        data.filter(function (i) {
+          if (i.name.toLowerCase().startsWith(q.toLowerCase())) {
+            matches.push(i);
+          } else if (
+            !i.name.toLowerCase().startsWith(q.toLowerCase()) &&
+            i.name.toLowerCase().includes(q.toLowerCase())
+          ) {
+            matches.push(i);
+            matches.sort(function (a, b) {
+              return b.name < a.name ? 1 : -1;
+            });
+          }
+        });
+        cb(matches);
+      };
+    };
+
+    // Perform search on keyup
+    searchInput.on('keyup', function () {
+      let query = $(this).val();
+
+      // AJAX call to fetch data
+      $.ajax({
+        url: "{{ route('front.global_search') }}",
+        type: 'GET',
+        data: { query: query },
+        dataType: 'json',
+        success: function (searchData) {
+          console.log(searchData);  // Check the data received from the backend
+
+          // Init typeahead with the received searchData
+          searchInput.typeahead(
+            {
+              hint: false,
+              classNames: {
+                menu: 'tt-menu navbar-search-suggestion',
+                cursor: 'active',
+                suggestion: 'suggestion d-flex justify-content-between px-3 py-2 w-100'
+              }
+            },
+            // Users
+            {
+              name: 'users',
+              display: 'name',
+              limit: 5,
+              source: filterConfig(searchData.users),
+              templates: {
+                header: '<h6 class="suggestions-header text-primary mb-0 mx-3 mt-3 pb-2">User</h6>',
+                suggestion: function ({ name }) {
+                  return '<a href="#"><div><span class="align-middle">' + name + '</span></div></a>';
+                },
+                notFound:
+                  '<div class="not-found px-3 py-2">' +
+                  '<h6 class="suggestions-header text-primary mb-2">Users</h6>' +
+                  '<p class="py-2 mb-0"><i class="mdi mdi-alert-circle-outline me-2 mdi-14px"></i> No Results Found</p>' +
+                  '</div>'
+              }
+            },
+            // Services
+            {
+              name: 'services',
+              display: 'name',
+              limit: 5,
+              source: filterConfig(searchData.role),
+              templates: {
+                header: '<h6 class="suggestions-header text-primary mb-0 mx-3 mt-3 pb-2">Roles</h6>',
+                suggestion: function ({ name }) {
+                  return '<a href="#"><div><span class="align-middle">' + name + '</span></div></a>';
+                },
+                notFound:
+                  '<div class="not-found px-3 py-2">' +
+                  '<h6 class="suggestions-header text-primary mb-2">Roles</h6>' +
+                  '<p class="py-2 mb-0"><i class="mdi mdi-alert-circle-outline me-2 mdi-14px"></i> No Results Found</p>' +
+                  '</div>'
+              }
+            }
+          );
+
+          // Handle typeahead rendering and other events
+          searchInput.bind('typeahead:render', function () {
+            contentBackdrop.addClass('show').removeClass('fade');
+          }).bind('typeahead:select', function (ev, suggestion) {
+            if (suggestion.url) {
+              window.location = suggestion.url;
+            }
+          }).bind('typeahead:close', function () {
+            searchInput.val('');
+            $(this).typeahead('val', '');
+            searchInputWrapper.addClass('d-none');
+            contentBackdrop.addClass('fade').removeClass('show');
+          });
+
+          // Init typeahead with the received searchData
+          searchInput.typeahead(
+            {
+              hint: false,
+              classNames: {
+                menu: 'tt-menu navbar-search-suggestion',
+                cursor: 'active',
+                suggestion: 'suggestion d-flex justify-content-between px-3 py-2 w-100'
+              }
+            },
+            // Users
+            {
+              name: 'users',
+              display: 'name',
+              limit: 5,
+              source: filterConfig(searchData.users),
+              templates: {
+                header: '<h6 class="suggestions-header text-primary mb-0 mx-3 mt-3 pb-2">User</h6>',
+                suggestion: function ({ name }) {
+                  return '<a href="#"><div><span class="align-middle">' + name + '</span></div></a>';
+                },
+                notFound:
+                  '<div class="not-found px-3 py-2">' +
+                  '<h6 class="suggestions-header text-primary mb-2">Users</h6>' +
+                  '<p class="py-2 mb-0"><i class="mdi mdi-alert-circle-outline me-2 mdi-14px"></i> No Results Found</p>' +
+                  '</div>'
+              }
+            },
+            // Services
+            {
+              name: 'services',
+              display: 'name',
+              limit: 5,
+              source: filterConfig(searchData.role),
+              templates: {
+                header: '<h6 class="suggestions-header text-primary mb-0 mx-3 mt-3 pb-2">Roles</h6>',
+                suggestion: function ({ name }) {
+                  return '<a href="#"><div><span class="align-middle">' + name + '</span></div></a>';
+                },
+                notFound:
+                  '<div class="not-found px-3 py-2">' +
+                  '<h6 class="suggestions-header text-primary mb-2">Roles</h6>' +
+                  '<p class="py-2 mb-0"><i class="mdi mdi-alert-circle-outline me-2 mdi-14px"></i> No Results Found</p>' +
+                  '</div>'
+              }
+            }
+          );
+
+          // Handle typeahead rendering and other events
+          searchInput.bind('typeahead:render', function () {
+            contentBackdrop.addClass('show').removeClass('fade');
+          }).bind('typeahead:select', function (ev, suggestion) {
+            if (suggestion.url) {
+              window.location = suggestion.url;
+            }
+          }).bind('typeahead:close', function () {
+            searchInput.val('');
+            $(this).typeahead('val', '');
+            searchInputWrapper.addClass('d-none');
+            contentBackdrop.addClass('fade').removeClass('show');
+          });
+
+        },
+        error: function (xhr, status, error) {
+          console.error("Error occurred: " + error);
+        }
+      });
+    });
+
+    // Initialize PerfectScrollbar
+    var psSearch;
+    $('.navbar-search-suggestion').each(function () {
+      psSearch = new PerfectScrollbar($(this)[0], {
+        wheelPropagation: false,
+        suppressScrollX: true
+      });
+    });
+    searchInput.on('keyup', function () {
+      psSearch.update();
+    });
+  }
+});
+</script> --}}
+
+    {{-- <script>
           $(function () {
     // ! TODO: Required to load after DOM is ready, did this now with jQuery ready.
     window.Helpers.initSidebarToggle();
@@ -394,12 +759,19 @@
       if ($('#layout-menu').hasClass('menu-horizontal')) {
         var searchJson = 'search-horizontal.json'; // For vertical layout
       }
+
+      searchInput.on('keyup', function () {
+        let query = $(this).val();
+        console.log(query);
+
       // Search API AJAX call
       var  searchData = $.ajax({
           url: "{{ route('front.global_search') }}",
           type: 'GET',
           data: { query: query },
       }).responseJSON;
+      console.log(searchData);
+
       // Init typeahead on searchInput
       searchInput.each(function () {
         var $this = $(this);
@@ -415,10 +787,10 @@
               },
               // Clients
               {
-                name: 'clients',
+                name: 'users',
                 display: 'name',
                 limit: 5,
-                source: filterConfig(searchData.clients),
+                source: filterConfig(searchData.users),
                 templates: {
                   header: '<h6 class="suggestions-header text-primary mb-0 mx-3 mt-3 pb-2">Clients</h6>',
                   suggestion: function ({ name }) {
@@ -436,7 +808,7 @@
                 name: 'services',
                 display: 'name',
                 limit: 5,
-                source: filterConfig(searchData.services),
+                source: filterConfig(searchData.role),
                 templates: {
                   header: '<h6 class="suggestions-header text-primary mb-0 mx-3 mt-3 pb-2">Services</h6>',
                   suggestion: function ({ name }) {
@@ -449,42 +821,7 @@
                     '</div>'
                 }
               },
-              // Keywords
-              {
-                name: 'keywords',
-                display: 'word',
-                limit: 5,
-                source: filterConfig(searchData.keywords),
-                templates: {
-                  header: '<h6 class="suggestions-header text-primary mb-0 mx-3 mt-3 pb-2">Keywords</h6>',
-                  suggestion: function ({ word }) {
-                    return '<a href="#"><div><span class="align-middle">' + word + '</span></div></a>';
-                  },
-                  notFound:
-                    '<div class="not-found px-3 py-2">' +
-                    '<h6 class="suggestions-header text-primary mb-2">Keywords</h6>' +
-                    '<p class="py-2 mb-0"><i class="mdi mdi-alert-circle-outline me-2 mdi-14px"></i> No Results Found</p>' +
-                    '</div>'
-                }
-              },
-              // Service Areas
-              {
-                name: 'serviceAreas',
-                display: 'area_name',
-                limit: 5,
-                source: filterConfig(searchData.serviceAreas),
-                templates: {
-                  header: '<h6 class="suggestions-header text-primary mb-0 mx-3 mt-3 pb-2">Service Areas</h6>',
-                  suggestion: function ({ area_name }) {
-                    return '<a href="#"><div><span class="align-middle">' + area_name + '</span></div></a>';
-                  },
-                  notFound:
-                    '<div class="not-found px-3 py-2">' +
-                    '<h6 class="suggestions-header text-primary mb-2">Service Areas</h6>' +
-                    '<p class="py-2 mb-0"><i class="mdi mdi-alert-circle-outline me-2 mdi-14px"></i> No Results Found</p>' +
-                    '</div>'
-                }
-              }
+
             )
 
           //On typeahead result render.
@@ -518,6 +855,8 @@
         });
       });
 
+    });
+
       // Init PerfectScrollbar in search result
       var psSearch;
       $('.navbar-search-suggestion').each(function () {
@@ -526,12 +865,13 @@
           suppressScrollX: true
         });
       });
-
       searchInput.on('keyup', function () {
         psSearch.update();
       });
+
+
     }
   });
-    </script>
+    </script> --}}
   </body>
 </html>

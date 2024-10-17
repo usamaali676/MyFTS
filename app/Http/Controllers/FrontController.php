@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Lead;
 use App\Models\Role;
 use App\Models\SubCategory;
 use App\Models\User;
@@ -29,6 +30,11 @@ class FrontController extends Controller
                 // Search Services
                 $role = Role::where('name', 'LIKE', "%{$searchTerm}%")->get();
 
+                $lead = Lead::where('business_name_adv', 'LIKE', "%{$searchTerm}%")
+                ->orWhere('business_number_adv', 'LIKE', "%{$searchTerm}%")
+                ->orwhere('off_email', 'LIKE', "%{$searchTerm}%")
+                ->get();
+
                 // Search Keywords
                 // $keywords = Keyword::where('word', 'LIKE', "%{$searchTerm}%")->get();
 
@@ -39,6 +45,7 @@ class FrontController extends Controller
                 $results = [
                     'users' => $users,
                     'role' => $role,
+                    'leads' => $lead,
                     // 'keywords' => $keywords,
                     // 'serviceAreas' => $serviceAreas,
                 ];

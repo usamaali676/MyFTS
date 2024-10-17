@@ -106,7 +106,7 @@
                     </div>
                     <div class="col-md-6">
                         <div class="form-floating form-floating-outline">
-                            <input type="number" id="multicol-last-name" name="business_number" class="form-control"
+                            <input type="text" pattern="\d*" maxlength="15" id="multicol-last-name" name="business_number" class="form-control"
                                 placeholder="
                                 +1111111111" />
                             <label for="multicol-last-name">Business Number</label>
@@ -132,6 +132,27 @@
                             <input type="text" class="form-control " name="website_url"
                                 placeholder="Example.com" aria-label="Example.com" />
                             <label for="multicol-phone">Website Url</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-floating form-floating-outline">
+                            <input type="text" class="form-control " name="client_name"
+                                placeholder="Client Name" aria-label="client_name" />
+                            <label for="client_name">Client Name</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-floating form-floating-outline">
+                            <input type="text" class="form-control " name="client_address"
+                                placeholder="Client Address" aria-label="client_address" />
+                            <label for="client_address">Client Address</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-floating form-floating-outline">
+                            <input type="text" class="form-control " name="client_designation"
+                                placeholder="Client Designation" aria-label="client_designation" />
+                            <label for="client_designation">Client Designation</label>
                         </div>
                     </div>
                     <div class="col-md-6">
@@ -168,6 +189,22 @@
 
                             </select>
                             <label for="lead-status">Lead Status</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6 select2-primary">
+                        <div class="form-floating form-floating-outline">
+                            <select id="multicol-closers" name="closers[]" class="select2 form-select" multiple
+                                >
+                                <option value="">Please Select</option>
+                                @foreach ($closers as $user)
+                                    <option value="{{ $user->id }}">{{ $user->name }}</option>
+                                @endforeach
+                                {{-- <option value="en" selected>English</option>
+                                <option value="fr" selected>French</option>
+                                <option value="de">German</option>
+                                <option value="pt">Portuguese</option> --}}
+                            </select>
+                            <label for="multicol-closers">Select Closers</label>
                         </div>
                     </div>
                 </div>

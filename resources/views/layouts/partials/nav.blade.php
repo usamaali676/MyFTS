@@ -22,6 +22,40 @@ id="layout-navbar">
   </div>
   <!-- /Search -->
 
+  <div class="navbar-search-wrapper search-input-wrapper ">
+<span class="twitter-typeahead" style="position: relative; display: inline-block;">
+    <input type="text" id="global_search"
+            class="form-control search-input container-xxl border-0 tt-input" placeholder="Search..." aria-label="Search..."
+            autocomplete="off" spellcheck="false" dir="auto" style="position: relative; vertical-align: top;">
+        <pre aria-hidden="true"
+            style="position: absolute; visibility: hidden; white-space: pre; font-family: Inter, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Oxygen, Ubuntu, Cantarell, &quot;Fira Sans&quot;, &quot;Droid Sans&quot;, &quot;Helvetica Neue&quot;, sans-serif; font-size: 15px; font-style: normal; font-variant: normal; font-weight: 400; word-spacing: 0px; letter-spacing: 0px; text-indent: 0px; text-rendering: auto; text-transform: none;"></pre>
+        <div class="tt-menu navbar-search-suggestion"
+            style="position: absolute; top: 100%; left: 0px; z-index: 100; ">
+            <div class="tt-dataset tt-dataset-users">
+
+            </div>
+            <div class="tt-dataset tt-dataset-roles"></div>
+            <div class="tt-dataset tt-dataset-leads"></div>
+        </div>
+        {{-- <div class="tt-menu navbar-search-suggestion"
+            style="position: absolute; top: 100%; left: 0px; z-index: 100; ">
+            <div class="tt-dataset tt-dataset-users">
+                <div class="not-found px-3 py-2">
+                    <h6 class="suggestions-header text-primary mb-2">Users</h6>
+                    <p class="py-2 mb-0"><i class="mdi mdi-alert-circle-outline me-2 mdi-14px"></i> No Results Found</p>
+                </div>
+            </div>
+            <div class="tt-dataset tt-dataset-services">
+                <div class="not-found px-3 py-2">
+                    <h6 class="suggestions-header text-primary mb-2">Roles</h6>
+                    <p class="py-2 mb-0"><i class="mdi mdi-alert-circle-outline me-2 mdi-14px"></i> No Results Found</p>
+                </div>
+            </div>
+        </div> --}}
+    </span>  </div>
+
+
+
   <ul class="navbar-nav flex-row align-items-center ms-auto">
     <!-- Language -->
     {{-- <li class="nav-item dropdown-language dropdown me-1 me-xl-0">

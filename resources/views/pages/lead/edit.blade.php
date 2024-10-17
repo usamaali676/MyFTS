@@ -99,6 +99,27 @@
                     </div>
                     <div class="col-md-6">
                         <div class="form-floating form-floating-outline">
+                            <input type="text" class="form-control " name="client_name"
+                                placeholder="Client Name" aria-label="client_name" value="{{ $lead->client_name }}" />
+                            <label for="client_name">Client Name</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-floating form-floating-outline">
+                            <input type="text" class="form-control " name="client_address"
+                                placeholder="Client Address" aria-label="client_address" value="{{ $lead->client_address }}"/>
+                            <label for="client_address">Client Address</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-floating form-floating-outline">
+                            <input type="text" class="form-control " name="client_designation"
+                                placeholder="Client Designation" aria-label="client_designation" value="{{ $lead->client_designation }}"/>
+                            <label for="client_designation">Client Designation</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-floating form-floating-outline">
                             <select id="call-status" name="call_status" class="select2 form-select"
                                 data-allow-clear="true">
 
@@ -141,6 +162,29 @@
 
                             </select>
                             <label for="lead-status">Lead Status</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6 select2-primary">
+                        <div class="form-floating form-floating-outline">
+                            <select id="multicol-closers" name="closers[]" class="select2 form-select" multiple
+                                >
+
+                                @if(isset($lead->closers))
+                                @foreach ($lead->closers as $item)
+                                    <option value="{{ $item->closer_id }}" selected>{{ $item->user->name }}</option>
+                                @endforeach
+                                @else
+                                <option value="">Please Select</option>
+                                @endif
+                                @foreach ($closers as $item)
+                                <option value="{{ $item->id }}">{{ $item->name }}</option>
+                                @endforeach
+                                {{-- <option value="en" selected>English</option>
+                                <option value="fr" selected>French</option>
+                                <option value="de">German</option>
+                                <option value="pt">Portuguese</option> --}}
+                            </select>
+                            <label for="multicol-closers">Select Closers</label>
                         </div>
                     </div>
                 </div>
