@@ -45,6 +45,7 @@ class LeadController extends Controller
             'business_name' => 'required',
             'business_number' => 'required',
             'category' => 'required',
+
         ]);
       $lead = Lead::create([
             'business_name_adv' => $request->business_name,
