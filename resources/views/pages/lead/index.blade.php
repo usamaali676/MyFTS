@@ -2,6 +2,10 @@
 @section('css')
 <link rel="stylesheet" href="{{ asset('assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css') }}" />
 <link rel="stylesheet" href="{{ asset('assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css') }}" />
+<link
+    href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css"
+    rel="stylesheet"
+/>
 @endsection
 @section('content')
           <!-- Content wrapper -->
@@ -49,7 +53,9 @@
                             <td>{{ $item->saler->name }}</td>
                             <td>{{ $item->call_status }}</td>
                             <td>
-                                <div class="d-inline-block text-nowrap"><button
+                                <div class="d-inline-block text-nowrap">
+                                    <a href="{{ route('sale.create', $item->id) }}" class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect" data-bs-toggle="tooltip" title="Preview"><i class="ri-send-plane-2-line ri-20px"></i></a>
+                                    <button
                                     class="btn btn-sm btn-icon btn-text-secondary rounded-pill dropdown-toggle hide-arrow"
                                     data-bs-toggle="dropdown" aria-expanded="false"><i class="mdi mdi-dots-vertical mdi-20px"></i></button>
                                     <div class="dropdown-menu dropdown-menu-end m-0" style=""><a
