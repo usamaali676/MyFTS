@@ -21,6 +21,15 @@
             <h5 class="card-header">Insert Data of Sale</h5>
             <form class="card-body" method="POST" action="{{ route('lead.store') }}">
                 @csrf
+                @if ($errors->any())
+                <div class="alert alert-danger">
+                    <ul>
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+                @endif
                 {{-- <div class="row g-4">
                     <div class="col-md-6">
                         <div class="form-floating form-floating-outline">

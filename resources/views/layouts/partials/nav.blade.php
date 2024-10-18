@@ -22,7 +22,7 @@ id="layout-navbar">
   </div>
   <!-- /Search -->
 
-  <div class="navbar-search-wrapper search-input-wrapper ">
+  <div class="navbar-search-wrapper search-input-wrapper d-none">
 <span class="twitter-typeahead" style="position: relative; display: inline-block;">
     <input type="text" id="global_search"
             class="form-control search-input container-xxl border-0 tt-input" placeholder="Search..." aria-label="Search..."
