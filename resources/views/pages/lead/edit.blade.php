@@ -19,12 +19,12 @@
         <!-- Multi Column with Form Separator -->
         <div class="card mb-4">
             <h5 class="card-header">Insert Data of Sale</h5>
-            <form class="card-body" method="POST" action="{{ route('lead.update', $lead->id) }}">
+            <form class="card-body" method="POST" action="{{ route('lead.update', $lead->id) }}" id="leadForm" onsubmit="return validateForm()">
                 @csrf
                 <div class="row g-4">
                     <div class="col-md-6">
                         <div class="form-floating form-floating-outline">
-                            <select id="category" name="category" class="select2 form-select" data-allow-clear="true">
+                            <select id="category" name="category" class="select2 form-select" data-allow-clear="true" required>
                                 <option value="">Please Select</option>
                                 @if(isset($lead->category_id))
                                 <option value="{{$lead->category_id}}" selected>{{$lead->category->name}}</option>
@@ -63,7 +63,8 @@
                     <div class="col-md-6">
                         <div class="form-floating form-floating-outline">
                             <input type="text" id="multicol-first-name" name="business_name" class="form-control"
-                                placeholder="John" value="{{ $lead->business_name_adv }}" />
+                                placeholder="John" value="{{ $lead->business_name_adv }}"
+                                onkeydown="return /[a-zA-Z\s]/.test(event.key) || event.key === 'Backspace' || event.key === 'Tab';" />
                             <label for="multicol-first-name">Business Name</label>
                         </div>
                     </div>
@@ -100,21 +101,24 @@
                     <div class="col-md-6">
                         <div class="form-floating form-floating-outline">
                             <input type="text" class="form-control " name="client_name"
-                                placeholder="Client Name" aria-label="client_name" value="{{ $lead->client_name }}" />
+                                placeholder="Client Name" aria-label="client_name" value="{{ $lead->client_name }}"
+                                onkeydown="return /[a-zA-Z\s]/.test(event.key) || event.key === 'Backspace' || event.key === 'Tab';"/>
                             <label for="client_name">Client Name</label>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-floating form-floating-outline">
                             <input type="text" class="form-control " name="client_address"
-                                placeholder="Client Address" aria-label="client_address" value="{{ $lead->client_address }}"/>
+                                placeholder="Client Address" aria-label="client_address" value="{{ $lead->client_address }}"
+                                onkeydown="return /[a-zA-Z0-9\/\-\_\:\,]/.test(event.key) || event.key === 'Backspace' || event.key === 'Tab';"/>
                             <label for="client_address">Client Address</label>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-floating form-floating-outline">
                             <input type="text" class="form-control " name="client_designation"
-                                placeholder="Client Designation" aria-label="client_designation" value="{{ $lead->client_designation }}"/>
+                                placeholder="Client Designation" aria-label="client_designation" value="{{ $lead->client_designation }}"
+                                onkeydown="return /[a-zA-Z\s]/.test(event.key) || event.key === 'Backspace' || event.key === 'Tab';"/>
                             <label for="client_designation">Client Designation</label>
                         </div>
                     </div>
@@ -290,5 +294,53 @@
         subcategories.prop('disabled', true);
     }
 });
+</script>
+<script>
+    function validateForm() {
+        const businessName = document.getElementById('business_name').value;
+        const businessNumber = document.getElementById('business_number').value;
+        const email = document.getElementById('basic-default-email').value;
+        const websiteUrl = document.getElementsByName('website_url')[0].value;
+        const clientName = document.getElementsByName('client_name')[0].value;
+        const clientAddress = document.getElementsByName('client_address')[0].value;
+
+        // Validate business name (only letters and spaces)
+        if (!/^[a-zA-Z\s]*$/.test(businessName)) {
+            alert('Invalid Business Name. Only letters and spaces are allowed.');
+            return false;
+        }
+
+        // Validate business number (only digits)
+        if (!/^\d*$/.test(businessNumber)) {
+            alert('Invalid Business Number. Only digits are allowed.');
+            return false;
+        }
+        const urlPattern = /^(https?:\/\/)?([a-zA-Z0-9\-]+\.)+[a-zA-Z]{2,}(\/[^\s]*)?$/;
+        if (!urlPattern.test(websiteUrl)) {
+            alert('Invalid Website URL. Please enter a valid URL (e.g., http://example.com).');
+            return false;
+        }
+
+        // Validate email format
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailPattern.test(email)) {
+            alert('Invalid Email. Please enter a valid email address.');
+            return false;
+        }
+
+        // Validate client name (only letters and spaces)
+        if (!/^[a-zA-Z\s]*$/.test(clientName)) {
+            alert('Invalid Client Name. Only letters and spaces are allowed.');
+            return false;
+        }
+
+        // Validate client address (allowing letters, digits, and certain symbols)
+        if (!/^[a-zA-Z0-9\/\-\_\:\, ]*$/.test(clientAddress)) {
+            alert('Invalid Client Address. Only letters, numbers, and certain symbols are allowed.');
+            return false;
+        }
+
+        return true; // All validations passed
+    }
 </script>
 @endsection
