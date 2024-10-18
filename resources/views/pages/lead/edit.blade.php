@@ -62,7 +62,7 @@
                     </div>
                     <div class="col-md-6">
                         <div class="form-floating form-floating-outline">
-                            <input type="text" id="multicol-first-name" name="business_name" class="form-control"
+                            <input type="text" id="business_name" name="business_name" class="form-control"
                                 placeholder="John" value="{{ $lead->business_name_adv }}"
                                 onkeydown="return /[a-zA-Z\s]/.test(event.key) || event.key === 'Backspace' || event.key === 'Tab';" />
                             <label for="multicol-first-name">Business Name</label>
@@ -70,7 +70,7 @@
                     </div>
                     <div class="col-md-6">
                         <div class="form-floating form-floating-outline">
-                            <input type="number" id="multicol-last-name" name="business_number" class="form-control"
+                            <input type="number" id="business_number" name="business_number" class="form-control"
                                 placeholder="
                                 +1111111111" value="{{ $lead->business_number_adv }}" />
                             <label for="multicol-last-name">Business Number</label>
