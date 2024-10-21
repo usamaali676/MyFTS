@@ -3,6 +3,8 @@
 <link rel="stylesheet" href="{{ asset('assets/vendor/libs/bs-stepper/bs-stepper.css') }}" />
 <link rel="stylesheet" href="{{ asset('assets/vendor/libs/bootstrap-select/bootstrap-select.css') }}" />
 <link rel="stylesheet" href="{{ asset('assets/vendor/libs/bootstrap-maxlength/bootstrap-maxlength.css') }}" />
+{{-- <link rel="stylesheet" href="{{ asset('assets/vendor/libs/jquery-timepicker/jquery-timepicker.css') }}" />
+<link rel="stylesheet" href="{{ asset('assets/vendor/libs/pickr/pickr-themes.css') }}" /> --}}
 <style>
     .col-md-5 {
         margin-top: 0.5rem;
@@ -203,195 +205,311 @@
                                         <h6 class="mb-0">Business Hours</h6>
                                         {{-- <small>From Lead Model</small> --}}
                                     </div>
-                                    <div class="col-md-12">
+                                    <div class="col-md-12" style="display: flex; flex-direction: column; gap: 25px;">
                                         <!-- Day -->
                                         <div class="row opening-day">
                                             <div class="col-md-2">
                                                 <h5>Monday <input type="hidden" name="day[]" value="Monday"></h5>
                                             </div>
-                                            <div class="col-md-5">
-                                                <select class="chosen-selec select2 form-selectt"
-                                                    data-placeholder="Opening Time" name="opening[]">
-                                                    <option label="Opening Time"></option>
-                                                    <option>Closed</option>
-                                                    <option>Open 24/7</option>
-                                                    <option>1 AM</option>
-                                                    <option>2 AM</option>
-                                                    <option>3 AM</option>
-                                                    <option>4 AM</option>
-                                                    <option>5 AM</option>
-                                                    <option>6 AM</option>
-                                                    <option>7 AM</option>
-                                                    <option>8 AM</option>
-                                                    <option>9 AM</option>
-                                                    <option>10 AM</option>
-                                                    <option>11 AM</option>
-                                                    <option>12 AM</option>
-                                                    <option>1 PM</option>
-                                                    <option>2 PM</option>
-                                                    <option>3 PM</option>
-                                                    <option>4 PM</option>
-                                                    <option>5 PM</option>
-                                                    <option>6 PM</option>
-                                                    <option>7 PM</option>
-                                                    <option>8 PM</option>
-                                                    <option>9 PM</option>
-                                                    <option>10 PM</option>
-                                                    <option>11 PM</option>
-                                                    <option>12 PM</option>
-                                                </select>
+                                            <div class="col-md-3 form-floating form-floating-outline">
+                                                <input type="time" class="form-control flatpickr-input active" name="open[]" id="monday_open">
                                             </div>
-                                            <div class="col-md-5">
-                                                <select class="chosen-select select2 form-select"
-                                                    data-placeholder="Closing Time" name="closing[]">
-                                                    <option label="Closing Time"></option>
-                                                    <option>Closed</option>
-                                                    <option>Open 24/7</option>
-                                                    <option>1 AM</option>
-                                                    <option>2 AM</option>
-                                                    <option>3 AM</option>
-                                                    <option>4 AM</option>
-                                                    <option>5 AM</option>
-                                                    <option>6 AM</option>
-                                                    <option>7 AM</option>
-                                                    <option>8 AM</option>
-                                                    <option>9 AM</option>
-                                                    <option>10 AM</option>
-                                                    <option>11 AM</option>
-                                                    <option>12 AM</option>
-                                                    <option>1 PM</option>
-                                                    <option>2 PM</option>
-                                                    <option>3 PM</option>
-                                                    <option>4 PM</option>
-                                                    <option>5 PM</option>
-                                                    <option>6 PM</option>
-                                                    <option>7 PM</option>
-                                                    <option>8 PM</option>
-                                                    <option>9 PM</option>
-                                                    <option>10 PM</option>
-                                                    <option>11 PM</option>
-                                                    <option>12 PM</option>
-                                                </select>
+                                            <div class="col-md-3 form-floating form-floating-outline">
+                                                <input type="time" class="form-control flatpickr-input active" name="closed[]" id="monday_closed">
+                                            </div>
+                                            <div class="col-md-2 d-flex" style="gap: 20px;">
+                                                <div class="form-check custom-option custom-option-basic checked">
+                                                    <label class="form-check-label custom-option-content" for="customRadioTemp1">
+                                                        <input  data-day="check" data-day-name="monday" name="check[]" class="form-check-input" type="radio" value="open" id="customRadioTemp1"
+                                                            checked="">
+                                                        <span class="custom-option-header">
+                                                            <span class="h6 mb-0">Open</span>
+                                                        </span>
+                                                    </label>
+                                                </div>
+                                                <div class="form-check custom-option custom-option-basic">
+                                                    <label class="form-check-label custom-option-content" for="customRadioTemp2">
+                                                        <input  data-day="check" data-day-name="monday" name="check[]" class="form-check-input" type="radio" value="closed"
+                                                            id="customRadioTemp2">
+                                                        <span class="custom-option-header">
+                                                            <span class="h6 mb-0">Closed</span>
+                                                        </span>
+                                                    </label>
+                                                </div>
+                                                <div class="form-check custom-option custom-option-basic">
+                                                    <label class="form-check-label custom-option-content" for="customRadioTemp3">
+                                                        <input  data-day="check" data-day-name="monday" name="check[]" class="form-check-input" type="radio" value="24/7"
+                                                            id="customRadioTemp3">
+                                                        <span class="custom-option-header">
+                                                            <span class="h6 mb-0">24/7</span>
+                                                        </span>
+                                                    </label>
+                                                </div>
+
                                             </div>
                                         </div>
                                         <!-- Day / End -->
 
                                         <!-- Day -->
-                                        <div class="row opening-day js-demo-hours">
+                                        <div class="row opening-day">
                                             <div class="col-md-2">
                                                 <h5>Tuesday <input type="hidden" name="day[]" value="Tuesday"></h5>
                                             </div>
-                                            <div class="col-md-5">
-                                                <select class="chosen-select select2 form-select"
-                                                    data-placeholder="Opening Time" name="opening[]">
-                                                    <!-- Hours added via JS (this is only for demo purpose) -->
-                                                </select>
+                                            <div class="col-md-3 form-floating form-floating-outline">
+                                                <input type="time" class="form-control flatpickr-input active" name="open[]" id="tuesday_open">
                                             </div>
-                                            <div class="col-md-5">
-                                                <select class="chosen-select select2 form-select"
-                                                    data-placeholder="Closing Time" name="closing[]">
-                                                    <!-- Hours added via JS (this is only for demo purpose) -->
-                                                </select>
+                                            <div class="col-md-3 form-floating form-floating-outline">
+                                                <input type="time" class="form-control flatpickr-input active" name="closed[]" id="tuesday_closed">
+                                            </div>
+                                            <div class="col-md-2 d-flex" style="gap: 20px;">
+                                                <div class="form-check custom-option custom-option-basic checked">
+                                                    <label class="form-check-label custom-option-content" for="customRadioTemp4">
+                                                        <input  data-day="check" data-day-name="tuesday" name="check[]" class="form-check-input" type="radio" value="open" id="customRadioTemp4"
+                                                            checked="">
+                                                        <span class="custom-option-header">
+                                                            <span class="h6 mb-0">Open</span>
+                                                        </span>
+                                                    </label>
+                                                </div>
+                                                <div class="form-check custom-option custom-option-basic">
+                                                    <label class="form-check-label custom-option-content" for="customRadioTemp5">
+                                                        <input  data-day="check" data-day-name="tuesday" name="check[]" class="form-check-input" type="radio" value="closed"
+                                                            id="customRadioTemp5">
+                                                        <span class="custom-option-header">
+                                                            <span class="h6 mb-0">Closed</span>
+                                                        </span>
+                                                    </label>
+                                                </div>
+                                                <div class="form-check custom-option custom-option-basic">
+                                                    <label class="form-check-label custom-option-content" for="customRadioTemp6">
+                                                        <input  data-day="check" data-day-name="tuesday" name="check[]" class="form-check-input" type="radio" value="24/7"
+                                                            id="customRadioTemp6">
+                                                        <span class="custom-option-header">
+                                                            <span class="h6 mb-0">24/7</span>
+                                                        </span>
+                                                    </label>
+                                                </div>
+
                                             </div>
                                         </div>
                                         <!-- Day / End -->
 
                                         <!-- Day -->
-                                        <div class="row opening-day js-demo-hours">
+                                        <div class="row opening-day">
                                             <div class="col-md-2">
                                                 <h5>Wednesday <input type="hidden" name="day[]" value="Wednesday"></h5>
                                             </div>
-                                            <div class="col-md-5">
-                                                <select class="chosen-select select2 form-select"
-                                                    data-placeholder="Opening Time" name="opening[]">
-                                                    <!-- Hours added via JS (this is only for demo purpose) -->
-                                                </select>
+                                            <div class="col-md-3 form-floating form-floating-outline">
+                                                <input type="time" class="form-control flatpickr-input active" name="open[]" id="wednesday_open">
                                             </div>
-                                            <div class="col-md-5">
-                                                <select class="chosen-select select2 form-select"
-                                                    data-placeholder="Closing Time" name="closing[]">
-                                                    <!-- Hours added via JS (this is only for demo purpose) -->
-                                                </select>
+                                            <div class="col-md-3 form-floating form-floating-outline">
+                                                <input type="time" class="form-control flatpickr-input active" name="closed[]" id="wednesday_closed">
+                                            </div>
+                                            <div class="col-md-2 d-flex" style="gap: 20px;">
+                                                <div class="form-check custom-option custom-option-basic checked">
+                                                    <label class="form-check-label custom-option-content" for="customRadioTemp7">
+                                                        <input  data-day="check" data-day-name="wednesday" name="check[]" class="form-check-input" type="radio" value="open" id="customRadioTemp7"
+                                                            checked="">
+                                                        <span class="custom-option-header">
+                                                            <span class="h6 mb-0">Open</span>
+                                                        </span>
+                                                    </label>
+                                                </div>
+                                                <div class="form-check custom-option custom-option-basic">
+                                                    <label class="form-check-label custom-option-content" for="customRadioTemp8">
+                                                        <input  data-day="check" data-day-name="wednesday" name="check[]" class="form-check-input" type="radio" value="closed"
+                                                            id="customRadioTemp8">
+                                                        <span class="custom-option-header">
+                                                            <span class="h6 mb-0">Closed</span>
+                                                        </span>
+                                                    </label>
+                                                </div>
+                                                <div class="form-check custom-option custom-option-basic">
+                                                    <label class="form-check-label custom-option-content" for="customRadioTemp9">
+                                                        <input  data-day="check" data-day-name="wednesday" name="check[]" class="form-check-input" type="radio" value="24/7"
+                                                            id="customRadioTemp9">
+                                                        <span class="custom-option-header">
+                                                            <span class="h6 mb-0">24/7</span>
+                                                        </span>
+                                                    </label>
+                                                </div>
+
                                             </div>
                                         </div>
                                         <!-- Day / End -->
 
                                         <!-- Day -->
-                                        <div class="row opening-day js-demo-hours">
+                                        <div class="row opening-day">
                                             <div class="col-md-2">
                                                 <h5>Thursday <input type="hidden" name="day[]" value="Thursday"></h5>
                                             </div>
-                                            <div class="col-md-5">
-                                                <select class="chosen-selec select2 form-selectt"
-                                                    data-placeholder="Opening Time" name="opening[]">
-                                                    <!-- Hours added via JS (this is only for demo purpose) -->
-                                                </select>
+                                            <div class="col-md-3 form-floating form-floating-outline">
+                                                <input type="time" class="form-control flatpickr-input active" name="open[]" id="thursday_open">
                                             </div>
-                                            <div class="col-md-5">
-                                                <select class="chosen-select select2 form-select"
-                                                    data-placeholder="Closing Time" name="closing[]">
-                                                    <!-- Hours added via JS (this is only for demo purpose) -->
-                                                </select>
+                                            <div class="col-md-3 form-floating form-floating-outline">
+                                                <input type="time" class="form-control flatpickr-input active" name="closed[]" id="thursday_closed">
+                                            </div>
+                                            <div class="col-md-2 d-flex" style="gap: 20px;">
+                                                <div class="form-check custom-option custom-option-basic checked">
+                                                    <label   class="form-check-label custom-option-content" for="customRadioTemp10">
+                                                        <input data-day="check" data-day-name="thursday" name="check[]" class="form-check-input" type="radio" value="open" id="customRadioTemp10"
+                                                            checked="">
+                                                        <span class="custom-option-header">
+                                                            <span class="h6 mb-0">Open</span>
+                                                        </span>
+                                                    </label>
+                                                </div>
+                                                <div class="form-check custom-option custom-option-basic">
+                                                    <label class="form-check-label custom-option-content" for="customRadioTemp11">
+                                                        <input data-day="check" data-day-name="thursday" name="check[]" class="form-check-input" type="radio" value="closed"
+                                                            id="customRadioTemp11">
+                                                        <span class="custom-option-header">
+                                                            <span  class="h6 mb-0">Closed</span>
+                                                        </span>
+                                                    </label>
+                                                </div>
+                                                <div class="form-check custom-option custom-option-basic">
+                                                    <label class="form-check-label custom-option-content" for="customRadioTemp12">
+                                                        <input data-day="check" data-day-name="thursday" name="check[]" class="form-check-input" type="radio" value="24/7"
+                                                            id="customRadioTemp12">
+                                                        <span class="custom-option-header">
+                                                            <span  class="h6 mb-0">24/7</span>
+                                                        </span>
+                                                    </label>
+                                                </div>
+
                                             </div>
                                         </div>
                                         <!-- Day / End -->
 
                                         <!-- Day -->
-                                        <div class="row opening-day js-demo-hours">
+                                        <div class="row opening-day">
                                             <div class="col-md-2">
                                                 <h5>Friday <input type="hidden" name="day[]" value="Friday"></h5>
                                             </div>
-                                            <div class="col-md-5">
-                                                <select class="chosen-select select2 form-select"
-                                                    data-placeholder="Opening Time" name="opening[]">
-                                                    <!-- Hours added via JS (this is only for demo purpose) -->
-                                                </select>
+                                            <div class="col-md-3 form-floating form-floating-outline">
+                                                <input type="time" class="form-control flatpickr-input active" name="open[]" id="friday_open">
                                             </div>
-                                            <div class="col-md-5">
-                                                <select class="chosen-select select2 form-select"
-                                                    data-placeholder="Closing Time" name="closing[]">
-                                                    <!-- Hours added via JS (this is only for demo purpose) -->
-                                                </select>
+                                            <div class="col-md-3 form-floating form-floating-outline">
+                                                <input type="time" class="form-control flatpickr-input active" name="closed[]" id="friday_closed">
+                                            </div>
+                                            <div class="col-md-2 d-flex" style="gap: 20px;">
+                                                <div class="form-check custom-option custom-option-basic checked">
+                                                    <label class="form-check-label custom-option-content" for="customRadioTemp13">
+                                                        <input  data-day="check" data-day-name="friday" name="check[]" class="form-check-input" type="radio" value="open" id="customRadioTemp13"
+                                                            checked="">
+                                                        <span class="custom-option-header">
+                                                            <span class="h6 mb-0">Open</span>
+                                                        </span>
+                                                    </label>
+                                                </div>
+                                                <div class="form-check custom-option custom-option-basic">
+                                                    <label class="form-check-label custom-option-content" for="customRadioTemp14">
+                                                        <input  data-day="check" data-day-name="friday" name="check[]" class="form-check-input" type="radio" value="closed"
+                                                            id="customRadioTemp14">
+                                                        <span class="custom-option-header">
+                                                            <span class="h6 mb-0">Closed</span>
+                                                        </span>
+                                                    </label>
+                                                </div>
+                                                <div class="form-check custom-option custom-option-basic">
+                                                    <label class="form-check-label custom-option-content" for="customRadioTemp15">
+                                                        <input  data-day="check" data-day-name="friday" name="check[]" class="form-check-input" type="radio" value="24/7"
+                                                            id="customRadioTemp15">
+                                                        <span class="custom-option-header">
+                                                            <span class="h6 mb-0">24/7</span>
+                                                        </span>
+                                                    </label>
+                                                </div>
+
                                             </div>
                                         </div>
                                         <!-- Day / End -->
 
                                         <!-- Day -->
-                                        <div class="row opening-day js-demo-hours">
+                                        <div class="row opening-day">
                                             <div class="col-md-2">
                                                 <h5>Saturday <input type="hidden" name="day[]" value="Saturday"></h5>
                                             </div>
-                                            <div class="col-md-5">
-                                                <select class="chosen-select select2 form-select"
-                                                    data-placeholder="Opening Time" name="opening[]">
-                                                    <!-- Hours added via JS (this is only for demo purpose) -->
-                                                </select>
+                                            <div class="col-md-3 form-floating form-floating-outline">
+                                                <input type="time" class="form-control flatpickr-input active" name="open[]" id="saturday_open">
                                             </div>
-                                            <div class="col-md-5">
-                                                <select class="chosen-select select2 form-select"
-                                                    data-placeholder="Closing Time" name="closing[]">
-                                                    <!-- Hours added via JS (this is only for demo purpose) -->
-                                                </select>
+                                            <div class="col-md-3 form-floating form-floating-outline">
+                                                <input type="time" class="form-control flatpickr-input active" name="closed[]" id="saturday_closed">
+                                            </div>
+                                            <div class="col-md-2 d-flex" style="gap: 20px;">
+                                                <div class="form-check custom-option custom-option-basic checked">
+                                                    <label class="form-check-label custom-option-content" for="customRadioTemp16">
+                                                        <input  data-day="check" data-day-name="saturday" name="saturday_check" class="form-check-input" type="radio" value="open" id="customRadioTemp16"
+                                                            checked="">
+                                                        <span class="custom-option-header">
+                                                            <span class="h6 mb-0">Open</span>
+                                                        </span>
+                                                    </label>
+                                                </div>
+                                                <div class="form-check custom-option custom-option-basic">
+                                                    <label class="form-check-label custom-option-content" for="customRadioTemp17">
+                                                        <input  data-day="check" data-day-name="saturday" name="saturday_check" class="form-check-input" type="radio" value="closed"
+                                                            id="customRadioTemp17">
+                                                        <span class="custom-option-header">
+                                                            <span class="h6 mb-0">Closed</span>
+                                                        </span>
+                                                    </label>
+                                                </div>
+                                                <div class="form-check custom-option custom-option-basic">
+                                                    <label class="form-check-label custom-option-content" for="customRadioTemp18">
+                                                        <input  data-day="check" data-day-name="saturday" name="saturday_check" class="form-check-input" type="radio" value="24/7"
+                                                            id="customRadioTemp18">
+                                                        <span class="custom-option-header">
+                                                            <span class="h6 mb-0">24/7</span>
+                                                        </span>
+                                                    </label>
+                                                </div>
+
                                             </div>
                                         </div>
                                         <!-- Day / End -->
 
                                         <!-- Day -->
-                                        <div class="row opening-day js-demo-hours">
+                                        <div class="row opening-day">
                                             <div class="col-md-2">
                                                 <h5>Sunday <input type="hidden" name="day[]" value="Sunday"></h5>
                                             </div>
-                                            <div class="col-md-5">
-                                                <select class="chosen-select select2 form-select"
-                                                    data-placeholder="Opening Time" name="opening[]">
-                                                    <!-- Hours added via JS (this is only for demo purpose) -->
-                                                </select>
+                                            <div class="col-md-3 form-floating form-floating-outline">
+                                                <input type="time" class="form-control flatpickr-input active" name="open[]" id="sunday_open">
                                             </div>
-                                            <div class="col-md-5">
-                                                <select class="chosen-select select2 form-select"
-                                                    data-placeholder="Closing Time" name="closing[]">
-                                                    <!-- Hours added via JS (this is only for demo purpose) -->
-                                                </select>
+                                            <div class="col-md-3 form-floating form-floating-outline">
+                                                <input type="time" class="form-control flatpickr-input active" name="closed[]" id="sunday_closed">
+                                            </div>
+                                            <div class="col-md-2 d-flex" style="gap: 20px;">
+                                                <div class="form-check custom-option custom-option-basic checked">
+                                                    <label class="form-check-label custom-option-content" for="customRadioTemp19">
+                                                        <input  data-day="check" data-day-name="sunday" name="sunday_check" class="form-check-input" type="radio" value="open" id="customRadioTemp19"
+                                                            checked="">
+                                                        <span class="custom-option-header">
+                                                            <span class="h6 mb-0">Open</span>
+                                                        </span>
+                                                    </label>
+                                                </div>
+                                                <div class="form-check custom-option custom-option-basic">
+                                                    <label class="form-check-label custom-option-content" for="customRadioTemp20">
+                                                        <input  data-day="check" data-day-name="sunday" name="sunday_check" class="form-check-input" type="radio" value="closed"
+                                                            id="customRadioTemp20">
+                                                        <span class="custom-option-header">
+                                                            <span class="h6 mb-0">Closed</span>
+                                                        </span>
+                                                    </label>
+                                                </div>
+                                                <div class="form-check custom-option custom-option-basic">
+                                                    <label class="form-check-label custom-option-content" for="customRadioTemp21">
+                                                        <input  data-day="check" data-day-name="sunday" name="sunday_check" class="form-check-input" type="radio" value="24/7"
+                                                            id="customRadioTemp21">
+                                                        <span class="custom-option-header">
+                                                            <span class="h6 mb-0">24/7</span>
+                                                        </span>
+                                                    </label>
+                                                </div>
+
                                             </div>
                                         </div>
                                         <!-- Day / End -->
@@ -402,7 +520,7 @@
                                         {{-- <small>From Lead Model</small> --}}
                                     </div>
                                     <!-- Form Repeater -->
-                                    {{-- <div class="col-12">
+                                    <div class="col-12">
                                         <div class="card">
                                             <h5 class="card-header">Form Repeater</h5>
                                             <div class="card-body">
@@ -470,7 +588,7 @@
                                                 </form>
                                             </div>
                                         </div>
-                                    </div> --}}
+                                    </div>
                                     <!-- /Form Repeater -->
                                     <div class="col-12 d-flex justify-content-between">
                                         <button class="btn btn-outline-secondary btn-prev" disabled>
@@ -668,6 +786,10 @@
     <script src="{{ asset('assets/vendor/libs/cleavejs/cleave.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/cleavejs/cleave-phone.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/bootstrap-maxlength/bootstrap-maxlength.js') }}"></script>
+    {{-- <script src="{{ asset('assets/vendor/libs/jquery-timepicker/jquery-timepicker.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/pickr/pickr.js') }}"></script>
+    <script src="{{ asset('assets/js/forms-pickers.js') }}"></script> --}}
+
     <script>
         if (formRepeater.length) {
     var row = 2;
@@ -696,38 +818,58 @@
       }
     });
   }
-});
     </script>
-    <script>
-        $(".opening-day.js-demo-hours .chosen-select").each(function() {
-        $(this).append(''+
-            '<option></option>'+
-            '<option>Closed</option>'+
-            '<option>Open 24/7</option>'+
-            '<option>1 AM</option>'+
-            '<option>2 AM</option>'+
-            '<option>3 AM</option>'+
-            '<option>4 AM</option>'+
-            '<option>5 AM</option>'+
-            '<option>6 AM</option>'+
-            '<option>7 AM</option>'+
-            '<option>8 AM</option>'+
-            '<option>9 AM</option>'+
-            '<option>10 AM</option>'+
-            '<option>11 AM</option>'+
-            '<option>12 AM</option>'+
-            '<option>1 PM</option>'+
-            '<option>2 PM</option>'+
-            '<option>3 PM</option>'+
-            '<option>4 PM</option>'+
-            '<option>5 PM</option>'+
-            '<option>6 PM</option>'+
-            '<option>7 PM</option>'+
-            '<option>8 PM</option>'+
-            '<option>9 PM</option>'+
-            '<option>10 PM</option>'+
-            '<option>11 PM</option>'+
-            '<option>12 PM</option>');
+
+<script>
+    $(document).ready(function() {
+        $('input[data-day="check"]').change(function(e) {
+            e.preventDefault();
+            var selected = $(this).val(); // Get the value of the checked radio button
+            var day = $(this).data('day-name'); // Get the day from the data attribute
+
+            if (selected == "closed" || selected == "24/7") {
+                $('#' + day + '_open').prop('disabled', true);
+                $('#' + day + '_closed').prop('disabled', true);
+            } else {
+                $('#' + day + '_open').prop('disabled', false);
+                $('#' + day + '_closed').prop('disabled', false);
+            }
+        });
     });
     </script>
+
+    {{-- <script>
+        $(document).ready(function() {
+            $('input[name$="_check"]').change(function(e) {
+                e.preventDefault();
+                var selected = $(this).val(); // Get the value of the checked radio button
+                var day = $(this).attr('name').split('_')[0]; // Get the day (e.g., "monday", "tuesday")
+
+                if (selected == "closed" || selected == "24/7") {
+                    $('#' + day + '_open').prop('disabled', true);
+                    $('#' + day + '_closed').prop('disabled', true);
+                } else {
+                    $('#' + day + '_open').prop('disabled', false);
+                    $('#' + day + '_closed').prop('disabled', false);
+                }
+            });
+        });
+        </script> --}}
+
+    {{-- <script>
+    $('input[name="monday_check"]').change(function (e) {
+        e.preventDefault();
+        var selected = $(this).val(); // Get the value of the checked radio button
+        if(selected == "closed" || selected == "24/7"){
+            $('#monday_open').prop('disabled', true);
+            $('#monday_closed').prop('disabled', true);
+        }
+        else{
+            $('#monday_open').prop('disabled', false);
+            $('#monday_closed').prop('disabled', false);
+        }
+    });
+
+    </script> --}}
+
     @endsection
