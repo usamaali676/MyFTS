@@ -86,10 +86,10 @@ Route::controller(RoleController::class)
         Route::get('delete/{id}','destroy')->name('delete');
     });
 
-    Route::controller(SaleController::class)
-    ->prefix('sale_info')
-    ->as('sale_info.')
-    ->middleware(PermissionMiddelware::class)
-    ->group(function () {
-        Route::post('store', 'store')->name('store');
-    });
+    // Route::controller(SaleController::class)
+    // ->prefix('sale_info')
+    // ->as('sale_info.')
+    // ->middleware(PermissionMiddelware::class)
+    // ->group(function () {
+    //     Route::post('store', 'store')->name('store');
+    // });
