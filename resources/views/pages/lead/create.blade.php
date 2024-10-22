@@ -41,7 +41,7 @@
                 <div class="row g-4">
                     <div class="col-md-6">
                         <div class="form-floating form-floating-outline">
-                            <select id="category" name="category" class="select2 form-select" data-allow-clear="true">
+                            <select id="category" name="category" class="select2 form-select" data-allow-clear="true" required>
                                 <option value="">Please Select</option>
                                 @foreach ($categories as $item)
                                 <option value="{{$item->id}}">{{$item->name}}</option>
@@ -67,7 +67,7 @@
                     </div>
                     <div class="col-md-6">
                         <div class="form-floating form-floating-outline">
-                            <input type="text" id="business_name" name="business_name" class="form-control"
+                            <input type="text" id="business_name" name="business_name" class="form-control" required
                                 placeholder="John"
                                 onkeydown="return /[a-zA-Z\s]/.test(event.key) || event.key === 'Backspace' || event.key === 'Tab';" />
                             <label for="multicol-first-name">Business Name</label>
@@ -80,7 +80,7 @@
                         <div class="form-floating form-floating-outline">
                             <input type="tel" pattern="\d*" maxlength="15" id="business_number"
                                 name="business_number" class="form-control" placeholder="
-                                +1111111111" />
+                                +1111111111" required/>
                             <label for="multicol-last-name">Business Number</label>
                         </div>
                     </div>
@@ -133,7 +133,7 @@
                     <div class="col-md-6">
                         <div class="form-floating form-floating-outline">
                             <select id="call-status" name="call_status" class="select2 form-select"
-                                data-allow-clear="true">
+                                data-allow-clear="true" required>
                                 <option value="">Please Select</option>
                                 <option value="Interested">Interested</option>
                                 <option value="Do Not Caller List">Do Not Caller List</option>
@@ -156,7 +156,7 @@
                     <div class="col-md-6">
                         <div class="form-floating form-floating-outline">
                             <select id="lead-status" name="lead_status" class="select2 form-select"
-                                data-allow-clear="true">
+                                data-allow-clear="true" required>
                                 <option value="">Please Select</option>
                                 <option value="Interested">Interested</option>
                                 <option value="Do Not Caller List">Do Not Caller List</option>

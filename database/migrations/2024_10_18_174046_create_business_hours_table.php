@@ -14,8 +14,9 @@ return new class extends Migration
         Schema::create('business_hours', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('sale_id');
-            $table->time('opening_time');
-            $table->time('closing_time');
+            $table->string('day');
+            $table->time('opening_time')->nullable();
+            $table->time('closing_time')->nullable();
             $table->boolean('is_closed');
             $table->boolean('is_24/7');
             $table->foreign('sale_id')->references('id')->on('sales')->onDelete()->constrained()->onDelete('cascade');
