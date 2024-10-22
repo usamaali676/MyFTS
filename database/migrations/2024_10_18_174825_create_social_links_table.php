@@ -16,7 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('sale_id');
             $table->enum('social_name', ['Website','LinkedIn' ,'Facebook' ,'Instagram' ,'TikTok', 'Youtube', 'Twitter', 'GMB', 'Yelp',]);
             $table->string('social_link');
-            $table->foreign('sale_id')->references('id')->on('sales');
+            $table->foreign('sale_id')->references('id')->on('sales')->onDelete()->constrained()->onDelete('cascade');
             $table->softDeletes();
             $table->timestamps();
         });
@@ -27,6 +27,7 @@ return new class extends Migration
      */
     public function down(): void
     {
+
         Schema::dropIfExists('social_links');
     }
 };

@@ -3,6 +3,13 @@
 <link rel="stylesheet" href="{{ asset('assets/vendor/libs/bs-stepper/bs-stepper.css') }}" />
 <link rel="stylesheet" href="{{ asset('assets/vendor/libs/bootstrap-select/bootstrap-select.css') }}" />
 <link rel="stylesheet" href="{{ asset('assets/vendor/libs/bootstrap-maxlength/bootstrap-maxlength.css') }}" />
+<link rel="stylesheet" href="{{ asset('assets/vendor/libs/bootstrap-datepicker/bootstrap-datepicker.css') }}" />
+<link rel="stylesheet" href="{{ asset('assets/vendor/libs/flatpickr/flatpickr.css') }}" />
+<link rel="stylesheet" href="{{ asset('assets/vendor/libs/bootstrap-datepicker/bootstrap-datepicker.css') }}" />
+{{-- <link rel="stylesheet" href="{{ asset('assets/vendor/libs/bootstrap-daterangepicker/bootstrap-daterangepicker.css') }}" /> --}}
+{{-- <link rel="stylesheet" href="{{ asset('assets/vendor/libs/jquery-timepicker/jquery-timepicker.css') }}" /> --}}
+<link rel="stylesheet" href="{{ asset('assets/vendor/libs/pickr/pickr-themes.css') }}" />
+
 {{-- <link rel="stylesheet" href="{{ asset('assets/vendor/libs/jquery-timepicker/jquery-timepicker.css') }}" />
 <link rel="stylesheet" href="{{ asset('assets/vendor/libs/pickr/pickr-themes.css') }}" /> --}}
 <style>
@@ -17,7 +24,7 @@
     <!-- Content -->
 
     <div class="container-xxl flex-grow-1 container-p-y">
-        <h4 class="py-3 mb-4"><span class="text-muted fw-light">Form Wizard /</span> Icons</h4>
+        <h4 class="py-3 mb-4"><span class="text-muted fw-light">Sale /</span> Client Details</h4>
 
         <!-- Default -->
         <div class="row">
@@ -97,7 +104,7 @@
                         </div>
                     </div>
                     <div class="bs-stepper-content">
-                        <form onSubmit="return false">
+                        <form id="saleForm" method="POST" action="{{ route('sale.store') }}" onsubmit="return validateForm()">
                             @csrf
                             @if ($errors->any())
                             <div class="alert alert-danger">
@@ -108,6 +115,8 @@
                                 </ul>
                             </div>
                             @endif
+                            <div id="successMessage" style="display:none;" class="alert alert-success"></div>
+
                             <!-- Account Details -->
                             <div id="account-details" class="content">
                                 <div class="content-header mb-3">
@@ -116,8 +125,9 @@
                                 </div>
                                 <div class="row g-4">
                                     <div class="col-md-6">
+                                        <input type="hidden" name="lead_id" value="{{ $lead->id }}" id="">
                                         <div class="form-floating form-floating-outline">
-                                            <select id="client_nature" name="category" class="select2 form-select"
+                                            <select id="client_nature" name="client_nature" class="select2 form-select"
                                                 data-allow-clear="true">
                                                 <option value="">Please Select</option>
                                                 @foreach ($client_enum as $item)
@@ -183,7 +193,7 @@
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-floating form-floating-outline">
-                                            <select id="category" name="category" class="select2 form-select"
+                                            <select id="category" name="call_type" class="select2 form-select"
                                                 data-allow-clear="true">
                                                 <option value="">Please Select</option>
                                                 @foreach ($call_enum as $item)
@@ -196,8 +206,330 @@
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-floating form-floating-outline">
-                                            <input type="text" class="form-control " name="time_zone"
-                                                placeholder="Client Name" aria-label="time_zone" />
+                                           <select name="timezone" class="select2 form-select" data-allow-clear="true">
+                                                <optgroup label="US Time Zones">
+                                                    <option value="America/New_York">Eastern Time (ET)</option>
+                                                    <option value="America/Chicago">Central Time (CT)</option>
+                                                    <option value="America/Denver">Mountain Time (MT)</option>
+                                                    <option value="America/Los_Angeles">Pacific Time (PT)</option>
+                                                    <option value="America/Anchorage">Alaska Time (AKT)</option>
+                                                    <option value="Pacific/Honolulu">Hawaii-Aleutian Time (HAST)</option>
+                                                </optgroup>
+
+                                                <optgroup label="Global Time Zones">
+                                                    <option value="Africa/Abidjan">GMT (Abidjan)</option>
+                                                    <option value="Africa/Accra">GMT (Accra)</option>
+                                                    <option value="Africa/Addis_Ababa">EAT (Addis Ababa)</option>
+                                                    <option value="Africa/Algiers">CET (Algiers)</option>
+                                                    <option value="Africa/Asmara">EAT (Asmara)</option>
+                                                    <option value="Africa/Bangui">WAT (Bangui)</option>
+                                                    <option value="Africa/Banjul">GMT (Banjul)</option>
+                                                    <option value="Africa/Bissau">GMT (Bissau)</option>
+                                                    <option value="Africa/Blantyre">CAT (Blantyre)</option>
+                                                    <option value="Africa/Brazzaville">WAT (Brazzaville)</option>
+                                                    <option value="Africa/Bujumbura">CAT (Bujumbura)</option>
+                                                    <option value="Africa/Cairo">EET (Cairo)</option>
+                                                    <option value="Africa/Casablanca">WET (Casablanca)</option>
+                                                    <option value="Africa/Ceuta">CET (Ceuta)</option>
+                                                    <option value="Africa/Conakry">GMT (Conakry)</option>
+                                                    <option value="Africa/Dakar">GMT (Dakar)</option>
+                                                    <option value="Africa/Dar_es_Salaam">EAT (Dar es Salaam)</option>
+                                                    <option value="Africa/Djibouti">EAT (Djibouti)</option>
+                                                    <option value="Africa/El_Aaiun">WET (El Aaiun)</option>
+                                                    <option value="Africa/Freetown">GMT (Freetown)</option>
+                                                    <option value="Africa/Gaborone">CAT (Gaborone)</option>
+                                                    <option value="Africa/Harare">CAT (Harare)</option>
+                                                    <option value="Africa/Johannesburg">SAST (Johannesburg)</option>
+                                                    <option value="Africa/Juba">CAT (Juba)</option>
+                                                    <option value="Africa/Kampala">EAT (Kampala)</option>
+                                                    <option value="Africa/Khartoum">CAT (Khartoum)</option>
+                                                    <option value="Africa/Kigali">CAT (Kigali)</option>
+                                                    <option value="Africa/Kinshasa">WAT (Kinshasa)</option>
+                                                    <option value="Africa/Lagos">WAT (Lagos)</option>
+                                                    <option value="Africa/Libreville">WAT (Libreville)</option>
+                                                    <option value="Africa/Lome">GMT (Lome)</option>
+                                                    <option value="Africa/Luanda">WAT (Luanda)</option>
+                                                    <option value="Africa/Lubumbashi">CAT (Lubumbashi)</option>
+                                                    <option value="Africa/Lusaka">CAT (Lusaka)</option>
+                                                    <option value="Africa/Malabo">WAT (Malabo)</option>
+                                                    <option value="Africa/Maputo">CAT (Maputo)</option>
+                                                    <option value="Africa/Maseru">CAT (Maseru)</option>
+                                                    <option value="Africa/Mbabane">SAST (Mbabane)</option>
+                                                    <option value="Africa/Mogadishu">EAT (Mogadishu)</option>
+                                                    <option value="Africa/Nairobi">EAT (Nairobi)</option>
+                                                    <option value="Africa/Niamey">WAT (Niamey)</option>
+                                                    <option value="Africa/Nouakchott">GMT (Nouakchott)</option>
+                                                    <option value="Africa/Ouagadougou">GMT (Ouagadougou)</option>
+                                                    <option value="Africa/Porto-Novo">WAT (Porto-Novo)</option>
+                                                    <option value="Africa/Sao_Tome">GMT (Sao Tome)</option>
+                                                    <option value="Africa/Tunis">CET (Tunis)</option>
+                                                    <option value="Africa/Tripoli">EET (Tripoli)</option>
+                                                    <option value="America/Adak">HAST (Adak)</option>
+                                                    <option value="America/Anchorage">AKST (Anchorage)</option>
+                                                    <option value="America/Anguilla">AST (Anguilla)</option>
+                                                    <option value="America/Antigua">AST (Antigua)</option>
+                                                    <option value="America/Argentina/Buenos_Aires">ART (Buenos Aires)</option>
+                                                    <option value="America/Argentina/Catamarca">ART (Catamarca)</option>
+                                                    <option value="America/Argentina/ComodRivadavia">ART (ComodRivadavia)</option>
+                                                    <option value="America/Argentina/Cordoba">ART (Cordoba)</option>
+                                                    <option value="America/Argentina/Jujuy">ART (Jujuy)</option>
+                                                    <option value="America/Argentina/La_Rioja">ART (La Rioja)</option>
+                                                    <option value="America/Argentina/Mendoza">ART (Mendoza)</option>
+                                                    <option value="America/Argentina/Rosario">ART (Rosario)</option>
+                                                    <option value="America/Argentina/Tucuman">ART (Tucuman)</option>
+                                                    <option value="America/Argentina/Ushuaia">ART (Ushuaia)</option>
+                                                    <option value="America/Aruba">AST (Aruba)</option>
+                                                    <option value="America/Asuncion">PYT (Asuncion)</option>
+                                                    <option value="America/Atikokan">EST (Atikokan)</option>
+                                                    <option value="America/Barbados">AST (Barbados)</option>
+                                                    <option value="America/Belize">CST (Belize)</option>
+                                                    <option value="America/Blanc-Sablon">AST (Blanc-Sablon)</option>
+                                                    <option value="America/Boa_Vista">AMT (Boa Vista)</option>
+                                                    <option value="America/Bogota">COT (Bogota)</option>
+                                                    <option value="America/Boise">MDT (Boise)</option>
+                                                    <option value="America/Cambridge_Bay">MDT (Cambridge Bay)</option>
+                                                    <option value="America/Cancun">EST (Cancun)</option>
+                                                    <option value="America/Caracas">VET (Caracas)</option>
+                                                    <option value="America/Cayman">EST (Cayman)</option>
+                                                    <option value="America/Chicago">CST (Chicago)</option>
+                                                    <option value="America/Chihuahua">MDT (Chihuahua)</option>
+                                                    <option value="America/Costa_Rica">CST (Costa Rica)</option>
+                                                    <option value="America/Creston">MST (Creston)</option>
+                                                    <option value="America/Cuiaba">AMT (Cuiaba)</option>
+                                                    <option value="America/Curacao">AST (Curacao)</option>
+                                                    <option value="America/Dawson">PST (Dawson)</option>
+                                                    <option value="America/Dawson_Creek">MST (Dawson Creek)</option>
+                                                    <option value="America/Denver">MDT (Denver)</option>
+                                                    <option value="America/Detroit">EDT (Detroit)</option>
+                                                    <option value="America/Dominica">AST (Dominica)</option>
+                                                    <option value="America/Edmonton">MDT (Edmonton)</option>
+                                                    <option value="America/Eirunepe">ACT (Eirunepe)</option>
+                                                    <option value="America/El_Salvador">CST (El Salvador)</option>
+                                                    <option value="America/Fortaleza">BRT (Fortaleza)</option>
+                                                    <option value="America/Fort_Wayne">EST (Fort Wayne)</option>
+                                                    <option value="America/Glace_Bay">AST (Glace Bay)</option>
+                                                    <option value="America/Godthab">WGT (Godthab)</option>
+                                                    <option value="America/Goose_Bay">AST (Goose Bay)</option>
+                                                    <option value="America/Grand_Turk">EST (Grand Turk)</option>
+                                                    <option value="America/Grenada">AST (Grenada)</option>
+                                                    <option value="America/Guadeloupe">AST (Guadeloupe)</option>
+                                                    <option value="America/Guatemala">CST (Guatemala)</option>
+                                                    <option value="America/Guyana">GYT (Guyana)</option>
+                                                    <option value="America/Halifax">AST (Halifax)</option>
+                                                    <option value="America/Havana">CST (Havana)</option>
+                                                    <option value="America/Hermosillo">MST (Hermosillo)</option>
+                                                    <option value="America/Indiana/Indianapolis">EST (Indianapolis)</option>
+                                                    <option value="America/Indiana/Knox">CST (Knox)</option>
+                                                    <option value="America/Indiana/Marengo">EST (Marengo)</option>
+                                                    <option value="America/Indiana/Petersburg">EST (Petersburg)</option>
+                                                    <option value="America/Indiana/Tell_City">CST (Tell City)</option>
+                                                    <option value="America/Indiana/Vevay">EST (Vevay)</option>
+                                                    <option value="America/Indiana/Winamac">EST (Winamac)</option>
+                                                    <option value="America/Indianapolis">EDT (Indianapolis)</option>
+                                                    <option value="America/Inuvik">MDT (Inuvik)</option>
+                                                    <option value="America/Iqaluit">EDT (Iqaluit)</option>
+                                                    <option value="America/Jamaica">EST (Jamaica)</option>
+                                                    <option value="America/Juneau">AKDT (Juneau)</option>
+                                                    <option value="America/Kentucky/Louisville">EDT (Louisville)</option>
+                                                    <option value="America/Kentucky/Monticello">EDT (Monticello)</option>
+                                                    <option value="America/Kralendijk">AST (Kralendijk)</option>
+                                                    <option value="America/La_Paz">BOT (La Paz)</option>
+                                                    <option value="America/Lima">PET (Lima)</option>
+                                                    <option value="America/Los_Angeles">PDT (Los Angeles)</option>
+                                                    <option value="America/Maceio">BRT (Maceio)</option>
+                                                    <option value="America/Managua">CST (Managua)</option>
+                                                    <option value="America/Manaus">AMT (Manaus)</option>
+                                                    <option value="America/Marigot">AST (Marigot)</option>
+                                                    <option value="America/Martinique">AST (Martinique)</option>
+                                                    <option value="America/Matamoros">CST (Matamoros)</option>
+                                                    <option value="America/Mexico_City">CST (Mexico City)</option>
+                                                    <option value="America/Miquelon">PMST (Miquelon)</option>
+                                                    <option value="America/Moncton">AST (Moncton)</option>
+                                                    <option value="America/Montreal">EDT (Montreal)</option>
+                                                    <option value="America/Montserrat">AST (Montserrat)</option>
+                                                    <option value="America/Nassau">EST (Nassau)</option>
+                                                    <option value="America/New_York">EDT (New York)</option>
+                                                    <option value="America/Nipigon">EST (Nipigon)</option>
+                                                    <option value="America/Nome">AKDT (Nome)</option>
+                                                    <option value="America/Noronha">FNT (Noronha)</option>
+                                                    <option value="America/North_Dakota/Beulah">CST (Beulah)</option>
+                                                    <option value="America/North_Dakota/Center">CST (Center)</option>
+                                                    <option value="America/North_Dakota/New_Salem">CST (New Salem)</option>
+                                                    <option value="America/Ojinaga">MDT (Ojinaga)</option>
+                                                    <option value="America/Panama">EST (Panama)</option>
+                                                    <option value="America/Phoenix">MST (Phoenix)</option>
+                                                    <option value="America/Port-au-Prince">EST (Port-au-Prince)</option>
+                                                    <option value="America/Porto_Velho">AMT (Porto Velho)</option>
+                                                    <option value="America/Puerto_Rico">AST (Puerto Rico)</option>
+                                                    <option value="America/Punta_Arenas">CLT (Punta Arenas)</option>
+                                                    <option value="America/Rainy_River">CST (Rainy River)</option>
+                                                    <option value="America/Ramallah">EET (Ramallah)</option>
+                                                    <option value="America/Rankin_Inlet">CST (Rankin Inlet)</option>
+                                                    <option value="America/Recife">BRT (Recife)</option>
+                                                    <option value="America/Regina">CST (Regina)</option>
+                                                    <option value="America/Resolute">CST (Resolute)</option>
+                                                    <option value="America/Rio_Branco">ACT (Rio Branco)</option>
+                                                    <option value="America/Santarem">AMT (Santarem)</option>
+                                                    <option value="America/Santiago">CLT (Santiago)</option>
+                                                    <option value="America/Santo_Domingo">AST (Santo Domingo)</option>
+                                                    <option value="America/Sao_Paulo">BRT (Sao Paulo)</option>
+                                                    <option value="America/Scoresbysund">EGT (Scoresbysund)</option>
+                                                    <option value="America/Sitka">AKDT (Sitka)</option>
+                                                    <option value="America/St_Barthelemy">AST (St Barthelemy)</option>
+                                                    <option value="America/St_Johns">NST (St Johns)</option>
+                                                    <option value="America/St_Kitts">AST (St Kitts)</option>
+                                                    <option value="America/St_Lucia">AST (St Lucia)</option>
+                                                    <option value="America/St_Thomas">AST (St Thomas)</option>
+                                                    <option value="America/St_Vincent">AST (St Vincent)</option>
+                                                    <option value="America/Swift_Current">CST (Swift Current)</option>
+                                                    <option value="America/Tegucigalpa">CST (Tegucigalpa)</option>
+                                                    <option value="America/Thule">WGT (Thule)</option>
+                                                    <option value="America/Thunder_Bay">EST (Thunder Bay)</option>
+                                                    <option value="America/Toronto">EDT (Toronto)</option>
+                                                    <option value="America/Tortola">AST (Tortola)</option>
+                                                    <option value="America/Vancouver">PDT (Vancouver)</option>
+                                                    <option value="America/Winnipeg">CST (Winnipeg)</option>
+                                                    <option value="America/Yakutat">AKDT (Yakutat)</option>
+                                                    <option value="America/Yellowknife">MDT (Yellowknife)</option>
+                                                    <option value="Antarctica/Casey">CAST (Casey)</option>
+                                                    <option value="Antarctica/Davis">DAVT (Davis)</option>
+                                                    <option value="Antarctica/DumontDUrville">DDT (Dumont d'Urville)</option>
+                                                    <option value="Antarctica/Macquarie">MIST (Macquarie)</option>
+                                                    <option value="Antarctica/McMurdo">NZDT (McMurdo)</option>
+                                                    <option value="Antarctica/Palmer">CLT (Palmer)</option>
+                                                    <option value="Antarctica/Syowa">SYOT (Syowa)</option>
+                                                    <option value="Antarctica/Troll">UTC (Troll)</option>
+                                                    <option value="Antarctica/Vostok">VOST (Vostok)</option>
+                                                    <option value="Arctic/Longyearbyen">CET (Longyearbyen)</option>
+                                                    <option value="Asia/Aden">AST (Aden)</option>
+                                                    <option value="Asia/Almaty">ALMT (Almaty)</option>
+                                                    <option value="Asia/Amman">EET (Amman)</option>
+                                                    <option value="Asia/Aqtau">AQTT (Aqtau)</option>
+                                                    <option value="Asia/Aqtobe">AQTT (Aqtobe)</option>
+                                                    <option value="Asia/Ashgabat">TMT (Ashgabat)</option>
+                                                    <option value="Asia/Ashkhabad">TMT (Ashkhabad)</option>
+                                                    <option value="Asia/Bahrain">AST (Bahrain)</option>
+                                                    <option value="Asia/Bangkok">ICT (Bangkok)</option>
+                                                    <option value="Asia/Barnaul">ALMT (Barnaul)</option>
+                                                    <option value="Asia/Beirut">EET (Beirut)</option>
+                                                    <option value="Asia/Bishkek">KGT (Bishkek)</option>
+                                                    <option value="Asia/Brunei">BNT (Brunei)</option>
+                                                    <option value="Asia/Chita">IRKT (Chita)</option>
+                                                    <option value="Asia/Choibalsan">ULAT (Choibalsan)</option>
+                                                    <option value="Asia/Colombo">IST (Colombo)</option>
+                                                    <option value="Asia/Damascus">EET (Damascus)</option>
+                                                    <option value="Asia/Dhaka">BST (Dhaka)</option>
+                                                    <option value="Asia/Dili">TLT (Dili)</option>
+                                                    <option value="Asia/Dubai">GST (Dubai)</option>
+                                                    <option value="Asia/Dushanbe">TJT (Dushanbe)</option>
+                                                    <option value="Asia/Famagusta">EET (Famagusta)</option>
+                                                    <option value="Asia/Gaza">EET (Gaza)</option>
+                                                    <option value="Asia/Hebron">EET (Hebron)</option>
+                                                    <option value="Asia/Ho_Chi_Minh">ICT (Ho Chi Minh)</option>
+                                                    <option value="Asia/Hong_Kong">HKT (Hong Kong)</option>
+                                                    <option value="Asia/Hovd">HOVT (Hovd)</option>
+                                                    <option value="Asia/Irkutsk">IRKT (Irkutsk)</option>
+                                                    <option value="Asia/Jakarta">WIB (Jakarta)</option>
+                                                    <option value="Asia/Jayapura">WIT (Jayapura)</option>
+                                                    <option value="Asia/Jerusalem">IST (Jerusalem)</option>
+                                                    <option value="Asia/Kabul">AFT (Kabul)</option>
+                                                    <option value="Asia/Kamchatka">PETT (Kamchatka)</option>
+                                                    <option value="Asia/Karachi">PKT (Karachi)</option>
+                                                    <option value="Asia/Katmandu">NPT (Kathmandu)</option>
+                                                    <option value="Asia/Kolkata">IST (Kolkata)</option>
+                                                    <option value="Asia/Krasnoyarsk">KRAT (Krasnoyarsk)</option>
+                                                    <option value="Asia/Kuala_Lumpur">MYT (Kuala Lumpur)</option>
+                                                    <option value="Asia/Kuching">MYT (Kuching)</option>
+                                                    <option value="Asia/Macau">CST (Macau)</option>
+                                                    <option value="Asia/Magadan">MAGT (Magadan)</option>
+                                                    <option value="Asia/Makassar">WITA (Makassar)</option>
+                                                    <option value="Asia/Manila">PHT (Manila)</option>
+                                                    <option value="Asia/Muscat">GST (Muscat)</option>
+                                                    <option value="Asia/Nicosia">EET (Nicosia)</option>
+                                                    <option value="Asia/Novokuznetsk">KRAST (Novokuznetsk)</option>
+                                                    <option value="Asia/Novosibirsk">NOVT (Novosibirsk)</option>
+                                                    <option value="Asia/Omsk">OMST (Omsk)</option>
+                                                    <option value="Asia/Oral">ORAT (Oral)</option>
+                                                    <option value="Asia/Phnom_Penh">ICT (Phnom Penh)</option>
+                                                    <option value="Asia/Pontianak">WIB (Pontianak)</option>
+                                                    <option value="Asia/Pyongyang">KST (Pyongyang)</option>
+                                                    <option value="Asia/Qatar">AST (Qatar)</option>
+                                                    <option value="Asia/Qyzylorda">QYZT (Qyzylorda)</option>
+                                                    <option value="Asia/Riyadh">AST (Riyadh)</option>
+                                                    <option value="Asia/Sakhalin">PETT (Sakhalin)</option>
+                                                    <option value="Asia/Samarkand">UZT (Samarkand)</option>
+                                                    <option value="Asia/Taipei">CST (Taipei)</option>
+                                                    <option value="Asia/Tashkent">UZT (Tashkent)</option>
+                                                    <option value="Asia/Tbilisi">GET (Tbilisi)</option>
+                                                    <option value="Asia/Tehran">IRST (Tehran)</option>
+                                                    <option value="Asia/Thimphu">BTT (Thimphu)</option>
+                                                    <option value="Asia/Tokyo">JST (Tokyo)</option>
+                                                    <option value="Asia/Ulaanbaatar">ULAT (Ulaanbaatar)</option>
+                                                    <option value="Asia/Urumqi">XJT (Urumqi)</option>
+                                                    <option value="Asia/Vientiane">ICT (Vientiane)</option>
+                                                    <option value="Asia/Vladivostok">VLAT (Vladivostok)</option>
+                                                    <option value="Asia/Yakutsk">YAKT (Yakutsk)</option>
+                                                    <option value="Asia/Yerevan">AMT (Yerevan)</option>
+                                                    <option value="Atlantic/Azores">AZOT (Azores)</option>
+                                                    <option value="Atlantic/Bermuda">AST (Bermuda)</option>
+                                                    <option value="Atlantic/Canary">WET (Canary)</option>
+                                                    <option value="Atlantic/Cape_Verde">CVT (Cape Verde)</option>
+                                                    <option value="Atlantic/Faeroe">WET (Faeroe)</option>
+                                                    <option value="Atlantic/Jan_Mayen">CET (Jan Mayen)</option>
+                                                    <option value="Atlantic/Madeira">WET (Madeira)</option>
+                                                    <option value="Atlantic/Reykjavik">GMT (Reykjavik)</option>
+                                                    <option value="Atlantic/South_Georgia">GST (South Georgia)</option>
+                                                    <option value="Atlantic/Stanley">FKT (Stanley)</option>
+                                                    <option value="Australia/Adelaide">ACDT (Adelaide)</option>
+                                                    <option value="Australia/Brisbane">AEST (Brisbane)</option>
+                                                    <option value="Australia/Broken_Hill">ACDT (Broken Hill)</option>
+                                                    <option value="Australia/Currie">AEDT (Currie)</option>
+                                                    <option value="Australia/Darwin">ACST (Darwin)</option>
+                                                    <option value="Australia/Eucla">ACWST (Eucla)</option>
+                                                    <option value="Australia/Hobart">AEDT (Hobart)</option>
+                                                    <option value="Australia/Lindeman">AEST (Lindeman)</option>
+                                                    <option value="Australia/Melbourne">AEDT (Melbourne)</option>
+                                                    <option value="Australia/Perth">AWST (Perth)</option>
+                                                    <option value="Australia/Sydney">AEDT (Sydney)</option>
+                                                    <option value="Australia/Tasmania">AEDT (Tasmania)</option>
+                                                    <option value="Australia/Brisbane">AEST (Brisbane)</option>
+                                                    <option value="Australia/Currie">AEDT (Currie)</option>
+                                                    <option value="Australia/Darwin">ACST (Darwin)</option>
+                                                    <option value="Australia/Eucla">ACWST (Eucla)</option>
+                                                    <option value="Australia/Hobart">AEDT (Hobart)</option>
+                                                    <option value="Australia/Lindeman">AEST (Lindeman)</option>
+                                                    <option value="Australia/Melbourne">AEDT (Melbourne)</option>
+                                                    <option value="Australia/Perth">AWST (Perth)</option>
+                                                    <option value="Australia/Sydney">AEDT (Sydney)</option>
+                                                    <option value="Australia/Tasmania">AEDT (Tasmania)</option>
+                                                    <option value="Etc/GMT+12">GMT-12:00</option>
+                                                    <option value="Etc/GMT+11">GMT-11:00</option>
+                                                    <option value="Etc/GMT+10">GMT-10:00</option>
+                                                    <option value="Etc/GMT+9">GMT-9:00</option>
+                                                    <option value="Etc/GMT+8">GMT-8:00</option>
+                                                    <option value="Etc/GMT+7">GMT-7:00</option>
+                                                    <option value="Etc/GMT+6">GMT-6:00</option>
+                                                    <option value="Etc/GMT+5">GMT-5:00</option>
+                                                    <option value="Etc/GMT+4">GMT-4:00</option>
+                                                    <option value="Etc/GMT+3">GMT-3:00</option>
+                                                    <option value="Etc/GMT+2">GMT-2:00</option>
+                                                    <option value="Etc/GMT+1">GMT-1:00</option>
+                                                    <option value="Etc/GMT">GMT</option>
+                                                    <option value="Etc/GMT-1">GMT+1:00</option>
+                                                    <option value="Etc/GMT-2">GMT+2:00</option>
+                                                    <option value="Etc/GMT-3">GMT+3:00</option>
+                                                    <option value="Etc/GMT-4">GMT+4:00</option>
+                                                    <option value="Etc/GMT-5">GMT+5:00</option>
+                                                    <option value="Etc/GMT-6">GMT+6:00</option>
+                                                    <option value="Etc/GMT-7">GMT+7:00</option>
+                                                    <option value="Etc/GMT-8">GMT+8:00</option>
+                                                    <option value="Etc/GMT-9">GMT+9:00</option>
+                                                    <option value="Etc/GMT-10">GMT+10:00</option>
+                                                    <option value="Etc/GMT-11">GMT+11:00</option>
+                                                    <option value="Etc/GMT-12">GMT+12:00</option>
+                                                </optgroup>
+                                            </select>
+
                                             <label for="time_zone">Time Zone</label>
                                         </div>
                                     </div>
@@ -212,15 +544,15 @@
                                                 <h5>Monday <input type="hidden" name="day[]" value="Monday"></h5>
                                             </div>
                                             <div class="col-md-3 form-floating form-floating-outline">
-                                                <input type="time" class="form-control flatpickr-input active" name="open[]" id="monday_open">
+                                                <input type="time" class="form-control flatpickr-input " name="open[]" id="monday_open">
                                             </div>
                                             <div class="col-md-3 form-floating form-floating-outline">
-                                                <input type="time" class="form-control flatpickr-input active" name="closed[]" id="monday_closed">
+                                                <input type="time" class="form-control flatpickr-input " name="closed[]" id="monday_closed">
                                             </div>
                                             <div class="col-md-2 d-flex" style="gap: 20px;">
                                                 <div class="form-check custom-option custom-option-basic checked">
                                                     <label class="form-check-label custom-option-content" for="customRadioTemp1">
-                                                        <input  data-day="check" data-day-name="monday" name="check[]" class="form-check-input" type="radio" value="open" id="customRadioTemp1"
+                                                        <input  data-day="check" data-day-name="monday" name="monday_check" class="form-check-input" type="radio" value="open" id="customRadioTemp1"
                                                             checked="">
                                                         <span class="custom-option-header">
                                                             <span class="h6 mb-0">Open</span>
@@ -229,7 +561,7 @@
                                                 </div>
                                                 <div class="form-check custom-option custom-option-basic">
                                                     <label class="form-check-label custom-option-content" for="customRadioTemp2">
-                                                        <input  data-day="check" data-day-name="monday" name="check[]" class="form-check-input" type="radio" value="closed"
+                                                        <input  data-day="check" data-day-name="monday" name="monday_check" class="form-check-input" type="radio" value="closed"
                                                             id="customRadioTemp2">
                                                         <span class="custom-option-header">
                                                             <span class="h6 mb-0">Closed</span>
@@ -238,7 +570,7 @@
                                                 </div>
                                                 <div class="form-check custom-option custom-option-basic">
                                                     <label class="form-check-label custom-option-content" for="customRadioTemp3">
-                                                        <input  data-day="check" data-day-name="monday" name="check[]" class="form-check-input" type="radio" value="24/7"
+                                                        <input  data-day="check" data-day-name="monday" name="monday_check" class="form-check-input" type="radio" value="24/7"
                                                             id="customRadioTemp3">
                                                         <span class="custom-option-header">
                                                             <span class="h6 mb-0">24/7</span>
@@ -256,15 +588,15 @@
                                                 <h5>Tuesday <input type="hidden" name="day[]" value="Tuesday"></h5>
                                             </div>
                                             <div class="col-md-3 form-floating form-floating-outline">
-                                                <input type="time" class="form-control flatpickr-input active" name="open[]" id="tuesday_open">
+                                                <input type="time" class="form-control flatpickr-input " name="open[]" id="tuesday_open">
                                             </div>
                                             <div class="col-md-3 form-floating form-floating-outline">
-                                                <input type="time" class="form-control flatpickr-input active" name="closed[]" id="tuesday_closed">
+                                                <input type="time" class="form-control flatpickr-input " name="closed[]" id="tuesday_closed">
                                             </div>
                                             <div class="col-md-2 d-flex" style="gap: 20px;">
                                                 <div class="form-check custom-option custom-option-basic checked">
                                                     <label class="form-check-label custom-option-content" for="customRadioTemp4">
-                                                        <input  data-day="check" data-day-name="tuesday" name="check[]" class="form-check-input" type="radio" value="open" id="customRadioTemp4"
+                                                        <input  data-day="check" data-day-name="tuesday" name="tuesday_check" class="form-check-input" type="radio" value="open" id="customRadioTemp4"
                                                             checked="">
                                                         <span class="custom-option-header">
                                                             <span class="h6 mb-0">Open</span>
@@ -273,7 +605,7 @@
                                                 </div>
                                                 <div class="form-check custom-option custom-option-basic">
                                                     <label class="form-check-label custom-option-content" for="customRadioTemp5">
-                                                        <input  data-day="check" data-day-name="tuesday" name="check[]" class="form-check-input" type="radio" value="closed"
+                                                        <input  data-day="check" data-day-name="tuesday" name="tuesday_check" class="form-check-input" type="radio" value="closed"
                                                             id="customRadioTemp5">
                                                         <span class="custom-option-header">
                                                             <span class="h6 mb-0">Closed</span>
@@ -282,7 +614,7 @@
                                                 </div>
                                                 <div class="form-check custom-option custom-option-basic">
                                                     <label class="form-check-label custom-option-content" for="customRadioTemp6">
-                                                        <input  data-day="check" data-day-name="tuesday" name="check[]" class="form-check-input" type="radio" value="24/7"
+                                                        <input  data-day="check" data-day-name="tuesday" name="tuesday_check" class="form-check-input" type="radio" value="24/7"
                                                             id="customRadioTemp6">
                                                         <span class="custom-option-header">
                                                             <span class="h6 mb-0">24/7</span>
@@ -300,15 +632,15 @@
                                                 <h5>Wednesday <input type="hidden" name="day[]" value="Wednesday"></h5>
                                             </div>
                                             <div class="col-md-3 form-floating form-floating-outline">
-                                                <input type="time" class="form-control flatpickr-input active" name="open[]" id="wednesday_open">
+                                                <input type="time" class="form-control flatpickr-input " name="open[]" id="wednesday_open">
                                             </div>
                                             <div class="col-md-3 form-floating form-floating-outline">
-                                                <input type="time" class="form-control flatpickr-input active" name="closed[]" id="wednesday_closed">
+                                                <input type="time" class="form-control flatpickr-input " name="closed[]" id="wednesday_closed">
                                             </div>
                                             <div class="col-md-2 d-flex" style="gap: 20px;">
                                                 <div class="form-check custom-option custom-option-basic checked">
                                                     <label class="form-check-label custom-option-content" for="customRadioTemp7">
-                                                        <input  data-day="check" data-day-name="wednesday" name="check[]" class="form-check-input" type="radio" value="open" id="customRadioTemp7"
+                                                        <input  data-day="check" data-day-name="wednesday" name="wednesday_check" class="form-check-input" type="radio" value="open" id="customRadioTemp7"
                                                             checked="">
                                                         <span class="custom-option-header">
                                                             <span class="h6 mb-0">Open</span>
@@ -317,7 +649,7 @@
                                                 </div>
                                                 <div class="form-check custom-option custom-option-basic">
                                                     <label class="form-check-label custom-option-content" for="customRadioTemp8">
-                                                        <input  data-day="check" data-day-name="wednesday" name="check[]" class="form-check-input" type="radio" value="closed"
+                                                        <input  data-day="check" data-day-name="wednesday" name="wednesday_check" class="form-check-input" type="radio" value="closed"
                                                             id="customRadioTemp8">
                                                         <span class="custom-option-header">
                                                             <span class="h6 mb-0">Closed</span>
@@ -326,7 +658,7 @@
                                                 </div>
                                                 <div class="form-check custom-option custom-option-basic">
                                                     <label class="form-check-label custom-option-content" for="customRadioTemp9">
-                                                        <input  data-day="check" data-day-name="wednesday" name="check[]" class="form-check-input" type="radio" value="24/7"
+                                                        <input  data-day="check" data-day-name="wednesday" name="wednesday_check" class="form-check-input" type="radio" value="24/7"
                                                             id="customRadioTemp9">
                                                         <span class="custom-option-header">
                                                             <span class="h6 mb-0">24/7</span>
@@ -344,15 +676,15 @@
                                                 <h5>Thursday <input type="hidden" name="day[]" value="Thursday"></h5>
                                             </div>
                                             <div class="col-md-3 form-floating form-floating-outline">
-                                                <input type="time" class="form-control flatpickr-input active" name="open[]" id="thursday_open">
+                                                <input type="time" class="form-control flatpickr-input " name="open[]" id="thursday_open">
                                             </div>
                                             <div class="col-md-3 form-floating form-floating-outline">
-                                                <input type="time" class="form-control flatpickr-input active" name="closed[]" id="thursday_closed">
+                                                <input type="time" class="form-control flatpickr-input " name="closed[]" id="thursday_closed">
                                             </div>
                                             <div class="col-md-2 d-flex" style="gap: 20px;">
                                                 <div class="form-check custom-option custom-option-basic checked">
                                                     <label   class="form-check-label custom-option-content" for="customRadioTemp10">
-                                                        <input data-day="check" data-day-name="thursday" name="check[]" class="form-check-input" type="radio" value="open" id="customRadioTemp10"
+                                                        <input data-day="check" data-day-name="thursday" name="thursday_check" class="form-check-input" type="radio" value="open" id="customRadioTemp10"
                                                             checked="">
                                                         <span class="custom-option-header">
                                                             <span class="h6 mb-0">Open</span>
@@ -361,7 +693,7 @@
                                                 </div>
                                                 <div class="form-check custom-option custom-option-basic">
                                                     <label class="form-check-label custom-option-content" for="customRadioTemp11">
-                                                        <input data-day="check" data-day-name="thursday" name="check[]" class="form-check-input" type="radio" value="closed"
+                                                        <input data-day="check" data-day-name="thursday" name="thursday_check" class="form-check-input" type="radio" value="closed"
                                                             id="customRadioTemp11">
                                                         <span class="custom-option-header">
                                                             <span  class="h6 mb-0">Closed</span>
@@ -370,7 +702,7 @@
                                                 </div>
                                                 <div class="form-check custom-option custom-option-basic">
                                                     <label class="form-check-label custom-option-content" for="customRadioTemp12">
-                                                        <input data-day="check" data-day-name="thursday" name="check[]" class="form-check-input" type="radio" value="24/7"
+                                                        <input data-day="check" data-day-name="thursday" name="thursday_check" class="form-check-input" type="radio" value="24/7"
                                                             id="customRadioTemp12">
                                                         <span class="custom-option-header">
                                                             <span  class="h6 mb-0">24/7</span>
@@ -388,15 +720,15 @@
                                                 <h5>Friday <input type="hidden" name="day[]" value="Friday"></h5>
                                             </div>
                                             <div class="col-md-3 form-floating form-floating-outline">
-                                                <input type="time" class="form-control flatpickr-input active" name="open[]" id="friday_open">
+                                                <input type="time" class="form-control flatpickr-input " name="open[]" id="friday_open">
                                             </div>
                                             <div class="col-md-3 form-floating form-floating-outline">
-                                                <input type="time" class="form-control flatpickr-input active" name="closed[]" id="friday_closed">
+                                                <input type="time" class="form-control flatpickr-input " name="closed[]" id="friday_closed">
                                             </div>
                                             <div class="col-md-2 d-flex" style="gap: 20px;">
                                                 <div class="form-check custom-option custom-option-basic checked">
                                                     <label class="form-check-label custom-option-content" for="customRadioTemp13">
-                                                        <input  data-day="check" data-day-name="friday" name="check[]" class="form-check-input" type="radio" value="open" id="customRadioTemp13"
+                                                        <input  data-day="check" data-day-name="friday" name="friday_check" class="form-check-input" type="radio" value="open" id="customRadioTemp13"
                                                             checked="">
                                                         <span class="custom-option-header">
                                                             <span class="h6 mb-0">Open</span>
@@ -405,7 +737,7 @@
                                                 </div>
                                                 <div class="form-check custom-option custom-option-basic">
                                                     <label class="form-check-label custom-option-content" for="customRadioTemp14">
-                                                        <input  data-day="check" data-day-name="friday" name="check[]" class="form-check-input" type="radio" value="closed"
+                                                        <input  data-day="check" data-day-name="friday" name="friday_check" class="form-check-input" type="radio" value="closed"
                                                             id="customRadioTemp14">
                                                         <span class="custom-option-header">
                                                             <span class="h6 mb-0">Closed</span>
@@ -414,7 +746,7 @@
                                                 </div>
                                                 <div class="form-check custom-option custom-option-basic">
                                                     <label class="form-check-label custom-option-content" for="customRadioTemp15">
-                                                        <input  data-day="check" data-day-name="friday" name="check[]" class="form-check-input" type="radio" value="24/7"
+                                                        <input  data-day="check" data-day-name="friday" name="friday_check" class="form-check-input" type="radio" value="24/7"
                                                             id="customRadioTemp15">
                                                         <span class="custom-option-header">
                                                             <span class="h6 mb-0">24/7</span>
@@ -432,10 +764,10 @@
                                                 <h5>Saturday <input type="hidden" name="day[]" value="Saturday"></h5>
                                             </div>
                                             <div class="col-md-3 form-floating form-floating-outline">
-                                                <input type="time" class="form-control flatpickr-input active" name="open[]" id="saturday_open">
+                                                <input type="time" class="form-control flatpickr-input " name="open[]" id="saturday_open">
                                             </div>
                                             <div class="col-md-3 form-floating form-floating-outline">
-                                                <input type="time" class="form-control flatpickr-input active" name="closed[]" id="saturday_closed">
+                                                <input type="time" class="form-control flatpickr-input " name="closed[]" id="saturday_closed">
                                             </div>
                                             <div class="col-md-2 d-flex" style="gap: 20px;">
                                                 <div class="form-check custom-option custom-option-basic checked">
@@ -476,10 +808,10 @@
                                                 <h5>Sunday <input type="hidden" name="day[]" value="Sunday"></h5>
                                             </div>
                                             <div class="col-md-3 form-floating form-floating-outline">
-                                                <input type="time" class="form-control flatpickr-input active" name="open[]" id="sunday_open">
+                                                <input type="time" class="form-control flatpickr-input " name="open[]" id="sunday_open">
                                             </div>
                                             <div class="col-md-3 form-floating form-floating-outline">
-                                                <input type="time" class="form-control flatpickr-input active" name="closed[]" id="sunday_closed">
+                                                <input type="time" class="form-control flatpickr-input " name="closed[]" id="sunday_closed">
                                             </div>
                                             <div class="col-md-2 d-flex" style="gap: 20px;">
                                                 <div class="form-check custom-option custom-option-basic checked">
@@ -522,130 +854,146 @@
                                     <!-- Form Repeater -->
                                     <div class="col-12">
                                         <div class="card">
-                                            <h5 class="card-header">Form Repeater</h5>
                                             <div class="card-body">
-                                                <form class="form-repeater">
-                                                    <div data-repeater-list="group-a">
-                                                        <div data-repeater-item>
-                                                            <div class="row">
-                                                                <div class="mb-3 col-lg-6 col-xl-3 col-12 mb-0">
+                                                <div id="repeater">
+                                                    <div class="items">
+                                                        <!-- Repeater Content -->
+                                                        <div class="item-content">
+                                                            <div class="row py-2">
+                                                                <div class="col-md-4">
                                                                     <div class="form-floating form-floating-outline">
-                                                                        <input type="text" id="form-repeater-1-1"
-                                                                            class="form-control"
-                                                                            placeholder="john.doe" />
-                                                                        <label for="form-repeater-1-1">Username</label>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="mb-3 col-lg-6 col-xl-3 col-12 mb-0">
-                                                                    <div class="form-floating form-floating-outline">
-                                                                        <input type="password" id="form-repeater-1-2"
-                                                                            class="form-control"
-                                                                            placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;" />
-                                                                        <label for="form-repeater-1-2">Password</label>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="mb-3 col-lg-6 col-xl-2 col-12 mb-0">
-                                                                    <div class="form-floating form-floating-outline">
-                                                                        <select id="form-repeater-1-3"
-                                                                            class="form-select">
-                                                                            <option value="Male">Male</option>
-                                                                            <option value="Female">Female</option>
+                                                                        <select id="social_links" name="social_name[]" class="form-select" data-allow-clear="true">
+                                                                            <option value="">Please Select</option>
+                                                                            @foreach ($social_links as $item)
+                                                                            <option value="{{$item}}">{{$item}}</option>
+                                                                            @endforeach
+
                                                                         </select>
-                                                                        <label for="form-repeater-1-3">Gender</label>
+                                                                        <label for="multicol-country">Social Platform</label>
                                                                     </div>
                                                                 </div>
-                                                                <div class="mb-3 col-lg-6 col-xl-2 col-12 mb-0">
+                                                                <div class="col-md-6">
                                                                     <div class="form-floating form-floating-outline">
-                                                                        <select id="form-repeater-1-4"
-                                                                            class="form-select">
-                                                                            <option value="Designer">Designer</option>
-                                                                            <option value="Developer">Developer</option>
-                                                                            <option value="Tester">Tester</option>
-                                                                            <option value="Manager">Manager</option>
-                                                                        </select>
-                                                                        <label
-                                                                            for="form-repeater-1-4">Profession</label>
+                                                                        <input type="text" class="form-control " name="social_link[]" placeholder="Social Link" id="social_link" placeholder
+                                                                            aria-label="social_link" />
+                                                                        <label for="time_zone">Social Link</label>
                                                                     </div>
                                                                 </div>
-                                                                <div
-                                                                    class="mb-3 col-lg-12 col-xl-2 col-12 d-flex align-items-center mb-0">
-                                                                    <button class="btn btn-outline-danger"
-                                                                        data-repeater-delete>
-                                                                        <i class="mdi mdi-close me-1"></i>
-                                                                        <span class="align-middle">Delete</span>
-                                                                    </button>
+                                                                <div class="col-md-2">
+                                                                    <div class="pull-right repeater-remove-btn">
+                                                                        <a id="remove-btn" class="btn btn-outline-danger remove-btn waves-effect" style="color: #ff4d49 " disabled="true"
+                                                                            onclick="$(this).parents('.items').remove()">
+                                                                            Remove
+                                                                    </a>
+                                                                    </div>
                                                                 </div>
                                                             </div>
-                                                            <hr />
+
                                                         </div>
                                                     </div>
-                                                    <div class="mb-0">
-                                                        <button class="btn btn-primary" data-repeater-create>
-                                                            <i class="mdi mdi-plus me-1"></i>
-                                                            <span class="align-middle">Add</span>
-                                                        </button>
+                                                    <div class="items" data-group="test">
                                                     </div>
-                                                </form>
+                                                    <div class="repeater-footer py-4" style="display: flex; justify-content: flex-end;">
+                                                        <a class="btn btn-primary repeater-add-btn" style="color: #fff">Add</a>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                     <!-- /Form Repeater -->
                                     <div class="col-12 d-flex justify-content-between">
-                                        <button class="btn btn-outline-secondary btn-prev" disabled>
+                                        <a class="btn btn-outline-secondary btn-prev" style="color: #6d788d" disabled>
                                             <i class="mdi mdi-arrow-left me-sm-1"></i>
                                             <span class="align-middle d-sm-inline-block d-none">Previous</span>
-                                        </button>
-                                        <button class="btn btn-primary btn-next">
+                                        </a>
+                                        <div class="last-buttons d-flex" style="gap: 20px;">
+                                            <button class="btn btn-outline-primary waves-effect" type="submit">Save</button>
+                                        <a class="btn btn-primary btn-next" style="color: #fff">
                                             <span class="align-middle d-sm-inline-block d-none me-sm-1">Next</span>
                                             <i class="mdi mdi-arrow-right"></i>
-                                        </button>
+                                        </a>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
+                        </form>
                             <!-- Personal Info -->
                             <div id="personal-info" class="content">
-                                {{-- <div class="content-header mb-3">
-                                    <h6 class="mb-0">Personal Info</h6>
-                                    <small>Enter Your Personal Info.</small>
+                                <div class="content-header mb-3">
+                                    <h6 class="mb-0">Sale Info</h6>
                                 </div>
+                                <form method="POST" action="{{ route('sale.store') }}" onsubmit="return validateForm()">
+                                    @csrf
+                                    @if ($errors->any())
+                                    <div class="alert alert-danger">
+                                        <ul>
+                                            @foreach ($errors->all() as $error)
+                                            <li>{{ $error }}</li>
+                                            @endforeach
+                                        </ul>
+                                    </div>
+                                    @endif
+                                    <div id="successMessage" style="display:none;" class="alert alert-success"></div>
                                 <div class="row g-4">
                                     <div class="col-sm-6">
                                         <div class="form-floating form-floating-outline">
                                             <input type="text" id="first-name" class="form-control"
-                                                placeholder="John" />
-                                            <label for="first-name">First Name</label>
+                                                placeholder="John" value="{{ $lead->saler->name }}" readonly/>
+                                            <label for="first-name">Sale Rep</label>
                                         </div>
                                     </div>
-                                    <div class="col-sm-6">
+                                    <div class="col-md-6 select2-primary">
                                         <div class="form-floating form-floating-outline">
-                                            <input type="text" id="last-name" class="form-control" placeholder="Doe" />
-                                            <label for="last-name">Last Name</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-6">
-                                        <div class="form-floating form-floating-outline">
-                                            <select class="select2" id="country">
-                                                <option label=" "></option>
-                                                <option>UK</option>
-                                                <option>USA</option>
-                                                <option>Spain</option>
-                                                <option>France</option>
-                                                <option>Italy</option>
-                                                <option>Australia</option>
+                                            <select id="multicol-closers" name="closers[]" class="select2 form-select" multiple>
+                                                @if(isset($lead->closers))
+                                                @foreach ($lead->closers as $item)
+                                                    <option value="{{ $item->closer_id }}" selected>{{ $item->user->name }}</option>
+                                                @endforeach
+                                                @else
+                                                <option value="">Please Select</option>
+                                                @endif
+                                                @foreach ($closers as $item)
+                                                <option value="{{ $item->id }}">{{ $item->name }}</option>
+                                                @endforeach
+
                                             </select>
-                                            <label for="country">Country</label>
+                                            <label for="multicol-closers">Select Closers</label>
                                         </div>
                                     </div>
-                                    <div class="col-sm-6">
+                                    <div class="col-md-6 col-12 mb-6">
                                         <div class="form-floating form-floating-outline">
-                                            <select class="selectpicker w-auto" id="language"
-                                                data-style="btn-transparent" data-icon-base="mdi"
-                                                data-tick-icon="mdi-check text-white" multiple>
-                                                <option>English</option>
-                                                <option>French</option>
-                                                <option>Spanish</option>
+                                          <input type="text" class="form-control flatpickr-input active" placeholder="YYYY-MM-DD" id="flatpickr-date" readonly="readonly">
+                                          <label for="flatpickr-date">Date Picker</label>
+                                        </div>
+                                      </div>
+                                      <div class="col-md-6 select2-primary">
+                                        <div class="form-floating form-floating-outline">
+                                            <select id="multicol-cs" name="closers[]" class="select2 form-select" multiple>
+                                                <option value="">Please Select</option>
+                                                @foreach ($closers as $item)
+                                                <option value="{{ $item->id }}">{{ $item->name }}</option>
+                                                @endforeach
+
                                             </select>
-                                            <label for="language">Language</label>
+                                            <label for="multicol-closers">Select Customer Support Representative</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 select2-primary">
+                                        <div class="row">
+                                            <div class="col-md-3"><h6>Client Status</h6></div>
+                                            <div class="col-md-3">Active</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 select2-primary">
+                                        <div class="row">
+                                            <div class="col-md-3"><h6>Activation Date</h6></div>
+                                            <div class="col-md-3">01/Oct/2024</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 select2-primary">
+                                        <div class="row">
+                                            <div class="col-md-3"><h6>Mode of Payment</h6></div>
+                                            <div class="col-md-3">Credit Card</div>
                                         </div>
                                     </div>
                                     <div class="col-12 d-flex justify-content-between">
@@ -658,7 +1006,8 @@
                                             <i class="mdi mdi-arrow-right"></i>
                                         </button>
                                     </div>
-                                </div> --}}
+                                </div>
+                                </form>
                             </div>
                             <!-- Address -->
                             <div id="address" class="content">
@@ -753,7 +1102,6 @@
                                     </div>
                                 </div> --}}
                             </div>
-                            <!-- Review -->
                             <div id="review-submit" class="content">
 
                                 <div class="col-12 d-flex justify-content-between">
@@ -764,7 +1112,6 @@
                                     <button class="btn btn-primary btn-submit">Submit</button>
                                 </div>
                             </div>
-                        </form>
                     </div>
                 </div>
             </div>
@@ -786,47 +1133,28 @@
     <script src="{{ asset('assets/vendor/libs/cleavejs/cleave.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/cleavejs/cleave-phone.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/bootstrap-maxlength/bootstrap-maxlength.js') }}"></script>
-    {{-- <script src="{{ asset('assets/vendor/libs/jquery-timepicker/jquery-timepicker.js') }}"></script>
+    <script src="{{ asset('assets/js/repeater.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/flatpickr/flatpickr.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/bootstrap-datepicker/bootstrap-datepicker.js') }}"></script>
+    {{-- <script src="{{ asset('assets/vendor/libs/bootstrap-daterangepicker/bootstrap-daterangepicker.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/jquery-timepicker/jquery-timepicker.js') }}"></script> --}}
     <script src="{{ asset('assets/vendor/libs/pickr/pickr.js') }}"></script>
-    <script src="{{ asset('assets/js/forms-pickers.js') }}"></script> --}}
+    <script src="{{ asset('assets/js/forms-pickers.js') }}"></script>
 
-    <script>
-        if (formRepeater.length) {
-    var row = 2;
-    var col = 1;
-    formRepeater.on('submit', function (e) {
-      e.preventDefault();
+
+
+
+<script>
+    $(function(){
+        $("#repeater").createRepeater();
     });
-    formRepeater.repeater({
-      show: function () {
-        var fromControl = $(this).find('.form-control, .form-select');
-        var formLabel = $(this).find('.form-label');
-
-        fromControl.each(function (i) {
-          var id = 'form-repeater-' + row + '-' + col;
-          $(fromControl[i]).attr('id', id);
-          $(formLabel[i]).attr('for', id);
-          col++;
-        });
-
-        row++;
-
-        $(this).slideDown();
-      },
-      hide: function (e) {
-        confirm('Are you sure you want to delete this element?') && $(this).slideUp(e);
-      }
-    });
-  }
-    </script>
-
+</script>
 <script>
     $(document).ready(function() {
         $('input[data-day="check"]').change(function(e) {
             e.preventDefault();
             var selected = $(this).val(); // Get the value of the checked radio button
             var day = $(this).data('day-name'); // Get the day from the data attribute
-
             if (selected == "closed" || selected == "24/7") {
                 $('#' + day + '_open').prop('disabled', true);
                 $('#' + day + '_closed').prop('disabled', true);
@@ -837,6 +1165,174 @@
         });
     });
     </script>
+<script>
+    $(document).ready(function() {
+        // Loop through each day of the week
+        var days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+
+        days.forEach(function(day) {
+            var openTimeInput = $('#' + day + '_open');
+            var closedTimeInput = $('#' + day + '_closed');
+
+            // Check on page load if _open already has a value
+            if (openTimeInput.val()) {
+                // Enable the closed time input if _open has a value
+                closedTimeInput.prop('disabled', false);
+                // Set the minimum value of _closed to the current value of _open
+                closedTimeInput.attr('min', openTimeInput.val());
+            } else {
+                // Disable the closed time input by default if no value in _open
+                closedTimeInput.prop('disabled', true);
+            }
+
+            // On change event for the open time input
+            openTimeInput.change(function() {
+                var openTime = $(this).val(); // Get the selected open time
+
+                if (openTime) {
+                    // Enable the closed time input and set its minimum value
+                    closedTimeInput.prop('disabled', false);
+                    closedTimeInput.attr('min', openTime);
+                } else {
+                    // Disable the closed time input if open time is cleared
+                    closedTimeInput.prop('disabled', true).val(''); // Clear closed time when disabling
+                }
+            });
+        });
+    });
+</script>
+
+<script>
+    function validateForm() {
+        const businessName = document.getElementById('business_name').value;
+        const businessNumber = document.getElementById('business_number').value;
+        const email = document.getElementById('basic-default-email').value;
+        const websiteUrl = document.getElementsByName('website_url')[0].value;
+        const clientName = document.getElementsByName('client_name')[0].value;
+        const socialLink = document.getElementsByName('social_link')[0].value;
+
+        // Validate business name (only letters and spaces)
+        if (!/^[a-zA-Z\s]*$/.test(businessName)) {
+            alert('Invalid Business Name. Only letters and spaces are allowed.');
+            return false;
+        }
+
+        // Validate business number (only digits)
+        if (!/^\d*$/.test(businessNumber)) {
+            alert('Invalid Business Number. Only digits are allowed.');
+            return false;
+        }
+        const urlPattern = /^(https?:\/\/)?([a-zA-Z0-9\-]+\.)+[a-zA-Z]{2,}(\/[^\s]*)?$/;
+        if (!urlPattern.test(websiteUrl)) {
+            alert('Invalid Website URL. Please enter a valid URL (e.g., http://example.com).');
+            return false;
+        }
+
+        if (!urlPattern.test(socialLink)) {
+            alert('Invalid Social  URL. Please enter a valid URL (e.g., http://example.com).');
+            return false;
+        }
+
+        // Validate email format
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailPattern.test(email)) {
+            alert('Invalid Email. Please enter a valid email address.');
+            return false;
+        }
+
+        // Validate client name (only letters and spaces)
+        if (!/^[a-zA-Z\s]*$/.test(clientName)) {
+            alert('Invalid Client Name. Only letters and spaces are allowed.');
+            return false;
+        }
+
+        // Validate client address (allowing letters, digits, and certain symbols)
+        if (!/^[a-zA-Z0-9\/\-\_\:\, ]*$/.test(clientAddress)) {
+            alert('Invalid Client Address. Only letters, numbers, and certain symbols are allowed.');
+            return false;
+        }
+
+        return true; // All validations passed
+    }
+</script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+$(document).ready(function () {
+    $('#saleForm').on('submit', function (e) {
+        e.preventDefault(); // Prevent the default form submission
+
+        // Store current form values before submission, particularly time and select elements
+        let timeInputs = {};
+        let selectInputs = {};
+
+        // Save values of input[type="time"] and select elements before form submission
+        $('#saleForm').find('input[type="time"], select').each(function () {
+            timeInputs[$(this).attr('name')] = $(this).val();
+            selectInputs[$(this).attr('name')] = $(this).val();
+        });
+
+        // Create a FormData object to handle form data
+        let formData = new FormData(this);
+
+        // Clear previous error messages
+        $('.alert-danger').remove();
+
+        $.ajax({
+            url: $(this).attr('action'), // Form action URL
+            type: $(this).attr('method'), // POST method
+            data: formData,
+            processData: false, // Important: do not process the data
+            contentType: false, // Important: content type is false
+            success: function (response) {
+                // Handle success response (display success message using SweetAlert2)
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: response.message,
+                    timer: 2000, // Automatically close after 2 seconds
+                    showConfirmButton: false
+                });
+
+                // Optionally reset the form only on success
+                $('#saleForm')[0].reset(); // This will reset the form fields
+            },
+            error: function (xhr) {
+                // Handle validation errors
+                let errors = xhr.responseJSON.errors;
+                if (errors) {
+                    let errorHtml = '<div class="alert alert-danger"><ul>';
+                    $.each(errors, function (key, value) {
+                        errorHtml += '<li>' + value + '</li>';
+                    });
+                    errorHtml += '</ul></div>';
+                    $('#saleForm').prepend(errorHtml); // Add errors to the form
+
+                    // Display SweetAlert2 for validation errors
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Validation Error',
+                        html: errorHtml, // Use the generated error HTML
+                        timer: 4000, // Auto-close after 4 seconds (optional)
+                    });
+                }
+
+                // Restore time input and select values after error
+                $('#saleForm').find('input[type="time"], select').each(function () {
+                    if ($(this).attr('name') in timeInputs) {
+                        $(this).val(timeInputs[$(this).attr('name')]);
+                    }
+                    if ($(this).attr('name') in selectInputs) {
+                        $(this).val(selectInputs[$(this).attr('name')]);
+                    }
+                });
+            }
+        });
+    });
+});
+</script>
+
+
 
     {{-- <script>
         $(document).ready(function() {
