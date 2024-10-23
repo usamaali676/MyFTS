@@ -129,7 +129,11 @@
                                         <div class="form-floating form-floating-outline">
                                             <select id="client_nature" name="client_nature" class="select2 form-select"
                                                 data-allow-clear="true">
+                                                @if(isset($sale) && isset($sale->client_nature))
+                                                <option value="{{$sale->client_nature}}" selected>{{ $sale->client_nature }}</option>
+                                                @else
                                                 <option value="">Please Select</option>
+                                                @endif
                                                 @foreach ($client_enum as $item)
                                                 <option value="{{$item}}">{{$item}}</option>
                                                 @endforeach
@@ -195,7 +199,11 @@
                                         <div class="form-floating form-floating-outline">
                                             <select id="category" name="call_type" class="select2 form-select"
                                                 data-allow-clear="true">
+                                                @if(isset($sale) && isset($sale->call_type))
+                                                <option value="{{$sale->call_type}}" selected>{{ $sale->call_type }}</option>
+                                                @else
                                                 <option value="">Please Select</option>
+                                                @endif
                                                 @foreach ($call_enum as $item)
                                                 <option value="{{$item}}">{{$item}}</option>
                                                 @endforeach
@@ -207,6 +215,9 @@
                                     <div class="col-md-6">
                                         <div class="form-floating form-floating-outline">
                                            <select name="timezone" class="select2 form-select" data-allow-clear="true">
+                                            @if(isset($sale) && isset($sale->time_zone))
+                                            <option value="{{$sale->time_zone}}" selected>{{ $sale->time_zone }}</option>
+                                            @endif
                                                 <optgroup label="US Time Zones">
                                                     <option value="America/New_York">Eastern Time (ET)</option>
                                                     <option value="America/Chicago">Central Time (CT)</option>
@@ -856,6 +867,8 @@
                                         <div class="card">
                                             <div class="card-body">
                                                 <div id="repeater">
+                                                    @if(isset($sale) && isset($sale->social_links))
+                                                    @foreach($sale->social_links as $social_link)
                                                     <div class="items">
                                                         <!-- Repeater Content -->
                                                         <div class="item-content">
@@ -891,6 +904,44 @@
 
                                                         </div>
                                                     </div>
+                                                    @endforeach
+                                                    @else
+                                                    <div class="items">
+                                                        <!-- Repeater Content -->
+                                                        <div class="item-content">
+                                                            <div class="row py-2">
+                                                                <div class="col-md-4">
+                                                                    <div class="form-floating form-floating-outline">
+                                                                        <select id="social_links" name="social_name[]" class="form-select" data-allow-clear="true">
+                                                                            <option value="">Please Select</option>
+                                                                            @foreach ($social_links as $item)
+                                                                            <option value="{{$item}}">{{$item}}</option>
+                                                                            @endforeach
+
+                                                                        </select>
+                                                                        <label for="multicol-country">Social Platform</label>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <div class="form-floating form-floating-outline">
+                                                                        <input type="text" class="form-control " name="social_link[]" placeholder="Social Link" id="social_link" placeholder
+                                                                            aria-label="social_link" />
+                                                                        <label for="time_zone">Social Link</label>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-2">
+                                                                    <div class="pull-right repeater-remove-btn">
+                                                                        <a id="remove-btn" class="btn btn-outline-danger remove-btn waves-effect" style="color: #ff4d49 " disabled="true"
+                                                                            onclick="$(this).parents('.items').remove()">
+                                                                            Remove
+                                                                    </a>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+                                                    @endif
                                                     <div class="items" data-group="test">
                                                     </div>
                                                     <div class="repeater-footer py-4" style="display: flex; justify-content: flex-end;">
@@ -922,7 +973,7 @@
                                 <div class="content-header mb-3">
                                     <h6 class="mb-0">Sale Info</h6>
                                 </div>
-                                <form method="POST" action="{{ route('sale.store') }}" onsubmit="return validateForm()">
+                                <form id="detail_form" method="POST" action="{{ route('sale_info.store') }}" >
                                     @csrf
                                     @if ($errors->any())
                                     <div class="alert alert-danger">
@@ -935,6 +986,12 @@
                                     @endif
                                     <div id="successMessage" style="display:none;" class="alert alert-success"></div>
                                 <div class="row g-4">
+                                    <input type="hidden" name="lead_id" value="{{ $lead->id }}">
+                                    @if(isset($sale))
+                                    <input type="hidden" id="sale_id" name="sale_id" value="{{ $sale->id }}">
+                                    @else
+                                    <input type="hidden" id="sale_id" name="sale_id" value="">
+                                    @endif
                                     <div class="col-sm-6">
                                         <div class="form-floating form-floating-outline">
                                             <input type="text" id="first-name" class="form-control"
@@ -962,17 +1019,27 @@
                                     </div>
                                     <div class="col-md-6 col-12 mb-6">
                                         <div class="form-floating form-floating-outline">
-                                          <input type="text" class="form-control flatpickr-input active" placeholder="YYYY-MM-DD" id="flatpickr-date" readonly="readonly">
-                                          <label for="flatpickr-date">Date Picker</label>
+                                        @if(isset($sale) && isset($sale->signup_date))
+                                          <input type="text" class="form-control flatpickr-input active" name="signup_date" placeholder="YYYY-MM-DD" id="flatpickr-date" value="{{ $sale->signup_date }}" readonly="readonly">
+                                          @else
+                                          <input type="text" class="form-control flatpickr-input active" name="signup_date" placeholder="YYYY-MM-DD" id="flatpickr-date" readonly="readonly">
+                                          @endif
+                                          <label for="flatpickr-date">Signup Date</label>
                                         </div>
                                       </div>
                                       <div class="col-md-6 select2-primary">
                                         <div class="form-floating form-floating-outline">
-                                            <select id="multicol-cs" name="closers[]" class="select2 form-select" multiple>
+                                            <select id="multicol-cs" name="customer_support[]" class="select2 form-select" multiple>
+                                                @if(isset($sale) && isset($sale->Customer_support))
+                                                @foreach ($sale->Customer_support as $item)
+                                                <option value="{{ $item->id }}" selected>{{ $item->user->name }}</option>
+                                                @endforeach
                                                 <option value="">Please Select</option>
                                                 @foreach ($closers as $item)
                                                 <option value="{{ $item->id }}">{{ $item->name }}</option>
                                                 @endforeach
+                                                @endif
+
 
                                             </select>
                                             <label for="multicol-closers">Select Customer Support Representative</label>
@@ -996,7 +1063,7 @@
                                             <div class="col-md-3">Credit Card</div>
                                         </div>
                                     </div>
-                                    <div class="col-12 d-flex justify-content-between">
+                                    {{-- <div class="col-12 d-flex justify-content-between">
                                         <button class="btn btn-outline-secondary btn-prev">
                                             <i class="mdi mdi-arrow-left me-sm-1"></i>
                                             <span class="align-middle d-sm-inline-block d-none">Previous</span>
@@ -1005,44 +1072,41 @@
                                             <span class="align-middle d-sm-inline-block d-none me-sm-1">Next</span>
                                             <i class="mdi mdi-arrow-right"></i>
                                         </button>
+                                    </div> --}}
+                                    <div class="col-12 d-flex justify-content-between">
+                                        <a class="btn btn-outline-secondary btn-prev" style="color: #6d788d" disabled>
+                                            <i class="mdi mdi-arrow-left me-sm-1"></i>
+                                            <span class="align-middle d-sm-inline-block d-none">Previous</span>
+                                        </a>
+                                        <div class="last-buttons d-flex" style="gap: 20px;">
+                                            <button class="btn btn-outline-primary waves-effect" type="submit">Save</button>
+                                        <a class="btn btn-primary btn-next" style="color: #fff">
+                                            <span class="align-middle d-sm-inline-block d-none me-sm-1">Next</span>
+                                            <i class="mdi mdi-arrow-right"></i>
+                                        </a>
+                                        </div>
                                     </div>
                                 </div>
                                 </form>
                             </div>
                             <!-- Address -->
                             <div id="address" class="content">
-                                {{-- <div class="content-header mb-3">
-                                    <h6 class="mb-0">Address</h6>
-                                    <small>Enter Your Address.</small>
+                                <div class="content-header mb-3">
+                                    <h6 class="mb-0">Services</h6>
                                 </div>
                                 <div class="row g-4">
-                                    <div class="col-sm-6">
-                                        <div class="form-floating form-floating-outline">
-                                            <input type="text" class="form-control" id="address-input"
-                                                placeholder="98  Borough bridge Road, Birmingham" />
-                                            <label for="address-input">Address</label>
+                                    <form id="serviceform" method="POST" action="{{ route('client_services.store') }}">
+                                        <div class="col-sm-9">
+                                            <div class="form-floating form-floating-outline">
+                                                <input type="text" class="form-control" id="address-input"
+                                                    placeholder="Client Services" />
+                                                <label for="address-input">Client Services</label>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="col-sm-6">
-                                        <div class="form-floating form-floating-outline">
-                                            <input type="text" class="form-control" id="landmark"
-                                                placeholder="Borough bridge" />
-                                            <label for="landmark">Landmark</label>
+                                        <div class="col-sm-3">
+                                            <button class="btn btn-primary">Add</button>
                                         </div>
-                                    </div>
-                                    <div class="col-sm-6">
-                                        <div class="form-floating form-floating-outline">
-                                            <input type="text" class="form-control" id="pincode" placeholder="658921" />
-                                            <label for="pincode">Pincode</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-6">
-                                        <div class="form-floating form-floating-outline">
-                                            <input type="text" class="form-control" id="city"
-                                                placeholder="Birmingham" />
-                                            <label for="city">City</label>
-                                        </div>
-                                    </div>
+                                    </form>
                                     <div class="col-12 d-flex justify-content-between">
                                         <button class="btn btn-outline-secondary btn-prev">
                                             <i class="mdi mdi-arrow-left me-sm-1"></i>
@@ -1053,7 +1117,7 @@
                                             <i class="mdi mdi-arrow-right"></i>
                                         </button>
                                     </div>
-                                </div> --}}
+                                </div>
                             </div>
                             <!-- Social Links -->
                             <div id="social-links" class="content">
@@ -1285,6 +1349,9 @@ $(document).ready(function () {
             processData: false, // Important: do not process the data
             contentType: false, // Important: content type is false
             success: function (response) {
+
+                console.log(response.sale);
+                $('#sale_id').val(response.sale.id);
                 // Handle success response (display success message using SweetAlert2)
                 Swal.fire({
                     icon: 'success',
@@ -1294,8 +1361,11 @@ $(document).ready(function () {
                     showConfirmButton: false
                 });
 
+
+
                 // Optionally reset the form only on success
-                $('#saleForm')[0].reset(); // This will reset the form fields
+                // $('#saleForm')[0].reset();
+                // This will reset the form fields
             },
             error: function (xhr) {
                 // Handle validation errors
@@ -1332,6 +1402,148 @@ $(document).ready(function () {
 });
 </script>
 
+<script>
+$(document).ready(function () {
+    $('#detail_form').on('submit', function (e) {
+        e.preventDefault(); // Prevent the default form submission
+
+        // Store current form values before submission, particularly time and select elements
+
+
+        // Create a FormData object to handle form data
+        let formData = new FormData(this);
+
+        // Clear previous error messages
+
+        $.ajax({
+            url: $(this).attr('action'), // Form action URL
+            type: $(this).attr('method'), // POST method
+            data: formData,
+            processData: false, // Important: do not process the data
+            contentType: false, // Important: content type is false
+            success: function (response) {
+
+
+                // Handle success response (display success message using SweetAlert2)
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: response.message,
+                    timer: 2000, // Automatically close after 2 seconds
+                    showConfirmButton: false
+                });
+
+
+
+                // Optionally reset the form only on success
+                // $('#saleForm')[0].reset();
+                // This will reset the form fields
+            },
+            error: function (xhr) {
+                // Handle validation errors
+                let errors = xhr.responseJSON.errors;
+                if (errors) {
+                    let errorHtml = '<div class="alert alert-danger"><ul>';
+                    $.each(errors, function (key, value) {
+                        errorHtml += '<li>' + value + '</li>';
+                    });
+                    errorHtml += '</ul></div>';
+                    $('#saleForm').prepend(errorHtml); // Add errors to the form
+
+                    // Display SweetAlert2 for validation errors
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Validation Error',
+                        html: errorHtml, // Use the generated error HTML
+                        timer: 4000, // Auto-close after 4 seconds (optional)
+                    });
+                }
+                else if (xhr.responseJSON.error) {
+                    // Show custom error message with SweetAlert2
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: xhr.responseJSON.error, // Show the custom error message
+                        timer: 4000, // Auto-close after 4 seconds (optional)
+                    });
+                }
+
+                // Restore time input and select values after error
+            }
+        });
+    });
+});
+</script>
+
+<script>
+    $(document).ready(function () {
+        $('#serviceform').on('submit', function (e) {
+            e.preventDefault(); // Prevent the default form submission
+
+            // Store current form values before submission, particularly time and select elements
+
+
+            // Create a FormData object to handle form data
+            let formData = new FormData(this);
+
+            // Clear previous error messages
+
+            $.ajax({
+                url: $(this).attr('action'), // Form action URL
+                type: $(this).attr('method'), // POST method
+                data: formData,
+                processData: false, // Important: do not process the data
+                contentType: false, // Important: content type is false
+                success: function (response) {
+
+                    // Handle success response (display success message using SweetAlert2)
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: response.message,
+                        timer: 2000, // Automatically close after 2 seconds
+                        showConfirmButton: false
+                    });
+
+                    // Optionally reset the form only on success
+                    // $('#saleForm')[0].reset();
+                    // This will reset the form fields
+                },
+                error: function (xhr) {
+                    // Handle validation errors
+                    let errors = xhr.responseJSON.errors;
+                    if (errors) {
+                        let errorHtml = '<div class="alert alert-danger"><ul>';
+                        $.each(errors, function (key, value) {
+                            errorHtml += '<li>' + value + '</li>';
+                        });
+                        errorHtml += '</ul></div>';
+                        $('#saleForm').prepend(errorHtml); // Add errors to the form
+
+                        // Display SweetAlert2 for validation errors
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Validation Error',
+                            html: errorHtml, // Use the generated error HTML
+                            timer: 4000, // Auto-close after 4 seconds (optional)
+                        });
+                    }
+                    else if (xhr.responseJSON.error) {
+                        // Show custom error message with SweetAlert2
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: xhr.responseJSON.error, // Show the custom error message
+                            timer: 4000, // Auto-close after 4 seconds (optional)
+                        });
+                    }
+
+                    // Restore time input and select values after error
+                }
+            });
+        });
+    });
+    </script>
 
 
     {{-- <script>
