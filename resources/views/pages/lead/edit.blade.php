@@ -5,6 +5,17 @@
     href="{{ asset('assets/vendor/libs/bootstrap-daterangepicker/bootstrap-daterangepicker.css') }}" />
 <link rel="stylesheet" href="{{ asset('assets/vendor/libs/jquery-timepicker/jquery-timepicker.css') }}" />
 <link rel="stylesheet" href="{{ asset('assets/vendor/libs/pickr/pickr-themes.css') }}" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/24.6.0/build/css/intlTelInput.min.css" integrity="sha512-X3pJz9m4oT4uHCYS6UjxVdWk1yxSJJIJOJMIkf7TjPpb1BzugjiFyHu7WsXQvMMMZTnGUA9Q/GyxxCWNDZpdHA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<style>
+    .iti{
+        width: 100%;
+        padding: 0px;
+    }
+    .iti__dropdown-content{
+        z-index: 20 !important;
+    }
+
+</style>
 @endsection
 @section('content')
 <!-- Content wrapper -->
@@ -70,10 +81,9 @@
                     </div>
                     <div class="col-md-6">
                         <div class="form-floating form-floating-outline">
-                            <input type="number" id="business_number" name="business_number" class="form-control"
-                                placeholder="
-                                +1111111111" value="{{ $lead->business_number_adv }}" />
-                            <label for="multicol-last-name">Business Number</label>
+                            <input type="tel"  id="business_number" style="height: calc(2.940725rem + 2px);"
+                            name="business_number" class="form-control" value="{{ $lead->business_number_adv }}" />
+                            {{-- <label for="multicol-last-name">Business Number</label> --}}
                         </div>
                     </div>
 
@@ -265,6 +275,15 @@
 <script src="{{ asset('assets/vendor/libs/jquery-timepicker/jquery-timepicker.js') }}"></script>
 <script src="{{ asset('assets/vendor/libs/pickr/pickr.js') }}"></script>
 <script src="{{ asset('assets/js/forms-pickers.js') }}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/24.6.0/build/js/intlTelInput.min.js" integrity="sha512-/sRFlFRbcvObOo/SxW8pvmFZeMLvAF6hajRXeX15ekPgT4guXnfNSjLC98K/Tg2ObUgKX8vn9+Th5/mGHzZbEw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script>
+    const input = document.querySelector("#business_number");
+    const iti =  intlTelInput(input, {
+  initialCountry: "us",
+  strictMode: true,
+  utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/24.6.0/build/js/utils.min.js"
+});
+</script>
 
 <script>
     $('#category').change(function (e) {
@@ -311,20 +330,22 @@
         }
 
         // Validate business number (only digits)
-        if (!/^\d*$/.test(businessNumber)) {
-            alert('Invalid Business Number. Only digits are allowed.');
+        if (!iti.isValidNumber()) {
+            alert('Invalid Phone Number. Please enter a valid phone number.');
             return false;
         }
+
+        // Validate website URL (must be a valid URL with domain)
         const urlPattern = /^(https?:\/\/)?([a-zA-Z0-9\-]+\.)+[a-zA-Z]{2,}(\/[^\s]*)?$/;
         if (!urlPattern.test(websiteUrl)) {
             alert('Invalid Website URL. Please enter a valid URL (e.g., http://example.com).');
             return false;
         }
 
-        // Validate email format
-        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        // Validate email format (must contain "@" and a valid domain)
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/;
         if (!emailPattern.test(email)) {
-            alert('Invalid Email. Please enter a valid email address.');
+            alert('Invalid Email. Please enter a valid email address (e.g., user@example.com).');
             return false;
         }
 

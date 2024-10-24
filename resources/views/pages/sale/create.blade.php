@@ -9,6 +9,9 @@
 {{-- <link rel="stylesheet" href="{{ asset('assets/vendor/libs/bootstrap-daterangepicker/bootstrap-daterangepicker.css') }}" /> --}}
 {{-- <link rel="stylesheet" href="{{ asset('assets/vendor/libs/jquery-timepicker/jquery-timepicker.css') }}" /> --}}
 <link rel="stylesheet" href="{{ asset('assets/vendor/libs/pickr/pickr-themes.css') }}" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/24.6.0/build/css/intlTelInput.min.css" integrity="sha512-X3pJz9m4oT4uHCYS6UjxVdWk1yxSJJIJOJMIkf7TjPpb1BzugjiFyHu7WsXQvMMMZTnGUA9Q/GyxxCWNDZpdHA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<link rel="stylesheet" href="{{ asset('assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css') }}" />
+<link rel="stylesheet" href="{{ asset('assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css') }}" />
 
 {{-- <link rel="stylesheet" href="{{ asset('assets/vendor/libs/jquery-timepicker/jquery-timepicker.css') }}" />
 <link rel="stylesheet" href="{{ asset('assets/vendor/libs/pickr/pickr-themes.css') }}" /> --}}
@@ -16,6 +19,15 @@
     .col-md-5 {
         margin-top: 0.5rem;
     }
+
+    .iti{
+        width: 100%;
+        padding: 0px;
+    }
+    .iti__dropdown-content{
+        z-index: 20 !important;
+    }
+
 </style>
 @endsection
 @section('content')
@@ -156,10 +168,9 @@
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-floating form-floating-outline">
-                                            <input type="tel" pattern="\d*" maxlength="15" id="business_number"
-                                                name="business_number" class="form-control" placeholder="
-                                        +1111111111" value="{{ $lead->business_number_adv }}" />
-                                            <label for="multicol-last-name">Business Number Adv</label>
+                                            <input type="tel"  id="business_number" style="height: calc(2.940725rem + 2px);"
+                                                name="business_number" class="form-control"  value="{{ $lead->business_number_adv }}" />
+                                            {{-- <label for="multicol-last-name">Business Number Adv</label> --}}
                                         </div>
                                     </div>
                                     <div class="col-md-6">
@@ -867,80 +878,82 @@
                                         <div class="card">
                                             <div class="card-body">
                                                 <div id="repeater">
-                                                    @if(isset($sale) && isset($sale->social_links))
-                                                    @foreach($sale->social_links as $social_link)
-                                                    <div class="items">
-                                                        <!-- Repeater Content -->
-                                                        <div class="item-content">
-                                                            <div class="row py-2">
-                                                                <div class="col-md-4">
-                                                                    <div class="form-floating form-floating-outline">
-                                                                        <select id="social_links" name="social_name[]" class="form-select" data-allow-clear="true">
-                                                                            <option value="">Please Select</option>
-                                                                            @foreach ($social_links as $item)
-                                                                            <option value="{{$item}}">{{$item}}</option>
-                                                                            @endforeach
+                                                    @if(isset($sale) && isset($sale->social_links) && count($sale->social_links) > 0)
+                                                    {{-- <h1>fdgsdfg</h1> --}}
+                                                        @foreach($sale->social_links as $list)
+                                                        <div class="items">
+                                                            <!-- Repeater Content -->
+                                                            <div class="item-content">
+                                                                <div class="row py-2">
+                                                                    <div class="col-md-4">
+                                                                        <div class="form-floating form-floating-outline">
+                                                                            <select id="social_links" name="social_name[]" class="form-select" data-allow-clear="true">
+                                                                                <option value="">Please Select</option>
+                                                                                @foreach ($list as $item)
+                                                                                <option value="{{$item}}">{{$item}}</option>
+                                                                                @endforeach
 
-                                                                        </select>
-                                                                        <label for="multicol-country">Social Platform</label>
+                                                                            </select>
+                                                                            <label for="multicol-country">Social Platform</label>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-6">
+                                                                        <div class="form-floating form-floating-outline">
+                                                                            <input type="text" class="form-control " name="social_link[]" placeholder="Social Link" id="social_link" placeholder
+                                                                                aria-label="social_link" />
+                                                                            <label for="time_zone">Social Link</label>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-2">
+                                                                        <div class="pull-right repeater-remove-btn">
+                                                                            <a id="remove-btn" class="btn btn-outline-danger remove-btn waves-effect" style="color: #ff4d49 " disabled="true"
+                                                                                onclick="$(this).parents('.items').remove()">
+                                                                                Remove
+                                                                        </a>
+                                                                        </div>
                                                                     </div>
                                                                 </div>
-                                                                <div class="col-md-6">
-                                                                    <div class="form-floating form-floating-outline">
-                                                                        <input type="text" class="form-control " name="social_link[]" placeholder="Social Link" id="social_link" placeholder
-                                                                            aria-label="social_link" />
-                                                                        <label for="time_zone">Social Link</label>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="col-md-2">
-                                                                    <div class="pull-right repeater-remove-btn">
-                                                                        <a id="remove-btn" class="btn btn-outline-danger remove-btn waves-effect" style="color: #ff4d49 " disabled="true"
-                                                                            onclick="$(this).parents('.items').remove()">
-                                                                            Remove
-                                                                    </a>
-                                                                    </div>
-                                                                </div>
+
                                                             </div>
-
                                                         </div>
-                                                    </div>
-                                                    @endforeach
+                                                        @endforeach
                                                     @else
-                                                    <div class="items">
-                                                        <!-- Repeater Content -->
-                                                        <div class="item-content">
-                                                            <div class="row py-2">
-                                                                <div class="col-md-4">
-                                                                    <div class="form-floating form-floating-outline">
-                                                                        <select id="social_links" name="social_name[]" class="form-select" data-allow-clear="true">
-                                                                            <option value="">Please Select</option>
-                                                                            @foreach ($social_links as $item)
-                                                                            <option value="{{$item}}">{{$item}}</option>
-                                                                            @endforeach
+                                                        <div class="items">
+                                                            <!-- Repeater Content -->
+                                                            {{-- <h1>dfgdfg</h1> --}}
+                                                            <div class="item-content">
+                                                                <div class="row py-2">
+                                                                    <div class="col-md-4">
+                                                                        <div class="form-floating form-floating-outline">
+                                                                            <select id="social_links" name="social_name[]" class="form-select" data-allow-clear="true">
+                                                                                <option value="">Please Select</option>
+                                                                                @foreach ($social_links as $item)
+                                                                                <option value="{{$item}}">{{$item}}</option>
+                                                                                @endforeach
 
-                                                                        </select>
-                                                                        <label for="multicol-country">Social Platform</label>
+                                                                            </select>
+                                                                            <label for="multicol-country">Social Platform</label>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-6">
+                                                                        <div class="form-floating form-floating-outline">
+                                                                            <input type="text" class="form-control " name="social_link[]" placeholder="Social Link" id="social_link" placeholder
+                                                                                aria-label="social_link" />
+                                                                            <label for="time_zone">Social Link</label>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-2">
+                                                                        <div class="pull-right repeater-remove-btn">
+                                                                            <a id="remove-btn" class="btn btn-outline-danger remove-btn waves-effect" style="color: #ff4d49 " disabled="true"
+                                                                                onclick="$(this).parents('.items').remove()">
+                                                                                Remove
+                                                                        </a>
+                                                                        </div>
                                                                     </div>
                                                                 </div>
-                                                                <div class="col-md-6">
-                                                                    <div class="form-floating form-floating-outline">
-                                                                        <input type="text" class="form-control " name="social_link[]" placeholder="Social Link" id="social_link" placeholder
-                                                                            aria-label="social_link" />
-                                                                        <label for="time_zone">Social Link</label>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="col-md-2">
-                                                                    <div class="pull-right repeater-remove-btn">
-                                                                        <a id="remove-btn" class="btn btn-outline-danger remove-btn waves-effect" style="color: #ff4d49 " disabled="true"
-                                                                            onclick="$(this).parents('.items').remove()">
-                                                                            Remove
-                                                                    </a>
-                                                                    </div>
-                                                                </div>
+
                                                             </div>
-
                                                         </div>
-                                                    </div>
                                                     @endif
                                                     <div class="items" data-group="test">
                                                     </div>
@@ -1096,27 +1109,107 @@
                                 </div>
                                 <div class="row g-4">
                                     <form id="serviceform" method="POST" action="{{ route('client_services.store') }}">
-                                        <div class="col-sm-9">
-                                            <div class="form-floating form-floating-outline">
-                                                <input type="text" class="form-control" id="address-input"
-                                                    placeholder="Client Services" />
-                                                <label for="address-input">Client Services</label>
+                                        @csrf
+                                        @if ($errors->any())
+                                    <div class="alert alert-danger">
+                                        <ul>
+                                            @foreach ($errors->all() as $error)
+                                            <li>{{ $error }}</li>
+                                            @endforeach
+                                        </ul>
+                                    </div>
+                                    @endif
+                                        @if(isset($sale))
+                                        <input type="hidden" id="sale_id2" name="sale_id2" value="{{ $sale->id }}">
+                                        @else
+                                        <input type="hidden" id="sale_id2" name="sale_id2" value="">
+                                        @endif
+                                        <div class="row">
+                                            <div class="col-sm-9">
+                                                <div class="form-floating form-floating-outline">
+                                                    <input type="text" class="form-control" name="service_name" id="service_name" placeholder="Client Services" />
+                                                    <label for="address-input">Client Services</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-3">
+                                                <button class="btn btn-primary">Add</button>
                                             </div>
                                         </div>
-                                        <div class="col-sm-3">
-                                            <button class="btn btn-primary">Add</button>
+                                    </form>
+                                    <form id="sync_services" method="POST" action="{{ route('client_services.create') }}">
+                                        @csrf
+                                        <div class="row g-4">
+                                            <h6 class="mb-0">Services Selection</h6>
+                                            <!-- Responsive Datatable -->
+                                            <div class="card py-3 my-5">
+                                                {{-- <h5 class="card-header">Responsive Datatable</h5> --}}
+                                                <div class="card-datatable table-responsive">
+                                                    <table id="service_table" class=" table table-bordered">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Client Service Name</th>
+                                                                <th>Action</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            @if(isset($sale) && $sale->clientServices->isNotEmpty())
+                                                            @foreach ($sale->clientServices as $index => $s_service)
+                                                            <tr>
+
+                                                                <td>{{ $s_service->name }}
+                                                                    <input type="hidden"  name="client_service[{{ $index }}]" value="{{ $s_service->id }}" id="">
+                                                                </td>
+                                                                <td>
+                                                                    <div class="col-md-12 select2-primary">
+                                                                        <div class="form-floating form-floating-outline">
+                                                                            <select name="company_service[{{ $index }}][]" class="select2 form-select" multiple >
+                                                                                <option value="">Please Select</option>
+                                                                                @php
+                                                                                // Collect IDs of selected company services
+                                                                                $selectedCompanyServiceIds = $s_service->companyServices->pluck('id')->toArray();
+                                                                            @endphp
+
+                                                                            @foreach ($s_service->companyServices as $cs)
+                                                                                <option value="{{ $cs->id }}" selected>{{ $cs->name }}</option>
+                                                                            @endforeach
+
+                                                                            @foreach ($company_services as $item)
+                                                                                @if(!in_array($item->id, $selectedCompanyServiceIds))
+                                                                                    <option value="{{ $item->id }}">{{ $item->name }}</option>
+                                                                                @endif
+                                                                            @endforeach
+
+                                                                            </select>
+                                                                            <label for="multicol-closers">FTS Services</label>
+                                                                        </div>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                            @endforeach
+                                                            @endif
+
+                                                        </tbody>
+
+                                                    </table>
+                                                </div>
+                                            </div>
+                                            <!--/ Responsive Datatable -->
+
+                                        </div>
+                                        <div class="col-12 d-flex justify-content-between">
+                                            <a class="btn btn-outline-secondary btn-prev" style="color: #6d788d" disabled>
+                                                <i class="mdi mdi-arrow-left me-sm-1"></i>
+                                                <span class="align-middle d-sm-inline-block d-none">Previous</span>
+                                            </a>
+                                            <div class="last-buttons d-flex" style="gap: 20px;">
+                                                <button class="btn btn-outline-primary waves-effect" type="submit">Save</button>
+                                            <a class="btn btn-primary btn-next" style="color: #fff">
+                                                <span class="align-middle d-sm-inline-block d-none me-sm-1">Next</span>
+                                                <i class="mdi mdi-arrow-right"></i>
+                                            </a>
+                                            </div>
                                         </div>
                                     </form>
-                                    <div class="col-12 d-flex justify-content-between">
-                                        <button class="btn btn-outline-secondary btn-prev">
-                                            <i class="mdi mdi-arrow-left me-sm-1"></i>
-                                            <span class="align-middle d-sm-inline-block d-none">Previous</span>
-                                        </button>
-                                        <button class="btn btn-primary btn-next">
-                                            <span class="align-middle d-sm-inline-block d-none me-sm-1">Next</span>
-                                            <i class="mdi mdi-arrow-right"></i>
-                                        </button>
-                                    </div>
                                 </div>
                             </div>
                             <!-- Social Links -->
@@ -1204,6 +1297,15 @@
     <script src="{{ asset('assets/vendor/libs/jquery-timepicker/jquery-timepicker.js') }}"></script> --}}
     <script src="{{ asset('assets/vendor/libs/pickr/pickr.js') }}"></script>
     <script src="{{ asset('assets/js/forms-pickers.js') }}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/24.6.0/build/js/intlTelInput.min.js" integrity="sha512-/sRFlFRbcvObOo/SxW8pvmFZeMLvAF6hajRXeX15ekPgT4guXnfNSjLC98K/Tg2ObUgKX8vn9+Th5/mGHzZbEw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script>
+    const input = document.querySelector("#business_number");
+    const iti =  intlTelInput(input, {
+  initialCountry: "us",
+  strictMode: true,
+  utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/24.6.0/build/js/utils.min.js"
+});
+</script>
 
 
 
@@ -1273,7 +1375,7 @@
         const email = document.getElementById('basic-default-email').value;
         const websiteUrl = document.getElementsByName('website_url')[0].value;
         const clientName = document.getElementsByName('client_name')[0].value;
-        const socialLink = document.getElementsByName('social_link')[0].value;
+        // const socialLink = document.getElementsByName('social_link')[0].value;
 
         // Validate business name (only letters and spaces)
         if (!/^[a-zA-Z\s]*$/.test(businessName)) {
@@ -1282,10 +1384,15 @@
         }
 
         // Validate business number (only digits)
-        if (!/^\d*$/.test(businessNumber)) {
-            alert('Invalid Business Number. Only digits are allowed.');
+        if (!iti.isValidNumber()) {
+            alert('Invalid Phone Number. Please enter a valid phone number.');
             return false;
         }
+        // if (!/^\d*$/.test(businessNumber)) {
+        //     alert('Invalid Business Number. Only digits are allowed.');
+        //     return false;
+        // }
+
         const urlPattern = /^(https?:\/\/)?([a-zA-Z0-9\-]+\.)+[a-zA-Z]{2,}(\/[^\s]*)?$/;
         if (!urlPattern.test(websiteUrl)) {
             alert('Invalid Website URL. Please enter a valid URL (e.g., http://example.com).');
@@ -1320,11 +1427,44 @@
     }
 </script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="{{ asset('assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js') }}"></script>
+<script src="{{ asset('assets/js/tables-datatables-advanced.js') }}"></script>
+<script>
+    $(document).ready(function() {
+        var table = $('#service_table').DataTable({
+            pageLength: 5
+        });
+
+        // Listen for the draw event
+        table.on('draw', function() {
+            // Your custom script here
+            var link = document.createElement('link');
+                    link.rel = 'stylesheet';
+                    link.href = "{{ asset('assets/vendor/libs/select2/select2.css') }}"; // Adjust this if necessary
+                    document.head.appendChild(link);
+
+                    // Load the Select2 script
+                    var script = document.createElement('script');
+                    script.src = "{{ asset('assets/vendor/libs/select2/select2.js') }}"; // Adjust this if necessary
+                    script.onload = function() {
+                        // Initialize Select2 after the script loads
+                        $('.select2').select2(); // Reinitialize Select2 for the new select elements
+                    };
+                    document.head.appendChild(script);
+            console.log('Table redrawn, new page loaded.');
+            // You can also access the current page or other data if needed
+        });
+    });
+</script>
+
 
 <script>
 $(document).ready(function () {
     $('#saleForm').on('submit', function (e) {
         e.preventDefault(); // Prevent the default form submission
+        let isValid = validateForm(); // Call custom form validation function
+
+        if(isValid) {
 
         // Store current form values before submission, particularly time and select elements
         let timeInputs = {};
@@ -1350,8 +1490,9 @@ $(document).ready(function () {
             contentType: false, // Important: content type is false
             success: function (response) {
 
-                console.log(response.sale);
+                // console.log(response.sale);
                 $('#sale_id').val(response.sale.id);
+                $('#sale_id2').val(response.sale.id);
                 // Handle success response (display success message using SweetAlert2)
                 Swal.fire({
                     icon: 'success',
@@ -1398,6 +1539,7 @@ $(document).ready(function () {
                 });
             }
         });
+    }
     });
 });
 </script>
@@ -1475,8 +1617,32 @@ $(document).ready(function () {
 });
 </script>
 
+
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <script>
     $(document).ready(function () {
+        $("#service_name").autocomplete({
+                source: function(request, response) {
+                    $.ajax({
+                        url: "{{ route('client_services.search_services') }}",
+                        type: 'GET',
+                        dataType: 'json',
+                        data: {
+                            query: request.term
+                        },
+                        success: function(data) {
+                            response($.map(data, function(item) {
+                                return {
+                                    label: item.name,
+                                    value: item.name
+                                };
+                            }));
+                        }
+                    });
+                },
+                minLength: 2
+            });
+
         $('#serviceform').on('submit', function (e) {
             e.preventDefault(); // Prevent the default form submission
 
@@ -1495,6 +1661,61 @@ $(document).ready(function () {
                 processData: false, // Important: do not process the data
                 contentType: false, // Important: content type is false
                 success: function (response) {
+                    console.log(response);
+
+                    $('#service_table').empty(); // Use empty() to clear the table
+                    var client_service = response.client_service;
+                    var company_services = response.company_services;
+                    console.log(client_service);
+
+
+                    // Create options for the select element
+                    var options = $.map(company_services, function (item) {
+                        return '<option value="' + item.id + '">' + item.name + '</option>';
+                    }).join('');
+
+                    // Create table rows for each client service
+                    var content = $.map(client_service, function (service, index) {
+                        console.log(service);
+
+                        return '<tr>' +
+                            '<td>' + service.name + '</td>' +
+                            '<input type="hidden" name="client_service['+ index +'][]" value="' + service.id + '" />' +
+                            '<td>' +
+                                '<div class="col-md-12 select2-primary" data-select2-id="' + service.id + '">' +
+                                    '<div class="form-floating form-floating-outline form-floating-select2" data-select2-id="' + service.id + '">' +
+                                        '<div class="position-relative">' + // Removed duplicate data-select2-id attributes
+                                            '<select name="company_service['+ index +'][]" class="select2 form-select" multiple>' +
+                                                options +
+                                            '</select>' +
+                                            '<label for="multicol-closers">FTS Services</label>' +
+                                        '</div>' +
+                                    '</div>' +
+                                '</div>' +
+                            '</td>' +
+                        '</tr>';
+                    }).join(''); // Join the content into a single string
+
+                    // Append the new content to the service table
+                    $('#service_table').append(content);
+
+                    // table.page.len(5).draw();
+
+
+                        // Load the Select2 stylesheet
+                    var link = document.createElement('link');
+                    link.rel = 'stylesheet';
+                    link.href = "{{ asset('assets/vendor/libs/select2/select2.css') }}"; // Adjust this if necessary
+                    document.head.appendChild(link);
+
+                    // Load the Select2 script
+                    var script = document.createElement('script');
+                    script.src = "{{ asset('assets/vendor/libs/select2/select2.js') }}"; // Adjust this if necessary
+                    script.onload = function() {
+                        // Initialize Select2 after the script loads
+                        $('.select2').select2(); // Reinitialize Select2 for the new select elements
+                    };
+                    document.head.appendChild(script);
 
                     // Handle success response (display success message using SweetAlert2)
                     Swal.fire({
@@ -1504,6 +1725,79 @@ $(document).ready(function () {
                         timer: 2000, // Automatically close after 2 seconds
                         showConfirmButton: false
                     });
+
+                    // Optionally reset the form only on success
+                    $('#serviceform')[0].reset();
+                    // This will reset the form fields
+                },
+                error: function (xhr) {
+                    // Handle validation errors
+                    let errors = xhr.responseJSON.errors;
+                    if (errors) {
+                        let errorHtml = '<div class="alert alert-danger"><ul>';
+                        $.each(errors, function (key, value) {
+                            errorHtml += '<li>' + value + '</li>';
+                        });
+                        errorHtml += '</ul></div>';
+                        $('#saleForm').prepend(errorHtml); // Add errors to the form
+
+                        // Display SweetAlert2 for validation errors
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Validation Error',
+                            html: errorHtml, // Use the generated error HTML
+                            timer: 4000, // Auto-close after 4 seconds (optional)
+                        });
+                    }
+                    else if (xhr.responseJSON.error) {
+                        // Show custom error message with SweetAlert2
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: xhr.responseJSON.error, // Show the custom error message
+                            timer: 4000, // Auto-close after 4 seconds (optional)
+                        });
+                    }
+
+                    // Restore time input and select values after error
+                }
+            });
+        });
+    });
+    </script>
+
+<script>
+    $(document).ready(function () {
+        $('#sync_services').on('submit', function (e) {
+            e.preventDefault(); // Prevent the default form submission
+
+            // Store current form values before submission, particularly time and select elements
+
+
+            // Create a FormData object to handle form data
+            let formData = new FormData(this);
+
+            // Clear previous error messages
+
+            $.ajax({
+                url: $(this).attr('action'), // Form action URL
+                type: $(this).attr('method'), // POST method
+                data: formData,
+                processData: false, // Important: do not process the data
+                contentType: false, // Important: content type is false
+                success: function (response) {
+
+
+                    // Handle success response (display success message using SweetAlert2)
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: response.message,
+                        timer: 2000, // Automatically close after 2 seconds
+                        showConfirmButton: false
+                    });
+
+
 
                     // Optionally reset the form only on success
                     // $('#saleForm')[0].reset();
@@ -1544,7 +1838,6 @@ $(document).ready(function () {
         });
     });
     </script>
-
 
     {{-- <script>
         $(document).ready(function() {

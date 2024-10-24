@@ -100,5 +100,7 @@ Route::controller(RoleController::class)
     ->as('client_services.')
     ->middleware(PermissionMiddelware::class)
     ->group(function () {
-        Route::post('store', 'client_services')->name('store');
+        Route::get('search', 'search_services')->name('search_services');
+        Route::post('store', 'store')->name('store');
+        Route::post('sync-services', 'sync_comp_services')->name('create');
     });

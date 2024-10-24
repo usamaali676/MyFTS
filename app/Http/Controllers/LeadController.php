@@ -20,7 +20,7 @@ class LeadController extends Controller
      */
     public function index()
     {
-        $leads = Lead::all();
+        $leads = Lead::orderBy('id', 'DESC')->get();
         return view('pages.lead.index', compact('leads'));
     }
 

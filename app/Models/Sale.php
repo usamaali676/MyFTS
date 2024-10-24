@@ -21,4 +21,9 @@ class Sale extends Model
     {
         return $this->hasMany(SaleCS::class, 'sale_id');
     }
+    public function clientServices()
+    {
+        return $this->belongsToMany(ClientServices::class, 'client_service_sale');
+    }
+
 }
