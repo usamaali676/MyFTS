@@ -1008,7 +1008,7 @@
                                     <div class="col-sm-6">
                                         <div class="form-floating form-floating-outline">
                                             <input type="text" id="first-name" class="form-control"
-                                                placeholder="John" value="{{ $lead->saler->name }}" readonly/>
+                                                placeholder="John" value="{{ $lead->saler->name }}" disabled/>
                                             <label for="first-name">Sale Rep</label>
                                         </div>
                                     </div>
@@ -1035,7 +1035,7 @@
                                         @if(isset($sale) && isset($sale->signup_date))
                                           <input type="text" class="form-control flatpickr-input active" name="signup_date" placeholder="YYYY-MM-DD" id="flatpickr-date" value="{{ $sale->signup_date }}" readonly="readonly">
                                           @else
-                                          <input type="text" class="form-control flatpickr-input active" name="signup_date" placeholder="YYYY-MM-DD" id="flatpickr-date" readonly="readonly">
+                                          <input type="text" class="form-control flatpickr-input active" name="signup_date" placeholder="YYYY-MM-DD" id="flatpickr-date"  readonly="readonly">
                                           @endif
                                           <label for="flatpickr-date">Signup Date</label>
                                         </div>
@@ -1047,6 +1047,10 @@
                                                 @foreach ($sale->Customer_support as $item)
                                                 <option value="{{ $item->id }}" selected>{{ $item->user->name }}</option>
                                                 @endforeach
+                                                @foreach ($closers as $item)
+                                                <option value="{{ $item->id }}">{{ $item->name }}</option>
+                                                @endforeach
+                                                @else
                                                 <option value="">Please Select</option>
                                                 @foreach ($closers as $item)
                                                 <option value="{{ $item->id }}">{{ $item->name }}</option>
@@ -1168,7 +1172,6 @@
                                                                                 // Collect IDs of selected company services
                                                                                 $selectedCompanyServiceIds = $s_service->companyServices->pluck('id')->toArray();
                                                                             @endphp
-
                                                                             @foreach ($s_service->companyServices as $cs)
                                                                                 <option value="{{ $cs->id }}" selected>{{ $cs->name }}</option>
                                                                             @endforeach
@@ -1679,8 +1682,10 @@ $(document).ready(function () {
                         console.log(service);
 
                         return '<tr>' +
-                            '<td>' + service.name + '</td>' +
-                            '<input type="hidden" name="client_service['+ index +'][]" value="' + service.id + '" />' +
+                            '<td>' + service.name +
+                                '<input type="hidden" name="client_service['+ index +']" value="' + service.id + '" />' +
+                            '</td>' +
+
                             '<td>' +
                                 '<div class="col-md-12 select2-primary" data-select2-id="' + service.id + '">' +
                                     '<div class="form-floating form-floating-outline form-floating-select2" data-select2-id="' + service.id + '">' +
