@@ -49,11 +49,16 @@ class SaleController extends Controller
         ->get();
         $sale = Sale::where('lead_id', $lead->id)->first();
         $company_services = CompanyServices::all();
+        if(isset($sale)){
         $client_service = $sale->clientServices()->with('companyServices')->get();
+        return view('pages.sale.create', compact('lead', 'client_enum', 'call_enum' , 'social_links', 'closers', 'sale', 'company_services', 'client_service'));
+        }
+        else{
+            return view('pages.sale.create', compact('lead', 'client_enum', 'call_enum' , 'social_links', 'closers', 'sale', 'company_services'));
+        }
         // $client_service = ClientServices::where('id', 12)->first();
         // dd($client_service->companyServices);
 
-        return view('pages.sale.create', compact('lead', 'client_enum', 'call_enum' , 'social_links', 'closers', 'sale', 'company_services', 'client_service'));
     }
     public function sale_info(Request $request){
         // dd($request->all());
