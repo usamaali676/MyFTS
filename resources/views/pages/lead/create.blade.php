@@ -270,7 +270,7 @@ $('#call-status').change(function (e) {
         const clientName = document.getElementsByName('client_name')[0].value;
         const clientAddress = document.getElementsByName('client_address')[0].value;
 
-        alert(businessNumber);
+        // alert(businessNumber);
 
         // Validate business name (only letters and spaces)
         if (!/^[a-zA-Z\s]*$/.test(businessName)) {
