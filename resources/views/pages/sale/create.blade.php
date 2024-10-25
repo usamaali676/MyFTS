@@ -1418,10 +1418,10 @@
         }
 
         // Validate client address (allowing letters, digits, and certain symbols)
-        if (!/^[a-zA-Z0-9\/\-\_\:\, ]*$/.test(clientAddress)) {
-            alert('Invalid Client Address. Only letters, numbers, and certain symbols are allowed.');
-            return false;
-        }
+        // if (!/^[a-zA-Z0-9\/\-\_\:\, ]*$/.test(clientAddress)) {
+        //     alert('Invalid Client Address. Only letters, numbers, and certain symbols are allowed.');
+        //     return false;
+        // }
 
         return true; // All validations passed
     }
