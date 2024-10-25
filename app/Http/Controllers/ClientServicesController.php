@@ -85,15 +85,17 @@ class ClientServicesController extends Controller
             }
             $sale = Sale::find($request->sale_id2);
             $sale->clientServices()->syncWithoutDetaching([$service->id]);
-            $client_service = $sale->clientServices;
+            $client_service = $sale->clientServices()->with('companyServices')->get();;
 
             $company_services = CompanyServices::all();
+            $client_company_services = $sale->clientServices()->with('companyServices')->get();
 
             return response()->json([
                 'message' => 'Service Added Succesfully!',
                 'service' => $service,
                 'company_services' => $company_services,
-                'client_service' => $client_service
+                'client_service' => $client_service,
+                'client_company_services' => $client_company_services
             ], 200);
         } else {
             return response()->json([
