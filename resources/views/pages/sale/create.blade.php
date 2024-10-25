@@ -1149,6 +1149,11 @@
                                                 {{-- <h5 class="card-header">Responsive Datatable</h5> --}}
                                                 <div class="card-datatable table-responsive" style="padding-bottom: 5rem">
                                                     <table id="service_table" class=" table table-bordered">
+                                                        @if(isset($sale))
+                                                        <input type="hidden" id="sale_id3" name="sale_id3" value="{{ $sale->id }}">
+                                                        @else
+                                                        <input type="hidden" id="sale_id3" name="sale_id3" value="">
+                                                        @endif
                                                         <thead>
                                                             <tr>
                                                                 <th>Client Service Name</th>
@@ -1169,17 +1174,17 @@
                                                                             <select name="company_service[{{ $index }}][]" class="select2 form-select" multiple >
                                                                                 <option value="">Please Select</option>
                                                                                 @php
-                                                                                // Collect IDs of selected company services
-                                                                                $selectedCompanyServiceIds = $s_service->companyServices->pluck('id')->toArray();
+                                                                                // Get the specific `Company Services` for this `Sale` and `Client Service`
+                                                                                $selectedCompanyServiceIds = \App\Models\SaleClientServiceCompanyService::where('sale_id', $sale->id)
+                                                                                    ->where('client_service_id', $s_service->id)
+                                                                                    ->pluck('company_service_id')
+                                                                                    ->toArray();
                                                                             @endphp
-                                                                            @foreach ($s_service->companyServices as $cs)
-                                                                                <option value="{{ $cs->id }}" selected>{{ $cs->name }}</option>
-                                                                            @endforeach
 
                                                                             @foreach ($company_services as $item)
-                                                                                @if(!in_array($item->id, $selectedCompanyServiceIds))
-                                                                                    <option value="{{ $item->id }}">{{ $item->name }}</option>
-                                                                                @endif
+                                                                                <option value="{{ $item->id }}" {{ in_array($item->id, $selectedCompanyServiceIds) ? 'selected' : '' }}>
+                                                                                    {{ $item->name }}
+                                                                                </option>
                                                                             @endforeach
 
                                                                             </select>
@@ -1195,9 +1200,91 @@
 
                                                     </table>
                                                 </div>
+                                                <div class="row">
+                                                    <div class="col-md-6"></div>
+                                                    <div class="col-md-6" style="text-align: right">
+                                                        <button class="btn btn-outline-primary waves-effect" type="submit">Save</button>
+                                                    </div>
+                                                </div>
                                             </div>
                                             <!--/ Responsive Datatable -->
 
+                                        </div>
+
+                                        {{-- <div class="row g-4">
+                                            <h4>Client Service Area</h4>
+                                            <form action="">
+                                            <div class="row py-4">
+                                                <div class="col-md-3">
+                                                    <div class="form-floating form-floating-outline">
+                                                        <select id="countries" name="country" class="select2 form-select" data-allow-clear="true" >
+                                                            <option value="">Please Select</option>
+                                                        </select>
+                                                        <label for="multicol-country">Countries</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="form-floating form-floating-outline">
+                                                        <select id="states" name="states" class="select2 form-select" data-allow-clear="true" >
+                                                            <option value="">Please Select</option>
+                                                        </select>
+                                                        <label for="multicol-country">States</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="form-floating form-floating-outline">
+                                                        <select id="cities" name="cities" class="select2 form-select" data-allow-clear="true" >
+                                                            <option value="">Please Select</option>
+                                                        </select>
+                                                        <label for="multicol-country">Cities</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            </form>
+                                        </div> --}}
+
+                                    </form>
+
+                                    <div class="row g-4">
+                                            <h4>Client Service Area</h4>
+                                            <form id="service_area" action="{{ route('service_area.store') }}" method="POST" >
+                                            <div class="row py-4">
+                                                <div class="col-md-3">
+                                                    <div class="form-floating form-floating-outline">
+                                                        <select id="countries" name="country" class="select2 form-select" data-allow-clear="true" >
+                                                            <option value="">Please Select</option>
+                                                        </select>
+                                                        <label for="multicol-country">Countries</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="form-floating form-floating-outline">
+                                                        <select id="states" name="states" class="select2 form-select" data-allow-clear="true" >
+                                                            <option value="">Please Select</option>
+                                                        </select>
+                                                        <label for="multicol-country">States</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="form-floating form-floating-outline">
+                                                        <select id="cities" name="cities" class="select2 form-select" data-allow-clear="true" >
+                                                            <option value="">Please Select</option>
+                                                        </select>
+                                                        <label for="multicol-country">Cities</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <button type="submit" class="btn btn-primary">Save</button>
+                                                </div>
+                                            </div>
+                                            </form>
+                                        </div>
+                                        <div class="row g-4">
+                                            <div class="col-md-12">
+                                                <ul id="areas_we_serve">
+
+                                                </ul>
+                                            </div>
                                         </div>
                                         <div class="col-12 d-flex justify-content-between">
                                             <a class="btn btn-outline-secondary btn-prev" style="color: #6d788d" disabled>
@@ -1212,7 +1299,7 @@
                                             </a>
                                             </div>
                                         </div>
-                                    </form>
+
                                 </div>
                             </div>
                             <!-- Social Links -->
@@ -1496,6 +1583,7 @@ $(document).ready(function () {
                 // console.log(response.sale);
                 $('#sale_id').val(response.sale.id);
                 $('#sale_id2').val(response.sale.id);
+                $('#sale_id3').val(response.sale.id);
                 // Handle success response (display success message using SweetAlert2)
                 Swal.fire({
                     icon: 'success',
@@ -1688,37 +1776,47 @@ $(document).ready(function () {
 
                     // Create table rows for each client service
                     var content = $.map(client_service, function (service, index) {
-                        console.log(service);
-                        var options = '';
-                        if (service.company_services.length > 0) {
-                            options = $.map(service.company_services, function (item) {
-                                return '<option value="' + item.id + '" selected>' + item.name + '</option>';
-                            }).join('');
-                        } else {
-                            var options = $.map(company_services, function (item) {
-                                return '<option value="' + item.id + '">' + item.name + '</option>';
-                            }).join('');
-                        }
+                    console.log(service);
 
-                        return '<tr>' +
-                            '<td>' + service.name +
-                                '<input type="hidden" name="client_service['+ index +']" value="' + service.id + '" />' +
-                            '</td>' +
+                    var options = '';
 
-                            '<td>' +
-                                '<div class="col-md-12 select2-primary" data-select2-id="' + service.id + '">' +
-                                    '<div class="form-floating form-floating-outline form-floating-select2" data-select2-id="' + service.id + '">' +
-                                        '<div class="position-relative">' + // Removed duplicate data-select2-id attributes
-                                            '<select name="company_service['+ index +'][]" class="select2 form-select" multiple>' +
-                                                    options +
-                                            '</select>' +
-                                            '<label for="multicol-closers">FTS Services</label>' +
-                                        '</div>' +
+                    // Check if `companyServicesForSale` exists and has services
+                    if (service.company_services_for_sale && service.company_services_for_sale.length > 0) {
+                        options = $.map(service.company_services_for_sale, function (item) {
+                            return '<option value="' + item.id + '" selected>' + item.name + '</option>';
+                        }).join('');
+                    } else {
+                        options = $.map(company_services, function (item) {
+                            return '<option value="' + item.id + '">' + item.name + '</option>';
+                        }).join('');
+                    }
+
+                    return '<tr>' +
+                        '<td>' + service.name +
+                            '<input type="hidden" name="client_service[' + index + ']" value="' + service.id + '" />' +
+                        '</td>' +
+
+                        '<td>' +
+                            '<div class="col-md-12 select2-primary" data-select2-id="' + service.id + '">' +
+                                '<div class="form-floating form-floating-outline form-floating-select2" data-select2-id="' + service.id + '">' +
+                                    '<div class="position-relative">' +
+                                        '<select name="company_service[' + index + '][]" class="select2 form-select" multiple>' +
+                                            options +
+                                        '</select>' +
+                                        '<label for="multicol-closers">FTS Services</label>' +
                                     '</div>' +
                                 '</div>' +
-                            '</td>' +
-                        '</tr>';
-                    }).join(''); // Join the content into a single string
+                            '</div>' +
+                        '</td>' +
+                    '</tr>';
+                }).join(''); // Join the content into a single string
+
+                // Assuming you want to append this to a specific table or container
+                $('#service_table tbody').html(content);
+
+
+                // Assuming you want to append this to a specific table or container
+                // $('#service_table tbody').html(content);
 
                     // Append the new content to the service table
                     $('#service_table').append(content);
@@ -1862,6 +1960,48 @@ $(document).ready(function () {
         });
     });
     </script>
+
+<script>
+    $(document).ready(function() {
+        // Load countries
+        $.get('{{ route('front.countries') }}', function(data) {
+            $.each(data, function(index, country) {
+                $('#countries').append(`<option value="${country.id}">${country.name}</option>`);
+            });
+        });
+
+        // Load states on country select
+        $('#countries').on('change', function() {
+            const countryId = $(this).val();
+            $('#states').empty().append('<option value="">Select State</option>').prop('disabled', false);
+            $('#cities').empty().append('<option value="">Select City</option>').prop('disabled', true);
+            // console.log(count);
+
+            if (countryId) {
+                $.get(`http://newcrm.test/front/states/${countryId}`, function(data) {
+                    $.each(data, function(index, state) {
+                        $('#states').append(`<option value="${state.id}">${state.name}</option>`);
+                    });
+                });
+            }
+        });
+
+        // Load cities on state select
+        $('#states').on('change', function() {
+            const conrtyId = $('#countries').val();
+            const stateId = $(this).val();
+            $('#cities').empty().append('<option value="">Select City</option>').prop('disabled', false);
+
+            if (stateId) {
+                $.get(`http://newcrm.test/front/cities/${stateId}/${conrtyId}`, function(data) {
+                    $.each(data, function(index, city) {
+                        $('#cities').append(`<option value="${city.id}">${city.name}</option>`);
+                    });
+                });
+            }
+        });
+    });
+</script>
 
     {{-- <script>
         $(document).ready(function() {

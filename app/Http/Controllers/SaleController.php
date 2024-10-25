@@ -15,6 +15,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 
 class SaleController extends Controller
 {
@@ -48,14 +49,23 @@ class SaleController extends Controller
         $closers = User::where('user_type', "Closer")
         ->get();
         $sale = Sale::where('lead_id', $lead->id)->first();
+
+
         $company_services = CompanyServices::all();
-        if(isset($sale)){
-        $client_service = $sale->clientServices()->with('companyServices')->get();
-        return view('pages.sale.create', compact('lead', 'client_enum', 'call_enum' , 'social_links', 'closers', 'sale', 'company_services', 'client_service'));
+        if (isset($sale)) {
+            // Get client services for the sale and eager load their company services specific to this sale
+            $client_services = $sale->clientServices->map(function ($clientService) use ($sale) {
+                // Load the company services specific to the sale
+                $clientService->setRelation('companyServicesForSale', $clientService->companyServicesForSale($sale->id)->get());
+                return $clientService;
+            });
+
+            return view('pages.sale.create', compact('lead', 'client_enum', 'call_enum', 'social_links', 'closers', 'sale', 'company_services', 'client_services'));
+        } else {
+            return view('pages.sale.create', compact('lead', 'client_enum', 'call_enum', 'social_links', 'closers', 'sale', 'company_services'));
         }
-        else{
-            return view('pages.sale.create', compact('lead', 'client_enum', 'call_enum' , 'social_links', 'closers', 'sale', 'company_services'));
-        }
+
+
         // $client_service = ClientServices::where('id', 12)->first();
         // dd($client_service->companyServices);
 

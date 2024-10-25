@@ -23,7 +23,21 @@ class Sale extends Model
     }
     public function clientServices()
     {
-        return $this->belongsToMany(ClientServices::class, 'client_service_sale');
+        return $this->belongsToMany(ClientServices::class, 'client_service_sale')
+                    ->withPivot('id')  // keep track of pivot ID
+                    ->withTimestamps();
+    }
+
+    public function companyServices()
+    {
+        return $this->hasManyThrough(
+            CompanyServices::class,
+            SaleClientServiceCompanyService::class,
+            'sale_id', // Foreign key on the pivot table for Sale
+            'id', // Local key on the company_services table
+            'id', // Local key on the sales table
+            'company_service_id' // Foreign key on the pivot table for Company Service
+        );
     }
 
 }

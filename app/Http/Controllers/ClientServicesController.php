@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ClientServiceCompanyService;
 use App\Models\ClientServices;
 use App\Models\CompanyServices;
 use App\Models\Sale;
+use App\Models\SaleClientServiceCompanyService;
 use Illuminate\Http\Request;
 
 class ClientServicesController extends Controller
@@ -34,29 +34,34 @@ class ClientServicesController extends Controller
     {
         // dd($request->all());
         // Validate the request inputs
+
         $validated = $request->validate([
+            'sale_id3' => 'required|integer|exists:sales,id',
             'client_service' => 'required|array',
             'company_service' => 'required|array',
         ]);
 
+
         foreach ($request->input('client_service') as $index => $clientServiceId) {
-            // Get the company services for the current client service
             $companyServices = $request->input('company_service')[$index] ?? [];
 
-            // Ensure $companyServices is an array
             if (is_array($companyServices)) {
-                // Delete all existing relationships for this client service
-                ClientServiceCompanyService::where('client_service_id', $clientServiceId)->delete();
+                // Clear previous associations specific to this sale
+                SaleClientServiceCompanyService::where('sale_id', $validated['sale_id3'])
+                    ->where('client_service_id', $clientServiceId)
+                    ->delete();
 
-                // Insert the new selected company services
+                // Save new associations
                 foreach ($companyServices as $companyServiceId) {
-                    ClientServiceCompanyService::create([
+                    SaleClientServiceCompanyService::create([
+                        'sale_id' => $validated['sale_id3'],
                         'client_service_id' => $clientServiceId,
                         'company_service_id' => $companyServiceId,
                     ]);
                 }
             }
         }
+
         return response()->json([
             'message' => 'Service Added Succesfully!',
         ], 200);
@@ -85,17 +90,20 @@ class ClientServicesController extends Controller
             }
             $sale = Sale::find($request->sale_id2);
             $sale->clientServices()->syncWithoutDetaching([$service->id]);
-            $client_service = $sale->clientServices()->with('companyServices')->get();;
+            // $client_service = $sale->clientServices()->with('companyServices')->get();;
+            $client_services = $sale->clientServices->map(function ($clientService) use ($sale) {
+                // Load the company services specific to the sale
+                $clientService->setRelation('companyServicesForSale', $clientService->companyServicesForSale($sale->id)->get());
+                return $clientService;
+            });
 
             $company_services = CompanyServices::all();
-            $client_company_services = $sale->clientServices()->with('companyServices')->get();
 
             return response()->json([
                 'message' => 'Service Added Succesfully!',
                 'service' => $service,
                 'company_services' => $company_services,
-                'client_service' => $client_service,
-                'client_company_services' => $client_company_services
+                'client_service' => $client_services,
             ], 200);
         } else {
             return response()->json([
@@ -135,4 +143,6 @@ class ClientServicesController extends Controller
     {
         //
     }
+
+
 }

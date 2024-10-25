@@ -9,9 +9,10 @@ class CompanyServices extends Model
 {
     use HasFactory;
 
-    public function clientServices()
+    public function clientServicesForSale($saleId)
     {
-        return $this->belongsTo(ClientServices::class, 'client_service_company_services');
+        return $this->belongsToMany(ClientServices::class, 'sale_client_service_company_services', 'company_service_id', 'client_service_id')
+                    ->wherePivot('sale_id', $saleId);
     }
 
 }

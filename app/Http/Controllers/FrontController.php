@@ -54,6 +54,52 @@ class FrontController extends Controller
                 return response()->json($results);
             }
 
+            public function getCountries()
+            {
+                // Replace with your logic to fetch countries, e.g., from a JSON file or database
+                $countries = json_decode(file_get_contents(storage_path('app/areas.json')), true);
+                return response()->json($countries);
+            }
+
+            public function getStates($countryId)
+            {
+                $data = json_decode(file_get_contents(storage_path('app/areas.json')), true);
+
+                // Check if countries are structured properly
+                foreach ($data as $country) {
+                    if ($country['id'] == $countryId) {
+                        $states = $country['states'] ?? []; // Use null coalescing to avoid errors
+                        return response()->json($states);
+                    }
+                }
+
+                return response()->json(['error' => 'Country not found.'], 404);
+            }
+
+            public function getCities($stateId, $conrtyId)
+            {
+                $data = json_decode(file_get_contents(storage_path('app/areas.json')), true);
+
+                // Since there's no 'countries' key, access 'states' directly
+
+
+                $cities = [];
+
+                foreach ($data as $country) {
+                    if ($country['id'] == $conrtyId) {
+                        $states = $country['states'] ?? [];
+                        foreach ($states as $state) {
+                            if ($state['id'] == $stateId) {
+                                $cities = $state['cities']?? []; // Use null coalescing to avoid errors
+                                return response()->json($cities);
+                            }
+                        }
+                    }
+                }
+
+                return response()->json(['error' => 'Cities not found.'], 404);
+            }
+
     }
 
 
