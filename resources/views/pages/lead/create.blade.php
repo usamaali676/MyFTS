@@ -257,7 +257,9 @@ $('#call-status').change(function (e) {
     // alert(selected);
     if(selected == "Asked to Callback"){
         $('#flatpickr-datetime').prop('disabled', false);
-
+    }
+    else{
+        $('#flatpickr-datetime').prop('disabled', true);
     }
 });
 </script>

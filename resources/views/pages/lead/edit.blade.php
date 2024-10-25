@@ -284,6 +284,28 @@
   utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/24.6.0/build/js/utils.min.js"
 });
 </script>
+<script>
+    $(document).ready(function () {
+        var selected = $(this).find('option:selected').val();
+        if(selected == "Asked to Callback"){
+                $('#flatpickr-datetime').prop('disabled', false);
+            }
+            else{
+                $('#flatpickr-datetime').prop('disabled', true);
+            }
+        $('#call-status').change(function (e) {
+            e.preventDefault();
+            var selected = $(this).find('option:selected').val();
+            // alert(selected);
+            if(selected == "Asked to Callback"){
+                $('#flatpickr-datetime').prop('disabled', false);
+            }
+            else{
+                $('#flatpickr-datetime').prop('disabled', true);
+            }
+        });
+    });
+    </script>
 
 <script>
     $('#category').change(function (e) {
