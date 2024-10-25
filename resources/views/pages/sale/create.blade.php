@@ -1147,7 +1147,7 @@
                                             <!-- Responsive Datatable -->
                                             <div class="card py-3 my-5">
                                                 {{-- <h5 class="card-header">Responsive Datatable</h5> --}}
-                                                <div class="card-datatable table-responsive">
+                                                <div class="card-datatable table-responsive" style="padding-bottom: 5rem">
                                                     <table id="service_table" class=" table table-bordered">
                                                         <thead>
                                                             <tr>
@@ -1669,17 +1669,36 @@ $(document).ready(function () {
                     $('#service_table').empty(); // Use empty() to clear the table
                     var client_service = response.client_service;
                     var company_services = response.company_services;
+                    // var client_company_services = response.client_company_services;
                     console.log(client_service);
 
 
                     // Create options for the select element
-                    var options = $.map(company_services, function (item) {
-                        return '<option value="' + item.id + '">' + item.name + '</option>';
-                    }).join('');
+                    // if(!!client_service.companyServices && client_service.companyServices.lenght > 0){
+                    // var options = $.map(company_services.companyServices, function (item) {
+                    //     return '<option value="' + item.id + '">' + item.name + '</option>';
+                    // }).join('');
+                    // } else {
+                    //     var options = $.map(company_services, function (item) {
+                    //     return '<option value="' + item.id + '">' + item.name + '</option>';
+                    // }).join('');
+                    // }
+
+
 
                     // Create table rows for each client service
                     var content = $.map(client_service, function (service, index) {
                         console.log(service);
+                        var options = '';
+                        if (service.company_services.length > 0) {
+                            options = $.map(service.company_services, function (item) {
+                                return '<option value="' + item.id + '" selected>' + item.name + '</option>';
+                            }).join('');
+                        } else {
+                            var options = $.map(company_services, function (item) {
+                                return '<option value="' + item.id + '">' + item.name + '</option>';
+                            }).join('');
+                        }
 
                         return '<tr>' +
                             '<td>' + service.name +
@@ -1691,7 +1710,7 @@ $(document).ready(function () {
                                     '<div class="form-floating form-floating-outline form-floating-select2" data-select2-id="' + service.id + '">' +
                                         '<div class="position-relative">' + // Removed duplicate data-select2-id attributes
                                             '<select name="company_service['+ index +'][]" class="select2 form-select" multiple>' +
-                                                options +
+                                                    options +
                                             '</select>' +
                                             '<label for="multicol-closers">FTS Services</label>' +
                                         '</div>' +
