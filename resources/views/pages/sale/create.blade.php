@@ -1375,7 +1375,7 @@
         const email = document.getElementById('basic-default-email').value;
         const websiteUrl = document.getElementsByName('website_url')[0].value;
         const clientName = document.getElementsByName('client_name')[0].value;
-        // const socialLink = document.getElementsByName('social_link')[0].value;
+        const socialLink = document.getElementsByName('social_link')[0].value;
 
         // Validate business name (only letters and spaces)
         if (!/^[a-zA-Z\s]*$/.test(businessName)) {
