@@ -1375,7 +1375,7 @@
         const email = document.getElementById('basic-default-email').value;
         const websiteUrl = document.getElementsByName('website_url')[0].value;
         const clientName = document.getElementsByName('client_name')[0].value;
-        const socialLink = document.getElementsByName('social_link')[0].value;
+        // const socialLink = document.getElementsByName('social_link')[0].value;
 
         // Validate business name (only letters and spaces)
         if (!/^[a-zA-Z\s]*$/.test(businessName)) {
@@ -1399,10 +1399,10 @@
             return false;
         }
 
-        if (!urlPattern.test(socialLink)) {
-            alert('Invalid Social  URL. Please enter a valid URL (e.g., http://example.com).');
-            return false;
-        }
+        // if (!urlPattern.test(socialLink)) {
+        //     alert('Invalid Social  URL. Please enter a valid URL (e.g., http://example.com).');
+        //     return false;
+        // }
 
         // Validate email format
         const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
