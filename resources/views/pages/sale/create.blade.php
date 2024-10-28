@@ -1412,40 +1412,140 @@
                                     <h6 class="mb-0">Invoice</h6>
                                     <small>Manage Invoices</small>
                                 </div>
-                                <div class="row ">
-                                    <div class="col-sm-6">
-                                        <label class="switch switch-lg">
-                                            <input type="checkbox" class="switch-input" name="sale_status">
-                                            <span class="switch-toggle-slider">
-                                              <span class="switch-on">
-                                                <i class="ri-check-line"></i>
-                                              </span>
-                                              <span class="switch-off">
-                                                <i class="ri-close-line"></i>
-                                              </span>
-                                            </span>
-                                            <span class="switch-label">Sale Active Status</span>
-                                          </label>
-                                    </div>
-                                    <div class="col-md-6 col-12 mb-6">
-                                        <div class="form-floating form-floating-outline">
-                                          <input type="text" class="form-control flatpickr-input active" name="activation_date" placeholder="YYYY-MM-DD" id="flatpickr-date"  readonly="readonly">
-                                          <label for="flatpickr-date">Activation Date</label>
+                                <form action="">
+                                    <div class="row g-4">
+                                        <div class="col-sm-6">
+                                            <label class="switch switch-lg">
+                                                <input type="checkbox" class="switch-input" name="sale_status">
+                                                <span class="switch-toggle-slider">
+                                                    <span class="switch-on">
+                                                        <i class="ri-check-line"></i>
+                                                    </span>
+                                                    <span class="switch-off">
+                                                        <i class="ri-close-line"></i>
+                                                    </span>
+                                                </span>
+                                                <span class="switch-label">Sale Active Status</span>
+                                            </label>
                                         </div>
-                                      </div>
+                                        <div class="col-md-6 col-12 mb-6">
+                                            <div class="form-floating form-floating-outline">
+                                                <input type="text" class="form-control flatpickr-input active" name="activation_date"
+                                                    placeholder="YYYY-MM-DD" id="flatpickr-date" readonly="readonly">
+                                                <label for="flatpickr-date">Activation Date</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-floating form-floating-outline">
+                                                <select id="comp_Services" name="company_service" class="select2 form-select" data-allow-clear="true">
+                                                    <option value="">Please Select</option>
+                                                    @if(isset($sale) && count($sale->companyServices) > 0)
+                                                    @foreach ($sale->companyServices->unique('id') as $comp_ser)
+                                                    <option value="{{$comp_ser->id }}">{{ $comp_ser->name }} </option>
+                                                    @endforeach
+                                                    @endif
+                                                </select>
+                                                <label for="multicol-country">Invoiced Services</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-floating form-floating-outline">
+                                                        <div class="input-group input-group-merge">
+                                                            <span class="input-group-text">$</span>
+                                                            <div class="form-floating form-floating-outline">
+                                                                <input type="number" id="amount" class="form-control" placeholder="499"
+                                                                    aria-label="Amount (to the nearest dollar)">
+                                                                <label>Amount</label>
+                                                            </div>
+                                                            <span class="input-group-text">.00</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="form-floating form-floating-outline">
+                                                        <div class="form-check mt-3">
+                                                            <input class="form-check-input" type="checkbox" value="" id="defaultCheck1">
+                                                            <label class="form-check-label" for="defaultCheck1">
+                                                                Complementary
+                                                            </label>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <button type="submit" class="btn btn-primary">Add</button>
+                                                </div>
+                                            </div>
+
+
+                                        </div>
+                                    </div>
+                                </form>
+                                <div class="row py-4">
+                                    <div class="col-md-12">
+                                        <div class="table-responsive">
+                                            <table id="keyword_table" class="table table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Invoiced Service</th>
+                                                        <th>Is Complementary</th>
+                                                        <th>Service Service ($)</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @if(isset($sale) && count($sale->keyword) > 0)
+                                                        @foreach ($sale->keyword as $keyword)
+                                                        <tr>
+                                                            <td>{{ $keyword->keyword }}</td>
+                                                            <td>{{ $keyword->area->country }}, {{ $keyword->area->state }}, {{ $keyword->area->city }}</td>
+                                                            <td>500</td>
+
+                                                        </tr>
+                                                        @endforeach
+                                                    @endif
+
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row g-4 pt-3">
                                     <div class="col-md-6">
                                         <div class="form-floating form-floating-outline">
-                                            <select id="areas_dropdown" name="area_id" class="select2 form-select" data-allow-clear="true">
+                                            <select id="discount" name="discount_type" class="select2 form-select" data-allow-clear="true">
                                                 <option value="">Please Select</option>
-                                                @if(isset($sale) && count($sale->companyServices) > 0)
-                                                @foreach ($sale->companyServices->unique('id') as $comp_ser)
-                                                <option value="{{$comp_ser->id }}">{{ $comp_ser->name }} </option>
-                                                @endforeach
-                                                @endif
+                                                <option value="New Client Discount">New Client Discount</option>
+                                                <option value="New Year Discount">New Year Discount</option>
+                                                <option value="X-max Discount">X-max Discount</option>
                                             </select>
-                                            <label for="multicol-country">Invoiced Services</label>
+                                            <label for="multicol-country">Discount Type</label>
                                         </div>
-
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-floating form-floating-outline">
+                                            <div class="input-group input-group-merge">
+                                                <span class="input-group-text">$</span>
+                                                <div class="form-floating form-floating-outline">
+                                                    <input type="number" id="discount_amount" name="discount_amount" class="form-control" placeholder="499"
+                                                        aria-label="Amount (to the nearest dollar)">
+                                                    <label>Discount Amount</label>
+                                                </div>
+                                                <span class="input-group-text">.00</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-floating form-floating-outline">
+                                            <select id="discount" name="discount_type" class="select2 form-select" data-allow-clear="true">
+                                                <option value="">Please Select</option>
+                                                <option value="New Client Discount">New Client Discount</option>
+                                                <option value="New Year Discount">New Year Discount</option>
+                                                <option value="X-max Discount">X-max Discount</option>
+                                            </select>
+                                            <label for="multicol-country">Invoice Frequency</label>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="row g-4 pt-4">
@@ -2088,7 +2188,7 @@ $(document).ready(function () {
             // console.log(count);
 
             if (countryId) {
-                $.get(`http://newcrm.test/front/states/${countryId}`, function(data) {
+                $.get(`https://myfts.firmtech.biz//front/states/${countryId}`, function(data) {
                     $.each(data, function(index, state) {
                         $('#states').append(`<option value="${state.name}">${state.name}</option>`);
                     });
@@ -2103,7 +2203,7 @@ $(document).ready(function () {
             $('#cities').empty().append('<option value="">Select City</option>').prop('disabled', false);
 
             if (stateId) {
-                $.get(`http://newcrm.test/front/cities/${stateId}/${conrtyId}`, function(data) {
+                $.get(`https://myfts.firmtech.biz//front/cities/${stateId}/${conrtyId}`, function(data) {
                     $.each(data, function(index, city) {
                         $('#cities').append(`<option value="${city.name}">${city.name}</option>`);
                     });
