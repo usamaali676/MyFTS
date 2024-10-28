@@ -50,6 +50,7 @@ class SaleController extends Controller
         ->get();
         $sale = Sale::where('lead_id', $lead->id)->first();
 
+        // dd($sale->social_links);
 
 
         $company_services = CompanyServices::all();
@@ -176,6 +177,7 @@ class SaleController extends Controller
                 $social->delete();
             }
             if (isset($request->social_name)  && count($request->social_name) > 0) {
+                // dd("dfjhdsflkg");
                 foreach ($request->social_name as $key => $value) {
                     SocialLink::create([
                         'sale_id' => $sale->id,
@@ -186,8 +188,7 @@ class SaleController extends Controller
             }
         }
 
-        $old_businss_hour = BusinessHours::where('sale_id', $sale->id)->get();
-        if ($old_businss_hour == Null) {
+        if (isset($request->day) && count($request->day) > 0) {
             $days = $request->input('day');
             $openTimes = $request->input('open');
             $closeTimes = $request->input('closed');
@@ -203,13 +204,8 @@ class SaleController extends Controller
 
             // Array of checks corresponding to each day
             $dayChecks = [
-                $mondayCheck,
-                $tuesdayCheck,
-                $wednesdayCheck,
-                $thursdayCheck,
-                $fridayCheck,
-                $saturdayCheck,
-                $sundayCheck
+                $mondayCheck, $tuesdayCheck, $wednesdayCheck, $thursdayCheck,
+                $fridayCheck, $saturdayCheck, $sundayCheck
             ];
 
             foreach ($days as $index => $day) {
@@ -225,100 +221,45 @@ class SaleController extends Controller
                     $is24_7 = true;
                 }
 
-                // Only format opening and closing times if not closed or 24/7
-                if (!$isClosed && !$is24_7) {
-                    $openingTime = isset($openTimes[$index]) ? $openTimes[$index] : '00:00';
-                    $closingTime = isset($closeTimes[$index]) ? $closeTimes[$index] : '23:59';
+                // Retrieve existing business hours for the day if they exist
+                $existingHours = BusinessHours::where('sale_id', $sale->id)->where('day', $day)->first();
 
-                    // Format opening and closing times with Carbon
-                    $formattedOpeningTime = Carbon::createFromFormat('H:i', $openingTime)->format('H:i:s');
-                    $formattedClosingTime = Carbon::createFromFormat('H:i', $closingTime)->format('H:i:s');
+                // Default to existing times if provided; otherwise, format new ones
+                if (!$isClosed && !$is24_7) {
+                    $openingTime = isset($openTimes[$index]) ? $openTimes[$index] : ($existingHours->opening_time ?? '00:00');
+                    $closingTime = isset($closeTimes[$index]) ? $closeTimes[$index] : ($existingHours->closing_time ?? '23:59');
+
+                    try {
+                        $formattedOpeningTime = Carbon::createFromFormat('H:i', $openingTime)->format('H:i:s');
+                        $formattedClosingTime = Carbon::createFromFormat('H:i', $closingTime)->format('H:i:s');
+                    } catch (\Exception $e) {
+                        // Handle invalid format by using existing or default times
+                        $formattedOpeningTime = $existingHours->opening_time ?? '00:00:00';
+                        $formattedClosingTime = $existingHours->closing_time ?? '23:59:59';
+                    }
                 } else {
                     // If closed or 24/7, set default values for opening/closing time
-                    $formattedOpeningTime = '00:00:00';
-                    $formattedClosingTime = '23:59:59';
+                    $formattedOpeningTime = $existingHours->opening_time ?? '00:00:00';
+                    $formattedClosingTime = $existingHours->closing_time ?? '23:59:59';
                 }
 
-                // Save the schedule in the database
-                BusinessHours::create([
-                    'sale_id' => $sale->id,
-                    'day' => $day,
-                    'opening_time' => $formattedOpeningTime,
-                    'closing_time' => $formattedClosingTime,
-                    'is_closed' => $isClosed,
-                    'is_24/7' => $is24_7
-                ]);
-            }
-        } else {
-            $old_businss_hour = BusinessHours::where('sale_id', $sale->id)->get();
-            foreach ($old_businss_hour as $hour) {
-                $hour->delete();
-            }
-
-            $days = $request->input('day');
-            $openTimes = $request->input('open');
-            $closeTimes = $request->input('closed');
-
-            // Checks for each day
-            $mondayCheck = $request->input('monday_check');
-            $tuesdayCheck = $request->input('tuesday_check');
-            $wednesdayCheck = $request->input('wednesday_check');
-            $thursdayCheck = $request->input('thursday_check');
-            $fridayCheck = $request->input('friday_check');
-            $saturdayCheck = $request->input('saturday_check');
-            $sundayCheck = $request->input('sunday_check');
-
-            // Array of checks corresponding to each day
-            $dayChecks = [
-                $mondayCheck,
-                $tuesdayCheck,
-                $wednesdayCheck,
-                $thursdayCheck,
-                $fridayCheck,
-                $saturdayCheck,
-                $sundayCheck
-            ];
-
-            foreach ($days as $index => $day) {
-                $check = $dayChecks[$index];
-
-                // Determine is_closed and is_24/7 flags
-                $isClosed = false;
-                $is24_7 = false;
-
-                if ($check == 'closed') {
-                    $isClosed = true;
-                } elseif ($check == '24/7') {
-                    $is24_7 = true;
-                }
-
-                // Only format opening and closing times if not closed or 24/7
-                if (!$isClosed && !$is24_7) {
-                    $openingTime = isset($openTimes[$index]) ? $openTimes[$index] : '00:00';
-                    $closingTime = isset($closeTimes[$index]) ? $closeTimes[$index] : '23:59';
-
-                    // Format opening and closing times with Carbon
-                    $formattedOpeningTime = Carbon::createFromFormat('H:i', $openingTime)->format('H:i:s');
-                    $formattedClosingTime = Carbon::createFromFormat('H:i', $closingTime)->format('H:i:s');
-                } else {
-                    // If closed or 24/7, set default values for opening/closing time
-                    $formattedOpeningTime = '00:00:00';
-                    $formattedClosingTime = '23:59:59';
-                }
-
-                // Save the schedule in the database
-                BusinessHours::create([
-                    'sale_id' => $sale->id,
-                    'day' => $day,
-                    'opening_time' => $formattedOpeningTime,
-                    'closing_time' => $formattedClosingTime,
-                    'is_closed' => $isClosed,
-                    'is_24/7' => $is24_7
-                ]);
+                // Use updateOrCreate to update if exists or create new if it doesn't
+                BusinessHours::updateOrCreate(
+                    // Conditions to find the record
+                    [
+                        'sale_id' => $sale->id,
+                        'day' => $day
+                    ],
+                    // Values to update or create
+                    [
+                        'opening_time' => $formattedOpeningTime,
+                        'closing_time' => $formattedClosingTime,
+                        'is_closed' => $isClosed,
+                        'is_24/7' => $is24_7
+                    ]
+                );
             }
         }
-
-
 
 
         return response()->json([

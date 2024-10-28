@@ -139,9 +139,28 @@ class ClientServicesController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(ClientServices $clientServices)
+    public function destroy( Request $request)
     {
-        //
+            // Find the client service by ID, return a 404 error if not found
+            $client_service = ClientServices::findOrFail($request->id);
+            // dd($client_service->sales);
+            // Delete related sales
+            if(isset($client_service->sale))
+            {
+                $client_service->sales()->detach();
+            }
+
+            // dd($client_service->companyServicesForSale($client_service->sales->id));
+            // Detach or delete company services
+            $client_service->companyServices()->detach();
+
+            // Finally, delete the client service itself
+            $client_service->delete();
+
+                return response()->json([
+                    'message' => 'Service Deleted Succesfully!',
+
+                ], 200);
     }
 
 

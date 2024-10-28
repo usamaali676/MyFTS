@@ -109,6 +109,7 @@ Route::controller(RoleController::class)
         Route::get('search', 'search_services')->name('search_services');
         Route::post('store', 'store')->name('store');
         Route::post('sync-services', 'sync_comp_services')->name('create');
+        Route::get('delete', 'destroy')->name('delete');
     });
 
     Route::controller(ServiceAreaController::class)

@@ -12,9 +12,14 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/24.6.0/build/css/intlTelInput.min.css" integrity="sha512-X3pJz9m4oT4uHCYS6UjxVdWk1yxSJJIJOJMIkf7TjPpb1BzugjiFyHu7WsXQvMMMZTnGUA9Q/GyxxCWNDZpdHA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 <link rel="stylesheet" href="{{ asset('assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css') }}" />
 <link rel="stylesheet" href="{{ asset('assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css') }}" />
+<link
+    href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css"
+    rel="stylesheet"
+/>
 
 {{-- <link rel="stylesheet" href="{{ asset('assets/vendor/libs/jquery-timepicker/jquery-timepicker.css') }}" />
 <link rel="stylesheet" href="{{ asset('assets/vendor/libs/pickr/pickr-themes.css') }}" /> --}}
+
 <style>
     .col-md-5 {
         margin-top: 0.5rem;
@@ -559,17 +564,117 @@
                                         <h6 class="mb-0">Business Hours</h6>
                                         {{-- <small>From Lead Model</small> --}}
                                     </div>
+                                    @if(isset($sale) && count($sale->business_hours) > 0)
                                     <div class="col-md-12" style="display: flex; flex-direction: column; gap: 25px;">
+                                        @foreach($sale->business_hours as $index => $business_hour)
+                                        <!-- Day -->
+                                        <div class="row opening-day">
+                                            <div class="col-md-2">
+                                                <h5>{{ $business_hour->day }} <input type="hidden" name="day[]" value="{{ $business_hour->day }}"></h5>
+                                            </div>
+                                            <div class="col-md-3 form-floating form-floating-outline">
+                                                <input type="time" class="form-control flatpickr-input" @if($business_hour->is_closed != 1 && $business_hour->{"is_24/7"} != 1) value="{{ $business_hour->opening_time }}" @endif name="open[]" id="{{ Str::lower($business_hour->day) }}_open">
+                                            </div>
+                                            <div class="col-md-3 form-floating form-floating-outline">
+                                                <input type="time" class="form-control flatpickr-input" @if($business_hour->is_closed != 1 && $business_hour->{"is_24/7"} != 1) value="{{ $business_hour->closing_time }}" @endif name="closed[]" id="{{ Str::lower($business_hour->day) }}_closed">
+                                            </div>
+                                            <div class="col-md-2 d-flex" style="gap: 20px;">
+                                                <div class="form-check custom-option custom-option-basic checked">
+                                                    <label class="form-check-label custom-option-content" for="customRadioTemp{{ $index }}_1">
+                                                        <input  data-day="check" data-day-name="{{ Str::lower($business_hour->day) }}" name="{{ Str::lower($business_hour->day) }}_check" class="form-check-input" type="radio" @if($business_hour->is_closed != 1 && $business_hour->{"is_24/7"} != 1) checked @endif value="open" id="customRadioTemp{{ $index }}_1"
+                                                            checked="">
+                                                        <span class="custom-option-header">
+                                                            <span class="h6 mb-0">Open</span>
+                                                        </span>
+                                                    </label>
+                                                </div>
+                                                <div class="form-check custom-option custom-option-basic">
+                                                    <label class="form-check-label custom-option-content" for="customRadioTemp{{ $index }}_2">
+                                                        <input  data-day="check" data-day-name="{{ Str::lower($business_hour->day) }}" name="{{ Str::lower($business_hour->day) }}_check" class="form-check-input" type="radio" @if($business_hour->is_closed == 1) checked @endif value="closed"
+                                                            id="customRadioTemp{{ $index }}_2">
+                                                        <span class="custom-option-header">
+                                                            <span class="h6 mb-0">Closed</span>
+                                                        </span>
+                                                    </label>
+                                                </div>
+                                                <div class="form-check custom-option custom-option-basic">
+                                                    <label class="form-check-label custom-option-content" for="customRadioTemp{{ $index }}_3">
+                                                        <input  data-day="check" data-day-name="{{ Str::lower($business_hour->day) }}" name="{{ Str::lower($business_hour->day) }}_check" class="form-check-input" @if($business_hour->{"is_24/7"} == 1) checked @endif type="radio" value="24/7"
+                                                            id="customRadioTemp{{ $index }}_3">
+                                                        <span class="custom-option-header">
+                                                            <span class="h6 mb-0">24/7</span>
+                                                        </span>
+                                                    </label>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                        <!-- Day / End -->
+                                        @endforeach
+                                    </div>
+                                    @else
+                                        @php
+                                            $business_hours = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday','Saturday','Sunday']
+                                        @endphp
+                                        <div class="col-md-12" style="display: flex; flex-direction: column; gap: 25px;">
+                                            @foreach($business_hours as $index=>$business_hour)
+                                            <!-- Day -->
+                                            <div class="row opening-day">
+                                                <div class="col-md-2">
+                                                    <h5>{{ $business_hour }} <input type="hidden" name="day[]" value="{{ $business_hour }}"></h5>
+                                                </div>
+                                                <div class="col-md-3 form-floating form-floating-outline">
+                                                    <input type="time" class="form-control flatpickr-input" value="" name="open[]" id="{{ Str::lower($business_hour) }}_open">
+                                                </div>
+                                                <div class="col-md-3 form-floating form-floating-outline">
+                                                    <input type="time" class="form-control flatpickr-input" value="" name="closed[]" id="{{ Str::lower($business_hour) }}_closed">
+                                                </div>
+                                                <div class="col-md-2 d-flex" style="gap: 20px;">
+                                                    <div class="form-check custom-option custom-option-basic checked">
+                                                        <label class="form-check-label custom-option-content" for="customRadioTemp{{ $index }}_1">
+                                                            <input  data-day="check" data-day-name="{{ Str::lower($business_hour) }}" name="{{ Str::lower($business_hour) }}_check" class="form-check-input" type="radio" value="open" id="customRadioTemp{{ $index }}_1"
+                                                                checked="">
+                                                            <span class="custom-option-header">
+                                                                <span class="h6 mb-0">Open</span>
+                                                            </span>
+                                                        </label>
+                                                    </div>
+                                                    <div class="form-check custom-option custom-option-basic">
+                                                        <label class="form-check-label custom-option-content" for="customRadioTemp{{ $index }}_2">
+                                                            <input  data-day="check" data-day-name="{{ Str::lower($business_hour) }}" name="{{ Str::lower($business_hour) }}_check" class="form-check-input" type="radio" value="closed"
+                                                                id="customRadioTemp{{ $index }}_2">
+                                                            <span class="custom-option-header">
+                                                                <span class="h6 mb-0">Closed</span>
+                                                            </span>
+                                                        </label>
+                                                    </div>
+                                                    <div class="form-check custom-option custom-option-basic">
+                                                        <label class="form-check-label custom-option-content" for="customRadioTemp{{ $index }}_3">
+                                                            <input  data-day="check" data-day-name="{{ Str::lower($business_hour) }}" name="{{ Str::lower($business_hour) }}_check" class="form-check-input" type="radio" value="24/7"
+                                                                id="customRadioTemp{{ $index }}_3">
+                                                            <span class="custom-option-header">
+                                                                <span class="h6 mb-0">24/7</span>
+                                                            </span>
+                                                        </label>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                            <!-- Day / End -->
+                                            @endforeach
+                                        </div>
+                                    @endif
+                                    {{-- <div class="col-md-12" style="display: flex; flex-direction: column; gap: 25px;">
                                         <!-- Day -->
                                         <div class="row opening-day">
                                             <div class="col-md-2">
                                                 <h5>Monday <input type="hidden" name="day[]" value="Monday"></h5>
                                             </div>
                                             <div class="col-md-3 form-floating form-floating-outline">
-                                                <input type="time" class="form-control flatpickr-input " name="open[]" id="monday_open">
+                                                <input type="time" class="form-control flatpickr-input" value="@if(isset($sale && $sale->business_hours))  @endif" name="open[]" id="monday_open">
                                             </div>
                                             <div class="col-md-3 form-floating form-floating-outline">
-                                                <input type="time" class="form-control flatpickr-input " name="closed[]" id="monday_closed">
+                                                <input type="time" class="form-control flatpickr-input" value="@if(isset($sale && $sale->business_hours))  @endif" name="closed[]" id="monday_closed">
                                             </div>
                                             <div class="col-md-2 d-flex" style="gap: 20px;">
                                                 <div class="form-check custom-option custom-option-basic checked">
@@ -610,10 +715,10 @@
                                                 <h5>Tuesday <input type="hidden" name="day[]" value="Tuesday"></h5>
                                             </div>
                                             <div class="col-md-3 form-floating form-floating-outline">
-                                                <input type="time" class="form-control flatpickr-input " name="open[]" id="tuesday_open">
+                                                <input type="time" class="form-control flatpickr-input " value="@if(isset($sale && $sale->business_hours))  @endif" name="open[]" id="tuesday_open">
                                             </div>
                                             <div class="col-md-3 form-floating form-floating-outline">
-                                                <input type="time" class="form-control flatpickr-input " name="closed[]" id="tuesday_closed">
+                                                <input type="time" class="form-control flatpickr-input " value="@if(isset($sale && $sale->business_hours))  @endif" name="closed[]" id="tuesday_closed">
                                             </div>
                                             <div class="col-md-2 d-flex" style="gap: 20px;">
                                                 <div class="form-check custom-option custom-option-basic checked">
@@ -654,10 +759,10 @@
                                                 <h5>Wednesday <input type="hidden" name="day[]" value="Wednesday"></h5>
                                             </div>
                                             <div class="col-md-3 form-floating form-floating-outline">
-                                                <input type="time" class="form-control flatpickr-input " name="open[]" id="wednesday_open">
+                                                <input type="time" class="form-control flatpickr-input " value="@if(isset($sale && $sale->business_hours))  @endif" name="open[]" id="wednesday_open">
                                             </div>
                                             <div class="col-md-3 form-floating form-floating-outline">
-                                                <input type="time" class="form-control flatpickr-input " name="closed[]" id="wednesday_closed">
+                                                <input type="time" class="form-control flatpickr-input " value="@if(isset($sale && $sale->business_hours))  @endif" name="closed[]" id="wednesday_closed">
                                             </div>
                                             <div class="col-md-2 d-flex" style="gap: 20px;">
                                                 <div class="form-check custom-option custom-option-basic checked">
@@ -698,10 +803,10 @@
                                                 <h5>Thursday <input type="hidden" name="day[]" value="Thursday"></h5>
                                             </div>
                                             <div class="col-md-3 form-floating form-floating-outline">
-                                                <input type="time" class="form-control flatpickr-input " name="open[]" id="thursday_open">
+                                                <input type="time" class="form-control flatpickr-input " value="@if(isset($sale && $sale->business_hours))  @endif" name="open[]" id="thursday_open">
                                             </div>
                                             <div class="col-md-3 form-floating form-floating-outline">
-                                                <input type="time" class="form-control flatpickr-input " name="closed[]" id="thursday_closed">
+                                                <input type="time" class="form-control flatpickr-input " value="@if(isset($sale && $sale->business_hours))  @endif" name="closed[]" id="thursday_closed">
                                             </div>
                                             <div class="col-md-2 d-flex" style="gap: 20px;">
                                                 <div class="form-check custom-option custom-option-basic checked">
@@ -742,10 +847,10 @@
                                                 <h5>Friday <input type="hidden" name="day[]" value="Friday"></h5>
                                             </div>
                                             <div class="col-md-3 form-floating form-floating-outline">
-                                                <input type="time" class="form-control flatpickr-input " name="open[]" id="friday_open">
+                                                <input type="time" class="form-control flatpickr-input " value="@if(isset($sale && $sale->business_hours))  @endif" name="open[]" id="friday_open">
                                             </div>
                                             <div class="col-md-3 form-floating form-floating-outline">
-                                                <input type="time" class="form-control flatpickr-input " name="closed[]" id="friday_closed">
+                                                <input type="time" class="form-control flatpickr-input " value="@if(isset($sale && $sale->business_hours))  @endif" name="closed[]" id="friday_closed">
                                             </div>
                                             <div class="col-md-2 d-flex" style="gap: 20px;">
                                                 <div class="form-check custom-option custom-option-basic checked">
@@ -786,10 +891,10 @@
                                                 <h5>Saturday <input type="hidden" name="day[]" value="Saturday"></h5>
                                             </div>
                                             <div class="col-md-3 form-floating form-floating-outline">
-                                                <input type="time" class="form-control flatpickr-input " name="open[]" id="saturday_open">
+                                                <input type="time" class="form-control flatpickr-input " value="@if(isset($sale && $sale->business_hours))  @endif" name="open[]" id="saturday_open">
                                             </div>
                                             <div class="col-md-3 form-floating form-floating-outline">
-                                                <input type="time" class="form-control flatpickr-input " name="closed[]" id="saturday_closed">
+                                                <input type="time" class="form-control flatpickr-input " value="@if(isset($sale && $sale->business_hours))  @endif" name="closed[]" id="saturday_closed">
                                             </div>
                                             <div class="col-md-2 d-flex" style="gap: 20px;">
                                                 <div class="form-check custom-option custom-option-basic checked">
@@ -830,10 +935,10 @@
                                                 <h5>Sunday <input type="hidden" name="day[]" value="Sunday"></h5>
                                             </div>
                                             <div class="col-md-3 form-floating form-floating-outline">
-                                                <input type="time" class="form-control flatpickr-input " name="open[]" id="sunday_open">
+                                                <input type="time" class="form-control flatpickr-input " value="@if(isset($sale && $sale->business_hours))  @endif" name="open[]" id="sunday_open">
                                             </div>
                                             <div class="col-md-3 form-floating form-floating-outline">
-                                                <input type="time" class="form-control flatpickr-input " name="closed[]" id="sunday_closed">
+                                                <input type="time" class="form-control flatpickr-input " value="@if(isset($sale && $sale->business_hours))  @endif" name="closed[]" id="sunday_closed">
                                             </div>
                                             <div class="col-md-2 d-flex" style="gap: 20px;">
                                                 <div class="form-check custom-option custom-option-basic checked">
@@ -867,7 +972,7 @@
                                             </div>
                                         </div>
                                         <!-- Day / End -->
-                                    </div>
+                                    </div> --}}
 
                                     <div class="content-header mb-3">
                                         <h6 class="mb-0">Social Link</h6>
@@ -878,7 +983,43 @@
                                         <div class="card">
                                             <div class="card-body">
                                                 <div id="repeater">
-                                                    @if(isset($sale) && isset($sale->social_links) && count($sale->social_links) > 0)
+                                                    {{-- <div class="items">
+                                                        <!-- Repeater Content -->
+
+                                                        <div class="item-content">
+                                                            <div class="row py-2">
+                                                                <div class="col-md-4">
+                                                                    <div class="form-floating form-floating-outline">
+                                                                        <select id="social_links" name="social_name[]" class="form-select" data-allow-clear="true">
+                                                                            <option value="">Please Select</option>
+                                                                            @foreach ($social_links as $item)
+                                                                            <option value="{{$item}}">{{$item}}</option>
+                                                                            @endforeach
+
+                                                                        </select>
+                                                                        <label for="multicol-country">Social Platform</label>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <div class="form-floating form-floating-outline">
+                                                                        <input type="text" class="form-control " name="social_link[]" placeholder="Social Link" id="social_link" placeholder
+                                                                            aria-label="social_link" />
+                                                                        <label for="time_zone">Social Link</label>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-2">
+                                                                    <div class="pull-right repeater-remove-btn">
+                                                                        <a id="remove-btn" class="btn btn-outline-danger remove-btn waves-effect" style="color: #ff4d49 " disabled="true"
+                                                                            onclick="$(this).parents('.items').remove()">
+                                                                            Remove
+                                                                    </a>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                        </div>
+                                                    </div> --}}
+                                                    @if(isset($sale) && count($sale->social_links) > 0)
                                                     {{-- <h1>fdgsdfg</h1> --}}
                                                         @foreach($sale->social_links as $list)
                                                         <div class="items">
@@ -889,7 +1030,8 @@
                                                                         <div class="form-floating form-floating-outline">
                                                                             <select id="social_links" name="social_name[]" class="form-select" data-allow-clear="true">
                                                                                 <option value="">Please Select</option>
-                                                                                @foreach ($list as $item)
+                                                                                <option value="{{ $list->social_name}}" selected>{{ $list->social_name }}</option>
+                                                                                @foreach ($social_links as $item)
                                                                                 <option value="{{$item}}">{{$item}}</option>
                                                                                 @endforeach
 
@@ -899,7 +1041,7 @@
                                                                     </div>
                                                                     <div class="col-md-6">
                                                                         <div class="form-floating form-floating-outline">
-                                                                            <input type="text" class="form-control " name="social_link[]" placeholder="Social Link" id="social_link" placeholder
+                                                                            <input type="text" class="form-control " name="social_link[]" placeholder="Social Link" value="{{ $list->social_link }}" id="social_link" placeholder
                                                                                 aria-label="social_link" />
                                                                             <label for="time_zone">Social Link</label>
                                                                         </div>
@@ -972,10 +1114,10 @@
                                         </a>
                                         <div class="last-buttons d-flex" style="gap: 20px;">
                                             <button class="btn btn-outline-primary waves-effect" type="submit">Save</button>
-                                        <a class="btn btn-primary btn-next" style="color: #fff">
+                                        <button type="button" id="first_next" class="btn btn-primary btn-next" style="color: #fff" disabled>
                                             <span class="align-middle d-sm-inline-block d-none me-sm-1">Next</span>
                                             <i class="mdi mdi-arrow-right"></i>
-                                        </a>
+                                        </button>
                                         </div>
                                     </div>
                                 </div>
@@ -1147,8 +1289,11 @@
                                             <!-- Responsive Datatable -->
                                             <div class="card py-3 my-5">
                                                 {{-- <h5 class="card-header">Responsive Datatable</h5> --}}
+
                                                 <div class="card-datatable table-responsive" style="padding-bottom: 5rem">
-                                                    <table id="service_table" class=" table table-bordered">
+                                                    <div class="table-responsive">
+                                                    <table id="service_table" class="table table-bordered">
+                                                    {{-- <table id="service_table" class=" table table-bordered"> --}}
                                                         @if(isset($sale))
                                                         <input type="hidden" id="sale_id3" name="sale_id3" value="{{ $sale->id }}">
                                                         @else
@@ -1157,6 +1302,7 @@
                                                         <thead>
                                                             <tr>
                                                                 <th>Client Service Name</th>
+                                                                <th>Company Services</th>
                                                                 <th>Action</th>
                                                             </tr>
                                                         </thead>
@@ -1192,6 +1338,9 @@
                                                                         </div>
                                                                     </div>
                                                                 </td>
+                                                                <td>
+                                                                    <a class="service_delete" data-id="{{ $s_service->id }}"  style="font-size:20px;" class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect" data-bs-toggle="tooltip" aria-label="Delete" data-bs-original-title="Delete"><i class="ri-delete-bin-5-line ri-50px"></i></a>
+                                                                </td>
                                                             </tr>
                                                             @endforeach
                                                             @endif
@@ -1199,6 +1348,7 @@
                                                         </tbody>
 
                                                     </table>
+                                                </div>
                                                 </div>
                                                 <div class="row">
                                                     <div class="col-md-6"></div>
@@ -1536,13 +1686,20 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <div class="col-md-6 col-12 mb-6">
+                                        <div class="form-floating form-floating-outline">
+                                            <input type="text" class="form-control flatpickr-input active" name="invoice_due_date"
+                                                placeholder="YYYY-MM-DD" id="flatpickr-date" readonly="readonly">
+                                            <label for="flatpickr-date">Invoice Due Date</label>
+                                        </div>
+                                    </div>
                                     <div class="col-md-6">
                                         <div class="form-floating form-floating-outline">
                                             <select id="discount" name="discount_type" class="select2 form-select" data-allow-clear="true">
                                                 <option value="">Please Select</option>
-                                                <option value="New Client Discount">New Client Discount</option>
-                                                <option value="New Year Discount">New Year Discount</option>
-                                                <option value="X-max Discount">X-max Discount</option>
+                                                <option value="Monthly">Monthly</option>
+                                                <option value="Bi-annually">Bi-annually</option>
+                                                <option value="Annually">Annually</option>
                                             </select>
                                             <label for="multicol-country">Invoice Frequency</label>
                                         </div>
@@ -1794,6 +1951,7 @@ $(document).ready(function () {
                 $('#sale_id3').val(response.sale.id);
                 $('#sale_id4').val(response.sale.id);
                 $('#sale_id5').val(response.sale.id);
+                $('#first_next').prop('disabled', false);
                 // Handle success response (display success message using SweetAlert2)
                 Swal.fire({
                     icon: 'success',
@@ -2097,7 +2255,63 @@ $(document).ready(function () {
         });
     });
     </script>
+<script>
+    $(document).ready(function () {
+        $('.service_delete').click(function (e) {
+            e.preventDefault();
+            var id = $(this).attr('data-id');
+            // alert(id);
+            // Get the service ID from the form data
+            $.ajax({
+                type: "GET",
+                url: "{{ route('client_services.delete') }}",
+                data: {id: id},
+                success: function (response) {
+                    Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: response.message,
+                    timer: 2000, // Automatically close after 2 seconds
+                    showConfirmButton: false
+                });
+                },
+                error: function (xhr) {
+                    // Handle validation errors
+                    let errors = xhr.responseJSON.errors;
+                    if (errors) {
+                        let errorHtml = '<div class="alert alert-danger"><ul>';
+                        $.each(errors, function (key, value) {
+                            errorHtml += '<li>' + value + '</li>';
+                        });
+                        errorHtml += '</ul></div>';
+                        $('#saleForm').prepend(errorHtml); // Add errors to the form
 
+                        // Display SweetAlert2 for validation errors
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Validation Error',
+                            html: errorHtml, // Use the generated error HTML
+                            timer: 4000, // Auto-close after 4 seconds (optional)
+                        });
+                    }
+                    else if (xhr.responseJSON.error) {
+                        // Show custom error message with SweetAlert2
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: xhr.responseJSON.error, // Show the custom error message
+                            timer: 4000, // Auto-close after 4 seconds (optional)
+                        });
+                    }
+
+                    // Restore time input and select values after error
+                }
+
+            });
+
+        });
+    });
+</script>
 <script>
     $(document).ready(function () {
         $('#sync_services').on('submit', function (e) {
