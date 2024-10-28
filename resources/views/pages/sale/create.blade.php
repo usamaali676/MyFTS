@@ -2188,7 +2188,7 @@ $(document).ready(function () {
             // console.log(count);
 
             if (countryId) {
-                $.get(`https://myfts.firmtech.biz//front/states/${countryId}`, function(data) {
+                $.get(`https://myfts.firmtech.biz/front/states/${countryId}`, function(data) {
                     $.each(data, function(index, state) {
                         $('#states').append(`<option value="${state.name}">${state.name}</option>`);
                     });
@@ -2203,7 +2203,7 @@ $(document).ready(function () {
             $('#cities').empty().append('<option value="">Select City</option>').prop('disabled', false);
 
             if (stateId) {
-                $.get(`https://myfts.firmtech.biz//front/cities/${stateId}/${conrtyId}`, function(data) {
+                $.get(`https://myfts.firmtech.biz/front/cities/${stateId}/${conrtyId}`, function(data) {
                     $.each(data, function(index, city) {
                         $('#cities').append(`<option value="${city.name}">${city.name}</option>`);
                     });
