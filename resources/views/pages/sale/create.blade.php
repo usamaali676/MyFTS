@@ -1248,7 +1248,13 @@
                                     <div class="row g-4">
                                             <h4>Client Service Area</h4>
                                             <form id="service_area" action="{{ route('service_area.store') }}" method="POST" >
+                                                @csrf
                                             <div class="row py-4">
+                                                @if(isset($sale))
+                                                <input type="hidden" value="{{ $sale->id }}" name="sale_id4" id="sale_id4">
+                                                @else
+                                                <input type="hidden" name="sale_id4" id="sale_id4">
+                                                @endif
                                                 <div class="col-md-3">
                                                     <div class="form-floating form-floating-outline">
                                                         <select id="countries" name="country" class="select2 form-select" data-allow-clear="true" >
@@ -1280,11 +1286,29 @@
                                             </form>
                                         </div>
                                         <div class="row g-4">
-                                            <div class="col-md-12">
-                                                <ul id="areas_we_serve">
 
-                                                </ul>
-                                            </div>
+                                                    <div class="col-md-12">
+                                                        <div class="table-responsive">
+                                                            <table id="areas_we_serve" class="table table-striped">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th>Service Area</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                @if(isset($sale) && count($sale->service_area) > 0)
+                                                                @foreach ($sale->service_area as $area)
+                                                                <tr>
+                                                                <td>{{ $area->country }}, {{ $area->state }}, {{ $area->city }}</td>
+                                                                </tr>
+                                                                @endforeach
+                                                            @endif
+
+
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
                                         </div>
                                         <div class="col-12 d-flex justify-content-between">
                                             <a class="btn btn-outline-secondary btn-prev" style="color: #6d788d" disabled>
@@ -1304,39 +1328,73 @@
                             </div>
                             <!-- Social Links -->
                             <div id="social-links" class="content">
-                                {{-- <div class="content-header mb-3">
-                                    <h6 class="mb-0">Social Links</h6>
-                                    <small>Enter Your Social Links.</small>
+                                <div class="content-header mb-3">
+                                    <h6 class="mb-0">Keywords</h6>
+                                    <small>Add Keywords against Areas</small>
                                 </div>
-                                <div class="row g-4">
-                                    <div class="col-sm-6">
-                                        <div class="form-floating form-floating-outline">
-                                            <input type="text" id="twitter" class="form-control"
-                                                placeholder="https://twitter.com/abc" />
-                                            <label for="twitter">Twitter</label>
+                                <form id="keywordadd" action="{{ route('keyword.store') }}" method="POST">
+                                    @csrf
+                                    <div class="row g-4">
+                                        @if(isset($sale))
+                                        <input type="hidden" name="sale_id5" id="sale_id5" value="{{ $sale->id }}">
+                                        @else
+                                        <input type="hidden" name="sale_id5" id="sale_id5" >
+                                        @endif
+                                        <div class="col-md-12">
+                                            <div class="form-floating form-floating-outline">
+                                                <input type="text" id="keyword" name="keyword" class="form-control" placeholder="Keyword" />
+                                                <label for="Keyword">Keyword</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-floating form-floating-outline">
+                                                <select id="areas_dropdown" name="area_id" class="select2 form-select" data-allow-clear="true">
+                                                    <option value="">Please Select</option>
+                                                    @if(isset($sale) && count($sale->service_area) > 0)
+                                                    @foreach ($sale->service_area as $area)
+                                                    <option value="{{$area->id }}">{{ $area->country }}, {{ $area->state }}, {{ $area->city }}</option>
+                                                    @endforeach
+                                                    @endif
+                                                </select>
+                                                <label for="multicol-country">Service Area</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-floating form-floating-outline">
+                                                <button type="submit" class="btn btn-primary">Add</button>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div class="col-sm-6">
-                                        <div class="form-floating form-floating-outline">
-                                            <input type="text" id="facebook" class="form-control"
-                                                placeholder="https://facebook.com/abc" />
-                                            <label for="facebook">Facebook</label>
+                                </form>
+                                <div class="row g-4 py-5">
+                                    <div class="col-md-12">
+                                        <div class="table-responsive">
+                                            <table id="keyword_table" class="table table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Keyword</th>
+                                                        <th>Service Area</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @if(isset($sale) && count($sale->keyword) > 0)
+                                                        @foreach ($sale->keyword as $keyword)
+                                                        <tr>
+                                                            <td>{{ $keyword->keyword }}</td>
+                                                            {{-- <td>{{ $keyword->area }}</td> --}}
+                                                            <td>{{ $keyword->area->country }}, {{ $keyword->area->state }}, {{ $keyword->area->city }}</td>
+
+                                                        </tr>
+                                                        @endforeach
+                                                    @endif
+
+                                                </tbody>
+                                            </table>
                                         </div>
                                     </div>
-                                    <div class="col-sm-6">
-                                        <div class="form-floating form-floating-outline">
-                                            <input type="text" id="google" class="form-control"
-                                                placeholder="https://plus.google.com/abc" />
-                                            <label for="google">Google+</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-6">
-                                        <div class="form-floating form-floating-outline">
-                                            <input type="text" id="linkedin" class="form-control"
-                                                placeholder="https://linkedin.com/abc" />
-                                            <label for="linkedin">Linkedin</label>
-                                        </div>
-                                    </div>
+                                </div>
+
+
                                     <div class="col-12 d-flex justify-content-between">
                                         <button class="btn btn-outline-secondary btn-prev">
                                             <i class="mdi mdi-arrow-left me-sm-1"></i>
@@ -1347,16 +1405,37 @@
                                             <i class="mdi mdi-arrow-right"></i>
                                         </button>
                                     </div>
-                                </div> --}}
-                            </div>
+                                </div>
+                            {{-- </div> --}}
                             <div id="review-submit" class="content">
+                                <div class="content-header mb-3">
+                                    <h6 class="mb-0">Invoice</h6>
+                                    <small>Manage Invoices</small>
+                                </div>
+                                <div class="row ">
+                                    <div class="col-md-6">
+                                        <div class="form-floating form-floating-outline">
+                                            <select id="areas_dropdown" name="area_id" class="select2 form-select" data-allow-clear="true">
+                                                <option value="">Please Select</option>
+                                                @if(isset($sale) && count($sale->companyServices) > 0)
+                                                @foreach ($sale->companyServices->unique('id') as $comp_ser)
+                                                <option value="{{$comp_ser->id }}">{{ $comp_ser->name }} </option>
+                                                @endforeach
+                                                @endif
+                                            </select>
+                                            <label for="multicol-country">Invoiced Services</label>
+                                        </div>
 
-                                <div class="col-12 d-flex justify-content-between">
-                                    <button class="btn btn-outline-secondary btn-prev">
-                                        <i class="mdi mdi-arrow-left me-sm-1"></i>
-                                        <span class="align-middle d-sm-inline-block d-none">Previous</span>
-                                    </button>
-                                    <button class="btn btn-primary btn-submit">Submit</button>
+                                    </div>
+                                </div>
+                                <div class="row g-4 pt-4">
+                                    <div class="col-12 d-flex justify-content-between">
+                                        <button class="btn btn-outline-secondary btn-prev">
+                                            <i class="mdi mdi-arrow-left me-sm-1"></i>
+                                            <span class="align-middle d-sm-inline-block d-none">Previous</span>
+                                        </button>
+                                        <button class="btn btn-primary btn-submit">Submit</button>
+                                    </div>
                                 </div>
                             </div>
                     </div>
@@ -1584,6 +1663,8 @@ $(document).ready(function () {
                 $('#sale_id').val(response.sale.id);
                 $('#sale_id2').val(response.sale.id);
                 $('#sale_id3').val(response.sale.id);
+                $('#sale_id4').val(response.sale.id);
+                $('#sale_id5').val(response.sale.id);
                 // Handle success response (display success message using SweetAlert2)
                 Swal.fire({
                     icon: 'success',
@@ -1966,7 +2047,7 @@ $(document).ready(function () {
         // Load countries
         $.get('{{ route('front.countries') }}', function(data) {
             $.each(data, function(index, country) {
-                $('#countries').append(`<option value="${country.id}">${country.name}</option>`);
+                $('#countries').append(`<option value="${country.name}">${country.name}</option>`);
             });
         });
 
@@ -1980,7 +2061,7 @@ $(document).ready(function () {
             if (countryId) {
                 $.get(`http://newcrm.test/front/states/${countryId}`, function(data) {
                     $.each(data, function(index, state) {
-                        $('#states').append(`<option value="${state.id}">${state.name}</option>`);
+                        $('#states').append(`<option value="${state.name}">${state.name}</option>`);
                     });
                 });
             }
@@ -1995,7 +2076,7 @@ $(document).ready(function () {
             if (stateId) {
                 $.get(`http://newcrm.test/front/cities/${stateId}/${conrtyId}`, function(data) {
                     $.each(data, function(index, city) {
-                        $('#cities').append(`<option value="${city.id}">${city.name}</option>`);
+                        $('#cities').append(`<option value="${city.name}">${city.name}</option>`);
                     });
                 });
             }
@@ -2003,38 +2084,164 @@ $(document).ready(function () {
     });
 </script>
 
-    {{-- <script>
-        $(document).ready(function() {
-            $('input[name$="_check"]').change(function(e) {
-                e.preventDefault();
-                var selected = $(this).val(); // Get the value of the checked radio button
-                var day = $(this).attr('name').split('_')[0]; // Get the day (e.g., "monday", "tuesday")
+<script>
+    $(document).ready(function () {
+        $('#service_area').on('submit', function (e) {
+            e.preventDefault(); // Prevent the default form submission
 
-                if (selected == "closed" || selected == "24/7") {
-                    $('#' + day + '_open').prop('disabled', true);
-                    $('#' + day + '_closed').prop('disabled', true);
-                } else {
-                    $('#' + day + '_open').prop('disabled', false);
-                    $('#' + day + '_closed').prop('disabled', false);
+            // Store current form values before submission, particularly time and select elements
+
+
+            // Create a FormData object to handle form data
+            let formData = new FormData(this);
+
+            // Clear previous error messages
+
+            $.ajax({
+                url: $(this).attr('action'), // Form action URL
+                type: $(this).attr('method'), // POST method
+                data: formData,
+                processData: false, // Important: do not process the data
+                contentType: false, // Important: content type is false
+                success: function (response) {
+
+                    var list = '<tr>\
+                                <td>'+response.servicearea.country+', '+ response.servicearea.state +', '+response.servicearea.city+'</td>\
+                                </tr>'
+                    $('#areas_we_serve').append(list);
+                    var option = '<option value="'+response.servicearea.id+'">'+response.servicearea.country+', '+ response.servicearea.state +', '+response.servicearea.city+'</option>'
+                    $('#areas_dropdown').append(option);
+
+
+
+                    // Handle success response (display success message using SweetAlert2)
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: response.message,
+                        timer: 2000, // Automatically close after 2 seconds
+                        showConfirmButton: false
+                    });
+
+
+                    // Optionally reset the form only on success
+                    $('#service_area')[0].reset();
+                    // This will reset the form fields
+                },
+                error: function (xhr) {
+                    // Handle validation errors
+                    let errors = xhr.responseJSON.errors;
+                    if (errors) {
+                        let errorHtml = '<div class="alert alert-danger"><ul>';
+                        $.each(errors, function (key, value) {
+                            errorHtml += '<li>' + value + '</li>';
+                        });
+                        errorHtml += '</ul></div>';
+                        $('#service_area').prepend(errorHtml); // Add errors to the form
+
+                        // Display SweetAlert2 for validation errors
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Validation Error',
+                            html: errorHtml, // Use the generated error HTML
+                            timer: 4000, // Auto-close after 4 seconds (optional)
+                        });
+                    }
+                    else if (xhr.responseJSON.error) {
+                        // Show custom error message with SweetAlert2
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: xhr.responseJSON.error, // Show the custom error message
+                            timer: 4000, // Auto-close after 4 seconds (optional)
+                        });
+                    }
+
+                    // Restore time input and select values after error
                 }
             });
         });
-        </script> --}}
-
-    {{-- <script>
-    $('input[name="monday_check"]').change(function (e) {
-        e.preventDefault();
-        var selected = $(this).val(); // Get the value of the checked radio button
-        if(selected == "closed" || selected == "24/7"){
-            $('#monday_open').prop('disabled', true);
-            $('#monday_closed').prop('disabled', true);
-        }
-        else{
-            $('#monday_open').prop('disabled', false);
-            $('#monday_closed').prop('disabled', false);
-        }
     });
+    </script>
 
-    </script> --}}
+<script>
+    $(document).ready(function () {
+        $('#keywordadd').on('submit', function (e) {
+            e.preventDefault(); // Prevent the default form submission
+
+            // Store current form values before submission, particularly time and select elements
+
+            // Create a FormData object to handle form data
+            let formData = new FormData(this);
+
+            // Clear previous error messages
+
+            $.ajax({
+                url: $(this).attr('action'), // Form action URL
+                type: $(this).attr('method'), // POST method
+                data: formData,
+                processData: false, // Important: do not process the data
+                contentType: false, // Important: content type is false
+                success: function (response) {
+
+
+
+                    var row = '<tr>\
+                                <td>'+response.keyword.keyword+'</td>\
+                                <td>'+response.area.country+', '+response.area.state+', '+response.area.city+'</td>\
+                              </tr>'
+                    $('#keyword_table').append(row);
+
+
+                    // Handle success response (display success message using SweetAlert2)
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: response.message,
+                        timer: 2000, // Automatically close after 2 seconds
+                        showConfirmButton: false
+                    });
+
+
+                    // Optionally reset the form only on success
+                    $('#keywordadd')[0].reset();
+                    // This will reset the form fields
+                },
+                error: function (xhr) {
+                    // Handle validation errors
+                    let errors = xhr.responseJSON.errors;
+                    if (errors) {
+                        let errorHtml = '<div class="alert alert-danger"><ul>';
+                        $.each(errors, function (key, value) {
+                            errorHtml += '<li>' + value + '</li>';
+                        });
+                        errorHtml += '</ul></div>';
+                        $('#saleForm').prepend(errorHtml); // Add errors to the form
+
+                        // Display SweetAlert2 for validation errors
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Validation Error',
+                            html: errorHtml, // Use the generated error HTML
+                            timer: 4000, // Auto-close after 4 seconds (optional)
+                        });
+                    }
+                    else if (xhr.responseJSON.error) {
+                        // Show custom error message with SweetAlert2
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: xhr.responseJSON.error, // Show the custom error message
+                            timer: 4000, // Auto-close after 4 seconds (optional)
+                        });
+                    }
+
+                    // Restore time input and select values after error
+                }
+            });
+        });
+    });
+    </script>
+
 
     @endsection

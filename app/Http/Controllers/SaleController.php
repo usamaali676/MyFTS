@@ -51,6 +51,7 @@ class SaleController extends Controller
         $sale = Sale::where('lead_id', $lead->id)->first();
 
 
+
         $company_services = CompanyServices::all();
         if (isset($sale)) {
             // Get client services for the sale and eager load their company services specific to this sale

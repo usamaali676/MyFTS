@@ -39,5 +39,11 @@ class Sale extends Model
             'company_service_id' // Foreign key on the pivot table for Company Service
         );
     }
+    public function service_area(){
+        return $this->hasMany(ServiceArea::class,'sale_id');
+    }
+    public function keyword(){
+        return $this->hasMany(Keyword::class,'sale_id');
+    }
 
 }

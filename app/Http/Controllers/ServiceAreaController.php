@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\ServiceArea;
+use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+
 
 class ServiceAreaController extends Controller
 {
@@ -28,7 +31,38 @@ class ServiceAreaController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        try {
+            $request->validate([
+                'country' => 'required',
+                'states' => 'required',
+                'sale_id4' => 'required',
+                'cities' => 'required', // Include cities if it's mandatory
+            ], [
+                'country.required' => 'The country field is required.',
+                'states.required' => 'The states field is required.',
+                'sale_id4.required' => 'The sale ID is required.',
+                'cities.required' => 'The city field is required.',
+            ]);
+
+            $servicearea = ServiceArea::create([
+                'sale_id' => $request->sale_id4,
+                'country' => $request->country,
+                'state' => $request->states,
+                'city' => $request->cities,
+            ]);
+
+            return response()->json([
+                'message' => 'Area Created Successfully!',
+                'servicearea' => $servicearea
+            ], 200);
+        } catch (Exception $e) {
+            // Log the exception for debugging
+            Log::error($e->getMessage());
+
+            return response()->json([
+                'error' => 'An error occurred while creating the area. Please try again.'
+            ], 422);
+        }
     }
 
     /**

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ClientServicesController;
 use App\Http\Controllers\FrontController;
+use App\Http\Controllers\KeywordController;
 use App\Http\Controllers\LeadController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SaleController;
@@ -111,8 +112,16 @@ Route::controller(RoleController::class)
     });
 
     Route::controller(ServiceAreaController::class)
-    ->prefix('service_area')
+    ->prefix('service-area')
     ->as('service_area.')
+    ->middleware(PermissionMiddelware::class)
+    ->group(function () {
+        Route::post('store', 'store')->name('store');
+    });
+
+    Route::controller(KeywordController::class)
+    ->prefix('keyword')
+    ->as('keyword.')
     ->middleware(PermissionMiddelware::class)
     ->group(function () {
         Route::post('store', 'store')->name('store');
