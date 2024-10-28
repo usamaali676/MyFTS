@@ -1316,7 +1316,7 @@
                                                 <span class="align-middle d-sm-inline-block d-none">Previous</span>
                                             </a>
                                             <div class="last-buttons d-flex" style="gap: 20px;">
-                                                <button class="btn btn-outline-primary waves-effect" type="submit">Save</button>
+                                                {{-- <button class="btn btn-outline-primary waves-effect" type="submit">Save</button> --}}
                                             <a class="btn btn-primary btn-next" style="color: #fff">
                                                 <span class="align-middle d-sm-inline-block d-none me-sm-1">Next</span>
                                                 <i class="mdi mdi-arrow-right"></i>
