@@ -1413,6 +1413,26 @@
                                     <small>Manage Invoices</small>
                                 </div>
                                 <div class="row ">
+                                    <div class="col-sm-6">
+                                        <label class="switch switch-lg">
+                                            <input type="checkbox" class="switch-input" name="sale_status">
+                                            <span class="switch-toggle-slider">
+                                              <span class="switch-on">
+                                                <i class="ri-check-line"></i>
+                                              </span>
+                                              <span class="switch-off">
+                                                <i class="ri-close-line"></i>
+                                              </span>
+                                            </span>
+                                            <span class="switch-label">Sale Active Status</span>
+                                          </label>
+                                    </div>
+                                    <div class="col-md-6 col-12 mb-6">
+                                        <div class="form-floating form-floating-outline">
+                                          <input type="text" class="form-control flatpickr-input active" name="activation_date" placeholder="YYYY-MM-DD" id="flatpickr-date"  readonly="readonly">
+                                          <label for="flatpickr-date">Activation Date</label>
+                                        </div>
+                                      </div>
                                     <div class="col-md-6">
                                         <div class="form-floating form-floating-outline">
                                             <select id="areas_dropdown" name="area_id" class="select2 form-select" data-allow-clear="true">
@@ -1467,6 +1487,15 @@
     <script src="{{ asset('assets/vendor/libs/pickr/pickr.js') }}"></script>
     <script src="{{ asset('assets/js/forms-pickers.js') }}"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/24.6.0/build/js/intlTelInput.min.js" integrity="sha512-/sRFlFRbcvObOo/SxW8pvmFZeMLvAF6hajRXeX15ekPgT4guXnfNSjLC98K/Tg2ObUgKX8vn9+Th5/mGHzZbEw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        const threeDaysAgo = new Date();
+        threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
+
+        // Initialize Flatpickr
+        flatpickr("#flatpickr-date", {
+            minDate: threeDaysAgo // Set minimum date to 3 days ago
+        });
+    </script>
 <script>
     const input = document.querySelector("#business_number");
     const iti =  intlTelInput(input, {
