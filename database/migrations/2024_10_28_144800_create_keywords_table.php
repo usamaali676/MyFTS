@@ -11,13 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('service_areas', function (Blueprint $table) {
+        Schema::create('keywords', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('sale_id');
-            $table->string('country');
-            $table->string('state')->nullable();
-            $table->string('city')->nullable();
+            $table->unsignedBigInteger('area_id');
+            $table->string('keyword');
+            $table->string('primary')->nullable();
+            $table->string('secondary')->nullable();
             $table->foreign('sale_id')->references('id')->on('sales')->onDelete()->constrained()->onDelete('cascade');
+            $table->foreign('area_id')->references('id')->on('service_areas')->onDelete()->constrained()->onDelete('cascade');
             $table->softDeletes();
             $table->timestamps();
         });
@@ -28,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('service_areas');
+        Schema::dropIfExists('keywords');
     }
 };

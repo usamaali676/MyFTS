@@ -8,4 +8,5 @@ use Illuminate\Database\Eloquent\Model;
 class ServiceArea extends Model
 {
     use HasFactory;
+    protected $fillable = ['sale_id', 'country', 'state', 'city'];
 }

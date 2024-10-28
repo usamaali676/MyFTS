@@ -67,7 +67,7 @@ class FrontController extends Controller
 
                 // Check if countries are structured properly
                 foreach ($data as $country) {
-                    if ($country['id'] == $countryId) {
+                    if ($country['name'] == $countryId) {
                         $states = $country['states'] ?? []; // Use null coalescing to avoid errors
                         return response()->json($states);
                     }
@@ -86,10 +86,10 @@ class FrontController extends Controller
                 $cities = [];
 
                 foreach ($data as $country) {
-                    if ($country['id'] == $conrtyId) {
+                    if ($country['name'] == $conrtyId) {
                         $states = $country['states'] ?? [];
                         foreach ($states as $state) {
-                            if ($state['id'] == $stateId) {
+                            if ($state['name'] == $stateId) {
                                 $cities = $state['cities']?? []; // Use null coalescing to avoid errors
                                 return response()->json($cities);
                             }
