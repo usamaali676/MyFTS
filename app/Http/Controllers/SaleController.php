@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\BusinessHours;
 use App\Models\ClientServices;
 use App\Models\CompanyServices;
+use App\Models\Invoice;
 use App\Models\Lead;
 use App\Models\LeadCloser;
+use App\Models\MerchantAccount;
 use App\Models\Sale;
 use App\Models\SaleCS;
 use App\Models\SocialLink;
@@ -49,12 +51,15 @@ class SaleController extends Controller
         $closers = User::where('user_type', "Closer")
         ->get();
         $sale = Sale::where('lead_id', $lead->id)->first();
+        $mehchant = MerchantAccount::all();
+
 
         // dd($sale->social_links);
 
 
         $company_services = CompanyServices::all();
         if (isset($sale)) {
+            $invoice = Invoice::where('sale_id', $sale->id)->first();
             // Get client services for the sale and eager load their company services specific to this sale
             $client_services = $sale->clientServices->map(function ($clientService) use ($sale) {
                 // Load the company services specific to the sale
@@ -62,9 +67,9 @@ class SaleController extends Controller
                 return $clientService;
             });
 
-            return view('pages.sale.create', compact('lead', 'client_enum', 'call_enum', 'social_links', 'closers', 'sale', 'company_services', 'client_services'));
+            return view('pages.sale.create', compact('lead', 'client_enum', 'call_enum', 'social_links', 'closers', 'sale', 'company_services', 'client_services', 'invoice', 'mehchant'));
         } else {
-            return view('pages.sale.create', compact('lead', 'client_enum', 'call_enum', 'social_links', 'closers', 'sale', 'company_services'));
+            return view('pages.sale.create', compact('lead', 'client_enum', 'call_enum', 'social_links', 'closers', 'sale', 'company_services', 'mehchant'));
         }
 
 
@@ -126,6 +131,7 @@ class SaleController extends Controller
      */
     public function store(Request $request)
     {
+
         // dd($request->all());
         $request->validate([
             'client_nature' => 'required',
@@ -162,7 +168,7 @@ class SaleController extends Controller
 
         $old_social = SocialLink::where('sale_id', $sale->id)->get();
         if ($old_social == Null) {
-            if (isset($request->social_name) && $request->social_name->count > 0) {
+            if (isset($request->social_name) && count(array_filter($request->social_name)) > 0) {
                 foreach ($request->social_name as $key => $value) {
                     SocialLink::create([
                         'sale_id' => $sale->id,
@@ -176,7 +182,7 @@ class SaleController extends Controller
             foreach ($social_links as $social) {
                 $social->delete();
             }
-            if (isset($request->social_name)  && count($request->social_name) > 0) {
+            if (isset($request->social_name)  && count(array_filter($request->social_name)) > 0) {
                 // dd("dfjhdsflkg");
                 foreach ($request->social_name as $key => $value) {
                     SocialLink::create([

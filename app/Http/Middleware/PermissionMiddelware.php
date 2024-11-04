@@ -37,7 +37,7 @@ class PermissionMiddelware
                 // dd($hasPermission);
                 // dd($routeNameMatches['operation']);
 
-                if(isset($perms)){
+                // if(isset($perms)){
                 switch ($routeNameMatches['operation']) {
                     case "index":
                         $hasPermission = $perms->view == 1;
@@ -70,11 +70,11 @@ class PermissionMiddelware
                     Alert::error('Opps',"You can't Perform this Operation");
                     return redirect()->route('home');
                 }
-            }
-            else{
-                Alert::error('Opps',"You can't Perform this Operation");
-                return redirect()->route('home');
-            }
+            // }
+            // else{
+            //     Alert::error('Opps',"You can't Perform this Operation");
+            //     return redirect()->route('home');
+            // }
             } else {
                 return $next($request);
             }

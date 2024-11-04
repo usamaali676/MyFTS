@@ -150,9 +150,13 @@ class ClientServicesController extends Controller
                 $client_service->sales()->detach();
             }
 
+            $relservices = SaleClientServiceCompanyService::where('client_service_id', $client_service->id)->get();
+            foreach ($relservices as $relservice) {
+                $relservice->delete();
+            }
+
             // dd($client_service->companyServicesForSale($client_service->sales->id));
             // Detach or delete company services
-            $client_service->companyServices()->detach();
 
             // Finally, delete the client service itself
             $client_service->delete();
