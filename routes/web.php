@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ClientServicesController;
 use App\Http\Controllers\FrontController;
+use App\Http\Controllers\InvoiceServiceChargesController;
 use App\Http\Controllers\KeywordController;
 use App\Http\Controllers\LeadController;
 use App\Http\Controllers\RoleController;
@@ -9,6 +10,7 @@ use App\Http\Controllers\SaleController;
 use App\Http\Controllers\ServiceAreaController;
 use App\Http\Controllers\UserController;
 use App\Http\Middleware\PermissionMiddelware;
+use App\Models\InvoiceServiceCharges;
 use App\Models\ServiceArea;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -109,6 +111,7 @@ Route::controller(RoleController::class)
         Route::get('search', 'search_services')->name('search_services');
         Route::post('store', 'store')->name('store');
         Route::post('sync-services', 'sync_comp_services')->name('create');
+        Route::get('delete', 'destroy')->name('delete');
     });
 
     Route::controller(ServiceAreaController::class)
@@ -125,4 +128,13 @@ Route::controller(RoleController::class)
     ->middleware(PermissionMiddelware::class)
     ->group(function () {
         Route::post('store', 'store')->name('store');
+    });
+
+    Route::controller(InvoiceServiceChargesController::class)
+    ->prefix('invoice_charges')
+    ->as('invoice_charges.')
+    ->middleware(PermissionMiddelware::class)
+    ->group(function () {
+        Route::post('store', 'store')->name('store');
+        Route::post('create', 'create')->name('create');
     });

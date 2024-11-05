@@ -12,9 +12,14 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/24.6.0/build/css/intlTelInput.min.css" integrity="sha512-X3pJz9m4oT4uHCYS6UjxVdWk1yxSJJIJOJMIkf7TjPpb1BzugjiFyHu7WsXQvMMMZTnGUA9Q/GyxxCWNDZpdHA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 <link rel="stylesheet" href="{{ asset('assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css') }}" />
 <link rel="stylesheet" href="{{ asset('assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css') }}" />
+<link
+    href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css"
+    rel="stylesheet"
+/>
 
 {{-- <link rel="stylesheet" href="{{ asset('assets/vendor/libs/jquery-timepicker/jquery-timepicker.css') }}" />
 <link rel="stylesheet" href="{{ asset('assets/vendor/libs/pickr/pickr-themes.css') }}" /> --}}
+
 <style>
     .col-md-5 {
         margin-top: 0.5rem;
@@ -27,6 +32,15 @@
     .iti__dropdown-content{
         z-index: 20 !important;
     }
+    ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front {
+    background: #fff;
+    box-shadow: 0 0.125rem 0.625rem 0 rgba(76, 78, 100, 0.22);
+    width: fit-content;
+    list-style: none;
+}
+ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
+    padding: 10px 0;
+}
 
 </style>
 @endsection
@@ -111,7 +125,7 @@
                                         </use>
                                     </svg>
                                 </span>
-                                <span class="bs-stepper-label">Client Reporting</span>
+                                <span class="bs-stepper-label">Invoice</span>
                             </button>
                         </div>
                     </div>
@@ -559,17 +573,117 @@
                                         <h6 class="mb-0">Business Hours</h6>
                                         {{-- <small>From Lead Model</small> --}}
                                     </div>
+                                    @if(isset($sale) && count($sale->business_hours) > 0)
                                     <div class="col-md-12" style="display: flex; flex-direction: column; gap: 25px;">
+                                        @foreach($sale->business_hours as $index => $business_hour)
+                                        <!-- Day -->
+                                        <div class="row opening-day">
+                                            <div class="col-md-2">
+                                                <h5>{{ $business_hour->day }} <input type="hidden" name="day[]" value="{{ $business_hour->day }}"></h5>
+                                            </div>
+                                            <div class="col-md-3 form-floating form-floating-outline">
+                                                <input type="time" class="form-control flatpickr-input" @if($business_hour->is_closed != 1 && $business_hour->{"is_24/7"} != 1) value="{{ $business_hour->opening_time }}" @endif name="open[]" id="{{ Str::lower($business_hour->day) }}_open">
+                                            </div>
+                                            <div class="col-md-3 form-floating form-floating-outline">
+                                                <input type="time" class="form-control flatpickr-input" @if($business_hour->is_closed != 1 && $business_hour->{"is_24/7"} != 1) value="{{ $business_hour->closing_time }}" @endif name="closed[]" id="{{ Str::lower($business_hour->day) }}_closed">
+                                            </div>
+                                            <div class="col-md-2 d-flex" style="gap: 20px;">
+                                                <div class="form-check custom-option custom-option-basic checked">
+                                                    <label class="form-check-label custom-option-content" for="customRadioTemp{{ $index }}_1">
+                                                        <input  data-day="check" data-day-name="{{ Str::lower($business_hour->day) }}" name="{{ Str::lower($business_hour->day) }}_check" class="form-check-input" type="radio" @if($business_hour->is_closed != 1 && $business_hour->{"is_24/7"} != 1) checked @endif value="open" id="customRadioTemp{{ $index }}_1"
+                                                            checked="">
+                                                        <span class="custom-option-header">
+                                                            <span class="h6 mb-0">Open</span>
+                                                        </span>
+                                                    </label>
+                                                </div>
+                                                <div class="form-check custom-option custom-option-basic">
+                                                    <label class="form-check-label custom-option-content" for="customRadioTemp{{ $index }}_2">
+                                                        <input  data-day="check" data-day-name="{{ Str::lower($business_hour->day) }}" name="{{ Str::lower($business_hour->day) }}_check" class="form-check-input" type="radio" @if($business_hour->is_closed == 1) checked @endif value="closed"
+                                                            id="customRadioTemp{{ $index }}_2">
+                                                        <span class="custom-option-header">
+                                                            <span class="h6 mb-0">Closed</span>
+                                                        </span>
+                                                    </label>
+                                                </div>
+                                                <div class="form-check custom-option custom-option-basic">
+                                                    <label class="form-check-label custom-option-content" for="customRadioTemp{{ $index }}_3">
+                                                        <input  data-day="check" data-day-name="{{ Str::lower($business_hour->day) }}" name="{{ Str::lower($business_hour->day) }}_check" class="form-check-input" @if($business_hour->{"is_24/7"} == 1) checked @endif type="radio" value="24/7"
+                                                            id="customRadioTemp{{ $index }}_3">
+                                                        <span class="custom-option-header">
+                                                            <span class="h6 mb-0">24/7</span>
+                                                        </span>
+                                                    </label>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                        <!-- Day / End -->
+                                        @endforeach
+                                    </div>
+                                    @else
+                                        @php
+                                            $business_hours = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday','Saturday','Sunday']
+                                        @endphp
+                                        <div class="col-md-12" style="display: flex; flex-direction: column; gap: 25px;">
+                                            @foreach($business_hours as $index=>$business_hour)
+                                            <!-- Day -->
+                                            <div class="row opening-day">
+                                                <div class="col-md-2">
+                                                    <h5>{{ $business_hour }} <input type="hidden" name="day[]" value="{{ $business_hour }}"></h5>
+                                                </div>
+                                                <div class="col-md-3 form-floating form-floating-outline">
+                                                    <input type="time" class="form-control flatpickr-input" value="" name="open[]" id="{{ Str::lower($business_hour) }}_open">
+                                                </div>
+                                                <div class="col-md-3 form-floating form-floating-outline">
+                                                    <input type="time" class="form-control flatpickr-input" value="" name="closed[]" id="{{ Str::lower($business_hour) }}_closed">
+                                                </div>
+                                                <div class="col-md-2 d-flex" style="gap: 20px;">
+                                                    <div class="form-check custom-option custom-option-basic checked">
+                                                        <label class="form-check-label custom-option-content" for="customRadioTemp{{ $index }}_1">
+                                                            <input  data-day="check" data-day-name="{{ Str::lower($business_hour) }}" name="{{ Str::lower($business_hour) }}_check" class="form-check-input" type="radio" value="open" id="customRadioTemp{{ $index }}_1"
+                                                                checked="">
+                                                            <span class="custom-option-header">
+                                                                <span class="h6 mb-0">Open</span>
+                                                            </span>
+                                                        </label>
+                                                    </div>
+                                                    <div class="form-check custom-option custom-option-basic">
+                                                        <label class="form-check-label custom-option-content" for="customRadioTemp{{ $index }}_2">
+                                                            <input  data-day="check" data-day-name="{{ Str::lower($business_hour) }}" name="{{ Str::lower($business_hour) }}_check" class="form-check-input" type="radio" value="closed"
+                                                                id="customRadioTemp{{ $index }}_2">
+                                                            <span class="custom-option-header">
+                                                                <span class="h6 mb-0">Closed</span>
+                                                            </span>
+                                                        </label>
+                                                    </div>
+                                                    <div class="form-check custom-option custom-option-basic">
+                                                        <label class="form-check-label custom-option-content" for="customRadioTemp{{ $index }}_3">
+                                                            <input  data-day="check" data-day-name="{{ Str::lower($business_hour) }}" name="{{ Str::lower($business_hour) }}_check" class="form-check-input" type="radio" value="24/7"
+                                                                id="customRadioTemp{{ $index }}_3">
+                                                            <span class="custom-option-header">
+                                                                <span class="h6 mb-0">24/7</span>
+                                                            </span>
+                                                        </label>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                            <!-- Day / End -->
+                                            @endforeach
+                                        </div>
+                                    @endif
+                                    {{-- <div class="col-md-12" style="display: flex; flex-direction: column; gap: 25px;">
                                         <!-- Day -->
                                         <div class="row opening-day">
                                             <div class="col-md-2">
                                                 <h5>Monday <input type="hidden" name="day[]" value="Monday"></h5>
                                             </div>
                                             <div class="col-md-3 form-floating form-floating-outline">
-                                                <input type="time" class="form-control flatpickr-input " name="open[]" id="monday_open">
+                                                <input type="time" class="form-control flatpickr-input" value="@if(isset($sale && $sale->business_hours))  @endif" name="open[]" id="monday_open">
                                             </div>
                                             <div class="col-md-3 form-floating form-floating-outline">
-                                                <input type="time" class="form-control flatpickr-input " name="closed[]" id="monday_closed">
+                                                <input type="time" class="form-control flatpickr-input" value="@if(isset($sale && $sale->business_hours))  @endif" name="closed[]" id="monday_closed">
                                             </div>
                                             <div class="col-md-2 d-flex" style="gap: 20px;">
                                                 <div class="form-check custom-option custom-option-basic checked">
@@ -610,10 +724,10 @@
                                                 <h5>Tuesday <input type="hidden" name="day[]" value="Tuesday"></h5>
                                             </div>
                                             <div class="col-md-3 form-floating form-floating-outline">
-                                                <input type="time" class="form-control flatpickr-input " name="open[]" id="tuesday_open">
+                                                <input type="time" class="form-control flatpickr-input " value="@if(isset($sale && $sale->business_hours))  @endif" name="open[]" id="tuesday_open">
                                             </div>
                                             <div class="col-md-3 form-floating form-floating-outline">
-                                                <input type="time" class="form-control flatpickr-input " name="closed[]" id="tuesday_closed">
+                                                <input type="time" class="form-control flatpickr-input " value="@if(isset($sale && $sale->business_hours))  @endif" name="closed[]" id="tuesday_closed">
                                             </div>
                                             <div class="col-md-2 d-flex" style="gap: 20px;">
                                                 <div class="form-check custom-option custom-option-basic checked">
@@ -654,10 +768,10 @@
                                                 <h5>Wednesday <input type="hidden" name="day[]" value="Wednesday"></h5>
                                             </div>
                                             <div class="col-md-3 form-floating form-floating-outline">
-                                                <input type="time" class="form-control flatpickr-input " name="open[]" id="wednesday_open">
+                                                <input type="time" class="form-control flatpickr-input " value="@if(isset($sale && $sale->business_hours))  @endif" name="open[]" id="wednesday_open">
                                             </div>
                                             <div class="col-md-3 form-floating form-floating-outline">
-                                                <input type="time" class="form-control flatpickr-input " name="closed[]" id="wednesday_closed">
+                                                <input type="time" class="form-control flatpickr-input " value="@if(isset($sale && $sale->business_hours))  @endif" name="closed[]" id="wednesday_closed">
                                             </div>
                                             <div class="col-md-2 d-flex" style="gap: 20px;">
                                                 <div class="form-check custom-option custom-option-basic checked">
@@ -698,10 +812,10 @@
                                                 <h5>Thursday <input type="hidden" name="day[]" value="Thursday"></h5>
                                             </div>
                                             <div class="col-md-3 form-floating form-floating-outline">
-                                                <input type="time" class="form-control flatpickr-input " name="open[]" id="thursday_open">
+                                                <input type="time" class="form-control flatpickr-input " value="@if(isset($sale && $sale->business_hours))  @endif" name="open[]" id="thursday_open">
                                             </div>
                                             <div class="col-md-3 form-floating form-floating-outline">
-                                                <input type="time" class="form-control flatpickr-input " name="closed[]" id="thursday_closed">
+                                                <input type="time" class="form-control flatpickr-input " value="@if(isset($sale && $sale->business_hours))  @endif" name="closed[]" id="thursday_closed">
                                             </div>
                                             <div class="col-md-2 d-flex" style="gap: 20px;">
                                                 <div class="form-check custom-option custom-option-basic checked">
@@ -742,10 +856,10 @@
                                                 <h5>Friday <input type="hidden" name="day[]" value="Friday"></h5>
                                             </div>
                                             <div class="col-md-3 form-floating form-floating-outline">
-                                                <input type="time" class="form-control flatpickr-input " name="open[]" id="friday_open">
+                                                <input type="time" class="form-control flatpickr-input " value="@if(isset($sale && $sale->business_hours))  @endif" name="open[]" id="friday_open">
                                             </div>
                                             <div class="col-md-3 form-floating form-floating-outline">
-                                                <input type="time" class="form-control flatpickr-input " name="closed[]" id="friday_closed">
+                                                <input type="time" class="form-control flatpickr-input " value="@if(isset($sale && $sale->business_hours))  @endif" name="closed[]" id="friday_closed">
                                             </div>
                                             <div class="col-md-2 d-flex" style="gap: 20px;">
                                                 <div class="form-check custom-option custom-option-basic checked">
@@ -786,10 +900,10 @@
                                                 <h5>Saturday <input type="hidden" name="day[]" value="Saturday"></h5>
                                             </div>
                                             <div class="col-md-3 form-floating form-floating-outline">
-                                                <input type="time" class="form-control flatpickr-input " name="open[]" id="saturday_open">
+                                                <input type="time" class="form-control flatpickr-input " value="@if(isset($sale && $sale->business_hours))  @endif" name="open[]" id="saturday_open">
                                             </div>
                                             <div class="col-md-3 form-floating form-floating-outline">
-                                                <input type="time" class="form-control flatpickr-input " name="closed[]" id="saturday_closed">
+                                                <input type="time" class="form-control flatpickr-input " value="@if(isset($sale && $sale->business_hours))  @endif" name="closed[]" id="saturday_closed">
                                             </div>
                                             <div class="col-md-2 d-flex" style="gap: 20px;">
                                                 <div class="form-check custom-option custom-option-basic checked">
@@ -830,10 +944,10 @@
                                                 <h5>Sunday <input type="hidden" name="day[]" value="Sunday"></h5>
                                             </div>
                                             <div class="col-md-3 form-floating form-floating-outline">
-                                                <input type="time" class="form-control flatpickr-input " name="open[]" id="sunday_open">
+                                                <input type="time" class="form-control flatpickr-input " value="@if(isset($sale && $sale->business_hours))  @endif" name="open[]" id="sunday_open">
                                             </div>
                                             <div class="col-md-3 form-floating form-floating-outline">
-                                                <input type="time" class="form-control flatpickr-input " name="closed[]" id="sunday_closed">
+                                                <input type="time" class="form-control flatpickr-input " value="@if(isset($sale && $sale->business_hours))  @endif" name="closed[]" id="sunday_closed">
                                             </div>
                                             <div class="col-md-2 d-flex" style="gap: 20px;">
                                                 <div class="form-check custom-option custom-option-basic checked">
@@ -867,7 +981,7 @@
                                             </div>
                                         </div>
                                         <!-- Day / End -->
-                                    </div>
+                                    </div> --}}
 
                                     <div class="content-header mb-3">
                                         <h6 class="mb-0">Social Link</h6>
@@ -878,7 +992,43 @@
                                         <div class="card">
                                             <div class="card-body">
                                                 <div id="repeater">
-                                                    @if(isset($sale) && isset($sale->social_links) && count($sale->social_links) > 0)
+                                                    {{-- <div class="items">
+                                                        <!-- Repeater Content -->
+
+                                                        <div class="item-content">
+                                                            <div class="row py-2">
+                                                                <div class="col-md-4">
+                                                                    <div class="form-floating form-floating-outline">
+                                                                        <select id="social_links" name="social_name[]" class="form-select" data-allow-clear="true">
+                                                                            <option value="">Please Select</option>
+                                                                            @foreach ($social_links as $item)
+                                                                            <option value="{{$item}}">{{$item}}</option>
+                                                                            @endforeach
+
+                                                                        </select>
+                                                                        <label for="multicol-country">Social Platform</label>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <div class="form-floating form-floating-outline">
+                                                                        <input type="text" class="form-control " name="social_link[]" placeholder="Social Link" id="social_link" placeholder
+                                                                            aria-label="social_link" />
+                                                                        <label for="time_zone">Social Link</label>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-2">
+                                                                    <div class="pull-right repeater-remove-btn">
+                                                                        <a id="remove-btn" class="btn btn-outline-danger remove-btn waves-effect" style="color: #ff4d49 " disabled="true"
+                                                                            onclick="$(this).parents('.items').remove()">
+                                                                            Remove
+                                                                    </a>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                        </div>
+                                                    </div> --}}
+                                                    @if(isset($sale) && count($sale->social_links) > 0)
                                                     {{-- <h1>fdgsdfg</h1> --}}
                                                         @foreach($sale->social_links as $list)
                                                         <div class="items">
@@ -889,7 +1039,8 @@
                                                                         <div class="form-floating form-floating-outline">
                                                                             <select id="social_links" name="social_name[]" class="form-select" data-allow-clear="true">
                                                                                 <option value="">Please Select</option>
-                                                                                @foreach ($list as $item)
+                                                                                <option value="{{ $list->social_name}}" selected>{{ $list->social_name }}</option>
+                                                                                @foreach ($social_links as $item)
                                                                                 <option value="{{$item}}">{{$item}}</option>
                                                                                 @endforeach
 
@@ -899,7 +1050,7 @@
                                                                     </div>
                                                                     <div class="col-md-6">
                                                                         <div class="form-floating form-floating-outline">
-                                                                            <input type="text" class="form-control " name="social_link[]" placeholder="Social Link" id="social_link" placeholder
+                                                                            <input type="text" class="form-control " name="social_link[]" placeholder="Social Link" value="{{ $list->social_link }}" id="social_link" placeholder
                                                                                 aria-label="social_link" />
                                                                             <label for="time_zone">Social Link</label>
                                                                         </div>
@@ -972,10 +1123,10 @@
                                         </a>
                                         <div class="last-buttons d-flex" style="gap: 20px;">
                                             <button class="btn btn-outline-primary waves-effect" type="submit">Save</button>
-                                        <a class="btn btn-primary btn-next" style="color: #fff">
+                                        <button type="button" id="first_next" class="btn btn-primary btn-next" style="color: #fff" disabled>
                                             <span class="align-middle d-sm-inline-block d-none me-sm-1">Next</span>
                                             <i class="mdi mdi-arrow-right"></i>
-                                        </a>
+                                        </button>
                                         </div>
                                     </div>
                                 </div>
@@ -1143,20 +1294,25 @@
                                     <form id="sync_services" method="POST" action="{{ route('client_services.create') }}">
                                         @csrf
                                         <div class="row g-4">
+                                            @if(isset($sale))
+                                            <input type="hidden" id="sale_id3" name="sale_id3" value="{{ $sale->id }}">
+                                            @else
+                                            <input type="hidden" id="sale_id3" name="sale_id3" value="">
+                                            @endif
                                             <h6 class="mb-0">Services Selection</h6>
                                             <!-- Responsive Datatable -->
                                             <div class="card py-3 my-5">
                                                 {{-- <h5 class="card-header">Responsive Datatable</h5> --}}
+
                                                 <div class="card-datatable table-responsive" style="padding-bottom: 5rem">
-                                                    <table id="service_table" class=" table table-bordered">
-                                                        @if(isset($sale))
-                                                        <input type="hidden" id="sale_id3" name="sale_id3" value="{{ $sale->id }}">
-                                                        @else
-                                                        <input type="hidden" id="sale_id3" name="sale_id3" value="">
-                                                        @endif
+                                                    <div class="table-responsive">
+                                                    <table id="service_table" class="table table-bordered">
+                                                    {{-- <table id="service_table" class=" table table-bordered"> --}}
+
                                                         <thead>
                                                             <tr>
                                                                 <th>Client Service Name</th>
+                                                                <th>Company Services</th>
                                                                 <th>Action</th>
                                                             </tr>
                                                         </thead>
@@ -1192,6 +1348,9 @@
                                                                         </div>
                                                                     </div>
                                                                 </td>
+                                                                <td>
+                                                                    <a class="service_delete" data-id="{{ $s_service->id }}"  style="font-size:20px;" class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect" data-bs-toggle="tooltip" aria-label="Delete" data-bs-original-title="Delete"><i class="ri-delete-bin-5-line ri-50px"></i></a>
+                                                                </td>
                                                             </tr>
                                                             @endforeach
                                                             @endif
@@ -1199,6 +1358,7 @@
                                                         </tbody>
 
                                                     </table>
+                                                </div>
                                                 </div>
                                                 <div class="row">
                                                     <div class="col-md-6"></div>
@@ -1412,11 +1572,17 @@
                                     <h6 class="mb-0">Invoice</h6>
                                     <small>Manage Invoices</small>
                                 </div>
-                                <form action="">
+                                <form id="add_service_charge" action="{{ route('invoice_charges.store') }}" method="POST">
+                                    @csrf
+                                    @if(isset($sale))
+                                    <input type="hidden" name="sale_id6" id="sale_id6" value="{{ $sale->id }}">
+                                    @else
+                                    <input type="hidden" name="sale_id6" id="sale_id6" value="">
+                                    @endif
                                     <div class="row g-4">
                                         <div class="col-sm-6">
                                             <label class="switch switch-lg">
-                                                <input type="checkbox" class="switch-input" name="sale_status">
+                                                <input type="checkbox" class="switch-input" name="invoice_status">
                                                 <span class="switch-toggle-slider">
                                                     <span class="switch-on">
                                                         <i class="ri-check-line"></i>
@@ -1437,7 +1603,8 @@
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-floating form-floating-outline">
-                                                <select id="comp_Services" name="company_service" class="select2 form-select" data-allow-clear="true">
+                                                <select id="company_service_charge" name="company_service_charge" class="select2 form-select"
+                                                    data-allow-clear="true">
                                                     <option value="">Please Select</option>
                                                     @if(isset($sale) && count($sale->companyServices) > 0)
                                                     @foreach ($sale->companyServices->unique('id') as $comp_ser)
@@ -1455,7 +1622,7 @@
                                                         <div class="input-group input-group-merge">
                                                             <span class="input-group-text">$</span>
                                                             <div class="form-floating form-floating-outline">
-                                                                <input type="number" id="amount" class="form-control" placeholder="499"
+                                                                <input type="number" id="amount" name="amount" class="form-control" placeholder="499"
                                                                     aria-label="Amount (to the nearest dollar)">
                                                                 <label>Amount</label>
                                                             </div>
@@ -1466,7 +1633,7 @@
                                                 <div class="col-md-3">
                                                     <div class="form-floating form-floating-outline">
                                                         <div class="form-check mt-3">
-                                                            <input class="form-check-input" type="checkbox" value="" id="defaultCheck1">
+                                                            <input class="form-check-input" name="is_complementary" type="checkbox" value="1" id="defaultCheck1">
                                                             <label class="form-check-label" for="defaultCheck1">
                                                                 Complementary
                                                             </label>
@@ -1480,13 +1647,14 @@
                                             </div>
 
 
+
                                         </div>
                                     </div>
                                 </form>
                                 <div class="row py-4">
                                     <div class="col-md-12">
                                         <div class="table-responsive">
-                                            <table id="keyword_table" class="table table-striped">
+                                            <table id="invoice_service_table" class="table table-striped">
                                                 <thead>
                                                     <tr>
                                                         <th>Invoiced Service</th>
@@ -1495,12 +1663,17 @@
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    @if(isset($sale) && count($sale->keyword) > 0)
-                                                        @foreach ($sale->keyword as $keyword)
+
+                                                    @if(isset($invoice) && count($invoice->servicecharges) > 0)
+                                                        @foreach ($invoice->servicecharges as $item)
                                                         <tr>
-                                                            <td>{{ $keyword->keyword }}</td>
-                                                            <td>{{ $keyword->area->country }}, {{ $keyword->area->state }}, {{ $keyword->area->city }}</td>
-                                                            <td>500</td>
+                                                            <td>{{ $item->service_name->name }}</td>
+                                                            <td><input class="form-check-input" name="is_complementary" type="checkbox" value="true" id="defaultCheck1" @if($item->is_complementary === 1) checked @endif readonly></td>
+                                                            @if($item->is_complementary === 0)
+                                                                <td>{{ $item->charged_price }}</td>
+                                                            @else
+                                                                <td>0</td>
+                                                            @endif
 
                                                         </tr>
                                                         @endforeach
@@ -1511,40 +1684,155 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="row g-4 pt-3">
-                                    <div class="col-md-6">
-                                        <div class="form-floating form-floating-outline">
-                                            <select id="discount" name="discount_type" class="select2 form-select" data-allow-clear="true">
-                                                <option value="">Please Select</option>
-                                                <option value="New Client Discount">New Client Discount</option>
-                                                <option value="New Year Discount">New Year Discount</option>
-                                                <option value="X-max Discount">X-max Discount</option>
-                                            </select>
-                                            <label for="multicol-country">Discount Type</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-floating form-floating-outline">
-                                            <div class="input-group input-group-merge">
-                                                <span class="input-group-text">$</span>
-                                                <div class="form-floating form-floating-outline">
-                                                    <input type="number" id="discount_amount" name="discount_amount" class="form-control" placeholder="499"
-                                                        aria-label="Amount (to the nearest dollar)">
-                                                    <label>Discount Amount</label>
-                                                </div>
-                                                <span class="input-group-text">.00</span>
+                                <form id="invoice_genrate" action="{{ route('invoice_charges.create')}}" method="POST" >
+                                    @csrf
+                                    @if(isset($invoice))
+                                        <input type="hidden" name="invoice_id" id="invoice_id" value="{{ $invoice->id }}">
+                                    @else
+                                        <input type="hidden" name="invoice_id" id="invoice_id">
+                                    @endif
+                                    <div class="row g-4 pt-3">
+                                        <div class="col-md-6">
+                                            <div class="form-floating form-floating-outline">
+                                                <select id="discount" name="discount_type" class="select2 form-select" data-allow-clear="true">
+                                                    <option value="">Please Select</option>
+                                                    @if(isset($invoice) && isset($invoice->discount_type))
+                                                    <option value="{{$invoice->discount_type}}" selected>{{ $invoice->discount_type }}</option>
+                                                    @endif
+                                                    <option value="New Client Discount">New Client Discount</option>
+                                                    <option value="New Year Discount">New Year Discount</option>
+                                                    <option value="X-max Discount">X-max Discount</option>
+                                                </select>
+                                                <label for="multicol-country">Discount Type</label>
                                             </div>
                                         </div>
+                                        <div class="col-md-6">
+                                            <div class="form-floating form-floating-outline">
+                                                <div class="input-group input-group-merge">
+                                                    <span class="input-group-text">$</span>
+                                                    <div class="form-floating form-floating-outline">
+                                                        <input type="number" id="discount_amount" name="discount_amount" @if(isset($invoice) && isset($invoice->discount_amount)) value="{{ $invoice->discount_amount }}" @endif class="form-control" placeholder="499"
+                                                            aria-label="Amount (to the nearest dollar)">
+                                                        <label>Discount Amount</label>
+                                                    </div>
+                                                    <span class="input-group-text">.00</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-12 mb-6">
+                                            <div class="form-floating form-floating-outline">
+                                                <input type="text" class="form-control flatpickr-input active" name="invoice_due_date" @if(isset($invoice) && isset($invoice->invoice_due_date)) value="{{ $invoice->invoice_due_date }}" @endif
+                                                    placeholder="YYYY-MM-DD" id="flatpickr-date" readonly="readonly">
+                                                <label for="flatpickr-date">Invoice Due Date</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-floating form-floating-outline">
+                                                <select id="invoice_freq" name="invoice_freq" class="select2 form-select" data-allow-clear="true">
+                                                    <option value="">Please Select</option>
+                                                    @if(isset($invoice) && isset($invoice->invoice_frequency))
+                                                    <option value="{{$invoice->invoice_frequency}}" selected>{{ $invoice->invoice_frequency }}</option>
+                                                    @endif
+                                                    <option value="Monthly">Monthly</option>
+                                                    <option value="Bi-annually">Bi-annually</option>
+                                                    <option value="Annually">Annually</option>
+                                                </select>
+                                                <label for="multicol-country">Invoice Frequency</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-12 mb-6">
+                                            <div class="form-floating form-floating-outline">
+                                                <input type="text" id="invoice_number" name="invoice_no" class="form-control" @if(isset($invoice)) value="{{ $invoice->invoice_number }}" @endif placeholder="Invoice No." disabled/>
+                                                <label for="Keyword">Invoice No.</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-floating form-floating-outline">
+                                                <div class="input-group input-group-merge">
+                                                    <span class="input-group-text">$</span>
+                                                    <div class="form-floating form-floating-outline">
+                                                        <input type="number" id="invoice_amount" name="invoice_amount" class="form-control" placeholder="499" @if(isset($invoice) && isset($invoice->total_amount)) value="{{ $invoice->total_amount }}" @endif
+                                                            aria-label="Amount (to the nearest dollar)">
+                                                        <label>Invoice Amount </label>
+                                                    </div>
+                                                    <span class="input-group-text">.00</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-12 text-right">
+                                            <button type="submit" class="btn btn-primary">Generate Invoice</button>
+                                        </div>
+                                    </div>
+                                </form>
+                                <!-- /Invoice Form -->
+                                <div class="row g-4 py-5">
+                                    <h4>Payment Detail</h4>
+
+                                    <div class="col-md-6">
+                                        <div class="form-floating form-floating-outline">
+                                            <select id="marchent" name="marchent" class="select2 form-select" data-allow-clear="true">
+                                                <option value="">Please Select</option>
+                                                @if(isset($mehchant) && count($mehchant) > 0)
+                                                    @foreach ($mehchant as $item)
+                                                        <option value="{{$item->id }}">{{ $item->name }}</option>
+                                                    @endforeach
+                                                @endif
+                                            </select>
+                                            <label for="multicol-country">Select Merchant</label>
+                                        </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-floating form-floating-outline">
-                                            <select id="discount" name="discount_type" class="select2 form-select" data-allow-clear="true">
+                                            <select id="mop" name="mop" class="select2 form-select" data-allow-clear="true">
                                                 <option value="">Please Select</option>
-                                                <option value="New Client Discount">New Client Discount</option>
-                                                <option value="New Year Discount">New Year Discount</option>
-                                                <option value="X-max Discount">X-max Discount</option>
+                                                <option value="Credit Card">Credit Card</option>
+                                                <option value="PayPal">PayPal</option>
+                                                <option value="Zeele">Zeele</option>
+                                                <option value="Cash App">Cash App</option>
+                                                <option value="Bank Transfer">Bank Transfer</option>
+                                                <option value="other">other</option>
                                             </select>
-                                            <label for="multicol-country">Invoice Frequency</label>
+                                            <label for="multicol-country">Mode of Payment</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="input-group input-group-merge">
+                                            <div class="form-floating form-floating-outline">
+                                              <input
+                                                type="text"
+                                                id="billings-card-num"
+                                                class="form-control billing-card-mask"
+                                                placeholder="4541 2541 2547 2577"
+                                                aria-describedby="paymentCard" />
+                                              <label for="billings-card-num">Card number</label>
+                                            </div>
+                                            <span class="input-group-text cursor-pointer p-1" id="paymentCard"
+                                              ><span class="card-type w-px-50"></span
+                                            ></span>
+                                          </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-floating form-floating-outline">
+                                            <select id="payment_type" name="payment_type" class="select2 form-select" data-allow-clear="true">
+                                                <option value="">Please Select</option>
+                                                <option value="Full Payment">Full Payment</option>
+                                                <option value="Partials Payment">Partials Payment</option>
+                                                <option value="Advance Payment">Advance Payment</option>
+                                            </select>
+                                            <label for="multicol-country">Payment Type</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-floating form-floating-outline">
+                                            <input type="text" id="payment_amount" name="payment_amount" class="form-control" @if(isset($invoice) && isset($invoice->total_amount)) value="{{ $invoice->total_amount }}" @endif >
+                                            <label for="payment_amount">Payment Amount</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-floating form-floating-outline">
+                                            <input type="text" id="Trans_id" name="Trans_id" class="form-control"  >
+                                            <label for="Trans_id">Int. Trans. Ids</label>
                                         </div>
                                     </div>
                                 </div>
@@ -1569,7 +1857,7 @@
         <!-- Content wrapper -->
     </div>
     @endsection
-    @section('js')
+  @section('js')
     <script src="{{ asset('assets/vendor/libs/bs-stepper/bs-stepper.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/bootstrap-select/bootstrap-select.js') }}"></script>
     <script src="{{ asset('assets/js/form-wizard-icons.js') }}"></script>
@@ -1582,378 +1870,206 @@
     <script src="{{ asset('assets/js/repeater.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/flatpickr/flatpickr.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/bootstrap-datepicker/bootstrap-datepicker.js') }}"></script>
+    <script src="{{ asset('assets/js/front-page-payment.js') }}"></script>
     {{-- <script src="{{ asset('assets/vendor/libs/bootstrap-daterangepicker/bootstrap-daterangepicker.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/jquery-timepicker/jquery-timepicker.js') }}"></script> --}}
     <script src="{{ asset('assets/vendor/libs/pickr/pickr.js') }}"></script>
     <script src="{{ asset('assets/js/forms-pickers.js') }}"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/24.6.0/build/js/intlTelInput.min.js" integrity="sha512-/sRFlFRbcvObOo/SxW8pvmFZeMLvAF6hajRXeX15ekPgT4guXnfNSjLC98K/Tg2ObUgKX8vn9+Th5/mGHzZbEw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/24.6.0/build/js/intlTelInput.min.js"
+        integrity="sha512-/sRFlFRbcvObOo/SxW8pvmFZeMLvAF6hajRXeX15ekPgT4guXnfNSjLC98K/Tg2ObUgKX8vn9+Th5/mGHzZbEw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script>
         const threeDaysAgo = new Date();
-        threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
+            threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
 
-        // Initialize Flatpickr
-        flatpickr("#flatpickr-date", {
-            minDate: threeDaysAgo // Set minimum date to 3 days ago
-        });
+            // Initialize Flatpickr
+            flatpickr("#flatpickr-date", {
+                minDate: threeDaysAgo // Set minimum date to 3 days ago
+            });
     </script>
-<script>
-    const input = document.querySelector("#business_number");
-    const iti =  intlTelInput(input, {
-  initialCountry: "us",
-  strictMode: true,
-  utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/24.6.0/build/js/utils.min.js"
-});
-</script>
-
-
-
-
-<script>
-    $(function(){
-        $("#repeater").createRepeater();
-    });
-</script>
-<script>
-    $(document).ready(function() {
-        $('input[data-day="check"]').change(function(e) {
-            e.preventDefault();
-            var selected = $(this).val(); // Get the value of the checked radio button
-            var day = $(this).data('day-name'); // Get the day from the data attribute
-            if (selected == "closed" || selected == "24/7") {
-                $('#' + day + '_open').prop('disabled', true);
-                $('#' + day + '_closed').prop('disabled', true);
-            } else {
-                $('#' + day + '_open').prop('disabled', false);
-                $('#' + day + '_closed').prop('disabled', false);
-            }
-        });
+    <script>
+        const input = document.querySelector("#business_number");
+        const iti =  intlTelInput(input, {
+      initialCountry: "us",
+      strictMode: true,
+      utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/24.6.0/build/js/utils.min.js"
     });
     </script>
-<script>
-    $(document).ready(function() {
-        // Loop through each day of the week
-        var days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
 
-        days.forEach(function(day) {
-            var openTimeInput = $('#' + day + '_open');
-            var closedTimeInput = $('#' + day + '_closed');
 
-            // Check on page load if _open already has a value
-            if (openTimeInput.val()) {
-                // Enable the closed time input if _open has a value
-                closedTimeInput.prop('disabled', false);
-                // Set the minimum value of _closed to the current value of _open
-                closedTimeInput.attr('min', openTimeInput.val());
-            } else {
-                // Disable the closed time input by default if no value in _open
-                closedTimeInput.prop('disabled', true);
-            }
 
-            // On change event for the open time input
-            openTimeInput.change(function() {
-                var openTime = $(this).val(); // Get the selected open time
 
-                if (openTime) {
-                    // Enable the closed time input and set its minimum value
-                    closedTimeInput.prop('disabled', false);
-                    closedTimeInput.attr('min', openTime);
+    <script>
+        $(function(){
+            $("#repeater").createRepeater();
+        });
+    </script>
+    <script>
+        $(document).ready(function() {
+            $('input[data-day="check"]').change(function(e) {
+                e.preventDefault();
+                var selected = $(this).val(); // Get the value of the checked radio button
+                var day = $(this).data('day-name'); // Get the day from the data attribute
+                if (selected == "closed" || selected == "24/7") {
+                    $('#' + day + '_open').prop('disabled', true);
+                    $('#' + day + '_closed').prop('disabled', true);
                 } else {
-                    // Disable the closed time input if open time is cleared
-                    closedTimeInput.prop('disabled', true).val(''); // Clear closed time when disabling
+                    $('#' + day + '_open').prop('disabled', false);
+                    $('#' + day + '_closed').prop('disabled', false);
                 }
             });
         });
-    });
-</script>
+    </script>
+    <script>
+        $(document).ready(function() {
+            // Loop through each day of the week
+            var days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
 
-<script>
-    function validateForm() {
-        const businessName = document.getElementById('business_name').value;
-        const businessNumber = document.getElementById('business_number').value;
-        const email = document.getElementById('basic-default-email').value;
-        const websiteUrl = document.getElementsByName('website_url')[0].value;
-        const clientName = document.getElementsByName('client_name')[0].value;
-        // const socialLink = document.getElementsByName('social_link')[0].value;
+            days.forEach(function(day) {
+                var openTimeInput = $('#' + day + '_open');
+                var closedTimeInput = $('#' + day + '_closed');
 
-        // Validate business name (only letters and spaces)
-        if (!/^[a-zA-Z\s]*$/.test(businessName)) {
-            alert('Invalid Business Name. Only letters and spaces are allowed.');
-            return false;
-        }
-
-        // Validate business number (only digits)
-        if (!iti.isValidNumber()) {
-            alert('Invalid Phone Number. Please enter a valid phone number.');
-            return false;
-        }
-        // if (!/^\d*$/.test(businessNumber)) {
-        //     alert('Invalid Business Number. Only digits are allowed.');
-        //     return false;
-        // }
-
-        const urlPattern = /^(https?:\/\/)?([a-zA-Z0-9\-]+\.)+[a-zA-Z]{2,}(\/[^\s]*)?$/;
-        if (!urlPattern.test(websiteUrl)) {
-            alert('Invalid Website URL. Please enter a valid URL (e.g., http://example.com).');
-            return false;
-        }
-
-        // if (!urlPattern.test(socialLink)) {
-        //     alert('Invalid Social  URL. Please enter a valid URL (e.g., http://example.com).');
-        //     return false;
-        // }
-
-        // Validate email format
-        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailPattern.test(email)) {
-            alert('Invalid Email. Please enter a valid email address.');
-            return false;
-        }
-
-        // Validate client name (only letters and spaces)
-        if (!/^[a-zA-Z\s]*$/.test(clientName)) {
-            alert('Invalid Client Name. Only letters and spaces are allowed.');
-            return false;
-        }
-
-        // Validate client address (allowing letters, digits, and certain symbols)
-        // if (!/^[a-zA-Z0-9\/\-\_\:\, ]*$/.test(clientAddress)) {
-        //     alert('Invalid Client Address. Only letters, numbers, and certain symbols are allowed.');
-        //     return false;
-        // }
-
-        return true; // All validations passed
-    }
-</script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="{{ asset('assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js') }}"></script>
-<script src="{{ asset('assets/js/tables-datatables-advanced.js') }}"></script>
-<script>
-    $(document).ready(function() {
-        var table = $('#service_table').DataTable({
-            pageLength: 5
-        });
-
-        // Listen for the draw event
-        table.on('draw', function() {
-            // Your custom script here
-            var link = document.createElement('link');
-                    link.rel = 'stylesheet';
-                    link.href = "{{ asset('assets/vendor/libs/select2/select2.css') }}"; // Adjust this if necessary
-                    document.head.appendChild(link);
-
-                    // Load the Select2 script
-                    var script = document.createElement('script');
-                    script.src = "{{ asset('assets/vendor/libs/select2/select2.js') }}"; // Adjust this if necessary
-                    script.onload = function() {
-                        // Initialize Select2 after the script loads
-                        $('.select2').select2(); // Reinitialize Select2 for the new select elements
-                    };
-                    document.head.appendChild(script);
-            console.log('Table redrawn, new page loaded.');
-            // You can also access the current page or other data if needed
-        });
-    });
-</script>
-
-
-<script>
-$(document).ready(function () {
-    $('#saleForm').on('submit', function (e) {
-        e.preventDefault(); // Prevent the default form submission
-        let isValid = validateForm(); // Call custom form validation function
-
-        if(isValid) {
-
-        // Store current form values before submission, particularly time and select elements
-        let timeInputs = {};
-        let selectInputs = {};
-
-        // Save values of input[type="time"] and select elements before form submission
-        $('#saleForm').find('input[type="time"], select').each(function () {
-            timeInputs[$(this).attr('name')] = $(this).val();
-            selectInputs[$(this).attr('name')] = $(this).val();
-        });
-
-        // Create a FormData object to handle form data
-        let formData = new FormData(this);
-
-        // Clear previous error messages
-        $('.alert-danger').remove();
-
-        $.ajax({
-            url: $(this).attr('action'), // Form action URL
-            type: $(this).attr('method'), // POST method
-            data: formData,
-            processData: false, // Important: do not process the data
-            contentType: false, // Important: content type is false
-            success: function (response) {
-
-                // console.log(response.sale);
-                $('#sale_id').val(response.sale.id);
-                $('#sale_id2').val(response.sale.id);
-                $('#sale_id3').val(response.sale.id);
-                $('#sale_id4').val(response.sale.id);
-                $('#sale_id5').val(response.sale.id);
-                // Handle success response (display success message using SweetAlert2)
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Success',
-                    text: response.message,
-                    timer: 2000, // Automatically close after 2 seconds
-                    showConfirmButton: false
-                });
-
-
-
-                // Optionally reset the form only on success
-                // $('#saleForm')[0].reset();
-                // This will reset the form fields
-            },
-            error: function (xhr) {
-                // Handle validation errors
-                let errors = xhr.responseJSON.errors;
-                if (errors) {
-                    let errorHtml = '<div class="alert alert-danger"><ul>';
-                    $.each(errors, function (key, value) {
-                        errorHtml += '<li>' + value + '</li>';
-                    });
-                    errorHtml += '</ul></div>';
-                    $('#saleForm').prepend(errorHtml); // Add errors to the form
-
-                    // Display SweetAlert2 for validation errors
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Validation Error',
-                        html: errorHtml, // Use the generated error HTML
-                        timer: 4000, // Auto-close after 4 seconds (optional)
-                    });
+                // Check on page load if _open already has a value
+                if (openTimeInput.val()) {
+                    // Enable the closed time input if _open has a value
+                    closedTimeInput.prop('disabled', false);
+                    // Set the minimum value of _closed to the current value of _open
+                    closedTimeInput.attr('min', openTimeInput.val());
+                } else {
+                    // Disable the closed time input by default if no value in _open
+                    closedTimeInput.prop('disabled', true);
                 }
 
-                // Restore time input and select values after error
-                $('#saleForm').find('input[type="time"], select').each(function () {
-                    if ($(this).attr('name') in timeInputs) {
-                        $(this).val(timeInputs[$(this).attr('name')]);
-                    }
-                    if ($(this).attr('name') in selectInputs) {
-                        $(this).val(selectInputs[$(this).attr('name')]);
+                // On change event for the open time input
+                openTimeInput.change(function() {
+                    var openTime = $(this).val(); // Get the selected open time
+
+                    if (openTime) {
+                        // Enable the closed time input and set its minimum value
+                        closedTimeInput.prop('disabled', false);
+                        closedTimeInput.attr('min', openTime);
+                    } else {
+                        // Disable the closed time input if open time is cleared
+                        closedTimeInput.prop('disabled', true).val(''); // Clear closed time when disabling
                     }
                 });
-            }
+            });
         });
-    }
-    });
-});
-</script>
+    </script>
 
-<script>
-$(document).ready(function () {
-    $('#detail_form').on('submit', function (e) {
-        e.preventDefault(); // Prevent the default form submission
+    <script>
+        function validateForm() {
+            const businessName = document.getElementById('business_name').value;
+            const businessNumber = document.getElementById('business_number').value;
+            const email = document.getElementById('basic-default-email').value;
+            const websiteUrl = document.getElementsByName('website_url')[0].value;
+            const clientName = document.getElementsByName('client_name')[0].value;
+            // const socialLink = document.getElementsByName('social_link')[0].value;
 
-        // Store current form values before submission, particularly time and select elements
-
-
-        // Create a FormData object to handle form data
-        let formData = new FormData(this);
-
-        // Clear previous error messages
-
-        $.ajax({
-            url: $(this).attr('action'), // Form action URL
-            type: $(this).attr('method'), // POST method
-            data: formData,
-            processData: false, // Important: do not process the data
-            contentType: false, // Important: content type is false
-            success: function (response) {
-
-
-                // Handle success response (display success message using SweetAlert2)
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Success',
-                    text: response.message,
-                    timer: 2000, // Automatically close after 2 seconds
-                    showConfirmButton: false
-                });
-
-
-
-                // Optionally reset the form only on success
-                // $('#saleForm')[0].reset();
-                // This will reset the form fields
-            },
-            error: function (xhr) {
-                // Handle validation errors
-                let errors = xhr.responseJSON.errors;
-                if (errors) {
-                    let errorHtml = '<div class="alert alert-danger"><ul>';
-                    $.each(errors, function (key, value) {
-                        errorHtml += '<li>' + value + '</li>';
-                    });
-                    errorHtml += '</ul></div>';
-                    $('#saleForm').prepend(errorHtml); // Add errors to the form
-
-                    // Display SweetAlert2 for validation errors
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Validation Error',
-                        html: errorHtml, // Use the generated error HTML
-                        timer: 4000, // Auto-close after 4 seconds (optional)
-                    });
-                }
-                else if (xhr.responseJSON.error) {
-                    // Show custom error message with SweetAlert2
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: xhr.responseJSON.error, // Show the custom error message
-                        timer: 4000, // Auto-close after 4 seconds (optional)
-                    });
-                }
-
-                // Restore time input and select values after error
+            // Validate business name (only letters and spaces)
+            if (!/^[a-zA-Z\s]*$/.test(businessName)) {
+                alert('Invalid Business Name. Only letters and spaces are allowed.');
+                return false;
             }
-        });
-    });
-});
-</script>
 
+            // Validate business number (only digits)
+            if (!iti.isValidNumber()) {
+                alert('Invalid Phone Number. Please enter a valid phone number.');
+                return false;
+            }
+            // if (!/^\d*$/.test(businessNumber)) {
+            //     alert('Invalid Business Number. Only digits are allowed.');
+            //     return false;
+            // }
 
-<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-<script>
-    $(document).ready(function () {
-        $("#service_name").autocomplete({
-                source: function(request, response) {
-                    $.ajax({
-                        url: "{{ route('client_services.search_services') }}",
-                        type: 'GET',
-                        dataType: 'json',
-                        data: {
-                            query: request.term
-                        },
-                        success: function(data) {
-                            response($.map(data, function(item) {
-                                return {
-                                    label: item.name,
-                                    value: item.name
-                                };
-                            }));
-                        }
-                    });
-                },
-                minLength: 2
+            const urlPattern = /^(https?:\/\/)?([a-zA-Z0-9\-]+\.)+[a-zA-Z]{2,}(\/[^\s]*)?$/;
+            if (!urlPattern.test(websiteUrl)) {
+                alert('Invalid Website URL. Please enter a valid URL (e.g., http://example.com).');
+                return false;
+            }
+
+            // if (!urlPattern.test(socialLink)) {
+            //     alert('Invalid Social  URL. Please enter a valid URL (e.g., http://example.com).');
+            //     return false;
+            // }
+
+            // Validate email format
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailPattern.test(email)) {
+                alert('Invalid Email. Please enter a valid email address.');
+                return false;
+            }
+
+            // Validate client name (only letters and spaces)
+            if (!/^[a-zA-Z\s]*$/.test(clientName)) {
+                alert('Invalid Client Name. Only letters and spaces are allowed.');
+                return false;
+            }
+
+            // Validate client address (allowing letters, digits, and certain symbols)
+            // if (!/^[a-zA-Z0-9\/\-\_\:\, ]*$/.test(clientAddress)) {
+            //     alert('Invalid Client Address. Only letters, numbers, and certain symbols are allowed.');
+            //     return false;
+            // }
+
+            return true; // All validations passed
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="{{ asset('assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js') }}"></script>
+    <script src="{{ asset('assets/js/tables-datatables-advanced.js') }}"></script>
+    <script>
+        $(document).ready(function() {
+            var table = $('#service_table').DataTable({
+                pageLength: 5
             });
 
-        $('#serviceform').on('submit', function (e) {
+            // Listen for the draw event
+            table.on('draw', function() {
+                // Your custom script here
+                var link = document.createElement('link');
+                        link.rel = 'stylesheet';
+                        link.href = "{{ asset('assets/vendor/libs/select2/select2.css') }}"; // Adjust this if necessary
+                        document.head.appendChild(link);
+
+                        // Load the Select2 script
+                        var script = document.createElement('script');
+                        script.src = "{{ asset('assets/vendor/libs/select2/select2.js') }}"; // Adjust this if necessary
+                        script.onload = function() {
+                            // Initialize Select2 after the script loads
+                            $('.select2').select2(); // Reinitialize Select2 for the new select elements
+                        };
+                        document.head.appendChild(script);
+                console.log('Table redrawn, new page loaded.');
+                // You can also access the current page or other data if needed
+            });
+        });
+    </script>
+
+
+    <script>
+        $(document).ready(function () {
+        $('#saleForm').on('submit', function (e) {
             e.preventDefault(); // Prevent the default form submission
+            let isValid = validateForm(); // Call custom form validation function
+
+            if(isValid) {
 
             // Store current form values before submission, particularly time and select elements
+            let timeInputs = {};
+            let selectInputs = {};
 
+            // Save values of input[type="time"] and select elements before form submission
+            $('#saleForm').find('input[type="time"], select').each(function () {
+                timeInputs[$(this).attr('name')] = $(this).val();
+                selectInputs[$(this).attr('name')] = $(this).val();
+            });
 
             // Create a FormData object to handle form data
             let formData = new FormData(this);
 
             // Clear previous error messages
+            $('.alert-danger').remove();
 
             $.ajax({
                 url: $(this).attr('action'), // Form action URL
@@ -1962,93 +2078,15 @@ $(document).ready(function () {
                 processData: false, // Important: do not process the data
                 contentType: false, // Important: content type is false
                 success: function (response) {
-                    console.log(response);
 
-                    $('#service_table').empty(); // Use empty() to clear the table
-                    var client_service = response.client_service;
-                    var company_services = response.company_services;
-                    // var client_company_services = response.client_company_services;
-                    console.log(client_service);
-
-
-                    // Create options for the select element
-                    // if(!!client_service.companyServices && client_service.companyServices.lenght > 0){
-                    // var options = $.map(company_services.companyServices, function (item) {
-                    //     return '<option value="' + item.id + '">' + item.name + '</option>';
-                    // }).join('');
-                    // } else {
-                    //     var options = $.map(company_services, function (item) {
-                    //     return '<option value="' + item.id + '">' + item.name + '</option>';
-                    // }).join('');
-                    // }
-
-
-
-                    // Create table rows for each client service
-                    var content = $.map(client_service, function (service, index) {
-                    console.log(service);
-
-                    var options = '';
-
-                    // Check if `companyServicesForSale` exists and has services
-                    if (service.company_services_for_sale && service.company_services_for_sale.length > 0) {
-                        options = $.map(service.company_services_for_sale, function (item) {
-                            return '<option value="' + item.id + '" selected>' + item.name + '</option>';
-                        }).join('');
-                    } else {
-                        options = $.map(company_services, function (item) {
-                            return '<option value="' + item.id + '">' + item.name + '</option>';
-                        }).join('');
-                    }
-
-                    return '<tr>' +
-                        '<td>' + service.name +
-                            '<input type="hidden" name="client_service[' + index + ']" value="' + service.id + '" />' +
-                        '</td>' +
-
-                        '<td>' +
-                            '<div class="col-md-12 select2-primary" data-select2-id="' + service.id + '">' +
-                                '<div class="form-floating form-floating-outline form-floating-select2" data-select2-id="' + service.id + '">' +
-                                    '<div class="position-relative">' +
-                                        '<select name="company_service[' + index + '][]" class="select2 form-select" multiple>' +
-                                            options +
-                                        '</select>' +
-                                        '<label for="multicol-closers">FTS Services</label>' +
-                                    '</div>' +
-                                '</div>' +
-                            '</div>' +
-                        '</td>' +
-                    '</tr>';
-                }).join(''); // Join the content into a single string
-
-                // Assuming you want to append this to a specific table or container
-                $('#service_table tbody').html(content);
-
-
-                // Assuming you want to append this to a specific table or container
-                // $('#service_table tbody').html(content);
-
-                    // Append the new content to the service table
-                    $('#service_table').append(content);
-
-                    // table.page.len(5).draw();
-
-
-                        // Load the Select2 stylesheet
-                    var link = document.createElement('link');
-                    link.rel = 'stylesheet';
-                    link.href = "{{ asset('assets/vendor/libs/select2/select2.css') }}"; // Adjust this if necessary
-                    document.head.appendChild(link);
-
-                    // Load the Select2 script
-                    var script = document.createElement('script');
-                    script.src = "{{ asset('assets/vendor/libs/select2/select2.js') }}"; // Adjust this if necessary
-                    script.onload = function() {
-                        // Initialize Select2 after the script loads
-                        $('.select2').select2(); // Reinitialize Select2 for the new select elements
-                    };
-                    document.head.appendChild(script);
-
+                    // console.log(response.sale);
+                    $('#sale_id').val(response.sale.id);
+                    $('#sale_id2').val(response.sale.id);
+                    $('#sale_id3').val(response.sale.id);
+                    $('#sale_id4').val(response.sale.id);
+                    $('#sale_id5').val(response.sale.id);
+                    $('#sale_id6').val(response.sale.id);
+                    $('#first_next').prop('disabled', false);
                     // Handle success response (display success message using SweetAlert2)
                     Swal.fire({
                         icon: 'success',
@@ -2058,8 +2096,10 @@ $(document).ready(function () {
                         showConfirmButton: false
                     });
 
+
+
                     // Optionally reset the form only on success
-                    $('#serviceform')[0].reset();
+                    // $('#saleForm')[0].reset();
                     // This will reset the form fields
                 },
                 error: function (xhr) {
@@ -2081,26 +2121,26 @@ $(document).ready(function () {
                             timer: 4000, // Auto-close after 4 seconds (optional)
                         });
                     }
-                    else if (xhr.responseJSON.error) {
-                        // Show custom error message with SweetAlert2
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: xhr.responseJSON.error, // Show the custom error message
-                            timer: 4000, // Auto-close after 4 seconds (optional)
-                        });
-                    }
 
                     // Restore time input and select values after error
+                    $('#saleForm').find('input[type="time"], select').each(function () {
+                        if ($(this).attr('name') in timeInputs) {
+                            $(this).val(timeInputs[$(this).attr('name')]);
+                        }
+                        if ($(this).attr('name') in selectInputs) {
+                            $(this).val(selectInputs[$(this).attr('name')]);
+                        }
+                    });
                 }
             });
+        }
         });
     });
     </script>
 
-<script>
-    $(document).ready(function () {
-        $('#sync_services').on('submit', function (e) {
+    <script>
+        $(document).ready(function () {
+        $('#detail_form').on('submit', function (e) {
             e.preventDefault(); // Prevent the default form submission
 
             // Store current form values before submission, particularly time and select elements
@@ -2171,206 +2211,716 @@ $(document).ready(function () {
     });
     </script>
 
-<script>
-    $(document).ready(function() {
-        // Load countries
-        $.get('{{ route('front.countries') }}', function(data) {
-            $.each(data, function(index, country) {
-                $('#countries').append(`<option value="${country.name}">${country.name}</option>`);
+
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script>
+        $(document).ready(function () {
+            $("#service_name").autocomplete({
+                    source: function(request, response) {
+                        $.ajax({
+                            url: "{{ route('client_services.search_services') }}",
+                            type: 'GET',
+                            dataType: 'json',
+                            data: {
+                                query: request.term
+                            },
+                            success: function(data) {
+                                response($.map(data, function(item) {
+                                    return {
+                                        label: item.name,
+                                        value: item.name
+                                    };
+                                }));
+                            }
+                        });
+                    },
+                    minLength: 2
+                });
+
+            $('#serviceform').on('submit', function (e) {
+                e.preventDefault(); // Prevent the default form submission
+
+                // Store current form values before submission, particularly time and select elements
+
+
+                // Create a FormData object to handle form data
+                let formData = new FormData(this);
+
+                // Clear previous error messages
+
+                $.ajax({
+                    url: $(this).attr('action'), // Form action URL
+                    type: $(this).attr('method'), // POST method
+                    data: formData,
+                    processData: false, // Important: do not process the data
+                    contentType: false, // Important: content type is false
+                    success: function (response) {
+                        console.log(response);
+
+                        $('#service_table').empty(); // Use empty() to clear the table
+                        var client_service = response.client_service;
+                        var company_services = response.company_services;
+                        // var client_company_services = response.client_company_services;
+                        console.log(client_service);
+
+
+                        // Create options for the select element
+                        // if(!!client_service.companyServices && client_service.companyServices.lenght > 0){
+                        // var options = $.map(company_services.companyServices, function (item) {
+                        //     return '<option value="' + item.id + '">' + item.name + '</option>';
+                        // }).join('');
+                        // } else {
+                        //     var options = $.map(company_services, function (item) {
+                        //     return '<option value="' + item.id + '">' + item.name + '</option>';
+                        // }).join('');
+                        // }
+
+
+
+                        // Create table rows for each client service
+                        var content = $.map(client_service, function (service, index) {
+                        console.log(service);
+
+                        var options = '';
+
+                        // Check if `companyServicesForSale` exists and has services
+                        if (service.company_services_for_sale && service.company_services_for_sale.length > 0) {
+                            options = $.map(service.company_services_for_sale, function (item) {
+                                return '<option value="' + item.id + '" selected>' + item.name + '</option>';
+                            }).join('');
+                        } else {
+                            options = $.map(company_services, function (item) {
+                                return '<option value="' + item.id + '">' + item.name + '</option>';
+                            }).join('');
+                        }
+
+                        return '<tr>' +
+                            '<td>' + service.name +
+                                '<input type="hidden" name="client_service[' + index + ']" value="' + service.id + '" />' +
+                            '</td>' +
+
+                            '<td>' +
+                                '<div class="col-md-12 select2-primary" data-select2-id="' + service.id + '">' +
+                                    '<div class="form-floating form-floating-outline form-floating-select2" data-select2-id="' + service.id + '">' +
+                                        '<div class="position-relative">' +
+                                            '<select name="company_service[' + index + '][]" class="select2 form-select" multiple>' +
+                                                options +
+                                            '</select>' +
+                                            '<label for="multicol-closers">FTS Services</label>' +
+                                        '</div>' +
+                                    '</div>' +
+                                '</div>' +
+                            '</td>' +
+                            '<td>'+
+                                '<a class="service_delete" data-id="'+ service.id +'"  style="font-size:20px;" class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect" data-bs-toggle="tooltip" aria-label="Delete" data-bs-original-title="Delete"><i class="ri-delete-bin-5-line ri-50px"></i></a>' +
+                            '</td>'+
+                        '</tr>';
+                    }).join(''); // Join the content into a single string
+
+                    // Assuming you want to append this to a specific table or container
+                    $('#service_table tbody').html(content);
+
+
+                    // Assuming you want to append this to a specific table or container
+                    // $('#service_table tbody').html(content);
+
+                        // Append the new content to the service table
+                        $('#service_table').append(content);
+
+                        // table.page.len(5).draw();
+
+
+                            // Load the Select2 stylesheet
+                        var link = document.createElement('link');
+                        link.rel = 'stylesheet';
+                        link.href = "{{ asset('assets/vendor/libs/select2/select2.css') }}"; // Adjust this if necessary
+                        document.head.appendChild(link);
+
+                        // Load the Select2 script
+                        var script = document.createElement('script');
+                        script.src = "{{ asset('assets/vendor/libs/select2/select2.js') }}"; // Adjust this if necessary
+                        script.onload = function() {
+                            // Initialize Select2 after the script loads
+                            $('.select2').select2(); // Reinitialize Select2 for the new select elements
+                        };
+                        document.head.appendChild(script);
+
+                        // Handle success response (display success message using SweetAlert2)
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: response.message,
+                            timer: 2000, // Automatically close after 2 seconds
+                            showConfirmButton: false
+                        });
+
+                        // Optionally reset the form only on success
+                        $('#serviceform')[0].reset();
+                        // This will reset the form fields
+                    },
+                    error: function (xhr) {
+                        // Handle validation errors
+                        let errors = xhr.responseJSON.errors;
+                        if (errors) {
+                            let errorHtml = '<div class="alert alert-danger"><ul>';
+                            $.each(errors, function (key, value) {
+                                errorHtml += '<li>' + value + '</li>';
+                            });
+                            errorHtml += '</ul></div>';
+                            $('#saleForm').prepend(errorHtml); // Add errors to the form
+
+                            // Display SweetAlert2 for validation errors
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Validation Error',
+                                html: errorHtml, // Use the generated error HTML
+                                timer: 4000, // Auto-close after 4 seconds (optional)
+                            });
+                        }
+                        else if (xhr.responseJSON.error) {
+                            // Show custom error message with SweetAlert2
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: xhr.responseJSON.error, // Show the custom error message
+                                timer: 4000, // Auto-close after 4 seconds (optional)
+                            });
+                        }
+
+                        // Restore time input and select values after error
+                    }
+                });
             });
         });
+    </script>
+    <script>
+        $(document).ready(function () {
+            $('.service_delete').click(function (e) {
+                e.preventDefault();
+                var id = $(this).attr('data-id');
+                var result = confirm("Want to delete?");
+                // alert(id);
+                // Get the service ID from the form data
+                if(result){
+                $.ajax({
+                    type: "GET",
+                    url: "{{ route('client_services.delete') }}",
+                    data: {id: id},
+                    success: function (response) {
 
-        // Load states on country select
-        $('#countries').on('change', function() {
-            const countryId = $(this).val();
-            $('#states').empty().append('<option value="">Select State</option>').prop('disabled', false);
-            $('#cities').empty().append('<option value="">Select City</option>').prop('disabled', true);
-            // console.log(count);
-
-            if (countryId) {
-                $.get(`https://myfts.firmtech.biz/front/states/${countryId}`, function(data) {
-                    $.each(data, function(index, state) {
-                        $('#states').append(`<option value="${state.name}">${state.name}</option>`);
-                    });
-                });
-            }
-        });
-
-        // Load cities on state select
-        $('#states').on('change', function() {
-            const conrtyId = $('#countries').val();
-            const stateId = $(this).val();
-            $('#cities').empty().append('<option value="">Select City</option>').prop('disabled', false);
-
-            if (stateId) {
-                $.get(`https://myfts.firmtech.biz/front/cities/${stateId}/${conrtyId}`, function(data) {
-                    $.each(data, function(index, city) {
-                        $('#cities').append(`<option value="${city.name}">${city.name}</option>`);
-                    });
-                });
-            }
-        });
-    });
-</script>
-
-<script>
-    $(document).ready(function () {
-        $('#service_area').on('submit', function (e) {
-            e.preventDefault(); // Prevent the default form submission
-
-            // Store current form values before submission, particularly time and select elements
-
-
-            // Create a FormData object to handle form data
-            let formData = new FormData(this);
-
-            // Clear previous error messages
-
-            $.ajax({
-                url: $(this).attr('action'), // Form action URL
-                type: $(this).attr('method'), // POST method
-                data: formData,
-                processData: false, // Important: do not process the data
-                contentType: false, // Important: content type is false
-                success: function (response) {
-
-                    var list = '<tr>\
-                                <td>'+response.servicearea.country+', '+ response.servicearea.state +', '+response.servicearea.city+'</td>\
-                                </tr>'
-                    $('#areas_we_serve').append(list);
-                    var option = '<option value="'+response.servicearea.id+'">'+response.servicearea.country+', '+ response.servicearea.state +', '+response.servicearea.city+'</option>'
-                    $('#areas_dropdown').append(option);
-
-
-
-                    // Handle success response (display success message using SweetAlert2)
-                    Swal.fire({
+                        Swal.fire({
                         icon: 'success',
                         title: 'Success',
                         text: response.message,
                         timer: 2000, // Automatically close after 2 seconds
                         showConfirmButton: false
                     });
+                    },
+                    error: function (xhr) {
+                        // Handle validation errors
+                        let errors = xhr.responseJSON.errors;
+                        if (errors) {
+                            let errorHtml = '<div class="alert alert-danger"><ul>';
+                            $.each(errors, function (key, value) {
+                                errorHtml += '<li>' + value + '</li>';
+                            });
+                            errorHtml += '</ul></div>';
+                            $('#saleForm').prepend(errorHtml); // Add errors to the form
 
+                            // Display SweetAlert2 for validation errors
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Validation Error',
+                                html: errorHtml, // Use the generated error HTML
+                                timer: 4000, // Auto-close after 4 seconds (optional)
+                            });
+                        }
+                        else if (xhr.responseJSON.error) {
+                            // Show custom error message with SweetAlert2
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: xhr.responseJSON.error, // Show the custom error message
+                                timer: 4000, // Auto-close after 4 seconds (optional)
+                            });
+                        }
 
-                    // Optionally reset the form only on success
-                    $('#service_area')[0].reset();
-                    // This will reset the form fields
-                },
-                error: function (xhr) {
-                    // Handle validation errors
-                    let errors = xhr.responseJSON.errors;
-                    if (errors) {
-                        let errorHtml = '<div class="alert alert-danger"><ul>';
-                        $.each(errors, function (key, value) {
-                            errorHtml += '<li>' + value + '</li>';
-                        });
-                        errorHtml += '</ul></div>';
-                        $('#service_area').prepend(errorHtml); // Add errors to the form
-
-                        // Display SweetAlert2 for validation errors
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Validation Error',
-                            html: errorHtml, // Use the generated error HTML
-                            timer: 4000, // Auto-close after 4 seconds (optional)
-                        });
-                    }
-                    else if (xhr.responseJSON.error) {
-                        // Show custom error message with SweetAlert2
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: xhr.responseJSON.error, // Show the custom error message
-                            timer: 4000, // Auto-close after 4 seconds (optional)
-                        });
+                        // Restore time input and select values after error
                     }
 
-                    // Restore time input and select values after error
+                });
+            }
+
+            });
+        });
+    </script>
+    <script>
+        $(document).ready(function () {
+            $('#sync_services').on('submit', function (e) {
+                e.preventDefault(); // Prevent the default form submission
+
+                // Store current form values before submission, particularly time and select elements
+
+
+                // Create a FormData object to handle form data
+                let formData = new FormData(this);
+
+                // Clear previous error messages
+
+                $.ajax({
+                    url: $(this).attr('action'), // Form action URL
+                    type: $(this).attr('method'), // POST method
+                    data: formData,
+                    processData: false, // Important: do not process the data
+                    contentType: false, // Important: content type is false
+                    success: function (response) {
+
+
+                        // Handle success response (display success message using SweetAlert2)
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: response.message,
+                            timer: 2000, // Automatically close after 2 seconds
+                            showConfirmButton: false
+                        });
+
+
+
+                        // Optionally reset the form only on success
+                        // $('#saleForm')[0].reset();
+                        // This will reset the form fields
+                    },
+                    error: function (xhr) {
+                        // Handle validation errors
+                        let errors = xhr.responseJSON.errors;
+                        if (errors) {
+                            let errorHtml = '<div class="alert alert-danger"><ul>';
+                            $.each(errors, function (key, value) {
+                                errorHtml += '<li>' + value + '</li>';
+                            });
+                            errorHtml += '</ul></div>';
+                            $('#saleForm').prepend(errorHtml); // Add errors to the form
+
+                            // Display SweetAlert2 for validation errors
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Validation Error',
+                                html: errorHtml, // Use the generated error HTML
+                                timer: 4000, // Auto-close after 4 seconds (optional)
+                            });
+                        }
+                        else if (xhr.responseJSON.error) {
+                            // Show custom error message with SweetAlert2
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: xhr.responseJSON.error, // Show the custom error message
+                                timer: 4000, // Auto-close after 4 seconds (optional)
+                            });
+                        }
+
+                        // Restore time input and select values after error
+                    }
+                });
+            });
+        });
+    </script>
+
+    <script>
+        $(document).ready(function() {
+            // Load countries
+            $.get('{{ route('front.countries') }}', function(data) {
+                $.each(data, function(index, country) {
+                    $('#countries').append(`<option value="${country.name}">${country.name}</option>`);
+                });
+            });
+
+            // Load states on country select
+            $('#countries').on('change', function() {
+                const countryId = $(this).val();
+                $('#states').empty().append('<option value="">Select State</option>').prop('disabled', false);
+                $('#cities').empty().append('<option value="">Select City</option>').prop('disabled', true);
+                // console.log(count);
+
+                if (countryId) {
+                    $.get(`https://myfts.firmtech.biz/front/states/${countryId}`, function(data) {
+                        $.each(data, function(index, state) {
+                            $('#states').append(`<option value="${state.name}">${state.name}</option>`);
+                        });
+                    });
+                }
+            });
+
+            // Load cities on state select
+            $('#states').on('change', function() {
+                const conrtyId = $('#countries').val();
+                const stateId = $(this).val();
+                $('#cities').empty().append('<option value="">Select City</option>').prop('disabled', false);
+
+                if (stateId) {
+                    $.get(`https://myfts.firmtech.biz/front/cities/${stateId}/${conrtyId}`, function(data) {
+                        $.each(data, function(index, city) {
+                            $('#cities').append(`<option value="${city.name}">${city.name}</option>`);
+                        });
+                    });
                 }
             });
         });
-    });
     </script>
 
-<script>
-    $(document).ready(function () {
-        $('#keywordadd').on('submit', function (e) {
-            e.preventDefault(); // Prevent the default form submission
+    <script>
+        $(document).ready(function () {
+            $('#service_area').on('submit', function (e) {
+                e.preventDefault(); // Prevent the default form submission
 
-            // Store current form values before submission, particularly time and select elements
-
-            // Create a FormData object to handle form data
-            let formData = new FormData(this);
-
-            // Clear previous error messages
-
-            $.ajax({
-                url: $(this).attr('action'), // Form action URL
-                type: $(this).attr('method'), // POST method
-                data: formData,
-                processData: false, // Important: do not process the data
-                contentType: false, // Important: content type is false
-                success: function (response) {
+                // Store current form values before submission, particularly time and select elements
 
 
+                // Create a FormData object to handle form data
+                let formData = new FormData(this);
 
-                    var row = '<tr>\
-                                <td>'+response.keyword.keyword+'</td>\
-                                <td>'+response.area.country+', '+response.area.state+', '+response.area.city+'</td>\
-                              </tr>'
-                    $('#keyword_table').append(row);
+                // Clear previous error messages
+
+                $.ajax({
+                    url: $(this).attr('action'), // Form action URL
+                    type: $(this).attr('method'), // POST method
+                    data: formData,
+                    processData: false, // Important: do not process the data
+                    contentType: false, // Important: content type is false
+                    success: function (response) {
+
+                        var list = '<tr>\
+                                    <td>'+response.servicearea.country+', '+ response.servicearea.state +', '+response.servicearea.city+'</td>\
+                                    </tr>'
+                        $('#areas_we_serve').append(list);
+                        var option = '<option value="'+response.servicearea.id+'">'+response.servicearea.country+', '+ response.servicearea.state +', '+response.servicearea.city+'</option>'
+                        $('#areas_dropdown').append(option);
 
 
-                    // Handle success response (display success message using SweetAlert2)
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Success',
-                        text: response.message,
-                        timer: 2000, // Automatically close after 2 seconds
-                        showConfirmButton: false
+
+                        // Handle success response (display success message using SweetAlert2)
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: response.message,
+                            timer: 2000, // Automatically close after 2 seconds
+                            showConfirmButton: false
+                        });
+
+
+                        // Optionally reset the form only on success
+                        $('#service_area')[0].reset();
+                        // This will reset the form fields
+                    },
+                    error: function (xhr) {
+                        // Handle validation errors
+                        let errors = xhr.responseJSON.errors;
+                        if (errors) {
+                            let errorHtml = '<div class="alert alert-danger"><ul>';
+                            $.each(errors, function (key, value) {
+                                errorHtml += '<li>' + value + '</li>';
+                            });
+                            errorHtml += '</ul></div>';
+                            $('#service_area').prepend(errorHtml); // Add errors to the form
+
+                            // Display SweetAlert2 for validation errors
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Validation Error',
+                                html: errorHtml, // Use the generated error HTML
+                                timer: 4000, // Auto-close after 4 seconds (optional)
+                            });
+                        }
+                        else if (xhr.responseJSON.error) {
+                            // Show custom error message with SweetAlert2
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: xhr.responseJSON.error, // Show the custom error message
+                                timer: 4000, // Auto-close after 4 seconds (optional)
+                            });
+                        }
+
+                        // Restore time input and select values after error
+                    }
+                });
+            });
+        });
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            $('#keywordadd').on('submit', function (e) {
+                e.preventDefault(); // Prevent the default form submission
+
+                // Store current form values before submission, particularly time and select elements
+
+                // Create a FormData object to handle form data
+                let formData = new FormData(this);
+
+                // Clear previous error messages
+
+                $.ajax({
+                    url: $(this).attr('action'), // Form action URL
+                    type: $(this).attr('method'), // POST method
+                    data: formData,
+                    processData: false, // Important: do not process the data
+                    contentType: false, // Important: content type is false
+                    success: function (response) {
+
+
+
+                        var row = '<tr>\
+                                    <td>'+response.keyword.keyword+'</td>\
+                                    <td>'+response.area.country+', '+response.area.state+', '+response.area.city+'</td>\
+                                  </tr>'
+                        $('#keyword_table').append(row);
+
+
+                        // Handle success response (display success message using SweetAlert2)
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: response.message,
+                            timer: 2000, // Automatically close after 2 seconds
+                            showConfirmButton: false
+                        });
+
+
+                        // Optionally reset the form only on success
+                        $('#keywordadd')[0].reset();
+                        // This will reset the form fields
+                    },
+                    error: function (xhr) {
+                        // Handle validation errors
+                        let errors = xhr.responseJSON.errors;
+                        if (errors) {
+                            let errorHtml = '<div class="alert alert-danger"><ul>';
+                            $.each(errors, function (key, value) {
+                                errorHtml += '<li>' + value + '</li>';
+                            });
+                            errorHtml += '</ul></div>';
+                            $('#saleForm').prepend(errorHtml); // Add errors to the form
+
+                            // Display SweetAlert2 for validation errors
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Validation Error',
+                                html: errorHtml, // Use the generated error HTML
+                                timer: 4000, // Auto-close after 4 seconds (optional)
+                            });
+                        }
+                        else if (xhr.responseJSON.error) {
+                            // Show custom error message with SweetAlert2
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: xhr.responseJSON.error, // Show the custom error message
+                                timer: 4000, // Auto-close after 4 seconds (optional)
+                            });
+                        }
+
+                        // Restore time input and select values after error
+                    }
+                });
+            });
+        });
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            $('#add_service_charge').on('submit', function (e) {
+                e.preventDefault(); // Prevent the default form submission
+
+                // Store current form values before submission, particularly time and select elements
+
+
+                // Create a FormData object to handle form data
+                let formData = new FormData(this);
+
+                // Clear previous error messages
+
+                $.ajax({
+                    url: $(this).attr('action'), // Form action URL
+                    type: $(this).attr('method'), // POST method
+                    data: formData,
+                    processData: false, // Important: do not process the data
+                    contentType: false, // Important: content type is false
+                    success: function (response) {
+
+                    console.log(response.invoice);
+
+
+                    var invoice = response.invoice;
+                    $('#invoice_id').val(invoice.id);
+
+                    $('#invoice_service_table tr').remove();
+
+                    var invoice_table = $.map(invoice.servicecharges, function (item) {
+                        var serviceName = item.service_name ? item.service_name.name : 'N/A'; // Handle potential null
+                        return '<tr>\
+                                    <td>' + serviceName + '</td>\
+                                    <td><input class="form-check-input" type="checkbox" value="1" id="defaultCheck' + item.id + '" ' + (item.is_complementary === 1 ? 'checked' : '') + ' readonly></td>\
+                                    <td>' + item.charged_price + '</td>\
+                                </tr>';
                     });
 
+                    // Append the generated rows to the table
+                    $('#invoice_service_table').append(invoice_table);
 
-                    // Optionally reset the form only on success
-                    $('#keywordadd')[0].reset();
-                    // This will reset the form fields
-                },
-                error: function (xhr) {
-                    // Handle validation errors
-                    let errors = xhr.responseJSON.errors;
-                    if (errors) {
-                        let errorHtml = '<div class="alert alert-danger"><ul>';
-                        $.each(errors, function (key, value) {
-                            errorHtml += '<li>' + value + '</li>';
-                        });
-                        errorHtml += '</ul></div>';
-                        $('#saleForm').prepend(errorHtml); // Add errors to the form
 
-                        // Display SweetAlert2 for validation errors
+                    // Calculate the total discount amount
+                    var totalDiscount = invoice.servicecharges.reduce(function (sum, item) {
+                        return sum + parseFloat(item.discount_price); // Summing up discount_price values
+                    }, 0);
+
+                    // Calculate the total charged amount
+                    var totalCharged = invoice.servicecharges.reduce(function (sum, item) {
+                        return sum + parseFloat(item.charged_price); // Summing up charged_price values
+                    }, 0);
+
+                    // Update the discount_amount and charged amount in the invoice object
+                    invoice.discount_amount = totalDiscount;
+                    invoice.total_amount = totalCharged;
+
+                    // Optionally, update the UI if necessary
+                    $('#discount_amount').val(totalDiscount.toFixed(2));
+                    $('#invoice_amount').val(totalCharged.toFixed(2));
+                    $('#invoice_number').val(invoice.invoice_number);
+
+
+
+
+
+
+                        // Handle success response (display success message using SweetAlert2)
                         Swal.fire({
-                            icon: 'error',
-                            title: 'Validation Error',
-                            html: errorHtml, // Use the generated error HTML
-                            timer: 4000, // Auto-close after 4 seconds (optional)
+                            icon: 'success',
+                            title: 'Success',
+                            text: response.message,
+                            timer: 2000, // Automatically close after 2 seconds
+                            showConfirmButton: false
                         });
-                    }
-                    else if (xhr.responseJSON.error) {
-                        // Show custom error message with SweetAlert2
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: xhr.responseJSON.error, // Show the custom error message
-                            timer: 4000, // Auto-close after 4 seconds (optional)
-                        });
-                    }
 
-                    // Restore time input and select values after error
-                }
+
+
+                        // Optionally reset the form only on success
+                        // $('#saleForm')[0].reset();
+                        // This will reset the form fields
+                    },
+                    error: function (xhr) {
+                        // Handle validation errors
+                        let errors = xhr.responseJSON.errors;
+                        if (errors) {
+                            let errorHtml = '<div class="alert alert-danger"><ul>';
+                            $.each(errors, function (key, value) {
+                                errorHtml += '<li>' + value + '</li>';
+                            });
+                            errorHtml += '</ul></div>';
+                            $('#saleForm').prepend(errorHtml); // Add errors to the form
+
+                            // Display SweetAlert2 for validation errors
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Validation Error',
+                                html: errorHtml, // Use the generated error HTML
+                                timer: 4000, // Auto-close after 4 seconds (optional)
+                            });
+                        }
+                        else if (xhr.responseJSON.error) {
+                            // Show custom error message with SweetAlert2
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: xhr.responseJSON.error, // Show the custom error message
+                                timer: 4000, // Auto-close after 4 seconds (optional)
+                            });
+                        }
+
+                        // Restore time input and select values after error
+                    }
+                });
             });
         });
-    });
+    </script>
+    <script>
+        $(document).ready(function () {
+            $('#invoice_genrate').on('submit', function (e) {
+                e.preventDefault(); // Prevent the default form submission
+
+                // Store current form values before submission, particularly time and select elements
+
+
+                // Create a FormData object to handle form data
+                let formData = new FormData(this);
+
+                // Clear previous error messages
+
+                $.ajax({
+                    url: $(this).attr('action'), // Form action URL
+                    type: $(this).attr('method'), // POST method
+                    data: formData,
+                    processData: false, // Important: do not process the data
+                    contentType: false, // Important: content type is false
+                    success: function (response) {
+
+                    console.log(response);
+
+
+                        // Handle success response (display success message using SweetAlert2)
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: response.message,
+                            timer: 2000, // Automatically close after 2 seconds
+                            showConfirmButton: false
+                        });
+
+
+
+                        // Optionally reset the form only on success
+                        // $('#saleForm')[0].reset();
+                        // This will reset the form fields
+                    },
+                    error: function (xhr) {
+                        // Handle validation errors
+                        let errors = xhr.responseJSON.errors;
+                        if (errors) {
+                            let errorHtml = '<div class="alert alert-danger"><ul>';
+                            $.each(errors, function (key, value) {
+                                errorHtml += '<li>' + value + '</li>';
+                            });
+                            errorHtml += '</ul></div>';
+                            $('#saleForm').prepend(errorHtml); // Add errors to the form
+
+                            // Display SweetAlert2 for validation errors
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Validation Error',
+                                html: errorHtml, // Use the generated error HTML
+                                timer: 4000, // Auto-close after 4 seconds (optional)
+                            });
+                        }
+                        else if (xhr.responseJSON.error) {
+                            // Show custom error message with SweetAlert2
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: xhr.responseJSON.error, // Show the custom error message
+                                timer: 4000, // Auto-close after 4 seconds (optional)
+                            });
+                        }
+
+                        // Restore time input and select values after error
+                    }
+                });
+            });
+        });
     </script>
 
+@endsection
 
-    @endsection
+
+
+

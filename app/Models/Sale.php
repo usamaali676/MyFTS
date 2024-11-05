@@ -14,6 +14,10 @@ class Sale extends Model
     public function closers() {
         return $this->hasMany(SaleCS::class, 'sale_id');
     }
+    public function business_hours()
+    {
+        return $this->hasMany(BusinessHours::class, 'sale_id');
+    }
     public function social_links(){
         return $this->hasMany(SocialLink::class, 'sale_id');
     }
@@ -45,5 +49,7 @@ class Sale extends Model
     public function keyword(){
         return $this->hasMany(Keyword::class,'sale_id');
     }
-
+    public function invoice(){
+        return $this->belongsTo(Invoice::class,'sale_id');
+    }
 }
