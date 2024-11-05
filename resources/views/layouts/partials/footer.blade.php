@@ -8,7 +8,7 @@
             document.write(new Date().getFullYear());
           </script>
           , made with <span class="text-danger"><i class="tf-icons mdi mdi-heart"></i></span> by
-          <a href="hhttp://firmtechservices.com/" target="_blank" class="footer-link fw-medium">Firm Tech Services</a>
+          <a href="https://firmtechservices.com/" target="_blank" class="footer-link fw-medium">Firm Tech Services</a>
         </div>
 
       </div>
