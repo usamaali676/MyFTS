@@ -1669,7 +1669,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                         <tr>
                                                             <td>{{ $item->service_name->name }}</td>
                                                             <td><input class="form-check-input" name="is_complementary" type="checkbox" value="true" id="defaultCheck1" @if($item->is_complementary === 1) checked @endif readonly></td>
-                                                            @if($item->is_complementary === 0)
+                                                            @if($item->is_complementary == 0)
                                                                 <td>{{ $item->charged_price }}</td>
                                                             @else
                                                                 <td>0</td>
@@ -1878,6 +1878,11 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
     <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/24.6.0/build/js/intlTelInput.min.js"
         integrity="sha512-/sRFlFRbcvObOo/SxW8pvmFZeMLvAF6hajRXeX15ekPgT4guXnfNSjLC98K/Tg2ObUgKX8vn9+Th5/mGHzZbEw=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        $(':checkbox[readonly]').click(function(){
+            return false;
+        });
+    </script>
     <script>
         const threeDaysAgo = new Date();
             threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
