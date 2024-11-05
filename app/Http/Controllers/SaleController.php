@@ -59,7 +59,11 @@ class SaleController extends Controller
 
         $company_services = CompanyServices::all();
         if (isset($sale)) {
-            $invoice = Invoice::where('sale_id', $sale->id)->first();
+            $lastMonthName = Carbon::now()->subMonth()->format('F');
+            // dd($lastMonthName);
+            // $monthName = Carbon::now()->format('F');
+            $invoice = Invoice::where('sale_id', $sale->id)->where('month', $lastMonthName)->first();
+            // dd($invoice);
             // Get client services for the sale and eager load their company services specific to this sale
             $client_services = $sale->clientServices->map(function ($clientService) use ($sale) {
                 // Load the company services specific to the sale

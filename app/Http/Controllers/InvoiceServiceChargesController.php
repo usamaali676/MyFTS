@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\CompanyServices;
 use App\Models\Invoice;
 use App\Models\InvoiceServiceCharges;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -23,26 +24,45 @@ class InvoiceServiceChargesController extends Controller
      */
     public function create(Request $request)
     {
-        // dd($request->all());
+        dd($request->all());
         $request->validate([
             'invoice_id' => 'required',
             'invoice_amount' => 'required',
         ]);
+        $unique_id = 'FTS'. '_' . Str::random(5) . '_' . time();
+        $date = Carbon::now(); // or any other Carbon instance
+        $monthName = $date->format('F');
         $invoice = Invoice::where('id', $request->invoice_id)->first();
-        $invoice->update([
-            'discount_type' => $request->discount_type,
-            'discount_amount' => $request->discount_amount,
-            'invoice_due_date' => $request->invoice_due_date,
-            'total_amount' => $request->invoice_amount,
-            'invoice_freq' =>   $request->invoice_freq,
-        ]);
-        return response()->json([
-            'message' => 'Item Added Succesfully!',
-            'invoice' => $invoice,
-
-        ], 200);
-
-
+        $last_invoice = Invoice::where('sale_id', $invoice->sale_id)->where('month', $monthName)->first();
+        if($last_invoice == NULL){
+            $invoice = Invoice::create([
+                'sale_id' => $request->sale_id6,
+                'invoice_number' => $unique_id,
+                'invoice_active_status' => $request->invoice_status? 1 : 0,
+                'activation_date' => $request->activation_date,
+                'discount_type' => $request->discount_type,
+                'discount_amount' => $request->discount_amount,
+                'invoice_due_date' => $request->invoice_due_date,
+                'total_amount' => $request->invoice_amount,
+                'invoice_freq' =>   $request->invoice_freq,
+                'month' => $monthName,
+                // 'month' => $monthName
+            ]);
+        }
+        else {
+            $invoice->update([
+                'discount_type' => $request->discount_type,
+                'discount_amount' => $request->discount_amount,
+                'invoice_due_date' => $request->invoice_due_date,
+                'total_amount' => $request->invoice_amount,
+                'invoice_freq' =>   $request->invoice_freq,
+                'month' => $monthName,
+            ]);
+            return response()->json([
+                'message' => 'Invoice Update Successfully!',
+                'invoice' => $invoice,
+            ], 200);
+        }
     }
 
     /**
@@ -50,19 +70,20 @@ class InvoiceServiceChargesController extends Controller
      */
     public function store(Request $request)
     {
-        // dd($request->all());
+        dd($request->all());
         $request->validate([
             'sale_id6' => 'required',
-            'company_service_charge' => 'required',
         ]);
-        $unique_id = 'FTS'. Str::random(5) . '_' . time();
-        $company_service = CompanyServices::where('id', $request->company_service_charge)->first();
-        if($company_service->price > $request->amount) {
-            $discount_amount = $company_service->price - $request->amount;
-        }
-        else {
-            $discount_amount = 0;
-        }
+        $unique_id = 'FTS'. '_' . Str::random(5) . '_' . time();
+        $date = Carbon::now(); // or any other Carbon instance
+        $monthName = $date->format('F');
+        // $company_service = CompanyServices::where('id', $request->company_service_charge)->first();
+        // if($company_service->price > $request->amount) {
+        //     $discount_amount = $company_service->price - $request->amount;
+        // }
+        // else {
+        //     $discount_amount = 0;
+        // }
         if(isset($request->is_complementary)){
             $complementary = $request->is_complementary;
             $charge_price = 0;
@@ -71,11 +92,16 @@ class InvoiceServiceChargesController extends Controller
             $complementary = 0;
             $charge_price = $request->amount;
         }
-        $invoice = Invoice::where('sale_id', $request->sale_id6)->first();
+        $invoice = Invoice::where('sale_id', $request->sale_id6)->where('month', $monthName)->first();
         if(isset($invoice)){
             $invoice->update([
-                'invoice_active_status' => $request->invoice_status? 1 : 0,
+               'invoice_active_status' => $request->invoice_status? 1 : 0,
                 'activation_date' => $request->activation_date,
+                'discount_type' => $request->discount_type,
+                'discount_amount' => $request->discount_amount,
+                'invoice_due_date' => $request->invoice_due_date,
+                'total_amount' => $request->invoice_amount,
+                'invoice_freq' =>   $request->invoice_freq,
             ]);
         }
         else{
@@ -84,26 +110,44 @@ class InvoiceServiceChargesController extends Controller
                 'invoice_number' => $unique_id,
                 'invoice_active_status' => $request->invoice_status? 1 : 0,
                 'activation_date' => $request->activation_date,
+                'discount_type' => $request->discount_type,
+                'discount_amount' => $request->discount_amount,
+                'invoice_due_date' => $request->invoice_due_date,
+                'total_amount' => $request->invoice_amount,
+                'invoice_freq' =>   $request->invoice_freq,
+                'month' => $monthName,
+                // 'month' => $monthName
             ]);
         }
-
-        if(isset($invoice)){
-            $invoiceServiceCharge = InvoiceServiceCharges::create([
-                'invoice_id' => $invoice->id,
-                'company_service_id' => $request->company_service_charge,
-                'shelf_amount' => $company_service->price,
-                'charged_price' => $charge_price,
-                'discount_price' => $discount_amount,
-                'is_complementary' => $complementary
-            ]);
-
-            return response()->json([
-                'message' => 'Item Added Succesfully!',
-                'invoice' => $invoice->load(['servicecharges.service_name']),
-
-            ], 200);
-        }
+        return response()->json([
+            'message' => 'Invoice Genrated Succesfully!',
+            'invoice' => $invoice->load(['servicecharges.service_name']),
+        ], 200);
+        // if(isset($invoice)){
+        //     $last_invoice_charge = InvoiceServiceCharges::where('company_service_id', $request->company_service_charge)->where('month', $monthName)->first();
+        //     if($last_invoice_charge == NULL) {
+        //         $invoiceServiceCharge = InvoiceServiceCharges::create([
+        //             'invoice_id' => $invoice->id,
+        //             'company_service_id' => $request->company_service_charge,
+        //             'shelf_amount' => $company_service->price,
+        //             'charged_price' => $charge_price,
+        //             'discount_price' => $discount_amount,
+        //             'is_complementary' => $complementary,
+        //             'month' => $monthName
+        //         ]);
+        //         return response()->json([
+        //             'message' => 'Item Added Succesfully!',
+        //             'invoice' => $invoice->load(['servicecharges.service_name']),
+        //         ], 200);
+        //     }
+        //     else {
+        //         return response()->json([
+        //             'error' => 'Item Already Exists!',
+        //         ], 422);
+        //     }
+        // }
     }
+
 
     /**
      * Display the specified resource.
