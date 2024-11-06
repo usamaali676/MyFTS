@@ -5,6 +5,7 @@ use App\Http\Controllers\FrontController;
 use App\Http\Controllers\InvoiceServiceChargesController;
 use App\Http\Controllers\KeywordController;
 use App\Http\Controllers\LeadController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SaleController;
 use App\Http\Controllers\ServiceAreaController;
@@ -136,5 +137,12 @@ Route::controller(RoleController::class)
     ->middleware(PermissionMiddelware::class)
     ->group(function () {
         Route::post('store', 'store')->name('store');
-        Route::post('create', 'create')->name('create');
+    });
+
+    Route::controller(PaymentController::class)
+    ->prefix('payment')
+    ->as('payment.')
+    ->middleware(PermissionMiddelware::class)
+    ->group(function () {
+        Route::post('store', 'store')->name('store');
     });

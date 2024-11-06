@@ -23,6 +23,7 @@ return new class extends Migration
             $table->boolean('invoice_active_status')->defaultFalse();
             $table->date('activation_date')->nullable();
             $table->string('month')->nullable();
+            $table->string('year')->nullable();
             $table->foreign('sale_id')->references('id')->on('sales')->onDelete()->constrained()->onDelete('cascade');
             $table->softDeletes();
             $table->unsignedBigInteger('created_by')->nullable();

@@ -70,13 +70,14 @@ class InvoiceServiceChargesController extends Controller
      */
     public function store(Request $request)
     {
-        dd($request->all());
+        // dd($request->all());
         $request->validate([
             'sale_id6' => 'required',
         ]);
         $unique_id = 'FTS'. '_' . Str::random(5) . '_' . time();
         $date = Carbon::now(); // or any other Carbon instance
         $monthName = $date->format('F');
+        $year = $date->format('Y');
         // $company_service = CompanyServices::where('id', $request->company_service_charge)->first();
         // if($company_service->price > $request->amount) {
         //     $discount_amount = $company_service->price - $request->amount;
@@ -102,6 +103,8 @@ class InvoiceServiceChargesController extends Controller
                 'invoice_due_date' => $request->invoice_due_date,
                 'total_amount' => $request->invoice_amount,
                 'invoice_freq' =>   $request->invoice_freq,
+                'month' => $monthName,
+                'year' => $year,
             ]);
         }
         else{
@@ -116,13 +119,34 @@ class InvoiceServiceChargesController extends Controller
                 'total_amount' => $request->invoice_amount,
                 'invoice_freq' =>   $request->invoice_freq,
                 'month' => $monthName,
+                'year' => $year,
                 // 'month' => $monthName
             ]);
+        }
+        if(isset($request->service_id) && count($request->service_id) > 0){
+            foreach($request->service_id as $key => $value){
+                $company_service = CompanyServices::where('id', $value)->first();
+                if($company_service->price > $request->amount[$key]) {
+                    $discount_amount = $company_service->price - $request->amount[$key];
+                }
+                else {
+                    $discount_amount = 0;
+                }
+                $invoiceServiceCharge = InvoiceServiceCharges::create([
+                    'invoice_id' => $invoice->id,
+                    'company_service_id' => $value,
+                    'shelf_amount' => $company_service->price,
+                    'charged_price' => $request->amount[$key],
+                    'discount_price' => $discount_amount,
+                    'is_complementary' => $request->is_complementary[$key],
+                    'month' => $monthName
+                ]);
         }
         return response()->json([
             'message' => 'Invoice Genrated Succesfully!',
             'invoice' => $invoice->load(['servicecharges.service_name']),
         ], 200);
+    }
         // if(isset($invoice)){
         //     $last_invoice_charge = InvoiceServiceCharges::where('company_service_id', $request->company_service_charge)->where('month', $monthName)->first();
         //     if($last_invoice_charge == NULL) {

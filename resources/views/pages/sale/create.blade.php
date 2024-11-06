@@ -1695,6 +1695,9 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                         <div class="col-md-6 col-12 mb-6">
                                             <div class="form-floating form-floating-outline">
                                                 <input type="text" id="year" class="form-control flatpickr-input active" format="YYYY" name="year"
+                                                @if(isset($invoice) && isset($invoice->year))
+                                                    value="{{ $invoice->year }}"
+                                                @endif
                                                 placeholder="YYYY-MM-DD" id="flatpickr-date" readonly="readonly">
                                                 <label for="flatpickr-date">Year</label>
                                             </div>
@@ -1702,6 +1705,9 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                         <div class="col-md-6">
                                             <div class="form-floating form-floating-outline">
                                                 <select id="month" name="month" class="select2 form-select" data-allow-clear="true">
+                                                    @if(isset($invoice) && isset($invoice->month))
+                                                    <option value="{{$invoice->month}}" selected>{{ $invoice->month }}</option>
+                                                    @endif
                                                     <option value="">Please Select</option>
                                                     <option value="January" >January</option>
                                                     <option value="February" >February</option>
@@ -1777,7 +1783,8 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                     $date=Carbon\Carbon::now()->format('F');
                                                 // dd($date);
                                                 @endphp
-                                                @if($invoice == $date)
+
+                                                @if((isset($invoice)) && $invoice->month == $date)
                                                 @if(isset($invoice)) value="{{ $invoice->invoice_number }}" @endif
                                                 @endif
                                                 placeholder="Invoice No." disabled/>
@@ -1806,73 +1813,147 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                     </div>
                                 </form>
                                 <!-- /Invoice Form -->
-                                <div class="row g-4 py-5">
-                                    <h4>Payment Detail</h4>
-
-                                    <div class="col-md-6">
-                                        <div class="form-floating form-floating-outline">
-                                            <select id="marchent" name="marchent" class="select2 form-select" data-allow-clear="true">
-                                                <option value="">Please Select</option>
-                                                @if(isset($mehchant) && count($mehchant) > 0)
-                                                    @foreach ($mehchant as $item)
-                                                        <option value="{{$item->id }}">{{ $item->name }}</option>
-                                                    @endforeach
-                                                @endif
-                                            </select>
-                                            <label for="multicol-country">Select Merchant</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-floating form-floating-outline">
-                                            <select id="mop" name="mop" class="select2 form-select" data-allow-clear="true">
-                                                <option value="">Please Select</option>
-                                                <option value="Credit Card">Credit Card</option>
-                                                <option value="PayPal">PayPal</option>
-                                                <option value="Zeele">Zeele</option>
-                                                <option value="Cash App">Cash App</option>
-                                                <option value="Bank Transfer">Bank Transfer</option>
-                                                <option value="other">other</option>
-                                            </select>
-                                            <label for="multicol-country">Mode of Payment</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="input-group input-group-merge">
+                                <form id="make_payment" action="{{ route('payment.store') }}" method="POST">
+                                    @csrf
+                                    <div class="row g-4 py-3">
+                                        <h4>Payment Detail</h4>
+                                        <div class="col-md-6">
                                             <div class="form-floating form-floating-outline">
-                                              <input
-                                                type="text"
-                                                id="billings-card-num"
-                                                class="form-control billing-card-mask"
-                                                placeholder="4541 2541 2547 2577"
-                                                aria-describedby="paymentCard" />
-                                              <label for="billings-card-num">Card number</label>
+                                                <select id="invoice_number" name="invoice_id" class="select2 form-select" data-allow-clear="true">
+                                                    <option value="">Please Select</option>
+                                                    @if(isset($all_invoices) && count($all_invoices) > 0)
+                                                        @foreach ($all_invoices as $item)
+                                                            <option value="{{$item->id }}">{{ $item->invoice_number }} (Month: {{ $item->month }})</option>
+                                                        @endforeach
+                                                    @endif
+                                                </select>
+                                                <label for="multicol-country">Invoice No.</label>
                                             </div>
-                                            <span class="input-group-text cursor-pointer p-1" id="paymentCard"
-                                              ><span class="card-type w-px-50"></span
-                                            ></span>
-                                          </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-floating form-floating-outline">
-                                            <select id="payment_type" name="payment_type" class="select2 form-select" data-allow-clear="true">
-                                                <option value="">Please Select</option>
-                                                <option value="Full Payment">Full Payment</option>
-                                                <option value="Partials Payment">Partials Payment</option>
-                                                <option value="Advance Payment">Advance Payment</option>
-                                            </select>
-                                            <label for="multicol-country">Payment Type</label>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-floating form-floating-outline">
+                                                <select id="marchent" name="marchent" class="select2 form-select" data-allow-clear="true">
+                                                    <option value="">Please Select</option>
+                                                    @if(isset($mehchant) && count($mehchant) > 0)
+                                                        @foreach ($mehchant as $item)
+                                                            <option value="{{$item->id }}">{{ $item->name }}</option>
+                                                        @endforeach
+                                                    @endif
+                                                </select>
+                                                <label for="multicol-country">Select Merchant</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-floating form-floating-outline">
+                                                <select id="mop" name="mop" class="select2 form-select" data-allow-clear="true">
+                                                    <option value="">Please Select</option>
+                                                    <option value="Credit Card">Credit Card</option>
+                                                    <option value="PayPal">PayPal</option>
+                                                    <option value="Zeele">Zeele</option>
+                                                    <option value="Cash App">Cash App</option>
+                                                    <option value="Bank Transfer">Bank Transfer</option>
+                                                    <option value="other">other</option>
+                                                </select>
+                                                <label for="multicol-country">Mode of Payment</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="input-group input-group-merge">
+                                                <div class="form-floating form-floating-outline">
+                                                <input
+                                                    type="text"
+                                                    id="billings-card-num"
+                                                    class="form-control billing-card-mask"
+                                                    placeholder="4541 2541 2547 2577"
+                                                    name="card_number"
+                                                    aria-describedby="paymentCard" />
+                                                <label for="billings-card-num">Card number</label>
+                                                </div>
+                                                <span class="input-group-text cursor-pointer p-1" id="paymentCard"
+                                                ><span class="card-type w-px-50"></span
+                                                ></span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-floating form-floating-outline">
+                                                <select id="payment_type" name="payment_type" class="select2 form-select" data-allow-clear="true">
+                                                    <option value="">Please Select</option>
+                                                    <option value="Full Payment">Full Payment</option>
+                                                    <option value="Partials Payment">Partials Payment</option>
+                                                    <option value="Advance Payment">Advance Payment</option>
+                                                </select>
+                                                <label for="multicol-country">Payment Type</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-floating form-floating-outline">
+                                                <input type="text" id="payment_amount" name="payment_amount" class="form-control" @if(isset($invoice) && isset($invoice->total_amount)) value="{{ $invoice->total_amount }}" @endif >
+                                                <label for="payment_amount">Payment Amount</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-floating form-floating-outline">
+                                                <input type="text" id="Trans_id" name="trans_id" class="form-control"  >
+                                                <label for="Trans_id">Int. Trans. Ids</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-floating form-floating-outline">
+                                                <div class="mb-4">
+                                                    <input class="form-control" name="trans_ss" type="file" id="formFile">
+                                                    <label for="formFile" class="form-label">Upload Recipt SS</label>
+
+                                                </div>
+                                                {{-- <label for="Trans_id">Recipt Upload</label> --}}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12 text-right m-auto">
+                                            <button type="submit" class="btn btn-primary">Make Payment</button>
                                         </div>
                                     </div>
-                                    <div class="col-md-6">
-                                        <div class="form-floating form-floating-outline">
-                                            <input type="text" id="payment_amount" name="payment_amount" class="form-control" @if(isset($invoice) && isset($invoice->total_amount)) value="{{ $invoice->total_amount }}" @endif >
-                                            <label for="payment_amount">Payment Amount</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-floating form-floating-outline">
-                                            <input type="text" id="Trans_id" name="Trans_id" class="form-control"  >
-                                            <label for="Trans_id">Int. Trans. Ids</label>
+                                </form>
+                                <div class="row py-4">
+                                    <h4>Invoices</h4>
+                                    <div class="col-md-12">
+                                        <div class="table-responsive">
+                                            <table id="invoice_service_table" class="table table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Sr</th>
+                                                        <th>Invoice Number</th>
+                                                        <th>Invoice Month</th>
+                                                        <th>Invoice Date</th>
+                                                        <th>Due Date</th>
+                                                        <th>Payment Status</th>
+                                                        <th>Invoice Amount</th>
+                                                        <th>Paid Amount</th>
+                                                        <th>Balance Amount</th>
+                                                        <th>Merchant Amount</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @if(isset($payments) && count($payments) > 0)
+                                                    @foreach ($payments as $key=>$item)
+                                                    @php
+                                                        $balance = $item->invoice->total_amount - $item->amount;
+                                                    @endphp
+                                                    <tr>
+                                                        <td>{{ $key + 1 }}</td>
+                                                        <td>{{ $item->invoice->invoice_number }}</td>
+                                                        <td>{{ $item->invoice->month }}</td>
+                                                        <td>{{ $item->invoice->activation_date }}</td>
+                                                        <td>{{ $item->invoice->invoice_due_date }}</td>
+                                                        <td>{{ $item->payment_type }}</td>
+                                                        <td>{{ $item->invoice->total_amount }}</td>
+                                                        <td>{{ $item->amount }}</td>
+                                                        <td>{{ $balance }}</td>
+                                                        <td>{{ $item->marchent->name }}</td>
+                                                    </tr>
+                                                    @endforeach
+                                                    @endif
+
+                                                </tbody>
+                                            </table>
                                         </div>
                                     </div>
                                 </div>
@@ -2934,7 +3015,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
     </script>
     <script>
         $(document).ready(function () {
-            $('#invoice_genrate').on('submit', function (e) {
+            $('#make_payment').on('submit', function (e) {
                 e.preventDefault(); // Prevent the default form submission
 
                 // Store current form values before submission, particularly time and select elements

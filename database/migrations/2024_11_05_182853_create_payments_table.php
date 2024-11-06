@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('payments', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('invoice_id');
             $table->string('invoice_number');
             $table->unsignedBigInteger('merchant_id');
             $table->enum('mop', ['Credit Card','PayPal','Zeele','Cash App','Bank Transfer', 'other'])->default('other');
@@ -22,6 +23,8 @@ return new class extends Migration
             $table->char('trans_id')->nullable();
             $table->string('trans_ss')->nullable();
             $table->foreign('merchant_id')->references('id')->on('merchant_accounts')->onDelete()->constrained()->onDelete('cascade');
+            $table->foreign('invoice_id')->references('id')->on('invoices')->onDelete('cascade');
+            $table->softDeletes();
             $table->timestamps();
         });
     }
