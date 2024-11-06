@@ -1050,7 +1050,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                                     </div>
                                                                     <div class="col-md-6">
                                                                         <div class="form-floating form-floating-outline">
-                                                                            <input type="text" class="form-control " name="social_link[]" placeholder="Social Link" value="{{ $list->social_link }}" id="social_link" placeholder
+                                                                            <input type="text" class="form-control social_link" name="social_link[]" placeholder="Social Link" value="{{ $list->social_link }}" id="social_link" placeholder
                                                                                 aria-label="social_link" />
                                                                             <label for="time_zone">Social Link</label>
                                                                         </div>
@@ -2098,7 +2098,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
             const email = document.getElementById('basic-default-email').value;
             const websiteUrl = document.getElementsByName('website_url')[0].value;
             const clientName = document.getElementsByName('client_name')[0].value;
-            // const socialLink = document.getElementsByName('social_link')[0].value;
+            const socialLink = document.getElementsByClassName('social_link')[0].value;
 
             // Validate business name (only letters and spaces)
             if (!/^[a-zA-Z\s]*$/.test(businessName)) {
@@ -2122,10 +2122,10 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                 return false;
             }
 
-            // if (!urlPattern.test(socialLink)) {
-            //     alert('Invalid Social  URL. Please enter a valid URL (e.g., http://example.com).');
-            //     return false;
-            // }
+            if (!urlPattern.test(socialLink)) {
+                alert('Invalid Social  URL. Please enter a valid URL (e.g., http://example.com).');
+                return false;
+            }
 
             // Validate email format
             const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
