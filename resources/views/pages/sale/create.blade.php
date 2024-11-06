@@ -1137,7 +1137,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                 <div class="content-header mb-3">
                                     <h6 class="mb-0">Sale Info</h6>
                                 </div>
-                                <form id="detail_form" method="POST" action="{{ route('sale_info.store') }}" >
+                                <form id="detail_form" method="POST" action="{{ route('saleInfo.store') }}" >
                                     @csrf
                                     @if ($errors->any())
                                     <div class="alert alert-danger">
@@ -1263,7 +1263,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                     <h6 class="mb-0">Services</h6>
                                 </div>
                                 <div class="row g-4">
-                                    <form id="serviceform" method="POST" action="{{ route('client_services.store') }}">
+                                    <form id="serviceform" method="POST" action="{{ route('clientServices.store') }}">
                                         @csrf
                                         @if ($errors->any())
                                     <div class="alert alert-danger">
@@ -1291,7 +1291,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                             </div>
                                         </div>
                                     </form>
-                                    <form id="sync_services" method="POST" action="{{ route('client_services.create') }}">
+                                    <form id="sync_services" method="POST" action="{{ route('clientServices.create') }}">
                                         @csrf
                                         <div class="row g-4">
                                             @if(isset($sale))
@@ -1407,7 +1407,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
 
                                     <div class="row g-4">
                                             <h4>Client Service Area</h4>
-                                            <form id="service_area" action="{{ route('service_area.store') }}" method="POST" >
+                                            <form id="service_area" action="{{ route('serviceArea.store') }}" method="POST" >
                                                 @csrf
                                             <div class="row py-4">
                                                 @if(isset($sale))
@@ -1572,7 +1572,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                     <h6 class="mb-0">Invoice</h6>
                                     <small>Manage Invoices</small>
                                 </div>
-                                <form id="add_service_charge" action="{{ route('invoice_charges.store') }}" method="POST">
+                                <form id="add_service_charge" action="{{ route('invoiceCharges.store') }}" method="POST">
                                     @csrf
                                     @if(isset($sale))
                                     <input type="hidden" name="sale_id6" id="sale_id6" value="{{ $sale->id }}">
@@ -2352,7 +2352,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
             $("#service_name").autocomplete({
                     source: function(request, response) {
                         $.ajax({
-                            url: "{{ route('client_services.search_services') }}",
+                            url: "{{ route('clientServices.search_services') }}",
                             type: 'GET',
                             dataType: 'json',
                             data: {
@@ -2538,7 +2538,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                 if(result){
                 $.ajax({
                     type: "GET",
-                    url: "{{ route('client_services.delete') }}",
+                    url: "{{ route('clientServices.delete') }}",
                     data: {id: id},
                     success: function (response) {
 

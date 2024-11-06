@@ -23,78 +23,97 @@ class PermissionMiddelware
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
     public function handle(Request $request, Closure $next)
-        {
-            $routeName = Route::currentRouteName();
-            // dd($routeName);
-            $user = Auth::user();
+    {
+        // if ($request->ajax() || $request->header('X-Requested-With') === 'XMLHttpRequest') {
+        //     dd('AJAX request detected');
+        // }
 
+        $routeName = Route::currentRouteName();
+        // dd($routeName);
+        $user = Auth::user();
+        // dd($user);
+        // Ensure a user is authenticated before checking their permissions
+        if ($user) {
             $role = Role::where('id', $user->role_id)->first();
-            // dd($routeNameMatches);
+            //  dd($role);
+            // If route matches permission pattern
             if ($routeNameMatches = $this->matchRouteWithPermissionName($routeName)) {
-                $perms = Permission::where('role_id', $role->id)->where('name', $routeNameMatches['permissionName'])->first();
+                // Fetch permission for the role
+                $perms = Permission::where('role_id', $role->id)
+                                   ->where('name', $routeNameMatches['permissionName'])
+                                   ->first();
                 // dd($perms);
-                // $hasPermission = $perms->index == 1;
-                // dd($hasPermission);
-                // dd($routeNameMatches['operation']);
 
-                // if(isset($perms)){
-                switch ($routeNameMatches['operation']) {
-                    case "index":
-                        $hasPermission = $perms->view == 1;
-                        break;
-                    case 'create':
-                        $hasPermission = $perms->create == 1;
-                        break;
-                    case 'edit':
-                        $hasPermission = $perms->edit == 1;
-                        break;
-                    case 'update':
-                        $hasPermission = $perms->edit == 1;
-                        break;
-                    case 'conf-delete':
-                        $hasPermission = $perms->delete == 1;
-                        break;
-                    case 'delete':
-                        $hasPermission = $perms->delete == 1;
-                        // dd($hasPermission);
-                        break;
-                    default:
-                        $hasPermission = false;
-                        break;
-                }
+                if ($perms) {
+                    // Check permission based on operation
+                    switch ($routeNameMatches['operation']) {
+                        case "index":
+                            $hasPermission = $perms->view == 1;
+                            break;
+                        case 'create':
+                            $hasPermission = $perms->create == 1;
+                            break;
+                        case 'edit':
+                            $hasPermission = $perms->edit == 1;
+                            break;
+                        case 'update':
+                            $hasPermission = $perms->edit == 1;
+                            break;
+                        case 'conf-delete':
+                            $hasPermission = $perms->delete == 1;
+                            break;
+                        case 'delete':
+                            $hasPermission = $perms->delete == 1;
+                            break;
+                        default:
+                            $hasPermission = false;
+                            break;
+                    }
 
-                // dd($hasPermission);
-                if ($hasPermission) {
-                    return $next($request);
-                } else {
-                    Alert::error('Opps',"You can't Perform this Operation");
-                    return redirect()->route('home');
+                    // If the user has permission, proceed to the next request
+                    if ($hasPermission) {
+                        return $next($request);
+                    } else {
+                        // Handle error for unauthorized request
+                        if ($request->ajax()) {
+                            return response()->json(['error' => "You can't perform this operation"], 403);
+                        } else {
+                            Alert::error('Opps', "You can't perform this operation");
+                            return redirect()->route('home');
+                        }
+                    }
                 }
-            // }
-            // else{
-            //     Alert::error('Opps',"You can't Perform this Operation");
-            //     return redirect()->route('home');
-            // }
-            } else {
-                return $next($request);
+                else{
+                    if ($request->ajax()) {
+                        return response()->json(['error' => "You can't perform this operation"], 422);
+                    } else {
+                        Alert::error('Opps', "You can't perform this operation");
+                        return redirect()->route('home');
+                    }
+                }
             }
         }
 
-        private function matchRouteWithPermissionName($routeName)
-        {
-            // dd($routeName);
-            $matches = [];
+        // If no matching route or user does not have necessary permissions, continue the request
+        return $next($request);
+    }
 
-            preg_match('/^(?P<entity>[a-z]+)\.(?P<operation>index|view|create|edit|update|delete|conf-delete )$/i', $routeName, $matches);
-            // dd($matches);
-            if (count($matches) > 2) {
-                // dd($matches);
-                return [
-                    'permissionName' => Str::title($matches['entity']),
-                    'operation' => $matches['operation']
-                ];
-            }
-            return false;
+    private function matchRouteWithPermissionName($routeName)
+    {
+        $matches = [];
+        // dd($matches);
+       preg_match('/^(?P<entity>[a-z]+)\.(?P<operation>index|view|create|store|edit|update|delete|conf-delete)$/i', $routeName, $matches);
+
+
+        if (count($matches) > 2) {
+            return [
+                'permissionName' => Str::title($matches['entity']),
+                'operation' => $matches['operation']
+            ];
         }
+
+        return false;
+    }
+
 }
 
