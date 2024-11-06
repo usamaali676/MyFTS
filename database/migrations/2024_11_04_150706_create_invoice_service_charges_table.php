@@ -19,6 +19,7 @@ return new class extends Migration
             $table->decimal('charged_price', 10, 2);
             $table->decimal('discount_price', 10, 2);
             $table->boolean('is_complementary', false)->default(0);
+            $table->string('month');
             $table->foreign('invoice_id')->references('id')->on('invoices')->onDelete('cascade');
             $table->foreign('company_service_id')->references('id')->on('company_services')->onDelete('cascade');
             $table->softDeletes();

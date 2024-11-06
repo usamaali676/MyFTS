@@ -20,11 +20,10 @@ return new class extends Migration
             $table->date('invoice_due_date')->nullable();
             $table->enum('invoice_frequency', ['Monthly', 'Bi-annually','Annually']);
             $table->decimal('total_amount', 10, 2)->nullable();
-            $table->unsignedBigInteger('marchent_id')->default(1);
             $table->boolean('invoice_active_status')->defaultFalse();
             $table->date('activation_date')->nullable();
-            $table->enum('mop', ['Credit Card','PayPal','Zeele','Cash App','Bank Transfer', 'other'])->default('other');
-            $table->foreign('marchent_id')->references('id')->on('merchant_accounts')->onDelete()->constrained()->onDelete('cascade');
+            $table->string('month')->nullable();
+            $table->string('year')->nullable();
             $table->foreign('sale_id')->references('id')->on('sales')->onDelete()->constrained()->onDelete('cascade');
             $table->softDeletes();
             $table->unsignedBigInteger('created_by')->nullable();

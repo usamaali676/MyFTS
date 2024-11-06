@@ -9,6 +9,7 @@ use App\Models\Invoice;
 use App\Models\Lead;
 use App\Models\LeadCloser;
 use App\Models\MerchantAccount;
+use App\Models\Payment;
 use App\Models\Sale;
 use App\Models\SaleCS;
 use App\Models\SocialLink;
@@ -59,15 +60,20 @@ class SaleController extends Controller
 
         $company_services = CompanyServices::all();
         if (isset($sale)) {
-            $invoice = Invoice::where('sale_id', $sale->id)->first();
+            // $lastMonthName = Carbon::now()->subMonth()->format('F');
+            // dd($lastMonthName);
+            $lastMonthName = Carbon::now()->format('F');
+            $invoice = Invoice::where('sale_id', $sale->id)->where('month', $lastMonthName)->first();
+            $all_invoices = Invoice::where('sale_id', $sale->id)->get();
+            $payments = Payment::where('invoice_id', $invoice->id)->get();
+            // dd($invoice);
             // Get client services for the sale and eager load their company services specific to this sale
             $client_services = $sale->clientServices->map(function ($clientService) use ($sale) {
                 // Load the company services specific to the sale
                 $clientService->setRelation('companyServicesForSale', $clientService->companyServicesForSale($sale->id)->get());
                 return $clientService;
             });
-
-            return view('pages.sale.create', compact('lead', 'client_enum', 'call_enum', 'social_links', 'closers', 'sale', 'company_services', 'client_services', 'invoice', 'mehchant'));
+            return view('pages.sale.create', compact('lead', 'client_enum', 'call_enum', 'social_links', 'closers', 'sale', 'company_services', 'client_services', 'invoice', 'mehchant' , 'all_invoices', 'payments'));
         } else {
             return view('pages.sale.create', compact('lead', 'client_enum', 'call_enum', 'social_links', 'closers', 'sale', 'company_services', 'mehchant'));
         }
