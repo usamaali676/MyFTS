@@ -97,16 +97,16 @@ Route::controller(RoleController::class)
     });
 
     Route::controller(SaleController::class)
-    ->prefix('sale_info')
-    ->as('sale_info.')
+    ->prefix('saleInfo')
+    ->as('saleInfo.')
     ->middleware(PermissionMiddelware::class)
     ->group(function () {
         Route::post('store', 'sale_info')->name('store');
     });
 
     Route::controller(ClientServicesController::class)
-    ->prefix('client_services')
-    ->as('client_services.')
+    ->prefix('clientServices')
+    ->as('clientServices.')
     ->middleware(PermissionMiddelware::class)
     ->group(function () {
         Route::get('search', 'search_services')->name('search_services');
@@ -117,7 +117,7 @@ Route::controller(RoleController::class)
 
     Route::controller(ServiceAreaController::class)
     ->prefix('service-area')
-    ->as('service_area.')
+    ->as('serviceArea.')
     ->middleware(PermissionMiddelware::class)
     ->group(function () {
         Route::post('store', 'store')->name('store');
@@ -133,7 +133,7 @@ Route::controller(RoleController::class)
 
     Route::controller(InvoiceServiceChargesController::class)
     ->prefix('invoice_charges')
-    ->as('invoice_charges.')
+    ->as('invoiceCharges.')
     ->middleware(PermissionMiddelware::class)
     ->group(function () {
         Route::post('store', 'store')->name('store');
