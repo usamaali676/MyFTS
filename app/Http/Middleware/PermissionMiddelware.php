@@ -53,6 +53,9 @@ class PermissionMiddelware
                         case 'create':
                             $hasPermission = $perms->create == 1;
                             break;
+                        case 'store':
+                            $hasPermission = $perms->create == 1;
+                            break;
                         case 'edit':
                             $hasPermission = $perms->edit == 1;
                             break;

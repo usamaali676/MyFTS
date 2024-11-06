@@ -122,7 +122,7 @@
                         <div class="form-floating form-floating-outline">
                             <input type="text" class="form-control " name="client_address" placeholder="Client Address"
                                 aria-label="client_address"
-                                onkeydown="return /[a-zA-Z0-9\/\-\_\:\,]/.test(event.key) || event.key === 'Backspace' || event.key === 'Tab';" />
+                                onkeydown="return /[a-zA-Z0-9\/\-\_\:\ \,]/.test(event.key) || event.key === 'Backspace' || event.key === 'Tab';" />
                             <label for="client_address">Client Address</label>
                         </div>
                     </div>
