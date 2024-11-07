@@ -76,7 +76,8 @@ class InvoiceServiceChargesController extends Controller
         ]);
         $unique_id = 'FTS'. '_' . Str::random(5) . '_' . time();
         $date = Carbon::now(); // or any other Carbon instance
-        $monthName = $date->format('F');
+        $monthName = $date->format('M Y');
+        // dd($monthName);
         $year = $date->format('Y');
         // $company_service = CompanyServices::where('id', $request->company_service_charge)->first();
         // if($company_service->price > $request->amount) {
@@ -103,8 +104,8 @@ class InvoiceServiceChargesController extends Controller
                 'invoice_due_date' => $request->invoice_due_date,
                 'total_amount' => $request->invoice_amount,
                 'invoice_freq' =>   $request->invoice_freq,
-                'month' => $monthName,
-                'year' => $year,
+                'month' => $request->year,
+                // 'year' => $year,
             ]);
         }
         else{
@@ -118,8 +119,8 @@ class InvoiceServiceChargesController extends Controller
                 'invoice_due_date' => $request->invoice_due_date,
                 'total_amount' => $request->invoice_amount,
                 'invoice_freq' =>   $request->invoice_freq,
-                'month' => $monthName,
-                'year' => $year,
+                'month' => $request->year,
+                // 'year' => $year,
                 // 'month' => $monthName
             ]);
         }

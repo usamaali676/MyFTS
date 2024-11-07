@@ -12,6 +12,10 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/24.6.0/build/css/intlTelInput.min.css" integrity="sha512-X3pJz9m4oT4uHCYS6UjxVdWk1yxSJJIJOJMIkf7TjPpb1BzugjiFyHu7WsXQvMMMZTnGUA9Q/GyxxCWNDZpdHA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 <link rel="stylesheet" href="{{ asset('assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css') }}" />
 <link rel="stylesheet" href="{{ asset('assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css') }}" />
+{{-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.css" integrity="sha512-MQXduO8IQnJVq1qmySpN87QQkiR1bZHtorbJBD0tzy7/0U9+YIC93QWHeGTEoojMVHWWNkoCp8V6OzVSYrX0oQ==" crossorigin="anonymous" referrerpolicy="no-referrer" /> --}}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/plugins/monthSelect/style.min.css" integrity="sha512-V7B1IY1DE/QzU/pIChM690dnl44vAMXBidRNgpw0mD+hhgcgbxHAycRpOCoLQVayXGyrbC+HdAONVsF+4DgrZA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
 <link
     href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css"
     rel="stylesheet"
@@ -40,6 +44,12 @@
 }
 ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
     padding: 10px 0;
+}
+.flatpickr-monthSelect-theme-dark .flatpickr-current-month input.cur-year{
+    color: #000 !important;
+}
+.flatpickr-monthSelect-theme-dark .flatpickr-monthSelect-month{
+    color: #000 !important;
 }
 
 </style>
@@ -1699,10 +1709,10 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                     value="{{ $invoice->year }}"
                                                 @endif
                                                 placeholder="YYYY-MM-DD" id="flatpickr-date" readonly="readonly">
-                                                <label for="flatpickr-date">Year</label>
+                                                <label for="flatpickr-date">Month</label>
                                             </div>
                                         </div>
-                                        <div class="col-md-6">
+                                        {{-- <div class="col-md-6">
                                             <div class="form-floating form-floating-outline">
                                                 <select id="month" name="month" class="select2 form-select" data-allow-clear="true">
                                                     @if(isset($invoice) && isset($invoice->month))
@@ -1724,7 +1734,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                 </select>
                                                 <label for="multicol-country">Month</label>
                                             </div>
-                                        </div>
+                                        </div> --}}
                                         <div class="col-md-6">
                                             <div class="form-floating form-floating-outline">
                                                 <select id="discount" name="discount_type" class="select2 form-select" data-allow-clear="true">
@@ -1819,7 +1829,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                         <h4>Payment Detail</h4>
                                         <div class="col-md-6">
                                             <div class="form-floating form-floating-outline">
-                                                <select id="invoice_number" name="invoice_id" class="select2 form-select" data-allow-clear="true">
+                                                <select id="invoice_number_id" name="invoice_id" class="select2 form-select" data-allow-clear="true">
                                                     <option value="">Please Select</option>
                                                     @if(isset($all_invoices) && count($all_invoices) > 0)
                                                         @foreach ($all_invoices as $item)
@@ -1887,7 +1897,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-floating form-floating-outline">
-                                                <input type="text" id="payment_amount" name="payment_amount" class="form-control" @if(isset($invoice) && isset($invoice->total_amount)) value="{{ $invoice->total_amount }}" @endif >
+                                                <input type="text" id="payment_amount" name="payment_amount" class="form-control"  >
                                                 <label for="payment_amount">Payment Amount</label>
                                             </div>
                                         </div>
@@ -1990,6 +2000,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
     <script src="{{ asset('assets/vendor/libs/bootstrap-maxlength/bootstrap-maxlength.js') }}"></script>
     <script src="{{ asset('assets/js/repeater.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/flatpickr/flatpickr.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/index.js"></script>
     <script src="{{ asset('assets/vendor/libs/bootstrap-datepicker/bootstrap-datepicker.js') }}"></script>
     <script src="{{ asset('assets/js/front-page-payment.js') }}"></script>
     {{-- <script src="{{ asset('assets/vendor/libs/bootstrap-daterangepicker/bootstrap-daterangepicker.js') }}"></script>
@@ -2024,9 +2035,14 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
 
     <script>
         flatpickr("#year", {
-        dateFormat: "Y", // Formats the input to show only the year
-        minDate: "2020", // Optional: Set a minimum date if needed
-        maxDate: "2099"  // Optional: Set a maximum date if needed
+            plugins: [
+            new monthSelectPlugin({
+            shorthand: true, //defaults to false
+            dateFormat: "M Y", //defaults to "F Y"
+            altFormat: "F Y", //defaults to "F Y"
+            theme: "dark" // defaults to "light"
+            })
+        ]
 
         });
     </script>
@@ -2098,7 +2114,25 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
             const email = document.getElementById('basic-default-email').value;
             const websiteUrl = document.getElementsByName('website_url')[0].value;
             const clientName = document.getElementsByName('client_name')[0].value;
-            const socialLink = document.getElementsByClassName('social_link')[0].value;
+            // const socialLinkElement = document.getElementsByName('social_link')[0];
+            // if (!socialLinkElement) {
+            //     alert('Social link element not found!');
+            //     return false;
+            // }
+            // const socialLink = socialLinkElement.value;
+
+
+            const urlPattern = /^(https?:\/\/)?([a-zA-Z0-9\-]+\.)+[a-zA-Z]{2,}(\/[^\s]*)?$/;
+
+            // for (let i = 0; i < socialLinks.length; i++) {
+            //     const socialLink = socialLinks[i].value; // Get the value of the current input
+
+            //     // Check if the value matches the URL pattern
+            //     if (socialLink && !urlPattern.test(socialLink)) {
+            //         alert(`Invalid Social URL in field ${i + 1}. Please enter a valid URL (e.g., http://example.com).`);
+            //         return false; // Stop if URL is invalid
+            //     }
+            // }
 
             // Validate business name (only letters and spaces)
             if (!/^[a-zA-Z\s]*$/.test(businessName)) {
@@ -2116,16 +2150,16 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
             //     return false;
             // }
 
-            const urlPattern = /^(https?:\/\/)?([a-zA-Z0-9\-]+\.)+[a-zA-Z]{2,}(\/[^\s]*)?$/;
+            // const urlPattern = /^(https?:\/\/)?([a-zA-Z0-9\-]+\.)+[a-zA-Z]{2,}(\/[^\s]*)?$/;
             if (!urlPattern.test(websiteUrl)) {
                 alert('Invalid Website URL. Please enter a valid URL (e.g., http://example.com).');
                 return false;
             }
 
-            if (!urlPattern.test(socialLink)) {
-                alert('Invalid Social  URL. Please enter a valid URL (e.g., http://example.com).');
-                return false;
-            }
+            // if (!urlPattern.test(socialLink)) {
+            //     alert('Invalid Social  URL. Please enter a valid URL (e.g., http://example.com).');
+            //     return false;
+            // }
 
             // Validate email format
             const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -2609,6 +2643,24 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                     contentType: false, // Important: content type is false
                     success: function (response) {
 
+                        var compService = response.sale.company_services;
+                        $('#company_service_charge').empty();
+                        if (compService && compService.length > 0) {
+                            var uniqueServices = compService.filter((value, index, self) =>
+                                index === self.findIndex((t) => (
+                                    t.id === value.id // Check uniqueness by `id`
+                                ))
+                            );
+
+                            // Generate options for the unique services
+                            var options = uniqueServices.map(service => {
+                                return '<option value="' + service.id + '">' + service.name + '</option>';
+                            }).join(''); // `.join('')` will concatenate the options into a single string
+
+                        } else {
+                            var options = '<option>No services available</option>'; // Default option if no services are found
+                        }
+                        $('#company_service_charge').append(options);
 
                         // Handle success response (display success message using SweetAlert2)
                         Swal.fire({
@@ -2666,6 +2718,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
             // Load countries
             $.get('{{ route('front.countries') }}', function(data) {
                 $.each(data, function(index, country) {
+                    // console.log(country);
                     $('#countries').append(`<option value="${country.name}">${country.name}</option>`);
                 });
             });
@@ -2730,6 +2783,11 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                         $('#areas_we_serve').append(list);
                         var option = '<option value="'+response.servicearea.id+'">'+response.servicearea.country+', '+ response.servicearea.state +', '+response.servicearea.city+'</option>'
                         $('#areas_dropdown').append(option);
+                        $('#countries').val(response.servicearea.country)
+                        $('#states').val(response.servicearea.state)
+                        $('#cities').val(response.servicearea.city)
+
+
 
 
 
@@ -2744,7 +2802,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
 
 
                         // Optionally reset the form only on success
-                        $('#service_area')[0].reset();
+                        // $('#service_area')[0].reset();
                         // This will reset the form fields
                     },
                     error: function (xhr) {
@@ -2810,6 +2868,8 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                     <td>'+response.area.country+', '+response.area.state+', '+response.area.city+'</td>\
                                   </tr>'
                         $('#keyword_table').append(row);
+                        $('#keyword').val('');
+                        $('areas_dropdown').val(response.area.id)
 
 
                         // Handle success response (display success message using SweetAlert2)
@@ -2823,7 +2883,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
 
 
                         // Optionally reset the form only on success
-                        $('#keywordadd')[0].reset();
+                        // $('#keywordadd')[0].reset();
                         // This will reset the form fields
                     },
                     error: function (xhr) {
@@ -2872,6 +2932,12 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                 var service_name = selectedOption.data('name');
                 var amount = $('#service_amount').val();
                 var check = $('#complementery_check').prop('checked');
+                var totalAmount = 0;
+
+                $('#invoice_service_table tr').each(function() {
+                    var rowAmount = $(this).find('input[name="amount[]"]').val();
+                    totalAmount += parseFloat(rowAmount) || 0; // Accumulate the amount, if valid
+                });
                // alert(service_name);
                if (service !== '' && service_name !== '' && amount !== '') {
                 invoice_table = '<tr>' +
@@ -2889,6 +2955,11 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                 $('#company_service_charge').prop('selectedIndex', -1);
                 $('#service_amount').val('');
                 $('#complementery_check').prop('checked', false);
+                    // Add the current amount to the totalAmount
+                    totalAmount += parseFloat(amount); // Add current amount to the total
+
+                // Update the total input with the new total
+                $('#invoice_amount').val(totalAmount.toFixed(2));
                 }
                 else{
                     alert('Please fill in all the required fields.');
@@ -3011,6 +3082,26 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                     }
                 });
             });
+        });
+    </script>
+    <script>
+        $(document).ready(function () {
+            $('#invoice_number_id').change(function () {
+                let id = $(this).val();
+                // alert(id);
+                $.ajax({
+                    type: "GET",
+                    url: "{{ route('front.invoicePrice') }}",
+                    data: {id: id},
+                    success: function (response) {
+                        // console.log(response);
+                        var invoice = response.invoice[0];
+                        // console.log(invoice.total_amount);
+                        $('#payment_amount').val(invoice.total_amount);
+
+                    }
+                });
+            })
         });
     </script>
     <script>

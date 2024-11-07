@@ -61,9 +61,11 @@ class ClientServicesController extends Controller
                 }
             }
         }
+        $sale = Sale::where('id', $request->sale_id3)->with('companyServices')->first();
 
         return response()->json([
             'message' => 'Service Added Succesfully!',
+            'sale' => $sale,
         ], 200);
 
 

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Invoice;
 use App\Models\Lead;
 use App\Models\Role;
 use App\Models\SubCategory;
@@ -58,7 +59,14 @@ class FrontController extends Controller
             {
                 // Replace with your logic to fetch countries, e.g., from a JSON file or database
                 $countries = json_decode(file_get_contents(storage_path('app/areas.json')), true);
-                return response()->json($countries);
+                $special_countries = [];
+                foreach ($countries as $country)
+                {
+                    if($country['id'] == 233 || $country['id'] == 39){
+                        $special_countries[] =  $country;
+                    }
+                }
+                return response()->json($special_countries);
             }
 
             public function getStates($countryId)
@@ -98,6 +106,13 @@ class FrontController extends Controller
                 }
 
                 return response()->json(['error' => 'Cities not found.'], 404);
+            }
+            public function getInvoicePrice(Request $request)
+            {
+                if($request->ajax()){
+                    $invoice = Invoice::where('id' , $request->id)->get();
+                    return response()->json(['invoice' => $invoice]);
+                }
             }
 
     }
