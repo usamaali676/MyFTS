@@ -34,7 +34,7 @@ Route::controller(FrontController::class)
    Route::get('/countries', 'getCountries')->name('countries');
     Route::get('/states/{countryId}', 'getStates')->name('states');
     Route::get('/cities/{stateId}/{conrtyId}', 'getCities')->name('cities');
-
+    Route::get('/invoice-price', 'getInvoicePrice')->name('invoicePrice');
 });
 
 Route::controller(RoleController::class)

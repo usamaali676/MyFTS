@@ -179,7 +179,7 @@ class SaleController extends Controller
 
         $old_social = SocialLink::where('sale_id', $sale->id)->get();
         if ($old_social == Null) {
-            if (isset($request->social_name) && count(array_filter($request->social_name)) > 0) {
+            if (isset($request->social_name) && isset($request->social_link) && count(array_filter($request->social_name)) > 0) {
                 foreach ($request->social_name as $key => $value) {
                     SocialLink::create([
                         'sale_id' => $sale->id,
@@ -193,7 +193,7 @@ class SaleController extends Controller
             foreach ($social_links as $social) {
                 $social->delete();
             }
-            if (isset($request->social_name)  && count(array_filter($request->social_name)) > 0) {
+            if (isset($request->social_name) && isset($request->social_link) && count(array_filter($request->social_name)) > 0) {
                 // dd("dfjhdsflkg");
                 foreach ($request->social_name as $key => $value) {
                     SocialLink::create([
