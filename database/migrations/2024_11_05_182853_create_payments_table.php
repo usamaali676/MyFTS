@@ -20,6 +20,7 @@ return new class extends Migration
             $table->enum('payment_type', ['Full Payment', 'Partials Payment', 'Advance Payment'])->default('Full Payment');
             $table->string('card_number');
             $table->decimal('amount', 10, 2);
+            $table->decimal('balance', 10, 2)->default(0);
             $table->char('trans_id')->nullable();
             $table->string('trans_ss')->nullable();
             $table->foreign('merchant_id')->references('id')->on('merchant_accounts')->onDelete()->constrained()->onDelete('cascade');

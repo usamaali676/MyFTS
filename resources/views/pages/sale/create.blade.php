@@ -146,7 +146,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                         </use>
                                     </svg>
                                 </span>
-                                <span class="bs-stepper-label">Invoice</span>
+                                <span class="bs-stepper-label">Invoice & Payments</span>
                             </button>
                         </div>
                     </div>
@@ -1737,29 +1737,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                     <label for="flatpickr-date">Month</label>
                                                 </div>
                                             </div>
-                                            {{-- <div class="col-md-6">
-                                                <div class="form-floating form-floating-outline">
-                                                    <select id="month" name="month" class="select2 form-select" data-allow-clear="true">
-                                                        @if(isset($invoice) && isset($invoice->month))
-                                                        <option value="{{$invoice->month}}" selected>{{ $invoice->month }}</option>
-                                                        @endif
-                                                        <option value="">Please Select</option>
-                                                        <option value="January" >January</option>
-                                                        <option value="February" >February</option>
-                                                        <option value="March" >March</option>
-                                                        <option value="April" >April</option>
-                                                        <option value="May" >May</option>
-                                                        <option value="June" >June</option>
-                                                        <option value="July" >July</option>
-                                                        <option value="August" >August</option>
-                                                        <option value="September" >September</option>
-                                                        <option value="October" >October</option>
-                                                        <option value="November" >November</option>
-                                                        <option value="December" >December</option>
-                                                    </select>
-                                                    <label for="multicol-country">Month</label>
-                                                </div>
-                                            </div> --}}
+
                                             <div class="col-md-6">
                                                 <div class="form-floating form-floating-outline">
                                                     <select id="discount" name="discount_type" class="select2 form-select" data-allow-clear="true">
@@ -1844,9 +1822,10 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
 
                                             <div class="col-md-12 text-right">
                                                 <div class="d-flex " style="gap: 0px 20px;">
-                                                    <button type="submit" class="btn btn-primary">Generate Invoice</button>
                                                     @if (isset($invoice) && isset($invoice->invoice_number))
-                                                    <a  href="{{ route('front.invoiceView', $invoice->invoice_number) }}" target="_blank" class="btn btn-success" style="color: #fff">View Invoice</a>
+                                                        <a  href="{{ route('front.invoiceView', $invoice->invoice_number) }}" target="_blank" class="btn btn-success" style="color: #fff">View Invoice</a>
+                                                    @else
+                                                        <button type="submit" class="btn btn-primary">Generate Invoice</button>
                                                     @endif
                                                 </div>
                                             </div>
@@ -1857,7 +1836,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                         <h4>Invoices</h4>
                                         <div class="col-md-12">
                                             <div class="table-responsive">
-                                                <table id="invoice_service_table" class="table table-striped">
+                                                <table id="invoice_table_gen" class="table table-striped">
                                                     <thead>
                                                         <tr>
                                                             <th>Sr</th>
@@ -1910,7 +1889,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-floating form-floating-outline">
-                                                <select id="marchent" name="marchent" class="select2 form-select" data-allow-clear="true">
+                                                <select id="merchant" name="merchant" class="select2 form-select" data-allow-clear="true">
                                                     <option value="">Please Select</option>
                                                     @if(isset($mehchant) && count($mehchant) > 0)
                                                         @foreach ($mehchant as $item)
@@ -1994,7 +1973,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                     <h4>Payments</h4>
                                     <div class="col-md-12">
                                         <div class="table-responsive">
-                                            <table id="invoice_service_table" class="table table-striped">
+                                            <table id="payment_table" class="table table-striped">
                                                 <thead>
                                                     <tr>
                                                         <th>Sr</th>
@@ -2012,9 +1991,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                 <tbody>
                                                     @if(isset($payments) && count($payments) > 0)
                                                     @foreach ($payments as $key=>$item)
-                                                    @php
-                                                        $balance = $item->invoice->total_amount - $item->amount;
-                                                    @endphp
+
                                                     <tr>
                                                         <td>{{ $key + 1 }}</td>
                                                         <td>{{ $item->invoice->invoice_number }}</td>
@@ -2024,8 +2001,8 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                         <td>{{ $item->payment_type }}</td>
                                                         <td>{{ $item->invoice->total_amount }}</td>
                                                         <td>{{ $item->amount }}</td>
-                                                        <td>{{ $balance }}</td>
-                                                        <td>{{ $item->marchent->name }}</td>
+                                                        <td>{{ $item->balance }}</td>
+                                                        <td>{{ $item->merchant->name }}</td>
                                                     </tr>
                                                     @endforeach
                                                     @endif
@@ -2723,7 +2700,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
 
                             // Generate options for the unique services
                             var options = uniqueServices.map(service => {
-                                return '<option value="' + service.id + '">' + service.name + '</option>';
+                                return '<option value="' + service.id + '" data-name="'+ service.name +'">' + service.name + '</option>';
                             }).join(''); // `.join('')` will concatenate the options into a single string
 
                         } else {
@@ -3002,7 +2979,20 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                 var amount = $('#service_amount').val();
                 var check = $('#complementery_check').prop('checked');
                 var totalAmount = 0;
+                var serviceExists = false;
+                $('#invoice_service_table tr').each(function() {
+                    var existingServiceId = $(this).find('input[name="service_id[]"]').val();
+                    if (existingServiceId == service) {
+                        serviceExists = true;
+                        return false; // Stop iterating as we found the service
+                    }
+                });
 
+                // If the service is already added, show an alert
+                if (serviceExists) {
+                    alert('This service has already been added to the invoice.');
+                    return; // Exit the function without adding the service again
+                }
                 $('#invoice_service_table tr').each(function() {
                     var rowAmount = $(this).find('input[name="amount[]"]').val();
                     totalAmount += parseFloat(rowAmount) || 0; // Accumulate the amount, if valid
@@ -3059,6 +3049,24 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                     success: function (response) {
 
                     console.log(response.invoice);
+
+                    var invoice = response.invoice;
+                    var table_content = ''
+                    invoice.forEach(function(invoice, index) {
+                            tableContent += '<tr>\
+                                <td>' + (index + 1) + '</td>\
+                                <td>' + invoice.invoice_number + '</td>\
+                                <td>' + invoice.month + '</td>\
+                                <td>' + invoice.activation_date + '</td>\
+                                <td>' + invoice.invoice_due_date + '</td>\
+                                <td>' + invoice.amount + '</td>\
+                            </tr>';
+                        });
+
+                        // Clear the table first and then append the new rows
+                        $('#invoice_table_gen tbody').empty().append(tableContent);
+
+
 
 
                     // var invoice = response.invoice;
@@ -3193,13 +3201,13 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                     processData: false, // Important: do not process the data
                     contentType: false, // Important: content type is false
                     success: function (response) {
-                        console.log(response);
 
                         var payments = response.payments;
+                        console.log(payments);
                         var tableContent = ''; // Initialize a variable to store the rows
 
                         payments.forEach(function(payment, index) {
-                            var balance = payment.invoice.total_amount - payment.amount;
+
                             tableContent += '<tr>\
                                 <td>' + (index + 1) + '</td>\
                                 <td>' + payment.invoice_number + '</td>\
@@ -3209,13 +3217,16 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                 <td>' + payment.payment_type + '</td>\
                                 <td>' + payment.invoice.total_amount + '</td>\
                                 <td>' + payment.amount + '</td>\
-                                <td>' + balance + '</td>\
-                                <td>' + payment.marchent.name + '</td>\
+                                <td>' + payment.balance  + '</td>\
+                                <td>' + payment.merchant.name + '</td>\
                             </tr>';
                         });
 
                         // Clear the table first and then append the new rows
-                        $('#invoice_service_table').empty().append(tableContent);
+                        $('#payment_table tbody').empty().append(tableContent);
+
+
+                        // alert("dskfjsdkljf");
 
 
 
@@ -3232,7 +3243,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
 
 
                         // Optionally reset the form only on success
-                        // $('#saleForm')[0].reset();
+                        $('#make_payment')[0].reset();
                         // This will reset the form fields
                     },
                     error: function (xhr) {
