@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Helpers\GlobalHelper;
 use App\Models\Invoice;
 use App\Models\Payment;
+use App\Models\Sale;
 use Illuminate\Http\Request;
 
 class PaymentController extends Controller
@@ -55,11 +56,20 @@ class PaymentController extends Controller
             $payment->amount = $request->payment_amount;
             $payment->card_number = $request->card_number;
             $payment->trans_id = $request->trans_id;
+            if(isset($request->trans_ss)){
             $payment->trans_ss	= GlobalHelper::fts_upload_img($request->trans_ss, 'recipts' );
+            }
             $payment->save();
+
+            $sale = Sale::where('id', $invoice->sale_id)->first();
+            $all_invoices =  Invoice::where('sale_id', $sale->id)->get();
+            $invoiceIds = $all_invoices->pluck('id')->toArray();
+            $payments = Payment::whereIn('invoice_id', $invoiceIds)->with('invoice', 'marchent' )->get();
+
 
             return response()->json([
                 'message' => 'Payment Added Successfully',
+                'payments' => $payments,
             ], 200);
         }
     }

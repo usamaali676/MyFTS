@@ -62,7 +62,7 @@ class SaleController extends Controller
         if (isset($sale)) {
             // $lastMonthName = Carbon::now()->subMonth()->format('F');
             // dd($lastMonthName);
-            $lastMonthName = Carbon::now()->format('F');
+            $lastMonthName = Carbon::now()->format('M Y');
             $invoice = Invoice::where('sale_id', $sale->id)->where('month', $lastMonthName)->first();
             $all_invoices = Invoice::where('sale_id', $sale->id)->get();
             if(isset($invoice)){

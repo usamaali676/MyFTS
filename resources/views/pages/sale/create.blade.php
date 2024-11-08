@@ -1,3 +1,14 @@
+@php
+    $user = auth()->user();
+    $sale_perm =  App\Models\Permission::where('role_id', $user->role_id)->where('name', "sale")->first();
+    $Saleinfo = App\Models\Permission::where('role_id', $user->role_id)->where('name', "saleinfo")->first();
+    // dd($Saleinfo);
+    $Clientservices_perm = App\Models\Permission::where('role_id', $user->role_id)->where('name', "clientservices")->first();
+    $Servicearea_perm = App\Models\Permission::where('role_id', $user->role_id)->where('name', "servicearea")->first();
+    $Keyword_perm = App\Models\Permission::where('role_id', $user->role_id)->where('name', "keyword")->first();
+    $Invoicecharges_perm = App\Models\Permission::where('role_id', $user->role_id)->where('name', "invoicecharges")->first();
+    $Payment_perm = App\Models\Permission::where('role_id', $user->role_id)->where('name', "payment")->first();
+@endphp
 @extends('layouts.dashboard')
 @section('css')
 <link rel="stylesheet" href="{{ asset('assets/vendor/libs/bs-stepper/bs-stepper.css') }}" />
@@ -140,1281 +151,1287 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                         </div>
                     </div>
                     <div class="bs-stepper-content">
-                        <form id="saleForm" method="POST" action="{{ route('sale.store') }}" onsubmit="return validateForm()">
-                            @csrf
-                            @if ($errors->any())
-                            <div class="alert alert-danger">
-                                <ul>
-                                    @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                    @endforeach
-                                </ul>
-                            </div>
-                            @endif
-                            <div id="successMessage" style="display:none;" class="alert alert-success"></div>
-
-                            <!-- Account Details -->
-                            <div id="account-details" class="content">
-                                <div class="content-header mb-3">
-                                    <h6 class="mb-0">Lead Details</h6>
-                                    <small>From Lead Model</small>
-                                </div>
-                                <div class="row g-4">
-                                    <div class="col-md-6">
-                                        <input type="hidden" name="lead_id" value="{{ $lead->id }}" id="">
-                                        <div class="form-floating form-floating-outline">
-                                            <select id="client_nature" name="client_nature" class="select2 form-select"
-                                                data-allow-clear="true">
-                                                @if(isset($sale) && isset($sale->client_nature))
-                                                <option value="{{$sale->client_nature}}" selected>{{ $sale->client_nature }}</option>
-                                                @else
-                                                <option value="">Please Select</option>
-                                                @endif
-                                                @foreach ($client_enum as $item)
-                                                <option value="{{$item}}">{{$item}}</option>
-                                                @endforeach
-
-                                            </select>
-                                            <label for="multicol-country">Client Nature</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-floating form-floating-outline">
-                                            <input type="text" id="business_name" name="business_name"
-                                                class="form-control" placeholder="John"
-                                                value="{{ $lead->business_name_adv }}"
-                                                onkeydown="return /[a-zA-Z\s]/.test(event.key) || event.key === 'Backspace' || event.key === 'Tab';" />
-                                            <label for="multicol-first-name">Business Name Adv</label>
-                                        </div>
-                                        @error('business_name')
-                                        <span class="text-danger">{{ $message }}</span>
-                                        @enderror
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-floating form-floating-outline">
-                                            <input type="tel"  id="business_number" style="height: calc(2.940725rem + 2px);"
-                                                name="business_number" class="form-control"  value="{{ $lead->business_number_adv }}" />
-                                            {{-- <label for="multicol-last-name">Business Number Adv</label> --}}
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-floating form-floating-outline">
-                                            <input type="text" class="form-control " name="client_name"
-                                                placeholder="Client Name" aria-label="client_name"
-                                                value="{{ $lead->client_name }}"
-                                                onkeydown="return /[a-zA-Z\s]/.test(event.key) || event.key === 'Backspace' || event.key === 'Tab';" />
-                                            <label for="client_name">Client Name</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="mb-2">
-                                            <div class="input-group input-group-merge">
-                                                <div class="form-floating form-floating-outline">
-                                                    <input type="email" id="basic-default-email" name="email"
-                                                        class="form-control" placeholder="john.doe"
-                                                        aria-label="john.doe" value="{{ $lead->off_email }}"
-                                                        aria-describedby="basic-default-email2">
-                                                    <label for="basic-default-email">Official Email</label>
-                                                </div>
-                                                <span class="input-group-text"
-                                                    id="basic-default-email2">@example.com</span>
-                                            </div>
-                                            <div class="form-text">You can use letters, numbers &amp; periods</div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-floating form-floating-outline">
-                                            <input type="text" class="form-control " name="website_url"
-                                                placeholder="Example.com" value="{{ $lead->website_url }}"
-                                                aria-label="Example.com" />
-                                            <label for="multicol-phone">Website Url</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-floating form-floating-outline">
-                                            <select id="category" name="call_type" class="select2 form-select"
-                                                data-allow-clear="true">
-                                                @if(isset($sale) && isset($sale->call_type))
-                                                <option value="{{$sale->call_type}}" selected>{{ $sale->call_type }}</option>
-                                                @else
-                                                <option value="">Please Select</option>
-                                                @endif
-                                                @foreach ($call_enum as $item)
-                                                <option value="{{$item}}">{{$item}}</option>
-                                                @endforeach
-
-                                            </select>
-                                            <label for="multicol-country">Call Type</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-floating form-floating-outline">
-                                           <select name="timezone" class="select2 form-select" data-allow-clear="true">
-                                            @if(isset($sale) && isset($sale->time_zone))
-                                            <option value="{{$sale->time_zone}}" selected>{{ $sale->time_zone }}</option>
-                                            @endif
-                                                <optgroup label="US Time Zones">
-                                                    <option value="America/New_York">Eastern Time (ET)</option>
-                                                    <option value="America/Chicago">Central Time (CT)</option>
-                                                    <option value="America/Denver">Mountain Time (MT)</option>
-                                                    <option value="America/Los_Angeles">Pacific Time (PT)</option>
-                                                    <option value="America/Anchorage">Alaska Time (AKT)</option>
-                                                    <option value="Pacific/Honolulu">Hawaii-Aleutian Time (HAST)</option>
-                                                </optgroup>
-
-                                                <optgroup label="Global Time Zones">
-                                                    <option value="Africa/Abidjan">GMT (Abidjan)</option>
-                                                    <option value="Africa/Accra">GMT (Accra)</option>
-                                                    <option value="Africa/Addis_Ababa">EAT (Addis Ababa)</option>
-                                                    <option value="Africa/Algiers">CET (Algiers)</option>
-                                                    <option value="Africa/Asmara">EAT (Asmara)</option>
-                                                    <option value="Africa/Bangui">WAT (Bangui)</option>
-                                                    <option value="Africa/Banjul">GMT (Banjul)</option>
-                                                    <option value="Africa/Bissau">GMT (Bissau)</option>
-                                                    <option value="Africa/Blantyre">CAT (Blantyre)</option>
-                                                    <option value="Africa/Brazzaville">WAT (Brazzaville)</option>
-                                                    <option value="Africa/Bujumbura">CAT (Bujumbura)</option>
-                                                    <option value="Africa/Cairo">EET (Cairo)</option>
-                                                    <option value="Africa/Casablanca">WET (Casablanca)</option>
-                                                    <option value="Africa/Ceuta">CET (Ceuta)</option>
-                                                    <option value="Africa/Conakry">GMT (Conakry)</option>
-                                                    <option value="Africa/Dakar">GMT (Dakar)</option>
-                                                    <option value="Africa/Dar_es_Salaam">EAT (Dar es Salaam)</option>
-                                                    <option value="Africa/Djibouti">EAT (Djibouti)</option>
-                                                    <option value="Africa/El_Aaiun">WET (El Aaiun)</option>
-                                                    <option value="Africa/Freetown">GMT (Freetown)</option>
-                                                    <option value="Africa/Gaborone">CAT (Gaborone)</option>
-                                                    <option value="Africa/Harare">CAT (Harare)</option>
-                                                    <option value="Africa/Johannesburg">SAST (Johannesburg)</option>
-                                                    <option value="Africa/Juba">CAT (Juba)</option>
-                                                    <option value="Africa/Kampala">EAT (Kampala)</option>
-                                                    <option value="Africa/Khartoum">CAT (Khartoum)</option>
-                                                    <option value="Africa/Kigali">CAT (Kigali)</option>
-                                                    <option value="Africa/Kinshasa">WAT (Kinshasa)</option>
-                                                    <option value="Africa/Lagos">WAT (Lagos)</option>
-                                                    <option value="Africa/Libreville">WAT (Libreville)</option>
-                                                    <option value="Africa/Lome">GMT (Lome)</option>
-                                                    <option value="Africa/Luanda">WAT (Luanda)</option>
-                                                    <option value="Africa/Lubumbashi">CAT (Lubumbashi)</option>
-                                                    <option value="Africa/Lusaka">CAT (Lusaka)</option>
-                                                    <option value="Africa/Malabo">WAT (Malabo)</option>
-                                                    <option value="Africa/Maputo">CAT (Maputo)</option>
-                                                    <option value="Africa/Maseru">CAT (Maseru)</option>
-                                                    <option value="Africa/Mbabane">SAST (Mbabane)</option>
-                                                    <option value="Africa/Mogadishu">EAT (Mogadishu)</option>
-                                                    <option value="Africa/Nairobi">EAT (Nairobi)</option>
-                                                    <option value="Africa/Niamey">WAT (Niamey)</option>
-                                                    <option value="Africa/Nouakchott">GMT (Nouakchott)</option>
-                                                    <option value="Africa/Ouagadougou">GMT (Ouagadougou)</option>
-                                                    <option value="Africa/Porto-Novo">WAT (Porto-Novo)</option>
-                                                    <option value="Africa/Sao_Tome">GMT (Sao Tome)</option>
-                                                    <option value="Africa/Tunis">CET (Tunis)</option>
-                                                    <option value="Africa/Tripoli">EET (Tripoli)</option>
-                                                    <option value="America/Adak">HAST (Adak)</option>
-                                                    <option value="America/Anchorage">AKST (Anchorage)</option>
-                                                    <option value="America/Anguilla">AST (Anguilla)</option>
-                                                    <option value="America/Antigua">AST (Antigua)</option>
-                                                    <option value="America/Argentina/Buenos_Aires">ART (Buenos Aires)</option>
-                                                    <option value="America/Argentina/Catamarca">ART (Catamarca)</option>
-                                                    <option value="America/Argentina/ComodRivadavia">ART (ComodRivadavia)</option>
-                                                    <option value="America/Argentina/Cordoba">ART (Cordoba)</option>
-                                                    <option value="America/Argentina/Jujuy">ART (Jujuy)</option>
-                                                    <option value="America/Argentina/La_Rioja">ART (La Rioja)</option>
-                                                    <option value="America/Argentina/Mendoza">ART (Mendoza)</option>
-                                                    <option value="America/Argentina/Rosario">ART (Rosario)</option>
-                                                    <option value="America/Argentina/Tucuman">ART (Tucuman)</option>
-                                                    <option value="America/Argentina/Ushuaia">ART (Ushuaia)</option>
-                                                    <option value="America/Aruba">AST (Aruba)</option>
-                                                    <option value="America/Asuncion">PYT (Asuncion)</option>
-                                                    <option value="America/Atikokan">EST (Atikokan)</option>
-                                                    <option value="America/Barbados">AST (Barbados)</option>
-                                                    <option value="America/Belize">CST (Belize)</option>
-                                                    <option value="America/Blanc-Sablon">AST (Blanc-Sablon)</option>
-                                                    <option value="America/Boa_Vista">AMT (Boa Vista)</option>
-                                                    <option value="America/Bogota">COT (Bogota)</option>
-                                                    <option value="America/Boise">MDT (Boise)</option>
-                                                    <option value="America/Cambridge_Bay">MDT (Cambridge Bay)</option>
-                                                    <option value="America/Cancun">EST (Cancun)</option>
-                                                    <option value="America/Caracas">VET (Caracas)</option>
-                                                    <option value="America/Cayman">EST (Cayman)</option>
-                                                    <option value="America/Chicago">CST (Chicago)</option>
-                                                    <option value="America/Chihuahua">MDT (Chihuahua)</option>
-                                                    <option value="America/Costa_Rica">CST (Costa Rica)</option>
-                                                    <option value="America/Creston">MST (Creston)</option>
-                                                    <option value="America/Cuiaba">AMT (Cuiaba)</option>
-                                                    <option value="America/Curacao">AST (Curacao)</option>
-                                                    <option value="America/Dawson">PST (Dawson)</option>
-                                                    <option value="America/Dawson_Creek">MST (Dawson Creek)</option>
-                                                    <option value="America/Denver">MDT (Denver)</option>
-                                                    <option value="America/Detroit">EDT (Detroit)</option>
-                                                    <option value="America/Dominica">AST (Dominica)</option>
-                                                    <option value="America/Edmonton">MDT (Edmonton)</option>
-                                                    <option value="America/Eirunepe">ACT (Eirunepe)</option>
-                                                    <option value="America/El_Salvador">CST (El Salvador)</option>
-                                                    <option value="America/Fortaleza">BRT (Fortaleza)</option>
-                                                    <option value="America/Fort_Wayne">EST (Fort Wayne)</option>
-                                                    <option value="America/Glace_Bay">AST (Glace Bay)</option>
-                                                    <option value="America/Godthab">WGT (Godthab)</option>
-                                                    <option value="America/Goose_Bay">AST (Goose Bay)</option>
-                                                    <option value="America/Grand_Turk">EST (Grand Turk)</option>
-                                                    <option value="America/Grenada">AST (Grenada)</option>
-                                                    <option value="America/Guadeloupe">AST (Guadeloupe)</option>
-                                                    <option value="America/Guatemala">CST (Guatemala)</option>
-                                                    <option value="America/Guyana">GYT (Guyana)</option>
-                                                    <option value="America/Halifax">AST (Halifax)</option>
-                                                    <option value="America/Havana">CST (Havana)</option>
-                                                    <option value="America/Hermosillo">MST (Hermosillo)</option>
-                                                    <option value="America/Indiana/Indianapolis">EST (Indianapolis)</option>
-                                                    <option value="America/Indiana/Knox">CST (Knox)</option>
-                                                    <option value="America/Indiana/Marengo">EST (Marengo)</option>
-                                                    <option value="America/Indiana/Petersburg">EST (Petersburg)</option>
-                                                    <option value="America/Indiana/Tell_City">CST (Tell City)</option>
-                                                    <option value="America/Indiana/Vevay">EST (Vevay)</option>
-                                                    <option value="America/Indiana/Winamac">EST (Winamac)</option>
-                                                    <option value="America/Indianapolis">EDT (Indianapolis)</option>
-                                                    <option value="America/Inuvik">MDT (Inuvik)</option>
-                                                    <option value="America/Iqaluit">EDT (Iqaluit)</option>
-                                                    <option value="America/Jamaica">EST (Jamaica)</option>
-                                                    <option value="America/Juneau">AKDT (Juneau)</option>
-                                                    <option value="America/Kentucky/Louisville">EDT (Louisville)</option>
-                                                    <option value="America/Kentucky/Monticello">EDT (Monticello)</option>
-                                                    <option value="America/Kralendijk">AST (Kralendijk)</option>
-                                                    <option value="America/La_Paz">BOT (La Paz)</option>
-                                                    <option value="America/Lima">PET (Lima)</option>
-                                                    <option value="America/Los_Angeles">PDT (Los Angeles)</option>
-                                                    <option value="America/Maceio">BRT (Maceio)</option>
-                                                    <option value="America/Managua">CST (Managua)</option>
-                                                    <option value="America/Manaus">AMT (Manaus)</option>
-                                                    <option value="America/Marigot">AST (Marigot)</option>
-                                                    <option value="America/Martinique">AST (Martinique)</option>
-                                                    <option value="America/Matamoros">CST (Matamoros)</option>
-                                                    <option value="America/Mexico_City">CST (Mexico City)</option>
-                                                    <option value="America/Miquelon">PMST (Miquelon)</option>
-                                                    <option value="America/Moncton">AST (Moncton)</option>
-                                                    <option value="America/Montreal">EDT (Montreal)</option>
-                                                    <option value="America/Montserrat">AST (Montserrat)</option>
-                                                    <option value="America/Nassau">EST (Nassau)</option>
-                                                    <option value="America/New_York">EDT (New York)</option>
-                                                    <option value="America/Nipigon">EST (Nipigon)</option>
-                                                    <option value="America/Nome">AKDT (Nome)</option>
-                                                    <option value="America/Noronha">FNT (Noronha)</option>
-                                                    <option value="America/North_Dakota/Beulah">CST (Beulah)</option>
-                                                    <option value="America/North_Dakota/Center">CST (Center)</option>
-                                                    <option value="America/North_Dakota/New_Salem">CST (New Salem)</option>
-                                                    <option value="America/Ojinaga">MDT (Ojinaga)</option>
-                                                    <option value="America/Panama">EST (Panama)</option>
-                                                    <option value="America/Phoenix">MST (Phoenix)</option>
-                                                    <option value="America/Port-au-Prince">EST (Port-au-Prince)</option>
-                                                    <option value="America/Porto_Velho">AMT (Porto Velho)</option>
-                                                    <option value="America/Puerto_Rico">AST (Puerto Rico)</option>
-                                                    <option value="America/Punta_Arenas">CLT (Punta Arenas)</option>
-                                                    <option value="America/Rainy_River">CST (Rainy River)</option>
-                                                    <option value="America/Ramallah">EET (Ramallah)</option>
-                                                    <option value="America/Rankin_Inlet">CST (Rankin Inlet)</option>
-                                                    <option value="America/Recife">BRT (Recife)</option>
-                                                    <option value="America/Regina">CST (Regina)</option>
-                                                    <option value="America/Resolute">CST (Resolute)</option>
-                                                    <option value="America/Rio_Branco">ACT (Rio Branco)</option>
-                                                    <option value="America/Santarem">AMT (Santarem)</option>
-                                                    <option value="America/Santiago">CLT (Santiago)</option>
-                                                    <option value="America/Santo_Domingo">AST (Santo Domingo)</option>
-                                                    <option value="America/Sao_Paulo">BRT (Sao Paulo)</option>
-                                                    <option value="America/Scoresbysund">EGT (Scoresbysund)</option>
-                                                    <option value="America/Sitka">AKDT (Sitka)</option>
-                                                    <option value="America/St_Barthelemy">AST (St Barthelemy)</option>
-                                                    <option value="America/St_Johns">NST (St Johns)</option>
-                                                    <option value="America/St_Kitts">AST (St Kitts)</option>
-                                                    <option value="America/St_Lucia">AST (St Lucia)</option>
-                                                    <option value="America/St_Thomas">AST (St Thomas)</option>
-                                                    <option value="America/St_Vincent">AST (St Vincent)</option>
-                                                    <option value="America/Swift_Current">CST (Swift Current)</option>
-                                                    <option value="America/Tegucigalpa">CST (Tegucigalpa)</option>
-                                                    <option value="America/Thule">WGT (Thule)</option>
-                                                    <option value="America/Thunder_Bay">EST (Thunder Bay)</option>
-                                                    <option value="America/Toronto">EDT (Toronto)</option>
-                                                    <option value="America/Tortola">AST (Tortola)</option>
-                                                    <option value="America/Vancouver">PDT (Vancouver)</option>
-                                                    <option value="America/Winnipeg">CST (Winnipeg)</option>
-                                                    <option value="America/Yakutat">AKDT (Yakutat)</option>
-                                                    <option value="America/Yellowknife">MDT (Yellowknife)</option>
-                                                    <option value="Antarctica/Casey">CAST (Casey)</option>
-                                                    <option value="Antarctica/Davis">DAVT (Davis)</option>
-                                                    <option value="Antarctica/DumontDUrville">DDT (Dumont d'Urville)</option>
-                                                    <option value="Antarctica/Macquarie">MIST (Macquarie)</option>
-                                                    <option value="Antarctica/McMurdo">NZDT (McMurdo)</option>
-                                                    <option value="Antarctica/Palmer">CLT (Palmer)</option>
-                                                    <option value="Antarctica/Syowa">SYOT (Syowa)</option>
-                                                    <option value="Antarctica/Troll">UTC (Troll)</option>
-                                                    <option value="Antarctica/Vostok">VOST (Vostok)</option>
-                                                    <option value="Arctic/Longyearbyen">CET (Longyearbyen)</option>
-                                                    <option value="Asia/Aden">AST (Aden)</option>
-                                                    <option value="Asia/Almaty">ALMT (Almaty)</option>
-                                                    <option value="Asia/Amman">EET (Amman)</option>
-                                                    <option value="Asia/Aqtau">AQTT (Aqtau)</option>
-                                                    <option value="Asia/Aqtobe">AQTT (Aqtobe)</option>
-                                                    <option value="Asia/Ashgabat">TMT (Ashgabat)</option>
-                                                    <option value="Asia/Ashkhabad">TMT (Ashkhabad)</option>
-                                                    <option value="Asia/Bahrain">AST (Bahrain)</option>
-                                                    <option value="Asia/Bangkok">ICT (Bangkok)</option>
-                                                    <option value="Asia/Barnaul">ALMT (Barnaul)</option>
-                                                    <option value="Asia/Beirut">EET (Beirut)</option>
-                                                    <option value="Asia/Bishkek">KGT (Bishkek)</option>
-                                                    <option value="Asia/Brunei">BNT (Brunei)</option>
-                                                    <option value="Asia/Chita">IRKT (Chita)</option>
-                                                    <option value="Asia/Choibalsan">ULAT (Choibalsan)</option>
-                                                    <option value="Asia/Colombo">IST (Colombo)</option>
-                                                    <option value="Asia/Damascus">EET (Damascus)</option>
-                                                    <option value="Asia/Dhaka">BST (Dhaka)</option>
-                                                    <option value="Asia/Dili">TLT (Dili)</option>
-                                                    <option value="Asia/Dubai">GST (Dubai)</option>
-                                                    <option value="Asia/Dushanbe">TJT (Dushanbe)</option>
-                                                    <option value="Asia/Famagusta">EET (Famagusta)</option>
-                                                    <option value="Asia/Gaza">EET (Gaza)</option>
-                                                    <option value="Asia/Hebron">EET (Hebron)</option>
-                                                    <option value="Asia/Ho_Chi_Minh">ICT (Ho Chi Minh)</option>
-                                                    <option value="Asia/Hong_Kong">HKT (Hong Kong)</option>
-                                                    <option value="Asia/Hovd">HOVT (Hovd)</option>
-                                                    <option value="Asia/Irkutsk">IRKT (Irkutsk)</option>
-                                                    <option value="Asia/Jakarta">WIB (Jakarta)</option>
-                                                    <option value="Asia/Jayapura">WIT (Jayapura)</option>
-                                                    <option value="Asia/Jerusalem">IST (Jerusalem)</option>
-                                                    <option value="Asia/Kabul">AFT (Kabul)</option>
-                                                    <option value="Asia/Kamchatka">PETT (Kamchatka)</option>
-                                                    <option value="Asia/Karachi">PKT (Karachi)</option>
-                                                    <option value="Asia/Katmandu">NPT (Kathmandu)</option>
-                                                    <option value="Asia/Kolkata">IST (Kolkata)</option>
-                                                    <option value="Asia/Krasnoyarsk">KRAT (Krasnoyarsk)</option>
-                                                    <option value="Asia/Kuala_Lumpur">MYT (Kuala Lumpur)</option>
-                                                    <option value="Asia/Kuching">MYT (Kuching)</option>
-                                                    <option value="Asia/Macau">CST (Macau)</option>
-                                                    <option value="Asia/Magadan">MAGT (Magadan)</option>
-                                                    <option value="Asia/Makassar">WITA (Makassar)</option>
-                                                    <option value="Asia/Manila">PHT (Manila)</option>
-                                                    <option value="Asia/Muscat">GST (Muscat)</option>
-                                                    <option value="Asia/Nicosia">EET (Nicosia)</option>
-                                                    <option value="Asia/Novokuznetsk">KRAST (Novokuznetsk)</option>
-                                                    <option value="Asia/Novosibirsk">NOVT (Novosibirsk)</option>
-                                                    <option value="Asia/Omsk">OMST (Omsk)</option>
-                                                    <option value="Asia/Oral">ORAT (Oral)</option>
-                                                    <option value="Asia/Phnom_Penh">ICT (Phnom Penh)</option>
-                                                    <option value="Asia/Pontianak">WIB (Pontianak)</option>
-                                                    <option value="Asia/Pyongyang">KST (Pyongyang)</option>
-                                                    <option value="Asia/Qatar">AST (Qatar)</option>
-                                                    <option value="Asia/Qyzylorda">QYZT (Qyzylorda)</option>
-                                                    <option value="Asia/Riyadh">AST (Riyadh)</option>
-                                                    <option value="Asia/Sakhalin">PETT (Sakhalin)</option>
-                                                    <option value="Asia/Samarkand">UZT (Samarkand)</option>
-                                                    <option value="Asia/Taipei">CST (Taipei)</option>
-                                                    <option value="Asia/Tashkent">UZT (Tashkent)</option>
-                                                    <option value="Asia/Tbilisi">GET (Tbilisi)</option>
-                                                    <option value="Asia/Tehran">IRST (Tehran)</option>
-                                                    <option value="Asia/Thimphu">BTT (Thimphu)</option>
-                                                    <option value="Asia/Tokyo">JST (Tokyo)</option>
-                                                    <option value="Asia/Ulaanbaatar">ULAT (Ulaanbaatar)</option>
-                                                    <option value="Asia/Urumqi">XJT (Urumqi)</option>
-                                                    <option value="Asia/Vientiane">ICT (Vientiane)</option>
-                                                    <option value="Asia/Vladivostok">VLAT (Vladivostok)</option>
-                                                    <option value="Asia/Yakutsk">YAKT (Yakutsk)</option>
-                                                    <option value="Asia/Yerevan">AMT (Yerevan)</option>
-                                                    <option value="Atlantic/Azores">AZOT (Azores)</option>
-                                                    <option value="Atlantic/Bermuda">AST (Bermuda)</option>
-                                                    <option value="Atlantic/Canary">WET (Canary)</option>
-                                                    <option value="Atlantic/Cape_Verde">CVT (Cape Verde)</option>
-                                                    <option value="Atlantic/Faeroe">WET (Faeroe)</option>
-                                                    <option value="Atlantic/Jan_Mayen">CET (Jan Mayen)</option>
-                                                    <option value="Atlantic/Madeira">WET (Madeira)</option>
-                                                    <option value="Atlantic/Reykjavik">GMT (Reykjavik)</option>
-                                                    <option value="Atlantic/South_Georgia">GST (South Georgia)</option>
-                                                    <option value="Atlantic/Stanley">FKT (Stanley)</option>
-                                                    <option value="Australia/Adelaide">ACDT (Adelaide)</option>
-                                                    <option value="Australia/Brisbane">AEST (Brisbane)</option>
-                                                    <option value="Australia/Broken_Hill">ACDT (Broken Hill)</option>
-                                                    <option value="Australia/Currie">AEDT (Currie)</option>
-                                                    <option value="Australia/Darwin">ACST (Darwin)</option>
-                                                    <option value="Australia/Eucla">ACWST (Eucla)</option>
-                                                    <option value="Australia/Hobart">AEDT (Hobart)</option>
-                                                    <option value="Australia/Lindeman">AEST (Lindeman)</option>
-                                                    <option value="Australia/Melbourne">AEDT (Melbourne)</option>
-                                                    <option value="Australia/Perth">AWST (Perth)</option>
-                                                    <option value="Australia/Sydney">AEDT (Sydney)</option>
-                                                    <option value="Australia/Tasmania">AEDT (Tasmania)</option>
-                                                    <option value="Australia/Brisbane">AEST (Brisbane)</option>
-                                                    <option value="Australia/Currie">AEDT (Currie)</option>
-                                                    <option value="Australia/Darwin">ACST (Darwin)</option>
-                                                    <option value="Australia/Eucla">ACWST (Eucla)</option>
-                                                    <option value="Australia/Hobart">AEDT (Hobart)</option>
-                                                    <option value="Australia/Lindeman">AEST (Lindeman)</option>
-                                                    <option value="Australia/Melbourne">AEDT (Melbourne)</option>
-                                                    <option value="Australia/Perth">AWST (Perth)</option>
-                                                    <option value="Australia/Sydney">AEDT (Sydney)</option>
-                                                    <option value="Australia/Tasmania">AEDT (Tasmania)</option>
-                                                    <option value="Etc/GMT+12">GMT-12:00</option>
-                                                    <option value="Etc/GMT+11">GMT-11:00</option>
-                                                    <option value="Etc/GMT+10">GMT-10:00</option>
-                                                    <option value="Etc/GMT+9">GMT-9:00</option>
-                                                    <option value="Etc/GMT+8">GMT-8:00</option>
-                                                    <option value="Etc/GMT+7">GMT-7:00</option>
-                                                    <option value="Etc/GMT+6">GMT-6:00</option>
-                                                    <option value="Etc/GMT+5">GMT-5:00</option>
-                                                    <option value="Etc/GMT+4">GMT-4:00</option>
-                                                    <option value="Etc/GMT+3">GMT-3:00</option>
-                                                    <option value="Etc/GMT+2">GMT-2:00</option>
-                                                    <option value="Etc/GMT+1">GMT-1:00</option>
-                                                    <option value="Etc/GMT">GMT</option>
-                                                    <option value="Etc/GMT-1">GMT+1:00</option>
-                                                    <option value="Etc/GMT-2">GMT+2:00</option>
-                                                    <option value="Etc/GMT-3">GMT+3:00</option>
-                                                    <option value="Etc/GMT-4">GMT+4:00</option>
-                                                    <option value="Etc/GMT-5">GMT+5:00</option>
-                                                    <option value="Etc/GMT-6">GMT+6:00</option>
-                                                    <option value="Etc/GMT-7">GMT+7:00</option>
-                                                    <option value="Etc/GMT-8">GMT+8:00</option>
-                                                    <option value="Etc/GMT-9">GMT+9:00</option>
-                                                    <option value="Etc/GMT-10">GMT+10:00</option>
-                                                    <option value="Etc/GMT-11">GMT+11:00</option>
-                                                    <option value="Etc/GMT-12">GMT+12:00</option>
-                                                </optgroup>
-                                            </select>
-
-                                            <label for="time_zone">Time Zone</label>
-                                        </div>
-                                    </div>
-                                    <div class="content-header mb-3">
-                                        <h6 class="mb-0">Business Hours</h6>
-                                        {{-- <small>From Lead Model</small> --}}
-                                    </div>
-                                    @if(isset($sale) && count($sale->business_hours) > 0)
-                                    <div class="col-md-12" style="display: flex; flex-direction: column; gap: 25px;">
-                                        @foreach($sale->business_hours as $index => $business_hour)
-                                        <!-- Day -->
-                                        <div class="row opening-day">
-                                            <div class="col-md-2">
-                                                <h5>{{ $business_hour->day }} <input type="hidden" name="day[]" value="{{ $business_hour->day }}"></h5>
-                                            </div>
-                                            <div class="col-md-3 form-floating form-floating-outline">
-                                                <input type="time" class="form-control flatpickr-input" @if($business_hour->is_closed != 1 && $business_hour->{"is_24/7"} != 1) value="{{ $business_hour->opening_time }}" @endif name="open[]" id="{{ Str::lower($business_hour->day) }}_open">
-                                            </div>
-                                            <div class="col-md-3 form-floating form-floating-outline">
-                                                <input type="time" class="form-control flatpickr-input" @if($business_hour->is_closed != 1 && $business_hour->{"is_24/7"} != 1) value="{{ $business_hour->closing_time }}" @endif name="closed[]" id="{{ Str::lower($business_hour->day) }}_closed">
-                                            </div>
-                                            <div class="col-md-2 d-flex" style="gap: 20px;">
-                                                <div class="form-check custom-option custom-option-basic checked">
-                                                    <label class="form-check-label custom-option-content" for="customRadioTemp{{ $index }}_1">
-                                                        <input  data-day="check" data-day-name="{{ Str::lower($business_hour->day) }}" name="{{ Str::lower($business_hour->day) }}_check" class="form-check-input" type="radio" @if($business_hour->is_closed != 1 && $business_hour->{"is_24/7"} != 1) checked @endif value="open" id="customRadioTemp{{ $index }}_1"
-                                                            checked="">
-                                                        <span class="custom-option-header">
-                                                            <span class="h6 mb-0">Open</span>
-                                                        </span>
-                                                    </label>
-                                                </div>
-                                                <div class="form-check custom-option custom-option-basic">
-                                                    <label class="form-check-label custom-option-content" for="customRadioTemp{{ $index }}_2">
-                                                        <input  data-day="check" data-day-name="{{ Str::lower($business_hour->day) }}" name="{{ Str::lower($business_hour->day) }}_check" class="form-check-input" type="radio" @if($business_hour->is_closed == 1) checked @endif value="closed"
-                                                            id="customRadioTemp{{ $index }}_2">
-                                                        <span class="custom-option-header">
-                                                            <span class="h6 mb-0">Closed</span>
-                                                        </span>
-                                                    </label>
-                                                </div>
-                                                <div class="form-check custom-option custom-option-basic">
-                                                    <label class="form-check-label custom-option-content" for="customRadioTemp{{ $index }}_3">
-                                                        <input  data-day="check" data-day-name="{{ Str::lower($business_hour->day) }}" name="{{ Str::lower($business_hour->day) }}_check" class="form-check-input" @if($business_hour->{"is_24/7"} == 1) checked @endif type="radio" value="24/7"
-                                                            id="customRadioTemp{{ $index }}_3">
-                                                        <span class="custom-option-header">
-                                                            <span class="h6 mb-0">24/7</span>
-                                                        </span>
-                                                    </label>
-                                                </div>
-
-                                            </div>
-                                        </div>
-                                        <!-- Day / End -->
+                            <form id="saleForm" method="POST" action="{{ route('sale.store') }}" onsubmit="return validateForm()">
+                                @csrf
+                                @if ($errors->any())
+                                <div class="alert alert-danger">
+                                    <ul>
+                                        @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
                                         @endforeach
-                                    </div>
-                                    @else
-                                        @php
-                                            $business_hours = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday','Saturday','Sunday']
-                                        @endphp
-                                        <div class="col-md-12" style="display: flex; flex-direction: column; gap: 25px;">
-                                            @foreach($business_hours as $index=>$business_hour)
-                                            <!-- Day -->
-                                            <div class="row opening-day">
-                                                <div class="col-md-2">
-                                                    <h5>{{ $business_hour }} <input type="hidden" name="day[]" value="{{ $business_hour }}"></h5>
-                                                </div>
-                                                <div class="col-md-3 form-floating form-floating-outline">
-                                                    <input type="time" class="form-control flatpickr-input" value="" name="open[]" id="{{ Str::lower($business_hour) }}_open">
-                                                </div>
-                                                <div class="col-md-3 form-floating form-floating-outline">
-                                                    <input type="time" class="form-control flatpickr-input" value="" name="closed[]" id="{{ Str::lower($business_hour) }}_closed">
-                                                </div>
-                                                <div class="col-md-2 d-flex" style="gap: 20px;">
-                                                    <div class="form-check custom-option custom-option-basic checked">
-                                                        <label class="form-check-label custom-option-content" for="customRadioTemp{{ $index }}_1">
-                                                            <input  data-day="check" data-day-name="{{ Str::lower($business_hour) }}" name="{{ Str::lower($business_hour) }}_check" class="form-check-input" type="radio" value="open" id="customRadioTemp{{ $index }}_1"
-                                                                checked="">
-                                                            <span class="custom-option-header">
-                                                                <span class="h6 mb-0">Open</span>
-                                                            </span>
-                                                        </label>
-                                                    </div>
-                                                    <div class="form-check custom-option custom-option-basic">
-                                                        <label class="form-check-label custom-option-content" for="customRadioTemp{{ $index }}_2">
-                                                            <input  data-day="check" data-day-name="{{ Str::lower($business_hour) }}" name="{{ Str::lower($business_hour) }}_check" class="form-check-input" type="radio" value="closed"
-                                                                id="customRadioTemp{{ $index }}_2">
-                                                            <span class="custom-option-header">
-                                                                <span class="h6 mb-0">Closed</span>
-                                                            </span>
-                                                        </label>
-                                                    </div>
-                                                    <div class="form-check custom-option custom-option-basic">
-                                                        <label class="form-check-label custom-option-content" for="customRadioTemp{{ $index }}_3">
-                                                            <input  data-day="check" data-day-name="{{ Str::lower($business_hour) }}" name="{{ Str::lower($business_hour) }}_check" class="form-check-input" type="radio" value="24/7"
-                                                                id="customRadioTemp{{ $index }}_3">
-                                                            <span class="custom-option-header">
-                                                                <span class="h6 mb-0">24/7</span>
-                                                            </span>
-                                                        </label>
-                                                    </div>
+                                    </ul>
+                                </div>
+                                @endif
+                                <div id="successMessage" style="display:none;" class="alert alert-success"></div>
+                                <!-- Account Details -->
+                                <div id="account-details" class="content">
+                                    @if(isset($sale_perm) && $sale_perm->create == 1)
+                                        <div class="content-header mb-3">
+                                            <h6 class="mb-0">Lead Details</h6>
+                                            <small>From Lead Model</small>
+                                        </div>
+                                        <div class="row g-4">
+                                            <div class="col-md-6">
+                                                <input type="hidden" name="lead_id" value="{{ $lead->id }}" id="">
+                                                <div class="form-floating form-floating-outline">
+                                                    <select id="client_nature" name="client_nature" class="select2 form-select"
+                                                        data-allow-clear="true">
+                                                        @if(isset($sale) && isset($sale->client_nature))
+                                                        <option value="{{$sale->client_nature}}" selected>{{ $sale->client_nature }}</option>
+                                                        @else
+                                                        <option value="">Please Select</option>
+                                                        @endif
+                                                        @foreach ($client_enum as $item)
+                                                        <option value="{{$item}}">{{$item}}</option>
+                                                        @endforeach
 
+                                                    </select>
+                                                    <label for="multicol-country">Client Nature</label>
                                                 </div>
                                             </div>
-                                            <!-- Day / End -->
-                                            @endforeach
+                                            <div class="col-md-6">
+                                                <div class="form-floating form-floating-outline">
+                                                    <input type="text" id="business_name" name="business_name"
+                                                        class="form-control" placeholder="John"
+                                                        value="{{ $lead->business_name_adv }}"
+                                                        onkeydown="return /[a-zA-Z\s]/.test(event.key) || event.key === 'Backspace' || event.key === 'Tab';" />
+                                                    <label for="multicol-first-name">Business Name Adv</label>
+                                                </div>
+                                                @error('business_name')
+                                                <span class="text-danger">{{ $message }}</span>
+                                                @enderror
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-floating form-floating-outline">
+                                                    <input type="tel"  id="business_number" style="height: calc(2.940725rem + 2px);"
+                                                        name="business_number" class="form-control"  value="{{ $lead->business_number_adv }}" />
+                                                    {{-- <label for="multicol-last-name">Business Number Adv</label> --}}
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-floating form-floating-outline">
+                                                    <input type="text" class="form-control " name="client_name"
+                                                        placeholder="Client Name" aria-label="client_name"
+                                                        value="{{ $lead->client_name }}"
+                                                        onkeydown="return /[a-zA-Z\s]/.test(event.key) || event.key === 'Backspace' || event.key === 'Tab';" />
+                                                    <label for="client_name">Client Name</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-2">
+                                                    <div class="input-group input-group-merge">
+                                                        <div class="form-floating form-floating-outline">
+                                                            <input type="email" id="basic-default-email" name="email"
+                                                                class="form-control" placeholder="john.doe"
+                                                                aria-label="john.doe" value="{{ $lead->off_email }}"
+                                                                aria-describedby="basic-default-email2">
+                                                            <label for="basic-default-email">Official Email</label>
+                                                        </div>
+                                                        <span class="input-group-text"
+                                                            id="basic-default-email2">@example.com</span>
+                                                    </div>
+                                                    <div class="form-text">You can use letters, numbers &amp; periods</div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-floating form-floating-outline">
+                                                    <input type="text" class="form-control " name="website_url"
+                                                        placeholder="Example.com" value="{{ $lead->website_url }}"
+                                                        aria-label="Example.com" />
+                                                    <label for="multicol-phone">Website Url</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-floating form-floating-outline">
+                                                    <select id="category" name="call_type" class="select2 form-select"
+                                                        data-allow-clear="true">
+                                                        @if(isset($sale) && isset($sale->call_type))
+                                                        <option value="{{$sale->call_type}}" selected>{{ $sale->call_type }}</option>
+                                                        @else
+                                                        <option value="">Please Select</option>
+                                                        @endif
+                                                        @foreach ($call_enum as $item)
+                                                        <option value="{{$item}}">{{$item}}</option>
+                                                        @endforeach
+
+                                                    </select>
+                                                    <label for="multicol-country">Call Type</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-floating form-floating-outline">
+                                                <select name="timezone" class="select2 form-select" data-allow-clear="true">
+                                                    @if(isset($sale) && isset($sale->time_zone))
+                                                    <option value="{{$sale->time_zone}}" selected>{{ $sale->time_zone }}</option>
+                                                    @endif
+                                                        <optgroup label="US Time Zones">
+                                                            <option value="America/New_York">Eastern Time (ET)</option>
+                                                            <option value="America/Chicago">Central Time (CT)</option>
+                                                            <option value="America/Denver">Mountain Time (MT)</option>
+                                                            <option value="America/Los_Angeles">Pacific Time (PT)</option>
+                                                            <option value="America/Anchorage">Alaska Time (AKT)</option>
+                                                            <option value="Pacific/Honolulu">Hawaii-Aleutian Time (HAST)</option>
+                                                        </optgroup>
+
+                                                        <optgroup label="Global Time Zones">
+                                                            <option value="Africa/Abidjan">GMT (Abidjan)</option>
+                                                            <option value="Africa/Accra">GMT (Accra)</option>
+                                                            <option value="Africa/Addis_Ababa">EAT (Addis Ababa)</option>
+                                                            <option value="Africa/Algiers">CET (Algiers)</option>
+                                                            <option value="Africa/Asmara">EAT (Asmara)</option>
+                                                            <option value="Africa/Bangui">WAT (Bangui)</option>
+                                                            <option value="Africa/Banjul">GMT (Banjul)</option>
+                                                            <option value="Africa/Bissau">GMT (Bissau)</option>
+                                                            <option value="Africa/Blantyre">CAT (Blantyre)</option>
+                                                            <option value="Africa/Brazzaville">WAT (Brazzaville)</option>
+                                                            <option value="Africa/Bujumbura">CAT (Bujumbura)</option>
+                                                            <option value="Africa/Cairo">EET (Cairo)</option>
+                                                            <option value="Africa/Casablanca">WET (Casablanca)</option>
+                                                            <option value="Africa/Ceuta">CET (Ceuta)</option>
+                                                            <option value="Africa/Conakry">GMT (Conakry)</option>
+                                                            <option value="Africa/Dakar">GMT (Dakar)</option>
+                                                            <option value="Africa/Dar_es_Salaam">EAT (Dar es Salaam)</option>
+                                                            <option value="Africa/Djibouti">EAT (Djibouti)</option>
+                                                            <option value="Africa/El_Aaiun">WET (El Aaiun)</option>
+                                                            <option value="Africa/Freetown">GMT (Freetown)</option>
+                                                            <option value="Africa/Gaborone">CAT (Gaborone)</option>
+                                                            <option value="Africa/Harare">CAT (Harare)</option>
+                                                            <option value="Africa/Johannesburg">SAST (Johannesburg)</option>
+                                                            <option value="Africa/Juba">CAT (Juba)</option>
+                                                            <option value="Africa/Kampala">EAT (Kampala)</option>
+                                                            <option value="Africa/Khartoum">CAT (Khartoum)</option>
+                                                            <option value="Africa/Kigali">CAT (Kigali)</option>
+                                                            <option value="Africa/Kinshasa">WAT (Kinshasa)</option>
+                                                            <option value="Africa/Lagos">WAT (Lagos)</option>
+                                                            <option value="Africa/Libreville">WAT (Libreville)</option>
+                                                            <option value="Africa/Lome">GMT (Lome)</option>
+                                                            <option value="Africa/Luanda">WAT (Luanda)</option>
+                                                            <option value="Africa/Lubumbashi">CAT (Lubumbashi)</option>
+                                                            <option value="Africa/Lusaka">CAT (Lusaka)</option>
+                                                            <option value="Africa/Malabo">WAT (Malabo)</option>
+                                                            <option value="Africa/Maputo">CAT (Maputo)</option>
+                                                            <option value="Africa/Maseru">CAT (Maseru)</option>
+                                                            <option value="Africa/Mbabane">SAST (Mbabane)</option>
+                                                            <option value="Africa/Mogadishu">EAT (Mogadishu)</option>
+                                                            <option value="Africa/Nairobi">EAT (Nairobi)</option>
+                                                            <option value="Africa/Niamey">WAT (Niamey)</option>
+                                                            <option value="Africa/Nouakchott">GMT (Nouakchott)</option>
+                                                            <option value="Africa/Ouagadougou">GMT (Ouagadougou)</option>
+                                                            <option value="Africa/Porto-Novo">WAT (Porto-Novo)</option>
+                                                            <option value="Africa/Sao_Tome">GMT (Sao Tome)</option>
+                                                            <option value="Africa/Tunis">CET (Tunis)</option>
+                                                            <option value="Africa/Tripoli">EET (Tripoli)</option>
+                                                            <option value="America/Adak">HAST (Adak)</option>
+                                                            <option value="America/Anchorage">AKST (Anchorage)</option>
+                                                            <option value="America/Anguilla">AST (Anguilla)</option>
+                                                            <option value="America/Antigua">AST (Antigua)</option>
+                                                            <option value="America/Argentina/Buenos_Aires">ART (Buenos Aires)</option>
+                                                            <option value="America/Argentina/Catamarca">ART (Catamarca)</option>
+                                                            <option value="America/Argentina/ComodRivadavia">ART (ComodRivadavia)</option>
+                                                            <option value="America/Argentina/Cordoba">ART (Cordoba)</option>
+                                                            <option value="America/Argentina/Jujuy">ART (Jujuy)</option>
+                                                            <option value="America/Argentina/La_Rioja">ART (La Rioja)</option>
+                                                            <option value="America/Argentina/Mendoza">ART (Mendoza)</option>
+                                                            <option value="America/Argentina/Rosario">ART (Rosario)</option>
+                                                            <option value="America/Argentina/Tucuman">ART (Tucuman)</option>
+                                                            <option value="America/Argentina/Ushuaia">ART (Ushuaia)</option>
+                                                            <option value="America/Aruba">AST (Aruba)</option>
+                                                            <option value="America/Asuncion">PYT (Asuncion)</option>
+                                                            <option value="America/Atikokan">EST (Atikokan)</option>
+                                                            <option value="America/Barbados">AST (Barbados)</option>
+                                                            <option value="America/Belize">CST (Belize)</option>
+                                                            <option value="America/Blanc-Sablon">AST (Blanc-Sablon)</option>
+                                                            <option value="America/Boa_Vista">AMT (Boa Vista)</option>
+                                                            <option value="America/Bogota">COT (Bogota)</option>
+                                                            <option value="America/Boise">MDT (Boise)</option>
+                                                            <option value="America/Cambridge_Bay">MDT (Cambridge Bay)</option>
+                                                            <option value="America/Cancun">EST (Cancun)</option>
+                                                            <option value="America/Caracas">VET (Caracas)</option>
+                                                            <option value="America/Cayman">EST (Cayman)</option>
+                                                            <option value="America/Chicago">CST (Chicago)</option>
+                                                            <option value="America/Chihuahua">MDT (Chihuahua)</option>
+                                                            <option value="America/Costa_Rica">CST (Costa Rica)</option>
+                                                            <option value="America/Creston">MST (Creston)</option>
+                                                            <option value="America/Cuiaba">AMT (Cuiaba)</option>
+                                                            <option value="America/Curacao">AST (Curacao)</option>
+                                                            <option value="America/Dawson">PST (Dawson)</option>
+                                                            <option value="America/Dawson_Creek">MST (Dawson Creek)</option>
+                                                            <option value="America/Denver">MDT (Denver)</option>
+                                                            <option value="America/Detroit">EDT (Detroit)</option>
+                                                            <option value="America/Dominica">AST (Dominica)</option>
+                                                            <option value="America/Edmonton">MDT (Edmonton)</option>
+                                                            <option value="America/Eirunepe">ACT (Eirunepe)</option>
+                                                            <option value="America/El_Salvador">CST (El Salvador)</option>
+                                                            <option value="America/Fortaleza">BRT (Fortaleza)</option>
+                                                            <option value="America/Fort_Wayne">EST (Fort Wayne)</option>
+                                                            <option value="America/Glace_Bay">AST (Glace Bay)</option>
+                                                            <option value="America/Godthab">WGT (Godthab)</option>
+                                                            <option value="America/Goose_Bay">AST (Goose Bay)</option>
+                                                            <option value="America/Grand_Turk">EST (Grand Turk)</option>
+                                                            <option value="America/Grenada">AST (Grenada)</option>
+                                                            <option value="America/Guadeloupe">AST (Guadeloupe)</option>
+                                                            <option value="America/Guatemala">CST (Guatemala)</option>
+                                                            <option value="America/Guyana">GYT (Guyana)</option>
+                                                            <option value="America/Halifax">AST (Halifax)</option>
+                                                            <option value="America/Havana">CST (Havana)</option>
+                                                            <option value="America/Hermosillo">MST (Hermosillo)</option>
+                                                            <option value="America/Indiana/Indianapolis">EST (Indianapolis)</option>
+                                                            <option value="America/Indiana/Knox">CST (Knox)</option>
+                                                            <option value="America/Indiana/Marengo">EST (Marengo)</option>
+                                                            <option value="America/Indiana/Petersburg">EST (Petersburg)</option>
+                                                            <option value="America/Indiana/Tell_City">CST (Tell City)</option>
+                                                            <option value="America/Indiana/Vevay">EST (Vevay)</option>
+                                                            <option value="America/Indiana/Winamac">EST (Winamac)</option>
+                                                            <option value="America/Indianapolis">EDT (Indianapolis)</option>
+                                                            <option value="America/Inuvik">MDT (Inuvik)</option>
+                                                            <option value="America/Iqaluit">EDT (Iqaluit)</option>
+                                                            <option value="America/Jamaica">EST (Jamaica)</option>
+                                                            <option value="America/Juneau">AKDT (Juneau)</option>
+                                                            <option value="America/Kentucky/Louisville">EDT (Louisville)</option>
+                                                            <option value="America/Kentucky/Monticello">EDT (Monticello)</option>
+                                                            <option value="America/Kralendijk">AST (Kralendijk)</option>
+                                                            <option value="America/La_Paz">BOT (La Paz)</option>
+                                                            <option value="America/Lima">PET (Lima)</option>
+                                                            <option value="America/Los_Angeles">PDT (Los Angeles)</option>
+                                                            <option value="America/Maceio">BRT (Maceio)</option>
+                                                            <option value="America/Managua">CST (Managua)</option>
+                                                            <option value="America/Manaus">AMT (Manaus)</option>
+                                                            <option value="America/Marigot">AST (Marigot)</option>
+                                                            <option value="America/Martinique">AST (Martinique)</option>
+                                                            <option value="America/Matamoros">CST (Matamoros)</option>
+                                                            <option value="America/Mexico_City">CST (Mexico City)</option>
+                                                            <option value="America/Miquelon">PMST (Miquelon)</option>
+                                                            <option value="America/Moncton">AST (Moncton)</option>
+                                                            <option value="America/Montreal">EDT (Montreal)</option>
+                                                            <option value="America/Montserrat">AST (Montserrat)</option>
+                                                            <option value="America/Nassau">EST (Nassau)</option>
+                                                            <option value="America/New_York">EDT (New York)</option>
+                                                            <option value="America/Nipigon">EST (Nipigon)</option>
+                                                            <option value="America/Nome">AKDT (Nome)</option>
+                                                            <option value="America/Noronha">FNT (Noronha)</option>
+                                                            <option value="America/North_Dakota/Beulah">CST (Beulah)</option>
+                                                            <option value="America/North_Dakota/Center">CST (Center)</option>
+                                                            <option value="America/North_Dakota/New_Salem">CST (New Salem)</option>
+                                                            <option value="America/Ojinaga">MDT (Ojinaga)</option>
+                                                            <option value="America/Panama">EST (Panama)</option>
+                                                            <option value="America/Phoenix">MST (Phoenix)</option>
+                                                            <option value="America/Port-au-Prince">EST (Port-au-Prince)</option>
+                                                            <option value="America/Porto_Velho">AMT (Porto Velho)</option>
+                                                            <option value="America/Puerto_Rico">AST (Puerto Rico)</option>
+                                                            <option value="America/Punta_Arenas">CLT (Punta Arenas)</option>
+                                                            <option value="America/Rainy_River">CST (Rainy River)</option>
+                                                            <option value="America/Ramallah">EET (Ramallah)</option>
+                                                            <option value="America/Rankin_Inlet">CST (Rankin Inlet)</option>
+                                                            <option value="America/Recife">BRT (Recife)</option>
+                                                            <option value="America/Regina">CST (Regina)</option>
+                                                            <option value="America/Resolute">CST (Resolute)</option>
+                                                            <option value="America/Rio_Branco">ACT (Rio Branco)</option>
+                                                            <option value="America/Santarem">AMT (Santarem)</option>
+                                                            <option value="America/Santiago">CLT (Santiago)</option>
+                                                            <option value="America/Santo_Domingo">AST (Santo Domingo)</option>
+                                                            <option value="America/Sao_Paulo">BRT (Sao Paulo)</option>
+                                                            <option value="America/Scoresbysund">EGT (Scoresbysund)</option>
+                                                            <option value="America/Sitka">AKDT (Sitka)</option>
+                                                            <option value="America/St_Barthelemy">AST (St Barthelemy)</option>
+                                                            <option value="America/St_Johns">NST (St Johns)</option>
+                                                            <option value="America/St_Kitts">AST (St Kitts)</option>
+                                                            <option value="America/St_Lucia">AST (St Lucia)</option>
+                                                            <option value="America/St_Thomas">AST (St Thomas)</option>
+                                                            <option value="America/St_Vincent">AST (St Vincent)</option>
+                                                            <option value="America/Swift_Current">CST (Swift Current)</option>
+                                                            <option value="America/Tegucigalpa">CST (Tegucigalpa)</option>
+                                                            <option value="America/Thule">WGT (Thule)</option>
+                                                            <option value="America/Thunder_Bay">EST (Thunder Bay)</option>
+                                                            <option value="America/Toronto">EDT (Toronto)</option>
+                                                            <option value="America/Tortola">AST (Tortola)</option>
+                                                            <option value="America/Vancouver">PDT (Vancouver)</option>
+                                                            <option value="America/Winnipeg">CST (Winnipeg)</option>
+                                                            <option value="America/Yakutat">AKDT (Yakutat)</option>
+                                                            <option value="America/Yellowknife">MDT (Yellowknife)</option>
+                                                            <option value="Antarctica/Casey">CAST (Casey)</option>
+                                                            <option value="Antarctica/Davis">DAVT (Davis)</option>
+                                                            <option value="Antarctica/DumontDUrville">DDT (Dumont d'Urville)</option>
+                                                            <option value="Antarctica/Macquarie">MIST (Macquarie)</option>
+                                                            <option value="Antarctica/McMurdo">NZDT (McMurdo)</option>
+                                                            <option value="Antarctica/Palmer">CLT (Palmer)</option>
+                                                            <option value="Antarctica/Syowa">SYOT (Syowa)</option>
+                                                            <option value="Antarctica/Troll">UTC (Troll)</option>
+                                                            <option value="Antarctica/Vostok">VOST (Vostok)</option>
+                                                            <option value="Arctic/Longyearbyen">CET (Longyearbyen)</option>
+                                                            <option value="Asia/Aden">AST (Aden)</option>
+                                                            <option value="Asia/Almaty">ALMT (Almaty)</option>
+                                                            <option value="Asia/Amman">EET (Amman)</option>
+                                                            <option value="Asia/Aqtau">AQTT (Aqtau)</option>
+                                                            <option value="Asia/Aqtobe">AQTT (Aqtobe)</option>
+                                                            <option value="Asia/Ashgabat">TMT (Ashgabat)</option>
+                                                            <option value="Asia/Ashkhabad">TMT (Ashkhabad)</option>
+                                                            <option value="Asia/Bahrain">AST (Bahrain)</option>
+                                                            <option value="Asia/Bangkok">ICT (Bangkok)</option>
+                                                            <option value="Asia/Barnaul">ALMT (Barnaul)</option>
+                                                            <option value="Asia/Beirut">EET (Beirut)</option>
+                                                            <option value="Asia/Bishkek">KGT (Bishkek)</option>
+                                                            <option value="Asia/Brunei">BNT (Brunei)</option>
+                                                            <option value="Asia/Chita">IRKT (Chita)</option>
+                                                            <option value="Asia/Choibalsan">ULAT (Choibalsan)</option>
+                                                            <option value="Asia/Colombo">IST (Colombo)</option>
+                                                            <option value="Asia/Damascus">EET (Damascus)</option>
+                                                            <option value="Asia/Dhaka">BST (Dhaka)</option>
+                                                            <option value="Asia/Dili">TLT (Dili)</option>
+                                                            <option value="Asia/Dubai">GST (Dubai)</option>
+                                                            <option value="Asia/Dushanbe">TJT (Dushanbe)</option>
+                                                            <option value="Asia/Famagusta">EET (Famagusta)</option>
+                                                            <option value="Asia/Gaza">EET (Gaza)</option>
+                                                            <option value="Asia/Hebron">EET (Hebron)</option>
+                                                            <option value="Asia/Ho_Chi_Minh">ICT (Ho Chi Minh)</option>
+                                                            <option value="Asia/Hong_Kong">HKT (Hong Kong)</option>
+                                                            <option value="Asia/Hovd">HOVT (Hovd)</option>
+                                                            <option value="Asia/Irkutsk">IRKT (Irkutsk)</option>
+                                                            <option value="Asia/Jakarta">WIB (Jakarta)</option>
+                                                            <option value="Asia/Jayapura">WIT (Jayapura)</option>
+                                                            <option value="Asia/Jerusalem">IST (Jerusalem)</option>
+                                                            <option value="Asia/Kabul">AFT (Kabul)</option>
+                                                            <option value="Asia/Kamchatka">PETT (Kamchatka)</option>
+                                                            <option value="Asia/Karachi">PKT (Karachi)</option>
+                                                            <option value="Asia/Katmandu">NPT (Kathmandu)</option>
+                                                            <option value="Asia/Kolkata">IST (Kolkata)</option>
+                                                            <option value="Asia/Krasnoyarsk">KRAT (Krasnoyarsk)</option>
+                                                            <option value="Asia/Kuala_Lumpur">MYT (Kuala Lumpur)</option>
+                                                            <option value="Asia/Kuching">MYT (Kuching)</option>
+                                                            <option value="Asia/Macau">CST (Macau)</option>
+                                                            <option value="Asia/Magadan">MAGT (Magadan)</option>
+                                                            <option value="Asia/Makassar">WITA (Makassar)</option>
+                                                            <option value="Asia/Manila">PHT (Manila)</option>
+                                                            <option value="Asia/Muscat">GST (Muscat)</option>
+                                                            <option value="Asia/Nicosia">EET (Nicosia)</option>
+                                                            <option value="Asia/Novokuznetsk">KRAST (Novokuznetsk)</option>
+                                                            <option value="Asia/Novosibirsk">NOVT (Novosibirsk)</option>
+                                                            <option value="Asia/Omsk">OMST (Omsk)</option>
+                                                            <option value="Asia/Oral">ORAT (Oral)</option>
+                                                            <option value="Asia/Phnom_Penh">ICT (Phnom Penh)</option>
+                                                            <option value="Asia/Pontianak">WIB (Pontianak)</option>
+                                                            <option value="Asia/Pyongyang">KST (Pyongyang)</option>
+                                                            <option value="Asia/Qatar">AST (Qatar)</option>
+                                                            <option value="Asia/Qyzylorda">QYZT (Qyzylorda)</option>
+                                                            <option value="Asia/Riyadh">AST (Riyadh)</option>
+                                                            <option value="Asia/Sakhalin">PETT (Sakhalin)</option>
+                                                            <option value="Asia/Samarkand">UZT (Samarkand)</option>
+                                                            <option value="Asia/Taipei">CST (Taipei)</option>
+                                                            <option value="Asia/Tashkent">UZT (Tashkent)</option>
+                                                            <option value="Asia/Tbilisi">GET (Tbilisi)</option>
+                                                            <option value="Asia/Tehran">IRST (Tehran)</option>
+                                                            <option value="Asia/Thimphu">BTT (Thimphu)</option>
+                                                            <option value="Asia/Tokyo">JST (Tokyo)</option>
+                                                            <option value="Asia/Ulaanbaatar">ULAT (Ulaanbaatar)</option>
+                                                            <option value="Asia/Urumqi">XJT (Urumqi)</option>
+                                                            <option value="Asia/Vientiane">ICT (Vientiane)</option>
+                                                            <option value="Asia/Vladivostok">VLAT (Vladivostok)</option>
+                                                            <option value="Asia/Yakutsk">YAKT (Yakutsk)</option>
+                                                            <option value="Asia/Yerevan">AMT (Yerevan)</option>
+                                                            <option value="Atlantic/Azores">AZOT (Azores)</option>
+                                                            <option value="Atlantic/Bermuda">AST (Bermuda)</option>
+                                                            <option value="Atlantic/Canary">WET (Canary)</option>
+                                                            <option value="Atlantic/Cape_Verde">CVT (Cape Verde)</option>
+                                                            <option value="Atlantic/Faeroe">WET (Faeroe)</option>
+                                                            <option value="Atlantic/Jan_Mayen">CET (Jan Mayen)</option>
+                                                            <option value="Atlantic/Madeira">WET (Madeira)</option>
+                                                            <option value="Atlantic/Reykjavik">GMT (Reykjavik)</option>
+                                                            <option value="Atlantic/South_Georgia">GST (South Georgia)</option>
+                                                            <option value="Atlantic/Stanley">FKT (Stanley)</option>
+                                                            <option value="Australia/Adelaide">ACDT (Adelaide)</option>
+                                                            <option value="Australia/Brisbane">AEST (Brisbane)</option>
+                                                            <option value="Australia/Broken_Hill">ACDT (Broken Hill)</option>
+                                                            <option value="Australia/Currie">AEDT (Currie)</option>
+                                                            <option value="Australia/Darwin">ACST (Darwin)</option>
+                                                            <option value="Australia/Eucla">ACWST (Eucla)</option>
+                                                            <option value="Australia/Hobart">AEDT (Hobart)</option>
+                                                            <option value="Australia/Lindeman">AEST (Lindeman)</option>
+                                                            <option value="Australia/Melbourne">AEDT (Melbourne)</option>
+                                                            <option value="Australia/Perth">AWST (Perth)</option>
+                                                            <option value="Australia/Sydney">AEDT (Sydney)</option>
+                                                            <option value="Australia/Tasmania">AEDT (Tasmania)</option>
+                                                            <option value="Australia/Brisbane">AEST (Brisbane)</option>
+                                                            <option value="Australia/Currie">AEDT (Currie)</option>
+                                                            <option value="Australia/Darwin">ACST (Darwin)</option>
+                                                            <option value="Australia/Eucla">ACWST (Eucla)</option>
+                                                            <option value="Australia/Hobart">AEDT (Hobart)</option>
+                                                            <option value="Australia/Lindeman">AEST (Lindeman)</option>
+                                                            <option value="Australia/Melbourne">AEDT (Melbourne)</option>
+                                                            <option value="Australia/Perth">AWST (Perth)</option>
+                                                            <option value="Australia/Sydney">AEDT (Sydney)</option>
+                                                            <option value="Australia/Tasmania">AEDT (Tasmania)</option>
+                                                            <option value="Etc/GMT+12">GMT-12:00</option>
+                                                            <option value="Etc/GMT+11">GMT-11:00</option>
+                                                            <option value="Etc/GMT+10">GMT-10:00</option>
+                                                            <option value="Etc/GMT+9">GMT-9:00</option>
+                                                            <option value="Etc/GMT+8">GMT-8:00</option>
+                                                            <option value="Etc/GMT+7">GMT-7:00</option>
+                                                            <option value="Etc/GMT+6">GMT-6:00</option>
+                                                            <option value="Etc/GMT+5">GMT-5:00</option>
+                                                            <option value="Etc/GMT+4">GMT-4:00</option>
+                                                            <option value="Etc/GMT+3">GMT-3:00</option>
+                                                            <option value="Etc/GMT+2">GMT-2:00</option>
+                                                            <option value="Etc/GMT+1">GMT-1:00</option>
+                                                            <option value="Etc/GMT">GMT</option>
+                                                            <option value="Etc/GMT-1">GMT+1:00</option>
+                                                            <option value="Etc/GMT-2">GMT+2:00</option>
+                                                            <option value="Etc/GMT-3">GMT+3:00</option>
+                                                            <option value="Etc/GMT-4">GMT+4:00</option>
+                                                            <option value="Etc/GMT-5">GMT+5:00</option>
+                                                            <option value="Etc/GMT-6">GMT+6:00</option>
+                                                            <option value="Etc/GMT-7">GMT+7:00</option>
+                                                            <option value="Etc/GMT-8">GMT+8:00</option>
+                                                            <option value="Etc/GMT-9">GMT+9:00</option>
+                                                            <option value="Etc/GMT-10">GMT+10:00</option>
+                                                            <option value="Etc/GMT-11">GMT+11:00</option>
+                                                            <option value="Etc/GMT-12">GMT+12:00</option>
+                                                        </optgroup>
+                                                    </select>
+
+                                                    <label for="time_zone">Time Zone</label>
+                                                </div>
+                                            </div>
+                                            <div class="content-header mb-3">
+                                                <h6 class="mb-0">Business Hours</h6>
+                                                {{-- <small>From Lead Model</small> --}}
+                                            </div>
+                                            @if(isset($sale) && count($sale->business_hours) > 0)
+                                            <div class="col-md-12" style="display: flex; flex-direction: column; gap: 25px;">
+                                                @foreach($sale->business_hours as $index => $business_hour)
+                                                <!-- Day -->
+                                                <div class="row opening-day">
+                                                    <div class="col-md-2">
+                                                        <h5>{{ $business_hour->day }} <input type="hidden" name="day[]" value="{{ $business_hour->day }}"></h5>
+                                                    </div>
+                                                    <div class="col-md-3 form-floating form-floating-outline">
+                                                        <input type="time" class="form-control flatpickr-input" @if($business_hour->is_closed != 1 && $business_hour->{"is_24/7"} != 1) value="{{ $business_hour->opening_time }}" @endif name="open[]" id="{{ Str::lower($business_hour->day) }}_open">
+                                                    </div>
+                                                    <div class="col-md-3 form-floating form-floating-outline">
+                                                        <input type="time" class="form-control flatpickr-input" @if($business_hour->is_closed != 1 && $business_hour->{"is_24/7"} != 1) value="{{ $business_hour->closing_time }}" @endif name="closed[]" id="{{ Str::lower($business_hour->day) }}_closed">
+                                                    </div>
+                                                    <div class="col-md-2 d-flex" style="gap: 20px;">
+                                                        <div class="form-check custom-option custom-option-basic checked">
+                                                            <label class="form-check-label custom-option-content" for="customRadioTemp{{ $index }}_1">
+                                                                <input  data-day="check" data-day-name="{{ Str::lower($business_hour->day) }}" name="{{ Str::lower($business_hour->day) }}_check" class="form-check-input" type="radio" @if($business_hour->is_closed != 1 && $business_hour->{"is_24/7"} != 1) checked @endif value="open" id="customRadioTemp{{ $index }}_1"
+                                                                    checked="">
+                                                                <span class="custom-option-header">
+                                                                    <span class="h6 mb-0">Open</span>
+                                                                </span>
+                                                            </label>
+                                                        </div>
+                                                        <div class="form-check custom-option custom-option-basic">
+                                                            <label class="form-check-label custom-option-content" for="customRadioTemp{{ $index }}_2">
+                                                                <input  data-day="check" data-day-name="{{ Str::lower($business_hour->day) }}" name="{{ Str::lower($business_hour->day) }}_check" class="form-check-input" type="radio" @if($business_hour->is_closed == 1) checked @endif value="closed"
+                                                                    id="customRadioTemp{{ $index }}_2">
+                                                                <span class="custom-option-header">
+                                                                    <span class="h6 mb-0">Closed</span>
+                                                                </span>
+                                                            </label>
+                                                        </div>
+                                                        <div class="form-check custom-option custom-option-basic">
+                                                            <label class="form-check-label custom-option-content" for="customRadioTemp{{ $index }}_3">
+                                                                <input  data-day="check" data-day-name="{{ Str::lower($business_hour->day) }}" name="{{ Str::lower($business_hour->day) }}_check" class="form-check-input" @if($business_hour->{"is_24/7"} == 1) checked @endif type="radio" value="24/7"
+                                                                    id="customRadioTemp{{ $index }}_3">
+                                                                <span class="custom-option-header">
+                                                                    <span class="h6 mb-0">24/7</span>
+                                                                </span>
+                                                            </label>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                                <!-- Day / End -->
+                                                @endforeach
+                                            </div>
+                                            @else
+                                                @php
+                                                    $business_hours = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday','Saturday','Sunday']
+                                                @endphp
+                                                <div class="col-md-12" style="display: flex; flex-direction: column; gap: 25px;">
+                                                    @foreach($business_hours as $index=>$business_hour)
+                                                    <!-- Day -->
+                                                    <div class="row opening-day">
+                                                        <div class="col-md-2">
+                                                            <h5>{{ $business_hour }} <input type="hidden" name="day[]" value="{{ $business_hour }}"></h5>
+                                                        </div>
+                                                        <div class="col-md-3 form-floating form-floating-outline">
+                                                            <input type="time" class="form-control flatpickr-input" value="" name="open[]" id="{{ Str::lower($business_hour) }}_open">
+                                                        </div>
+                                                        <div class="col-md-3 form-floating form-floating-outline">
+                                                            <input type="time" class="form-control flatpickr-input" value="" name="closed[]" id="{{ Str::lower($business_hour) }}_closed">
+                                                        </div>
+                                                        <div class="col-md-2 d-flex" style="gap: 20px;">
+                                                            <div class="form-check custom-option custom-option-basic checked">
+                                                                <label class="form-check-label custom-option-content" for="customRadioTemp{{ $index }}_1">
+                                                                    <input  data-day="check" data-day-name="{{ Str::lower($business_hour) }}" name="{{ Str::lower($business_hour) }}_check" class="form-check-input" type="radio" value="open" id="customRadioTemp{{ $index }}_1"
+                                                                        checked="">
+                                                                    <span class="custom-option-header">
+                                                                        <span class="h6 mb-0">Open</span>
+                                                                    </span>
+                                                                </label>
+                                                            </div>
+                                                            <div class="form-check custom-option custom-option-basic">
+                                                                <label class="form-check-label custom-option-content" for="customRadioTemp{{ $index }}_2">
+                                                                    <input  data-day="check" data-day-name="{{ Str::lower($business_hour) }}" name="{{ Str::lower($business_hour) }}_check" class="form-check-input" type="radio" value="closed"
+                                                                        id="customRadioTemp{{ $index }}_2">
+                                                                    <span class="custom-option-header">
+                                                                        <span class="h6 mb-0">Closed</span>
+                                                                    </span>
+                                                                </label>
+                                                            </div>
+                                                            <div class="form-check custom-option custom-option-basic">
+                                                                <label class="form-check-label custom-option-content" for="customRadioTemp{{ $index }}_3">
+                                                                    <input  data-day="check" data-day-name="{{ Str::lower($business_hour) }}" name="{{ Str::lower($business_hour) }}_check" class="form-check-input" type="radio" value="24/7"
+                                                                        id="customRadioTemp{{ $index }}_3">
+                                                                    <span class="custom-option-header">
+                                                                        <span class="h6 mb-0">24/7</span>
+                                                                    </span>
+                                                                </label>
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+                                                    <!-- Day / End -->
+                                                    @endforeach
+                                                </div>
+                                            @endif
+                                            {{-- <div class="col-md-12" style="display: flex; flex-direction: column; gap: 25px;">
+                                                <!-- Day -->
+                                                <div class="row opening-day">
+                                                    <div class="col-md-2">
+                                                        <h5>Monday <input type="hidden" name="day[]" value="Monday"></h5>
+                                                    </div>
+                                                    <div class="col-md-3 form-floating form-floating-outline">
+                                                        <input type="time" class="form-control flatpickr-input" value="@if(isset($sale && $sale->business_hours))  @endif" name="open[]" id="monday_open">
+                                                    </div>
+                                                    <div class="col-md-3 form-floating form-floating-outline">
+                                                        <input type="time" class="form-control flatpickr-input" value="@if(isset($sale && $sale->business_hours))  @endif" name="closed[]" id="monday_closed">
+                                                    </div>
+                                                    <div class="col-md-2 d-flex" style="gap: 20px;">
+                                                        <div class="form-check custom-option custom-option-basic checked">
+                                                            <label class="form-check-label custom-option-content" for="customRadioTemp1">
+                                                                <input  data-day="check" data-day-name="monday" name="monday_check" class="form-check-input" type="radio" value="open" id="customRadioTemp1"
+                                                                    checked="">
+                                                                <span class="custom-option-header">
+                                                                    <span class="h6 mb-0">Open</span>
+                                                                </span>
+                                                            </label>
+                                                        </div>
+                                                        <div class="form-check custom-option custom-option-basic">
+                                                            <label class="form-check-label custom-option-content" for="customRadioTemp2">
+                                                                <input  data-day="check" data-day-name="monday" name="monday_check" class="form-check-input" type="radio" value="closed"
+                                                                    id="customRadioTemp2">
+                                                                <span class="custom-option-header">
+                                                                    <span class="h6 mb-0">Closed</span>
+                                                                </span>
+                                                            </label>
+                                                        </div>
+                                                        <div class="form-check custom-option custom-option-basic">
+                                                            <label class="form-check-label custom-option-content" for="customRadioTemp3">
+                                                                <input  data-day="check" data-day-name="monday" name="monday_check" class="form-check-input" type="radio" value="24/7"
+                                                                    id="customRadioTemp3">
+                                                                <span class="custom-option-header">
+                                                                    <span class="h6 mb-0">24/7</span>
+                                                                </span>
+                                                            </label>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                                <!-- Day / End -->
+
+                                                <!-- Day -->
+                                                <div class="row opening-day">
+                                                    <div class="col-md-2">
+                                                        <h5>Tuesday <input type="hidden" name="day[]" value="Tuesday"></h5>
+                                                    </div>
+                                                    <div class="col-md-3 form-floating form-floating-outline">
+                                                        <input type="time" class="form-control flatpickr-input " value="@if(isset($sale && $sale->business_hours))  @endif" name="open[]" id="tuesday_open">
+                                                    </div>
+                                                    <div class="col-md-3 form-floating form-floating-outline">
+                                                        <input type="time" class="form-control flatpickr-input " value="@if(isset($sale && $sale->business_hours))  @endif" name="closed[]" id="tuesday_closed">
+                                                    </div>
+                                                    <div class="col-md-2 d-flex" style="gap: 20px;">
+                                                        <div class="form-check custom-option custom-option-basic checked">
+                                                            <label class="form-check-label custom-option-content" for="customRadioTemp4">
+                                                                <input  data-day="check" data-day-name="tuesday" name="tuesday_check" class="form-check-input" type="radio" value="open" id="customRadioTemp4"
+                                                                    checked="">
+                                                                <span class="custom-option-header">
+                                                                    <span class="h6 mb-0">Open</span>
+                                                                </span>
+                                                            </label>
+                                                        </div>
+                                                        <div class="form-check custom-option custom-option-basic">
+                                                            <label class="form-check-label custom-option-content" for="customRadioTemp5">
+                                                                <input  data-day="check" data-day-name="tuesday" name="tuesday_check" class="form-check-input" type="radio" value="closed"
+                                                                    id="customRadioTemp5">
+                                                                <span class="custom-option-header">
+                                                                    <span class="h6 mb-0">Closed</span>
+                                                                </span>
+                                                            </label>
+                                                        </div>
+                                                        <div class="form-check custom-option custom-option-basic">
+                                                            <label class="form-check-label custom-option-content" for="customRadioTemp6">
+                                                                <input  data-day="check" data-day-name="tuesday" name="tuesday_check" class="form-check-input" type="radio" value="24/7"
+                                                                    id="customRadioTemp6">
+                                                                <span class="custom-option-header">
+                                                                    <span class="h6 mb-0">24/7</span>
+                                                                </span>
+                                                            </label>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                                <!-- Day / End -->
+
+                                                <!-- Day -->
+                                                <div class="row opening-day">
+                                                    <div class="col-md-2">
+                                                        <h5>Wednesday <input type="hidden" name="day[]" value="Wednesday"></h5>
+                                                    </div>
+                                                    <div class="col-md-3 form-floating form-floating-outline">
+                                                        <input type="time" class="form-control flatpickr-input " value="@if(isset($sale && $sale->business_hours))  @endif" name="open[]" id="wednesday_open">
+                                                    </div>
+                                                    <div class="col-md-3 form-floating form-floating-outline">
+                                                        <input type="time" class="form-control flatpickr-input " value="@if(isset($sale && $sale->business_hours))  @endif" name="closed[]" id="wednesday_closed">
+                                                    </div>
+                                                    <div class="col-md-2 d-flex" style="gap: 20px;">
+                                                        <div class="form-check custom-option custom-option-basic checked">
+                                                            <label class="form-check-label custom-option-content" for="customRadioTemp7">
+                                                                <input  data-day="check" data-day-name="wednesday" name="wednesday_check" class="form-check-input" type="radio" value="open" id="customRadioTemp7"
+                                                                    checked="">
+                                                                <span class="custom-option-header">
+                                                                    <span class="h6 mb-0">Open</span>
+                                                                </span>
+                                                            </label>
+                                                        </div>
+                                                        <div class="form-check custom-option custom-option-basic">
+                                                            <label class="form-check-label custom-option-content" for="customRadioTemp8">
+                                                                <input  data-day="check" data-day-name="wednesday" name="wednesday_check" class="form-check-input" type="radio" value="closed"
+                                                                    id="customRadioTemp8">
+                                                                <span class="custom-option-header">
+                                                                    <span class="h6 mb-0">Closed</span>
+                                                                </span>
+                                                            </label>
+                                                        </div>
+                                                        <div class="form-check custom-option custom-option-basic">
+                                                            <label class="form-check-label custom-option-content" for="customRadioTemp9">
+                                                                <input  data-day="check" data-day-name="wednesday" name="wednesday_check" class="form-check-input" type="radio" value="24/7"
+                                                                    id="customRadioTemp9">
+                                                                <span class="custom-option-header">
+                                                                    <span class="h6 mb-0">24/7</span>
+                                                                </span>
+                                                            </label>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                                <!-- Day / End -->
+
+                                                <!-- Day -->
+                                                <div class="row opening-day">
+                                                    <div class="col-md-2">
+                                                        <h5>Thursday <input type="hidden" name="day[]" value="Thursday"></h5>
+                                                    </div>
+                                                    <div class="col-md-3 form-floating form-floating-outline">
+                                                        <input type="time" class="form-control flatpickr-input " value="@if(isset($sale && $sale->business_hours))  @endif" name="open[]" id="thursday_open">
+                                                    </div>
+                                                    <div class="col-md-3 form-floating form-floating-outline">
+                                                        <input type="time" class="form-control flatpickr-input " value="@if(isset($sale && $sale->business_hours))  @endif" name="closed[]" id="thursday_closed">
+                                                    </div>
+                                                    <div class="col-md-2 d-flex" style="gap: 20px;">
+                                                        <div class="form-check custom-option custom-option-basic checked">
+                                                            <label   class="form-check-label custom-option-content" for="customRadioTemp10">
+                                                                <input data-day="check" data-day-name="thursday" name="thursday_check" class="form-check-input" type="radio" value="open" id="customRadioTemp10"
+                                                                    checked="">
+                                                                <span class="custom-option-header">
+                                                                    <span class="h6 mb-0">Open</span>
+                                                                </span>
+                                                            </label>
+                                                        </div>
+                                                        <div class="form-check custom-option custom-option-basic">
+                                                            <label class="form-check-label custom-option-content" for="customRadioTemp11">
+                                                                <input data-day="check" data-day-name="thursday" name="thursday_check" class="form-check-input" type="radio" value="closed"
+                                                                    id="customRadioTemp11">
+                                                                <span class="custom-option-header">
+                                                                    <span  class="h6 mb-0">Closed</span>
+                                                                </span>
+                                                            </label>
+                                                        </div>
+                                                        <div class="form-check custom-option custom-option-basic">
+                                                            <label class="form-check-label custom-option-content" for="customRadioTemp12">
+                                                                <input data-day="check" data-day-name="thursday" name="thursday_check" class="form-check-input" type="radio" value="24/7"
+                                                                    id="customRadioTemp12">
+                                                                <span class="custom-option-header">
+                                                                    <span  class="h6 mb-0">24/7</span>
+                                                                </span>
+                                                            </label>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                                <!-- Day / End -->
+
+                                                <!-- Day -->
+                                                <div class="row opening-day">
+                                                    <div class="col-md-2">
+                                                        <h5>Friday <input type="hidden" name="day[]" value="Friday"></h5>
+                                                    </div>
+                                                    <div class="col-md-3 form-floating form-floating-outline">
+                                                        <input type="time" class="form-control flatpickr-input " value="@if(isset($sale && $sale->business_hours))  @endif" name="open[]" id="friday_open">
+                                                    </div>
+                                                    <div class="col-md-3 form-floating form-floating-outline">
+                                                        <input type="time" class="form-control flatpickr-input " value="@if(isset($sale && $sale->business_hours))  @endif" name="closed[]" id="friday_closed">
+                                                    </div>
+                                                    <div class="col-md-2 d-flex" style="gap: 20px;">
+                                                        <div class="form-check custom-option custom-option-basic checked">
+                                                            <label class="form-check-label custom-option-content" for="customRadioTemp13">
+                                                                <input  data-day="check" data-day-name="friday" name="friday_check" class="form-check-input" type="radio" value="open" id="customRadioTemp13"
+                                                                    checked="">
+                                                                <span class="custom-option-header">
+                                                                    <span class="h6 mb-0">Open</span>
+                                                                </span>
+                                                            </label>
+                                                        </div>
+                                                        <div class="form-check custom-option custom-option-basic">
+                                                            <label class="form-check-label custom-option-content" for="customRadioTemp14">
+                                                                <input  data-day="check" data-day-name="friday" name="friday_check" class="form-check-input" type="radio" value="closed"
+                                                                    id="customRadioTemp14">
+                                                                <span class="custom-option-header">
+                                                                    <span class="h6 mb-0">Closed</span>
+                                                                </span>
+                                                            </label>
+                                                        </div>
+                                                        <div class="form-check custom-option custom-option-basic">
+                                                            <label class="form-check-label custom-option-content" for="customRadioTemp15">
+                                                                <input  data-day="check" data-day-name="friday" name="friday_check" class="form-check-input" type="radio" value="24/7"
+                                                                    id="customRadioTemp15">
+                                                                <span class="custom-option-header">
+                                                                    <span class="h6 mb-0">24/7</span>
+                                                                </span>
+                                                            </label>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                                <!-- Day / End -->
+
+                                                <!-- Day -->
+                                                <div class="row opening-day">
+                                                    <div class="col-md-2">
+                                                        <h5>Saturday <input type="hidden" name="day[]" value="Saturday"></h5>
+                                                    </div>
+                                                    <div class="col-md-3 form-floating form-floating-outline">
+                                                        <input type="time" class="form-control flatpickr-input " value="@if(isset($sale && $sale->business_hours))  @endif" name="open[]" id="saturday_open">
+                                                    </div>
+                                                    <div class="col-md-3 form-floating form-floating-outline">
+                                                        <input type="time" class="form-control flatpickr-input " value="@if(isset($sale && $sale->business_hours))  @endif" name="closed[]" id="saturday_closed">
+                                                    </div>
+                                                    <div class="col-md-2 d-flex" style="gap: 20px;">
+                                                        <div class="form-check custom-option custom-option-basic checked">
+                                                            <label class="form-check-label custom-option-content" for="customRadioTemp16">
+                                                                <input  data-day="check" data-day-name="saturday" name="saturday_check" class="form-check-input" type="radio" value="open" id="customRadioTemp16"
+                                                                    checked="">
+                                                                <span class="custom-option-header">
+                                                                    <span class="h6 mb-0">Open</span>
+                                                                </span>
+                                                            </label>
+                                                        </div>
+                                                        <div class="form-check custom-option custom-option-basic">
+                                                            <label class="form-check-label custom-option-content" for="customRadioTemp17">
+                                                                <input  data-day="check" data-day-name="saturday" name="saturday_check" class="form-check-input" type="radio" value="closed"
+                                                                    id="customRadioTemp17">
+                                                                <span class="custom-option-header">
+                                                                    <span class="h6 mb-0">Closed</span>
+                                                                </span>
+                                                            </label>
+                                                        </div>
+                                                        <div class="form-check custom-option custom-option-basic">
+                                                            <label class="form-check-label custom-option-content" for="customRadioTemp18">
+                                                                <input  data-day="check" data-day-name="saturday" name="saturday_check" class="form-check-input" type="radio" value="24/7"
+                                                                    id="customRadioTemp18">
+                                                                <span class="custom-option-header">
+                                                                    <span class="h6 mb-0">24/7</span>
+                                                                </span>
+                                                            </label>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                                <!-- Day / End -->
+
+                                                <!-- Day -->
+                                                <div class="row opening-day">
+                                                    <div class="col-md-2">
+                                                        <h5>Sunday <input type="hidden" name="day[]" value="Sunday"></h5>
+                                                    </div>
+                                                    <div class="col-md-3 form-floating form-floating-outline">
+                                                        <input type="time" class="form-control flatpickr-input " value="@if(isset($sale && $sale->business_hours))  @endif" name="open[]" id="sunday_open">
+                                                    </div>
+                                                    <div class="col-md-3 form-floating form-floating-outline">
+                                                        <input type="time" class="form-control flatpickr-input " value="@if(isset($sale && $sale->business_hours))  @endif" name="closed[]" id="sunday_closed">
+                                                    </div>
+                                                    <div class="col-md-2 d-flex" style="gap: 20px;">
+                                                        <div class="form-check custom-option custom-option-basic checked">
+                                                            <label class="form-check-label custom-option-content" for="customRadioTemp19">
+                                                                <input  data-day="check" data-day-name="sunday" name="sunday_check" class="form-check-input" type="radio" value="open" id="customRadioTemp19"
+                                                                    checked="">
+                                                                <span class="custom-option-header">
+                                                                    <span class="h6 mb-0">Open</span>
+                                                                </span>
+                                                            </label>
+                                                        </div>
+                                                        <div class="form-check custom-option custom-option-basic">
+                                                            <label class="form-check-label custom-option-content" for="customRadioTemp20">
+                                                                <input  data-day="check" data-day-name="sunday" name="sunday_check" class="form-check-input" type="radio" value="closed"
+                                                                    id="customRadioTemp20">
+                                                                <span class="custom-option-header">
+                                                                    <span class="h6 mb-0">Closed</span>
+                                                                </span>
+                                                            </label>
+                                                        </div>
+                                                        <div class="form-check custom-option custom-option-basic">
+                                                            <label class="form-check-label custom-option-content" for="customRadioTemp21">
+                                                                <input  data-day="check" data-day-name="sunday" name="sunday_check" class="form-check-input" type="radio" value="24/7"
+                                                                    id="customRadioTemp21">
+                                                                <span class="custom-option-header">
+                                                                    <span class="h6 mb-0">24/7</span>
+                                                                </span>
+                                                            </label>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                                <!-- Day / End -->
+                                            </div> --}}
+
+                                            <div class="content-header mb-3">
+                                                <h6 class="mb-0">Social Link</h6>
+                                                {{-- <small>From Lead Model</small> --}}
+                                            </div>
+                                            <!-- Form Repeater -->
+                                            <div class="col-12">
+                                                <div class="card">
+                                                    <div class="card-body">
+                                                        <div id="repeater">
+                                                            {{-- <div class="items">
+                                                                <!-- Repeater Content -->
+
+                                                                <div class="item-content">
+                                                                    <div class="row py-2">
+                                                                        <div class="col-md-4">
+                                                                            <div class="form-floating form-floating-outline">
+                                                                                <select id="social_links" name="social_name[]" class="form-select" data-allow-clear="true">
+                                                                                    <option value="">Please Select</option>
+                                                                                    @foreach ($social_links as $item)
+                                                                                    <option value="{{$item}}">{{$item}}</option>
+                                                                                    @endforeach
+
+                                                                                </select>
+                                                                                <label for="multicol-country">Social Platform</label>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-md-6">
+                                                                            <div class="form-floating form-floating-outline">
+                                                                                <input type="text" class="form-control " name="social_link[]" placeholder="Social Link" id="social_link" placeholder
+                                                                                    aria-label="social_link" />
+                                                                                <label for="time_zone">Social Link</label>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-md-2">
+                                                                            <div class="pull-right repeater-remove-btn">
+                                                                                <a id="remove-btn" class="btn btn-outline-danger remove-btn waves-effect" style="color: #ff4d49 " disabled="true"
+                                                                                    onclick="$(this).parents('.items').remove()">
+                                                                                    Remove
+                                                                            </a>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+
+                                                                </div>
+                                                            </div> --}}
+                                                            @if(isset($sale) && count($sale->social_links) > 0)
+                                                            {{-- <h1>fdgsdfg</h1> --}}
+                                                                @foreach($sale->social_links as $list)
+                                                                <div class="items">
+                                                                    <!-- Repeater Content -->
+                                                                    <div class="item-content">
+                                                                        <div class="row py-2">
+                                                                            <div class="col-md-4">
+                                                                                <div class="form-floating form-floating-outline">
+                                                                                    <select id="social_links" name="social_name[]" class="form-select" data-allow-clear="true">
+                                                                                        <option value="">Please Select</option>
+                                                                                        <option value="{{ $list->social_name}}" selected>{{ $list->social_name }}</option>
+                                                                                        @foreach ($social_links as $item)
+                                                                                        <option value="{{$item}}">{{$item}}</option>
+                                                                                        @endforeach
+
+                                                                                    </select>
+                                                                                    <label for="multicol-country">Social Platform</label>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col-md-6">
+                                                                                <div class="form-floating form-floating-outline">
+                                                                                    <input type="text" class="form-control social_link" name="social_link[]" placeholder="Social Link" value="{{ $list->social_link }}" id="social_link" placeholder
+                                                                                        aria-label="social_link" />
+                                                                                    <label for="time_zone">Social Link</label>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col-md-2">
+                                                                                <div class="pull-right repeater-remove-btn">
+                                                                                    <a id="remove-btn" class="btn btn-outline-danger remove-btn waves-effect" style="color: #ff4d49 " disabled="true"
+                                                                                        onclick="$(this).parents('.items').remove()">
+                                                                                        Remove
+                                                                                </a>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+
+                                                                    </div>
+                                                                </div>
+                                                                @endforeach
+                                                            @else
+                                                                <div class="items">
+                                                                    <!-- Repeater Content -->
+                                                                    {{-- <h1>dfgdfg</h1> --}}
+                                                                    <div class="item-content">
+                                                                        <div class="row py-2">
+                                                                            <div class="col-md-4">
+                                                                                <div class="form-floating form-floating-outline">
+                                                                                    <select id="social_links" name="social_name[]" class="form-select" data-allow-clear="true">
+                                                                                        <option value="">Please Select</option>
+                                                                                        @foreach ($social_links as $item)
+                                                                                        <option value="{{$item}}">{{$item}}</option>
+                                                                                        @endforeach
+
+                                                                                    </select>
+                                                                                    <label for="multicol-country">Social Platform</label>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col-md-6">
+                                                                                <div class="form-floating form-floating-outline">
+                                                                                    <input type="text" class="form-control " name="social_link[]" placeholder="Social Link" id="social_link" placeholder
+                                                                                        aria-label="social_link" />
+                                                                                    <label for="time_zone">Social Link</label>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col-md-2">
+                                                                                <div class="pull-right repeater-remove-btn">
+                                                                                    <a id="remove-btn" class="btn btn-outline-danger remove-btn waves-effect" style="color: #ff4d49 " disabled="true"
+                                                                                        onclick="$(this).parents('.items').remove()">
+                                                                                        Remove
+                                                                                </a>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+
+                                                                    </div>
+                                                                </div>
+                                                            @endif
+                                                            <div class="items" data-group="test">
+                                                            </div>
+                                                            <div class="repeater-footer py-4" style="display: flex; justify-content: flex-end;">
+                                                                <a class="btn btn-primary repeater-add-btn" style="color: #fff">Add</a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- /Form Repeater -->
+                                            <div class="col-12 d-flex justify-content-between">
+                                                <a class="btn btn-outline-secondary btn-prev" style="color: #6d788d" disabled>
+                                                    <i class="mdi mdi-arrow-left me-sm-1"></i>
+                                                    <span class="align-middle d-sm-inline-block d-none">Previous</span>
+                                                </a>
+                                                <div class="last-buttons d-flex" style="gap: 20px;">
+                                                    <button class="btn btn-outline-primary waves-effect" type="submit">Save</button>
+                                                <button type="button" id="first_next" class="btn btn-primary btn-next" style="color: #fff" disabled>
+                                                    <span class="align-middle d-sm-inline-block d-none me-sm-1">Next</span>
+                                                    <i class="mdi mdi-arrow-right"></i>
+                                                </button>
+                                                </div>
+                                            </div>
                                         </div>
                                     @endif
-                                    {{-- <div class="col-md-12" style="display: flex; flex-direction: column; gap: 25px;">
-                                        <!-- Day -->
-                                        <div class="row opening-day">
-                                            <div class="col-md-2">
-                                                <h5>Monday <input type="hidden" name="day[]" value="Monday"></h5>
-                                            </div>
-                                            <div class="col-md-3 form-floating form-floating-outline">
-                                                <input type="time" class="form-control flatpickr-input" value="@if(isset($sale && $sale->business_hours))  @endif" name="open[]" id="monday_open">
-                                            </div>
-                                            <div class="col-md-3 form-floating form-floating-outline">
-                                                <input type="time" class="form-control flatpickr-input" value="@if(isset($sale && $sale->business_hours))  @endif" name="closed[]" id="monday_closed">
-                                            </div>
-                                            <div class="col-md-2 d-flex" style="gap: 20px;">
-                                                <div class="form-check custom-option custom-option-basic checked">
-                                                    <label class="form-check-label custom-option-content" for="customRadioTemp1">
-                                                        <input  data-day="check" data-day-name="monday" name="monday_check" class="form-check-input" type="radio" value="open" id="customRadioTemp1"
-                                                            checked="">
-                                                        <span class="custom-option-header">
-                                                            <span class="h6 mb-0">Open</span>
-                                                        </span>
-                                                    </label>
-                                                </div>
-                                                <div class="form-check custom-option custom-option-basic">
-                                                    <label class="form-check-label custom-option-content" for="customRadioTemp2">
-                                                        <input  data-day="check" data-day-name="monday" name="monday_check" class="form-check-input" type="radio" value="closed"
-                                                            id="customRadioTemp2">
-                                                        <span class="custom-option-header">
-                                                            <span class="h6 mb-0">Closed</span>
-                                                        </span>
-                                                    </label>
-                                                </div>
-                                                <div class="form-check custom-option custom-option-basic">
-                                                    <label class="form-check-label custom-option-content" for="customRadioTemp3">
-                                                        <input  data-day="check" data-day-name="monday" name="monday_check" class="form-check-input" type="radio" value="24/7"
-                                                            id="customRadioTemp3">
-                                                        <span class="custom-option-header">
-                                                            <span class="h6 mb-0">24/7</span>
-                                                        </span>
-                                                    </label>
-                                                </div>
-
-                                            </div>
-                                        </div>
-                                        <!-- Day / End -->
-
-                                        <!-- Day -->
-                                        <div class="row opening-day">
-                                            <div class="col-md-2">
-                                                <h5>Tuesday <input type="hidden" name="day[]" value="Tuesday"></h5>
-                                            </div>
-                                            <div class="col-md-3 form-floating form-floating-outline">
-                                                <input type="time" class="form-control flatpickr-input " value="@if(isset($sale && $sale->business_hours))  @endif" name="open[]" id="tuesday_open">
-                                            </div>
-                                            <div class="col-md-3 form-floating form-floating-outline">
-                                                <input type="time" class="form-control flatpickr-input " value="@if(isset($sale && $sale->business_hours))  @endif" name="closed[]" id="tuesday_closed">
-                                            </div>
-                                            <div class="col-md-2 d-flex" style="gap: 20px;">
-                                                <div class="form-check custom-option custom-option-basic checked">
-                                                    <label class="form-check-label custom-option-content" for="customRadioTemp4">
-                                                        <input  data-day="check" data-day-name="tuesday" name="tuesday_check" class="form-check-input" type="radio" value="open" id="customRadioTemp4"
-                                                            checked="">
-                                                        <span class="custom-option-header">
-                                                            <span class="h6 mb-0">Open</span>
-                                                        </span>
-                                                    </label>
-                                                </div>
-                                                <div class="form-check custom-option custom-option-basic">
-                                                    <label class="form-check-label custom-option-content" for="customRadioTemp5">
-                                                        <input  data-day="check" data-day-name="tuesday" name="tuesday_check" class="form-check-input" type="radio" value="closed"
-                                                            id="customRadioTemp5">
-                                                        <span class="custom-option-header">
-                                                            <span class="h6 mb-0">Closed</span>
-                                                        </span>
-                                                    </label>
-                                                </div>
-                                                <div class="form-check custom-option custom-option-basic">
-                                                    <label class="form-check-label custom-option-content" for="customRadioTemp6">
-                                                        <input  data-day="check" data-day-name="tuesday" name="tuesday_check" class="form-check-input" type="radio" value="24/7"
-                                                            id="customRadioTemp6">
-                                                        <span class="custom-option-header">
-                                                            <span class="h6 mb-0">24/7</span>
-                                                        </span>
-                                                    </label>
-                                                </div>
-
-                                            </div>
-                                        </div>
-                                        <!-- Day / End -->
-
-                                        <!-- Day -->
-                                        <div class="row opening-day">
-                                            <div class="col-md-2">
-                                                <h5>Wednesday <input type="hidden" name="day[]" value="Wednesday"></h5>
-                                            </div>
-                                            <div class="col-md-3 form-floating form-floating-outline">
-                                                <input type="time" class="form-control flatpickr-input " value="@if(isset($sale && $sale->business_hours))  @endif" name="open[]" id="wednesday_open">
-                                            </div>
-                                            <div class="col-md-3 form-floating form-floating-outline">
-                                                <input type="time" class="form-control flatpickr-input " value="@if(isset($sale && $sale->business_hours))  @endif" name="closed[]" id="wednesday_closed">
-                                            </div>
-                                            <div class="col-md-2 d-flex" style="gap: 20px;">
-                                                <div class="form-check custom-option custom-option-basic checked">
-                                                    <label class="form-check-label custom-option-content" for="customRadioTemp7">
-                                                        <input  data-day="check" data-day-name="wednesday" name="wednesday_check" class="form-check-input" type="radio" value="open" id="customRadioTemp7"
-                                                            checked="">
-                                                        <span class="custom-option-header">
-                                                            <span class="h6 mb-0">Open</span>
-                                                        </span>
-                                                    </label>
-                                                </div>
-                                                <div class="form-check custom-option custom-option-basic">
-                                                    <label class="form-check-label custom-option-content" for="customRadioTemp8">
-                                                        <input  data-day="check" data-day-name="wednesday" name="wednesday_check" class="form-check-input" type="radio" value="closed"
-                                                            id="customRadioTemp8">
-                                                        <span class="custom-option-header">
-                                                            <span class="h6 mb-0">Closed</span>
-                                                        </span>
-                                                    </label>
-                                                </div>
-                                                <div class="form-check custom-option custom-option-basic">
-                                                    <label class="form-check-label custom-option-content" for="customRadioTemp9">
-                                                        <input  data-day="check" data-day-name="wednesday" name="wednesday_check" class="form-check-input" type="radio" value="24/7"
-                                                            id="customRadioTemp9">
-                                                        <span class="custom-option-header">
-                                                            <span class="h6 mb-0">24/7</span>
-                                                        </span>
-                                                    </label>
-                                                </div>
-
-                                            </div>
-                                        </div>
-                                        <!-- Day / End -->
-
-                                        <!-- Day -->
-                                        <div class="row opening-day">
-                                            <div class="col-md-2">
-                                                <h5>Thursday <input type="hidden" name="day[]" value="Thursday"></h5>
-                                            </div>
-                                            <div class="col-md-3 form-floating form-floating-outline">
-                                                <input type="time" class="form-control flatpickr-input " value="@if(isset($sale && $sale->business_hours))  @endif" name="open[]" id="thursday_open">
-                                            </div>
-                                            <div class="col-md-3 form-floating form-floating-outline">
-                                                <input type="time" class="form-control flatpickr-input " value="@if(isset($sale && $sale->business_hours))  @endif" name="closed[]" id="thursday_closed">
-                                            </div>
-                                            <div class="col-md-2 d-flex" style="gap: 20px;">
-                                                <div class="form-check custom-option custom-option-basic checked">
-                                                    <label   class="form-check-label custom-option-content" for="customRadioTemp10">
-                                                        <input data-day="check" data-day-name="thursday" name="thursday_check" class="form-check-input" type="radio" value="open" id="customRadioTemp10"
-                                                            checked="">
-                                                        <span class="custom-option-header">
-                                                            <span class="h6 mb-0">Open</span>
-                                                        </span>
-                                                    </label>
-                                                </div>
-                                                <div class="form-check custom-option custom-option-basic">
-                                                    <label class="form-check-label custom-option-content" for="customRadioTemp11">
-                                                        <input data-day="check" data-day-name="thursday" name="thursday_check" class="form-check-input" type="radio" value="closed"
-                                                            id="customRadioTemp11">
-                                                        <span class="custom-option-header">
-                                                            <span  class="h6 mb-0">Closed</span>
-                                                        </span>
-                                                    </label>
-                                                </div>
-                                                <div class="form-check custom-option custom-option-basic">
-                                                    <label class="form-check-label custom-option-content" for="customRadioTemp12">
-                                                        <input data-day="check" data-day-name="thursday" name="thursday_check" class="form-check-input" type="radio" value="24/7"
-                                                            id="customRadioTemp12">
-                                                        <span class="custom-option-header">
-                                                            <span  class="h6 mb-0">24/7</span>
-                                                        </span>
-                                                    </label>
-                                                </div>
-
-                                            </div>
-                                        </div>
-                                        <!-- Day / End -->
-
-                                        <!-- Day -->
-                                        <div class="row opening-day">
-                                            <div class="col-md-2">
-                                                <h5>Friday <input type="hidden" name="day[]" value="Friday"></h5>
-                                            </div>
-                                            <div class="col-md-3 form-floating form-floating-outline">
-                                                <input type="time" class="form-control flatpickr-input " value="@if(isset($sale && $sale->business_hours))  @endif" name="open[]" id="friday_open">
-                                            </div>
-                                            <div class="col-md-3 form-floating form-floating-outline">
-                                                <input type="time" class="form-control flatpickr-input " value="@if(isset($sale && $sale->business_hours))  @endif" name="closed[]" id="friday_closed">
-                                            </div>
-                                            <div class="col-md-2 d-flex" style="gap: 20px;">
-                                                <div class="form-check custom-option custom-option-basic checked">
-                                                    <label class="form-check-label custom-option-content" for="customRadioTemp13">
-                                                        <input  data-day="check" data-day-name="friday" name="friday_check" class="form-check-input" type="radio" value="open" id="customRadioTemp13"
-                                                            checked="">
-                                                        <span class="custom-option-header">
-                                                            <span class="h6 mb-0">Open</span>
-                                                        </span>
-                                                    </label>
-                                                </div>
-                                                <div class="form-check custom-option custom-option-basic">
-                                                    <label class="form-check-label custom-option-content" for="customRadioTemp14">
-                                                        <input  data-day="check" data-day-name="friday" name="friday_check" class="form-check-input" type="radio" value="closed"
-                                                            id="customRadioTemp14">
-                                                        <span class="custom-option-header">
-                                                            <span class="h6 mb-0">Closed</span>
-                                                        </span>
-                                                    </label>
-                                                </div>
-                                                <div class="form-check custom-option custom-option-basic">
-                                                    <label class="form-check-label custom-option-content" for="customRadioTemp15">
-                                                        <input  data-day="check" data-day-name="friday" name="friday_check" class="form-check-input" type="radio" value="24/7"
-                                                            id="customRadioTemp15">
-                                                        <span class="custom-option-header">
-                                                            <span class="h6 mb-0">24/7</span>
-                                                        </span>
-                                                    </label>
-                                                </div>
-
-                                            </div>
-                                        </div>
-                                        <!-- Day / End -->
-
-                                        <!-- Day -->
-                                        <div class="row opening-day">
-                                            <div class="col-md-2">
-                                                <h5>Saturday <input type="hidden" name="day[]" value="Saturday"></h5>
-                                            </div>
-                                            <div class="col-md-3 form-floating form-floating-outline">
-                                                <input type="time" class="form-control flatpickr-input " value="@if(isset($sale && $sale->business_hours))  @endif" name="open[]" id="saturday_open">
-                                            </div>
-                                            <div class="col-md-3 form-floating form-floating-outline">
-                                                <input type="time" class="form-control flatpickr-input " value="@if(isset($sale && $sale->business_hours))  @endif" name="closed[]" id="saturday_closed">
-                                            </div>
-                                            <div class="col-md-2 d-flex" style="gap: 20px;">
-                                                <div class="form-check custom-option custom-option-basic checked">
-                                                    <label class="form-check-label custom-option-content" for="customRadioTemp16">
-                                                        <input  data-day="check" data-day-name="saturday" name="saturday_check" class="form-check-input" type="radio" value="open" id="customRadioTemp16"
-                                                            checked="">
-                                                        <span class="custom-option-header">
-                                                            <span class="h6 mb-0">Open</span>
-                                                        </span>
-                                                    </label>
-                                                </div>
-                                                <div class="form-check custom-option custom-option-basic">
-                                                    <label class="form-check-label custom-option-content" for="customRadioTemp17">
-                                                        <input  data-day="check" data-day-name="saturday" name="saturday_check" class="form-check-input" type="radio" value="closed"
-                                                            id="customRadioTemp17">
-                                                        <span class="custom-option-header">
-                                                            <span class="h6 mb-0">Closed</span>
-                                                        </span>
-                                                    </label>
-                                                </div>
-                                                <div class="form-check custom-option custom-option-basic">
-                                                    <label class="form-check-label custom-option-content" for="customRadioTemp18">
-                                                        <input  data-day="check" data-day-name="saturday" name="saturday_check" class="form-check-input" type="radio" value="24/7"
-                                                            id="customRadioTemp18">
-                                                        <span class="custom-option-header">
-                                                            <span class="h6 mb-0">24/7</span>
-                                                        </span>
-                                                    </label>
-                                                </div>
-
-                                            </div>
-                                        </div>
-                                        <!-- Day / End -->
-
-                                        <!-- Day -->
-                                        <div class="row opening-day">
-                                            <div class="col-md-2">
-                                                <h5>Sunday <input type="hidden" name="day[]" value="Sunday"></h5>
-                                            </div>
-                                            <div class="col-md-3 form-floating form-floating-outline">
-                                                <input type="time" class="form-control flatpickr-input " value="@if(isset($sale && $sale->business_hours))  @endif" name="open[]" id="sunday_open">
-                                            </div>
-                                            <div class="col-md-3 form-floating form-floating-outline">
-                                                <input type="time" class="form-control flatpickr-input " value="@if(isset($sale && $sale->business_hours))  @endif" name="closed[]" id="sunday_closed">
-                                            </div>
-                                            <div class="col-md-2 d-flex" style="gap: 20px;">
-                                                <div class="form-check custom-option custom-option-basic checked">
-                                                    <label class="form-check-label custom-option-content" for="customRadioTemp19">
-                                                        <input  data-day="check" data-day-name="sunday" name="sunday_check" class="form-check-input" type="radio" value="open" id="customRadioTemp19"
-                                                            checked="">
-                                                        <span class="custom-option-header">
-                                                            <span class="h6 mb-0">Open</span>
-                                                        </span>
-                                                    </label>
-                                                </div>
-                                                <div class="form-check custom-option custom-option-basic">
-                                                    <label class="form-check-label custom-option-content" for="customRadioTemp20">
-                                                        <input  data-day="check" data-day-name="sunday" name="sunday_check" class="form-check-input" type="radio" value="closed"
-                                                            id="customRadioTemp20">
-                                                        <span class="custom-option-header">
-                                                            <span class="h6 mb-0">Closed</span>
-                                                        </span>
-                                                    </label>
-                                                </div>
-                                                <div class="form-check custom-option custom-option-basic">
-                                                    <label class="form-check-label custom-option-content" for="customRadioTemp21">
-                                                        <input  data-day="check" data-day-name="sunday" name="sunday_check" class="form-check-input" type="radio" value="24/7"
-                                                            id="customRadioTemp21">
-                                                        <span class="custom-option-header">
-                                                            <span class="h6 mb-0">24/7</span>
-                                                        </span>
-                                                    </label>
-                                                </div>
-
-                                            </div>
-                                        </div>
-                                        <!-- Day / End -->
-                                    </div> --}}
-
-                                    <div class="content-header mb-3">
-                                        <h6 class="mb-0">Social Link</h6>
-                                        {{-- <small>From Lead Model</small> --}}
-                                    </div>
-                                    <!-- Form Repeater -->
-                                    <div class="col-12">
-                                        <div class="card">
-                                            <div class="card-body">
-                                                <div id="repeater">
-                                                    {{-- <div class="items">
-                                                        <!-- Repeater Content -->
-
-                                                        <div class="item-content">
-                                                            <div class="row py-2">
-                                                                <div class="col-md-4">
-                                                                    <div class="form-floating form-floating-outline">
-                                                                        <select id="social_links" name="social_name[]" class="form-select" data-allow-clear="true">
-                                                                            <option value="">Please Select</option>
-                                                                            @foreach ($social_links as $item)
-                                                                            <option value="{{$item}}">{{$item}}</option>
-                                                                            @endforeach
-
-                                                                        </select>
-                                                                        <label for="multicol-country">Social Platform</label>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="col-md-6">
-                                                                    <div class="form-floating form-floating-outline">
-                                                                        <input type="text" class="form-control " name="social_link[]" placeholder="Social Link" id="social_link" placeholder
-                                                                            aria-label="social_link" />
-                                                                        <label for="time_zone">Social Link</label>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="col-md-2">
-                                                                    <div class="pull-right repeater-remove-btn">
-                                                                        <a id="remove-btn" class="btn btn-outline-danger remove-btn waves-effect" style="color: #ff4d49 " disabled="true"
-                                                                            onclick="$(this).parents('.items').remove()">
-                                                                            Remove
-                                                                    </a>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-
-                                                        </div>
-                                                    </div> --}}
-                                                    @if(isset($sale) && count($sale->social_links) > 0)
-                                                    {{-- <h1>fdgsdfg</h1> --}}
-                                                        @foreach($sale->social_links as $list)
-                                                        <div class="items">
-                                                            <!-- Repeater Content -->
-                                                            <div class="item-content">
-                                                                <div class="row py-2">
-                                                                    <div class="col-md-4">
-                                                                        <div class="form-floating form-floating-outline">
-                                                                            <select id="social_links" name="social_name[]" class="form-select" data-allow-clear="true">
-                                                                                <option value="">Please Select</option>
-                                                                                <option value="{{ $list->social_name}}" selected>{{ $list->social_name }}</option>
-                                                                                @foreach ($social_links as $item)
-                                                                                <option value="{{$item}}">{{$item}}</option>
-                                                                                @endforeach
-
-                                                                            </select>
-                                                                            <label for="multicol-country">Social Platform</label>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="col-md-6">
-                                                                        <div class="form-floating form-floating-outline">
-                                                                            <input type="text" class="form-control social_link" name="social_link[]" placeholder="Social Link" value="{{ $list->social_link }}" id="social_link" placeholder
-                                                                                aria-label="social_link" />
-                                                                            <label for="time_zone">Social Link</label>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="col-md-2">
-                                                                        <div class="pull-right repeater-remove-btn">
-                                                                            <a id="remove-btn" class="btn btn-outline-danger remove-btn waves-effect" style="color: #ff4d49 " disabled="true"
-                                                                                onclick="$(this).parents('.items').remove()">
-                                                                                Remove
-                                                                        </a>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-
-                                                            </div>
-                                                        </div>
-                                                        @endforeach
-                                                    @else
-                                                        <div class="items">
-                                                            <!-- Repeater Content -->
-                                                            {{-- <h1>dfgdfg</h1> --}}
-                                                            <div class="item-content">
-                                                                <div class="row py-2">
-                                                                    <div class="col-md-4">
-                                                                        <div class="form-floating form-floating-outline">
-                                                                            <select id="social_links" name="social_name[]" class="form-select" data-allow-clear="true">
-                                                                                <option value="">Please Select</option>
-                                                                                @foreach ($social_links as $item)
-                                                                                <option value="{{$item}}">{{$item}}</option>
-                                                                                @endforeach
-
-                                                                            </select>
-                                                                            <label for="multicol-country">Social Platform</label>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="col-md-6">
-                                                                        <div class="form-floating form-floating-outline">
-                                                                            <input type="text" class="form-control " name="social_link[]" placeholder="Social Link" id="social_link" placeholder
-                                                                                aria-label="social_link" />
-                                                                            <label for="time_zone">Social Link</label>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="col-md-2">
-                                                                        <div class="pull-right repeater-remove-btn">
-                                                                            <a id="remove-btn" class="btn btn-outline-danger remove-btn waves-effect" style="color: #ff4d49 " disabled="true"
-                                                                                onclick="$(this).parents('.items').remove()">
-                                                                                Remove
-                                                                        </a>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-
-                                                            </div>
-                                                        </div>
-                                                    @endif
-                                                    <div class="items" data-group="test">
-                                                    </div>
-                                                    <div class="repeater-footer py-4" style="display: flex; justify-content: flex-end;">
-                                                        <a class="btn btn-primary repeater-add-btn" style="color: #fff">Add</a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <!-- /Form Repeater -->
-                                    <div class="col-12 d-flex justify-content-between">
-                                        <a class="btn btn-outline-secondary btn-prev" style="color: #6d788d" disabled>
-                                            <i class="mdi mdi-arrow-left me-sm-1"></i>
-                                            <span class="align-middle d-sm-inline-block d-none">Previous</span>
-                                        </a>
-                                        <div class="last-buttons d-flex" style="gap: 20px;">
-                                            <button class="btn btn-outline-primary waves-effect" type="submit">Save</button>
-                                        <button type="button" id="first_next" class="btn btn-primary btn-next" style="color: #fff" disabled>
-                                            <span class="align-middle d-sm-inline-block d-none me-sm-1">Next</span>
-                                            <i class="mdi mdi-arrow-right"></i>
-                                        </button>
-                                        </div>
-                                    </div>
                                 </div>
-                            </div>
-                        </form>
+                            </form>
                             <!-- Personal Info -->
                             <div id="personal-info" class="content">
-                                <div class="content-header mb-3">
-                                    <h6 class="mb-0">Sale Info</h6>
-                                </div>
-                                <form id="detail_form" method="POST" action="{{ route('saleInfo.store') }}" >
-                                    @csrf
-                                    @if ($errors->any())
-                                    <div class="alert alert-danger">
-                                        <ul>
-                                            @foreach ($errors->all() as $error)
-                                            <li>{{ $error }}</li>
-                                            @endforeach
-                                        </ul>
+                                @if(isset($Saleinfo) && $Saleinfo->view == 1)
+                                    <div class="content-header mb-3">
+                                        <h6 class="mb-0">Sale Info</h6>
                                     </div>
-                                    @endif
-                                    <div id="successMessage" style="display:none;" class="alert alert-success"></div>
-                                <div class="row g-4">
-                                    <input type="hidden" name="lead_id" value="{{ $lead->id }}">
-                                    @if(isset($sale))
-                                    <input type="hidden" id="sale_id" name="sale_id" value="{{ $sale->id }}">
-                                    @else
-                                    <input type="hidden" id="sale_id" name="sale_id" value="">
-                                    @endif
-                                    <div class="col-sm-6">
-                                        <div class="form-floating form-floating-outline">
-                                            <input type="text" id="first-name" class="form-control"
-                                                placeholder="John" value="{{ $lead->saler->name }}" disabled/>
-                                            <label for="first-name">Sale Rep</label>
+                                    <form id="detail_form" method="POST" action="{{ route('saleInfo.store') }}" >
+                                        @csrf
+                                        @if ($errors->any())
+                                        <div class="alert alert-danger">
+                                            <ul>
+                                                @foreach ($errors->all() as $error)
+                                                <li>{{ $error }}</li>
+                                                @endforeach
+                                            </ul>
                                         </div>
-                                    </div>
-                                    <div class="col-md-6 select2-primary">
-                                        <div class="form-floating form-floating-outline">
-                                            <select id="multicol-closers" name="closers[]" class="select2 form-select" multiple>
-                                                @if(isset($lead->closers))
-                                                @foreach ($lead->closers as $item)
-                                                    <option value="{{ $item->closer_id }}" selected>{{ $item->user->name }}</option>
-                                                @endforeach
-                                                @else
-                                                <option value="">Please Select</option>
-                                                @endif
-                                                @foreach ($closers as $item)
-                                                <option value="{{ $item->id }}">{{ $item->name }}</option>
-                                                @endforeach
+                                        @endif
+                                        <div id="successMessage" style="display:none;" class="alert alert-success"></div>
+                                    <div class="row g-4">
+                                        <input type="hidden" name="lead_id" value="{{ $lead->id }}">
+                                        @if(isset($sale))
+                                        <input type="hidden" id="sale_id" name="sale_id" value="{{ $sale->id }}">
+                                        @else
+                                        <input type="hidden" id="sale_id" name="sale_id" value="">
+                                        @endif
+                                        <div class="col-sm-6">
+                                            <div class="form-floating form-floating-outline">
+                                                <input type="text" id="first-name" class="form-control"
+                                                    placeholder="John" value="{{ $lead->saler->name }}" disabled/>
+                                                <label for="first-name">Sale Rep</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 select2-primary">
+                                            <div class="form-floating form-floating-outline">
+                                                <select id="multicol-closers" name="closers[]" class="select2 form-select" multiple>
+                                                    @if(isset($lead->closers))
+                                                    @foreach ($lead->closers as $item)
+                                                        <option value="{{ $item->closer_id }}" selected>{{ $item->user->name }}</option>
+                                                    @endforeach
+                                                    @else
+                                                    <option value="">Please Select</option>
+                                                    @endif
+                                                    @foreach ($closers as $item)
+                                                    <option value="{{ $item->id }}">{{ $item->name }}</option>
+                                                    @endforeach
 
-                                            </select>
-                                            <label for="multicol-closers">Select Closers</label>
+                                                </select>
+                                                <label for="multicol-closers">Select Closers</label>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="col-md-6 col-12 mb-6">
-                                        <div class="form-floating form-floating-outline">
-                                        @if(isset($sale) && isset($sale->signup_date))
-                                          <input type="text" class="form-control flatpickr-input active" name="signup_date" placeholder="YYYY-MM-DD" id="flatpickr-date" value="{{ $sale->signup_date }}" readonly="readonly">
-                                          @else
-                                          <input type="text" class="form-control flatpickr-input active" name="signup_date" placeholder="YYYY-MM-DD" id="flatpickr-date"  readonly="readonly">
-                                          @endif
-                                          <label for="flatpickr-date">Signup Date</label>
+                                        <div class="col-md-6 col-12 mb-6">
+                                            <div class="form-floating form-floating-outline">
+                                            @if(isset($sale) && isset($sale->signup_date))
+                                            <input type="text" class="form-control flatpickr-input active" name="signup_date" placeholder="YYYY-MM-DD" id="flatpickr-date" value="{{ $sale->signup_date }}" readonly="readonly">
+                                            @else
+                                            <input type="text" class="form-control flatpickr-input active" name="signup_date" placeholder="YYYY-MM-DD" id="flatpickr-date"  readonly="readonly">
+                                            @endif
+                                            <label for="flatpickr-date">Signup Date</label>
+                                            </div>
                                         </div>
-                                      </div>
-                                      <div class="col-md-6 select2-primary">
-                                        <div class="form-floating form-floating-outline">
-                                            <select id="multicol-cs" name="customer_support[]" class="select2 form-select" multiple>
-                                                @if(isset($sale) && isset($sale->Customer_support))
-                                                @foreach ($sale->Customer_support as $item)
-                                                <option value="{{ $item->id }}" selected>{{ $item->user->name }}</option>
-                                                @endforeach
-                                                @foreach ($closers as $item)
-                                                <option value="{{ $item->id }}">{{ $item->name }}</option>
-                                                @endforeach
-                                                @else
-                                                <option value="">Please Select</option>
-                                                @foreach ($closers as $item)
-                                                <option value="{{ $item->id }}">{{ $item->name }}</option>
-                                                @endforeach
-                                                @endif
+                                        <div class="col-md-6 select2-primary">
+                                            <div class="form-floating form-floating-outline">
+                                                <select id="multicol-cs" name="customer_support[]" class="select2 form-select" multiple>
+                                                    @if(isset($sale) && isset($sale->Customer_support))
+                                                    @foreach ($sale->Customer_support as $item)
+                                                    <option value="{{ $item->id }}" selected>{{ $item->user->name }}</option>
+                                                    @endforeach
+                                                    @foreach ($closers as $item)
+                                                    <option value="{{ $item->id }}">{{ $item->name }}</option>
+                                                    @endforeach
+                                                    @else
+                                                    <option value="">Please Select</option>
+                                                    @foreach ($closers as $item)
+                                                    <option value="{{ $item->id }}">{{ $item->name }}</option>
+                                                    @endforeach
+                                                    @endif
 
 
-                                            </select>
-                                            <label for="multicol-closers">Select Customer Support Representative</label>
+                                                </select>
+                                                <label for="multicol-closers">Select Customer Support Representative</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 select2-primary">
+                                            <div class="row">
+                                                <div class="col-md-3"><h6>Client Status</h6></div>
+                                                <div class="col-md-3">Active</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 select2-primary">
+                                            <div class="row">
+                                                <div class="col-md-3"><h6>Activation Date</h6></div>
+                                                <div class="col-md-3">01/Oct/2024</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 select2-primary">
+                                            <div class="row">
+                                                <div class="col-md-3"><h6>Mode of Payment</h6></div>
+                                                <div class="col-md-3">Credit Card</div>
+                                            </div>
+                                        </div>
+                                        {{-- <div class="col-12 d-flex justify-content-between">
+                                            <button class="btn btn-outline-secondary btn-prev">
+                                                <i class="mdi mdi-arrow-left me-sm-1"></i>
+                                                <span class="align-middle d-sm-inline-block d-none">Previous</span>
+                                            </button>
+                                            <button class="btn btn-primary btn-next">
+                                                <span class="align-middle d-sm-inline-block d-none me-sm-1">Next</span>
+                                                <i class="mdi mdi-arrow-right"></i>
+                                            </button>
+                                        </div> --}}
+                                        <div class="col-12 d-flex justify-content-between">
+                                            <a class="btn btn-outline-secondary btn-prev" style="color: #6d788d" disabled>
+                                                <i class="mdi mdi-arrow-left me-sm-1"></i>
+                                                <span class="align-middle d-sm-inline-block d-none">Previous</span>
+                                            </a>
+                                            <div class="last-buttons d-flex" style="gap: 20px;">
+                                                <button class="btn btn-outline-primary waves-effect" type="submit">Save</button>
+                                            <a class="btn btn-primary btn-next" style="color: #fff">
+                                                <span class="align-middle d-sm-inline-block d-none me-sm-1">Next</span>
+                                                <i class="mdi mdi-arrow-right"></i>
+                                            </a>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-6 select2-primary">
-                                        <div class="row">
-                                            <div class="col-md-3"><h6>Client Status</h6></div>
-                                            <div class="col-md-3">Active</div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6 select2-primary">
-                                        <div class="row">
-                                            <div class="col-md-3"><h6>Activation Date</h6></div>
-                                            <div class="col-md-3">01/Oct/2024</div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6 select2-primary">
-                                        <div class="row">
-                                            <div class="col-md-3"><h6>Mode of Payment</h6></div>
-                                            <div class="col-md-3">Credit Card</div>
-                                        </div>
-                                    </div>
-                                    {{-- <div class="col-12 d-flex justify-content-between">
-                                        <button class="btn btn-outline-secondary btn-prev">
-                                            <i class="mdi mdi-arrow-left me-sm-1"></i>
-                                            <span class="align-middle d-sm-inline-block d-none">Previous</span>
-                                        </button>
-                                        <button class="btn btn-primary btn-next">
-                                            <span class="align-middle d-sm-inline-block d-none me-sm-1">Next</span>
-                                            <i class="mdi mdi-arrow-right"></i>
-                                        </button>
-                                    </div> --}}
-                                    <div class="col-12 d-flex justify-content-between">
-                                        <a class="btn btn-outline-secondary btn-prev" style="color: #6d788d" disabled>
-                                            <i class="mdi mdi-arrow-left me-sm-1"></i>
-                                            <span class="align-middle d-sm-inline-block d-none">Previous</span>
-                                        </a>
-                                        <div class="last-buttons d-flex" style="gap: 20px;">
-                                            <button class="btn btn-outline-primary waves-effect" type="submit">Save</button>
-                                        <a class="btn btn-primary btn-next" style="color: #fff">
-                                            <span class="align-middle d-sm-inline-block d-none me-sm-1">Next</span>
-                                            <i class="mdi mdi-arrow-right"></i>
-                                        </a>
-                                        </div>
-                                    </div>
-                                </div>
-                                </form>
+                                    </form>
+                                @endif
                             </div>
                             <!-- Address -->
                             <div id="address" class="content">
-                                <div class="content-header mb-3">
-                                    <h6 class="mb-0">Services</h6>
-                                </div>
-                                <div class="row g-4">
-                                    <form id="serviceform" method="POST" action="{{ route('clientServices.store') }}">
-                                        @csrf
-                                        @if ($errors->any())
-                                    <div class="alert alert-danger">
-                                        <ul>
-                                            @foreach ($errors->all() as $error)
-                                            <li>{{ $error }}</li>
-                                            @endforeach
-                                        </ul>
+                                @if(isset($Clientservices_perm) && $Clientservices_perm->view == 1)
+                                    <div class="content-header mb-3">
+                                        <h6 class="mb-0">Services</h6>
                                     </div>
-                                    @endif
-                                        @if(isset($sale))
-                                        <input type="hidden" id="sale_id2" name="sale_id2" value="{{ $sale->id }}">
-                                        @else
-                                        <input type="hidden" id="sale_id2" name="sale_id2" value="">
+                                    <div class="row g-4">
+                                        <form id="serviceform" method="POST" action="{{ route('clientServices.store') }}">
+                                            @csrf
+                                            @if ($errors->any())
+                                        <div class="alert alert-danger">
+                                            <ul>
+                                                @foreach ($errors->all() as $error)
+                                                <li>{{ $error }}</li>
+                                                @endforeach
+                                            </ul>
+                                        </div>
                                         @endif
-                                        <div class="row">
-                                            <div class="col-sm-9">
-                                                <div class="form-floating form-floating-outline">
-                                                    <input type="text" class="form-control" name="service_name" id="service_name" placeholder="Client Services" />
-                                                    <label for="address-input">Client Services</label>
-                                                </div>
-                                            </div>
-                                            <div class="col-sm-3">
-                                                <button class="btn btn-primary">Add</button>
-                                            </div>
-                                        </div>
-                                    </form>
-                                    <form id="sync_services" method="POST" action="{{ route('clientServices.create') }}">
-                                        @csrf
-                                        <div class="row g-4">
                                             @if(isset($sale))
-                                            <input type="hidden" id="sale_id3" name="sale_id3" value="{{ $sale->id }}">
+                                            <input type="hidden" id="sale_id2" name="sale_id2" value="{{ $sale->id }}">
                                             @else
-                                            <input type="hidden" id="sale_id3" name="sale_id3" value="">
+                                            <input type="hidden" id="sale_id2" name="sale_id2" value="">
                                             @endif
-                                            <h6 class="mb-0">Services Selection</h6>
-                                            <!-- Responsive Datatable -->
-                                            <div class="card py-3 my-5">
-                                                {{-- <h5 class="card-header">Responsive Datatable</h5> --}}
+                                            <div class="row">
+                                                <div class="col-sm-9">
+                                                    <div class="form-floating form-floating-outline">
+                                                        <input type="text" class="form-control" name="service_name" id="service_name" placeholder="Client Services" />
+                                                        <label for="address-input">Client Services</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-3">
+                                                    <button class="btn btn-primary">Add</button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                        <form id="sync_services" method="POST" action="{{ route('clientServices.create') }}">
+                                            @csrf
+                                            <div class="row g-4">
+                                                @if(isset($sale))
+                                                <input type="hidden" id="sale_id3" name="sale_id3" value="{{ $sale->id }}">
+                                                @else
+                                                <input type="hidden" id="sale_id3" name="sale_id3" value="">
+                                                @endif
+                                                <h6 class="mb-0">Services Selection</h6>
+                                                <!-- Responsive Datatable -->
+                                                <div class="card py-3 my-5">
+                                                    {{-- <h5 class="card-header">Responsive Datatable</h5> --}}
 
-                                                <div class="card-datatable table-responsive" style="padding-bottom: 5rem">
-                                                    <div class="table-responsive">
-                                                    <table id="service_table" class="table table-bordered">
-                                                    {{-- <table id="service_table" class=" table table-bordered"> --}}
+                                                    <div class="card-datatable table-responsive" style="padding-bottom: 5rem">
+                                                        <div class="table-responsive">
+                                                        <table id="service_table" class="table table-bordered">
+                                                        {{-- <table id="service_table" class=" table table-bordered"> --}}
 
-                                                        <thead>
-                                                            <tr>
-                                                                <th>Client Service Name</th>
-                                                                <th>Company Services</th>
-                                                                <th>Action</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            @if(isset($sale) && $sale->clientServices->isNotEmpty())
-                                                            @foreach ($sale->clientServices as $index => $s_service)
-                                                            <tr>
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Client Service Name</th>
+                                                                    <th>Company Services</th>
+                                                                    <th>Action</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                @if(isset($sale) && $sale->clientServices->isNotEmpty())
+                                                                @foreach ($sale->clientServices as $index => $s_service)
+                                                                <tr>
 
-                                                                <td>{{ $s_service->name }}
-                                                                    <input type="hidden"  name="client_service[{{ $index }}]" value="{{ $s_service->id }}" id="">
-                                                                </td>
-                                                                <td>
-                                                                    <div class="col-md-12 select2-primary">
-                                                                        <div class="form-floating form-floating-outline">
-                                                                            <select name="company_service[{{ $index }}][]" class="select2 form-select" multiple >
-                                                                                <option value="">Please Select</option>
-                                                                                @php
-                                                                                // Get the specific `Company Services` for this `Sale` and `Client Service`
-                                                                                $selectedCompanyServiceIds = \App\Models\SaleClientServiceCompanyService::where('sale_id', $sale->id)
-                                                                                    ->where('client_service_id', $s_service->id)
-                                                                                    ->pluck('company_service_id')
-                                                                                    ->toArray();
-                                                                            @endphp
+                                                                    <td>{{ $s_service->name }}
+                                                                        <input type="hidden"  name="client_service[{{ $index }}]" value="{{ $s_service->id }}" id="">
+                                                                    </td>
+                                                                    <td>
+                                                                        <div class="col-md-12 select2-primary">
+                                                                            <div class="form-floating form-floating-outline">
+                                                                                <select name="company_service[{{ $index }}][]" class="select2 form-select" multiple >
+                                                                                    <option value="">Please Select</option>
+                                                                                    @php
+                                                                                    // Get the specific `Company Services` for this `Sale` and `Client Service`
+                                                                                    $selectedCompanyServiceIds = \App\Models\SaleClientServiceCompanyService::where('sale_id', $sale->id)
+                                                                                        ->where('client_service_id', $s_service->id)
+                                                                                        ->pluck('company_service_id')
+                                                                                        ->toArray();
+                                                                                @endphp
 
-                                                                            @foreach ($company_services as $item)
-                                                                                <option value="{{ $item->id }}" {{ in_array($item->id, $selectedCompanyServiceIds) ? 'selected' : '' }}>
-                                                                                    {{ $item->name }}
-                                                                                </option>
-                                                                            @endforeach
+                                                                                @foreach ($company_services as $item)
+                                                                                    <option value="{{ $item->id }}" {{ in_array($item->id, $selectedCompanyServiceIds) ? 'selected' : '' }}>
+                                                                                        {{ $item->name }}
+                                                                                    </option>
+                                                                                @endforeach
 
-                                                                            </select>
-                                                                            <label for="multicol-closers">FTS Services</label>
+                                                                                </select>
+                                                                                <label for="multicol-closers">FTS Services</label>
+                                                                            </div>
                                                                         </div>
-                                                                    </div>
-                                                                </td>
-                                                                <td>
-                                                                    <a class="service_delete" data-id="{{ $s_service->id }}"  style="font-size:20px;" class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect" data-bs-toggle="tooltip" aria-label="Delete" data-bs-original-title="Delete"><i class="ri-delete-bin-5-line ri-50px"></i></a>
-                                                                </td>
-                                                            </tr>
-                                                            @endforeach
-                                                            @endif
+                                                                    </td>
+                                                                    <td>
+                                                                        <a class="service_delete" data-id="{{ $s_service->id }}"  style="font-size:20px;" class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect" data-bs-toggle="tooltip" aria-label="Delete" data-bs-original-title="Delete"><i class="ri-delete-bin-5-line ri-50px"></i></a>
+                                                                    </td>
+                                                                </tr>
+                                                                @endforeach
+                                                                @endif
 
-                                                        </tbody>
+                                                            </tbody>
 
-                                                    </table>
-                                                </div>
-                                                </div>
-                                                <div class="row">
-                                                    <div class="col-md-6"></div>
-                                                    <div class="col-md-6" style="text-align: right">
-                                                        <button class="btn btn-outline-primary waves-effect" type="submit">Save</button>
+                                                        </table>
+                                                    </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-md-6"></div>
+                                                        <div class="col-md-6" style="text-align: right">
+                                                            <button class="btn btn-outline-primary waves-effect" type="submit">Save</button>
+                                                        </div>
                                                     </div>
                                                 </div>
+                                                <!--/ Responsive Datatable -->
+
                                             </div>
-                                            <!--/ Responsive Datatable -->
 
-                                        </div>
-
-                                        {{-- <div class="row g-4">
-                                            <h4>Client Service Area</h4>
-                                            <form action="">
-                                            <div class="row py-4">
-                                                <div class="col-md-3">
-                                                    <div class="form-floating form-floating-outline">
-                                                        <select id="countries" name="country" class="select2 form-select" data-allow-clear="true" >
-                                                            <option value="">Please Select</option>
-                                                        </select>
-                                                        <label for="multicol-country">Countries</label>
+                                            {{-- <div class="row g-4">
+                                                <h4>Client Service Area</h4>
+                                                <form action="">
+                                                <div class="row py-4">
+                                                    <div class="col-md-3">
+                                                        <div class="form-floating form-floating-outline">
+                                                            <select id="countries" name="country" class="select2 form-select" data-allow-clear="true" >
+                                                                <option value="">Please Select</option>
+                                                            </select>
+                                                            <label for="multicol-country">Countries</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <div class="form-floating form-floating-outline">
+                                                            <select id="states" name="states" class="select2 form-select" data-allow-clear="true" >
+                                                                <option value="">Please Select</option>
+                                                            </select>
+                                                            <label for="multicol-country">States</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <div class="form-floating form-floating-outline">
+                                                            <select id="cities" name="cities" class="select2 form-select" data-allow-clear="true" >
+                                                                <option value="">Please Select</option>
+                                                            </select>
+                                                            <label for="multicol-country">Cities</label>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                                <div class="col-md-3">
-                                                    <div class="form-floating form-floating-outline">
-                                                        <select id="states" name="states" class="select2 form-select" data-allow-clear="true" >
-                                                            <option value="">Please Select</option>
-                                                        </select>
-                                                        <label for="multicol-country">States</label>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <div class="form-floating form-floating-outline">
-                                                        <select id="cities" name="cities" class="select2 form-select" data-allow-clear="true" >
-                                                            <option value="">Please Select</option>
-                                                        </select>
-                                                        <label for="multicol-country">Cities</label>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            </form>
-                                        </div> --}}
+                                                </form>
+                                            </div> --}}
 
-                                    </form>
-
+                                        </form>
+                                    </div>
+                                @endif
+                                @if(isset($Servicearea_perm) && $Servicearea_perm->view == 1)
                                     <div class="row g-4">
                                             <h4>Client Service Area</h4>
                                             <form id="service_area" action="{{ route('serviceArea.store') }}" method="POST" >
@@ -1454,32 +1471,33 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                 </div>
                                             </div>
                                             </form>
+                                    </div>
+                                    <div class="row g-4">
+
+                                        <div class="col-md-12">
+                                            <div class="table-responsive">
+                                                <table id="areas_we_serve" class="table table-striped">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Service Area</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @if(isset($sale) && count($sale->service_area) > 0)
+                                                        @foreach ($sale->service_area as $area)
+                                                        <tr>
+                                                            <td>{{ $area->country }}, {{ $area->state }}, {{ $area->city }}</td>
+                                                        </tr>
+                                                        @endforeach
+                                                        @endif
+
+
+                                                    </tbody>
+                                                </table>
+                                            </div>
                                         </div>
-                                        <div class="row g-4">
-
-                                                    <div class="col-md-12">
-                                                        <div class="table-responsive">
-                                                            <table id="areas_we_serve" class="table table-striped">
-                                                                <thead>
-                                                                    <tr>
-                                                                        <th>Service Area</th>
-                                                                    </tr>
-                                                                </thead>
-                                                                <tbody>
-                                                                @if(isset($sale) && count($sale->service_area) > 0)
-                                                                @foreach ($sale->service_area as $area)
-                                                                <tr>
-                                                                <td>{{ $area->country }}, {{ $area->state }}, {{ $area->city }}</td>
-                                                                </tr>
-                                                                @endforeach
-                                                            @endif
-
-
-                                                                </tbody>
-                                                            </table>
-                                                        </div>
-                                                    </div>
-                                        </div>
+                                    </div>
+                                @endif
                                         <div class="col-12 d-flex justify-content-between">
                                             <a class="btn btn-outline-secondary btn-prev" style="color: #6d788d" disabled>
                                                 <i class="mdi mdi-arrow-left me-sm-1"></i>
@@ -1494,77 +1512,77 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                             </div>
                                         </div>
 
-                                </div>
+
                             </div>
                             <!-- Social Links -->
                             <div id="social-links" class="content">
-                                <div class="content-header mb-3">
-                                    <h6 class="mb-0">Keywords</h6>
-                                    <small>Add Keywords against Areas</small>
-                                </div>
-                                <form id="keywordadd" action="{{ route('keyword.store') }}" method="POST">
-                                    @csrf
-                                    <div class="row g-4">
-                                        @if(isset($sale))
-                                        <input type="hidden" name="sale_id5" id="sale_id5" value="{{ $sale->id }}">
-                                        @else
-                                        <input type="hidden" name="sale_id5" id="sale_id5" >
-                                        @endif
-                                        <div class="col-md-12">
-                                            <div class="form-floating form-floating-outline">
-                                                <input type="text" id="keyword" name="keyword" class="form-control" placeholder="Keyword" />
-                                                <label for="Keyword">Keyword</label>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-floating form-floating-outline">
-                                                <select id="areas_dropdown" name="area_id" class="select2 form-select" data-allow-clear="true">
-                                                    <option value="">Please Select</option>
-                                                    @if(isset($sale) && count($sale->service_area) > 0)
-                                                    @foreach ($sale->service_area as $area)
-                                                    <option value="{{$area->id }}">{{ $area->country }}, {{ $area->state }}, {{ $area->city }}</option>
-                                                    @endforeach
-                                                    @endif
-                                                </select>
-                                                <label for="multicol-country">Service Area</label>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-floating form-floating-outline">
-                                                <button type="submit" class="btn btn-primary">Add</button>
-                                            </div>
-                                        </div>
+                                @if(isset($Keyword_perm) && $Keyword_perm->view == 1)
+                                    <div class="content-header mb-3">
+                                        <h6 class="mb-0">Keywords</h6>
+                                        <small>Add Keywords against Areas</small>
                                     </div>
-                                </form>
-                                <div class="row g-4 py-5">
-                                    <div class="col-md-12">
-                                        <div class="table-responsive">
-                                            <table id="keyword_table" class="table table-striped">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Keyword</th>
-                                                        <th>Service Area</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    @if(isset($sale) && count($sale->keyword) > 0)
-                                                        @foreach ($sale->keyword as $keyword)
-                                                        <tr>
-                                                            <td>{{ $keyword->keyword }}</td>
-                                                            {{-- <td>{{ $keyword->area }}</td> --}}
-                                                            <td>{{ $keyword->area->country }}, {{ $keyword->area->state }}, {{ $keyword->area->city }}</td>
-
-                                                        </tr>
+                                    <form id="keywordadd" action="{{ route('keyword.store') }}" method="POST">
+                                        @csrf
+                                        <div class="row g-4">
+                                            @if(isset($sale))
+                                            <input type="hidden" name="sale_id5" id="sale_id5" value="{{ $sale->id }}">
+                                            @else
+                                            <input type="hidden" name="sale_id5" id="sale_id5" >
+                                            @endif
+                                            <div class="col-md-12">
+                                                <div class="form-floating form-floating-outline">
+                                                    <input type="text" id="keyword" name="keyword" class="form-control" placeholder="Keyword" />
+                                                    <label for="Keyword">Keyword</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-floating form-floating-outline">
+                                                    <select id="areas_dropdown" name="area_id" class="select2 form-select" data-allow-clear="true">
+                                                        <option value="">Please Select</option>
+                                                        @if(isset($sale) && count($sale->service_area) > 0)
+                                                        @foreach ($sale->service_area as $area)
+                                                        <option value="{{$area->id }}">{{ $area->country }}, {{ $area->state }}, {{ $area->city }}</option>
                                                         @endforeach
-                                                    @endif
+                                                        @endif
+                                                    </select>
+                                                    <label for="multicol-country">Service Area</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-floating form-floating-outline">
+                                                    <button type="submit" class="btn btn-primary">Add</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                    <div class="row g-4 py-5">
+                                        <div class="col-md-12">
+                                            <div class="table-responsive">
+                                                <table id="keyword_table" class="table table-striped">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Keyword</th>
+                                                            <th>Service Area</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @if(isset($sale) && count($sale->keyword) > 0)
+                                                            @foreach ($sale->keyword as $keyword)
+                                                            <tr>
+                                                                <td>{{ $keyword->keyword }}</td>
+                                                                {{-- <td>{{ $keyword->area }}</td> --}}
+                                                                <td>{{ $keyword->area->country }}, {{ $keyword->area->state }}, {{ $keyword->area->city }}</td>
 
-                                                </tbody>
-                                            </table>
+                                                            </tr>
+                                                            @endforeach
+                                                        @endif
+
+                                                    </tbody>
+                                                </table>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-
-
+                                @endif
                                     <div class="col-12 d-flex justify-content-between">
                                         <button class="btn btn-outline-secondary btn-prev">
                                             <i class="mdi mdi-arrow-left me-sm-1"></i>
@@ -1575,123 +1593,292 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                             <i class="mdi mdi-arrow-right"></i>
                                         </button>
                                     </div>
-                                </div>
+                            </div>
                             {{-- </div> --}}
                             <div id="review-submit" class="content">
-                                <div class="content-header mb-3">
-                                    <h6 class="mb-0">Invoice</h6>
-                                    <small>Manage Invoices</small>
-                                </div>
-                                <form id="add_service_charge" action="{{ route('invoiceCharges.store') }}" method="POST">
-                                    @csrf
-                                    @if(isset($sale))
-                                    <input type="hidden" name="sale_id6" id="sale_id6" value="{{ $sale->id }}">
-                                    @else
-                                    <input type="hidden" name="sale_id6" id="sale_id6" value="">
-                                    @endif
-                                    <div class="row g-4">
-                                        <div class="col-sm-6">
-                                            <label class="switch switch-lg">
-                                                <input type="checkbox" class="switch-input" name="invoice_status" @if(isset($invoice) &&
-                                                    $invoice->invoice_active_status == 1) checked @endif>
-                                                <span class="switch-toggle-slider">
-                                                    <span class="switch-on">
-                                                        <i class="ri-check-line"></i>
-                                                    </span>
-                                                    <span class="switch-off">
-                                                        <i class="ri-close-line"></i>
-                                                    </span>
-                                                </span>
-                                                <span class="switch-label">Sale Active Status</span>
-                                            </label>
-                                        </div>
-                                        <div class="col-md-6 col-12 mb-6">
-                                            <div class="form-floating form-floating-outline">
-                                                <input type="text" class="form-control flatpickr-input active" name="activation_date"
-                                                    @if(isset($invoice) && isset($invoice->activation_date)) value="{{ $invoice->activation_date }}"
-                                                @endif
-                                                placeholder="YYYY-MM-DD" id="flatpickr-date" readonly="readonly">
-                                                <label for="flatpickr-date">Activation Date</label>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-floating form-floating-outline">
-                                                <select id="company_service_charge" name="company_service_charge" class="select2 form-select"
-                                                    data-allow-clear="true">
-                                                    <option value="">Please Select</option>
-                                                    @if(isset($sale) && count($sale->companyServices) > 0)
-                                                    @foreach ($sale->companyServices->unique('id') as $comp_ser)
-                                                    <option value="{{$comp_ser->id }}" data-name="{{ $comp_ser->name }}">{{ $comp_ser->name }} </option>
-                                                    @endforeach
-                                                    @endif
-                                                </select>
-                                                <label for="multicol-country">Invoiced Services</label>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="row">
-                                                <div class="col-md-6">
-                                                    <div class="form-floating form-floating-outline">
-                                                        <div class="input-group input-group-merge">
-                                                            <span class="input-group-text">$</span>
-                                                            <div class="form-floating form-floating-outline">
-                                                                <input type="number" id="service_amount" name="amount" class="form-control" placeholder="499"
-                                                                    aria-label="Amount (to the nearest dollar)">
-                                                                <label>Amount</label>
-                                                            </div>
-                                                            <span class="input-group-text">.00</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <div class="form-floating form-floating-outline">
-                                                        <div class="form-check mt-3">
-                                                            <input class="form-check-input" name="is_complementary" type="checkbox" value="1"
-                                                                id="complementery_check">
-                                                            <label class="form-check-label" for="complementery_check">
-                                                                Complementary
-                                                            </label>
-                                                        </div>
-                                                    </div>
-
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <button type="button" id="add_service" class="btn btn-primary">Add</button>
-                                                </div>
-                                            </div>
-
-
-
-                                        </div>
+                                @if(isset($Invoicecharges_perm) && $Invoicecharges_perm->view == 1)
+                                    <div class="content-header mb-3">
+                                        <h6 class="mb-0">Invoice</h6>
+                                        <small>Manage Invoices</small>
                                     </div>
+                                    <form id="add_service_charge" action="{{ route('invoiceCharges.store') }}" method="POST">
+                                        @csrf
+                                        @if(isset($sale))
+                                        <input type="hidden" name="sale_id6" id="sale_id6" value="{{ $sale->id }}">
+                                        @else
+                                        <input type="hidden" name="sale_id6" id="sale_id6" value="">
+                                        @endif
+                                        <div class="row g-4">
+                                            <div class="col-sm-6">
+                                                <label class="switch switch-lg">
+                                                    <input type="checkbox" class="switch-input" name="invoice_status" @if(isset($invoice) &&
+                                                        $invoice->invoice_active_status == 1) checked @endif>
+                                                    <span class="switch-toggle-slider">
+                                                        <span class="switch-on">
+                                                            <i class="ri-check-line"></i>
+                                                        </span>
+                                                        <span class="switch-off">
+                                                            <i class="ri-close-line"></i>
+                                                        </span>
+                                                    </span>
+                                                    <span class="switch-label">Sale Active Status</span>
+                                                </label>
+                                            </div>
+                                            <div class="col-md-6 col-12 mb-6">
+                                                <div class="form-floating form-floating-outline">
+                                                    <input type="text" class="form-control flatpickr-input active" name="activation_date"
+                                                        @if(isset($invoice) && isset($invoice->activation_date)) value="{{ $invoice->activation_date }}"
+                                                    @endif
+                                                    placeholder="YYYY-MM-DD" id="flatpickr-date" readonly="readonly">
+                                                    <label for="flatpickr-date">Activation Date</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-floating form-floating-outline">
+                                                    <select id="company_service_charge" name="company_service_charge" class="select2 form-select"
+                                                        data-allow-clear="true">
+                                                        <option value="">Please Select</option>
+                                                        @if(isset($sale) && count($sale->companyServices) > 0)
+                                                        @foreach ($sale->companyServices->unique('id') as $comp_ser)
+                                                        <option value="{{$comp_ser->id }}" data-name="{{ $comp_ser->name }}">{{ $comp_ser->name }} </option>
+                                                        @endforeach
+                                                        @endif
+                                                    </select>
+                                                    <label for="multicol-country">Invoiced Services</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <div class="form-floating form-floating-outline">
+                                                            <div class="input-group input-group-merge">
+                                                                <span class="input-group-text">$</span>
+                                                                <div class="form-floating form-floating-outline">
+                                                                    <input type="number" id="service_amount" name="amount" class="form-control" placeholder="499"
+                                                                        aria-label="Amount (to the nearest dollar)">
+                                                                    <label>Amount</label>
+                                                                </div>
+                                                                <span class="input-group-text">.00</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <div class="form-floating form-floating-outline">
+                                                            <div class="form-check mt-3">
+                                                                <input class="form-check-input" name="is_complementary" type="checkbox" value="1"
+                                                                    id="complementery_check">
+                                                                <label class="form-check-label" for="complementery_check">
+                                                                    Complementary
+                                                                </label>
+                                                            </div>
+                                                        </div>
 
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <button type="button" id="add_service" class="btn btn-primary">Add</button>
+                                                    </div>
+                                                </div>
+
+
+
+                                            </div>
+                                        </div>
+
+                                        <div class="row py-4">
+                                            <div class="col-md-12">
+                                                <div class="table-responsive">
+                                                    <table id="invoice_service_table" class="table table-striped">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Invoiced Service</th>
+                                                                <th>Is Complementary</th>
+                                                                <th>Service Service ($)</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+
+                                                            @if(isset($invoice) && count($invoice->servicecharges) > 0)
+                                                            @foreach ($invoice->servicecharges as $item)
+                                                            <tr>
+                                                                <td>{{ $item->service_name->name }}
+                                                                    <input type="hidden" name="service_id[]" value="{{ $item->service_name->id }}">
+                                                                </td>
+                                                                <td><input class="form-check-input" name="is_complementary" type="checkbox" value="true"
+                                                                        id="defaultCheck1" @if($item->is_complementary === 1) checked @endif readonly>
+                                                                        <input type="hidden" name="is_complementary[]" @if($item->is_complementary == 1) value="1" @else value="0" @endif>
+                                                                </td>
+                                                                @if($item->is_complementary == 0)
+                                                                <td>{{ $item->charged_price }}
+                                                                    <input type="hidden" name="amount[]" value="{{ $item->amount }}">
+                                                                </td>
+                                                                @else
+                                                                <td>0</td>
+                                                                @endif
+
+                                                            </tr>
+                                                            @endforeach
+                                                            @endif
+
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+                                        <div class="row g-4 pt-3">
+                                            <div class="col-md-6 col-12 mb-6">
+                                                <div class="form-floating form-floating-outline">
+                                                    <input type="text" id="year" class="form-control flatpickr-input active" format="YYYY" name="year"
+                                                    @if(isset($invoice) && isset($invoice->month))
+                                                        value="{{ $invoice->month }}"
+                                                    @endif
+                                                    placeholder="YYYY-MM-DD" id="flatpickr-date" readonly="readonly">
+                                                    <label for="flatpickr-date">Month</label>
+                                                </div>
+                                            </div>
+                                            {{-- <div class="col-md-6">
+                                                <div class="form-floating form-floating-outline">
+                                                    <select id="month" name="month" class="select2 form-select" data-allow-clear="true">
+                                                        @if(isset($invoice) && isset($invoice->month))
+                                                        <option value="{{$invoice->month}}" selected>{{ $invoice->month }}</option>
+                                                        @endif
+                                                        <option value="">Please Select</option>
+                                                        <option value="January" >January</option>
+                                                        <option value="February" >February</option>
+                                                        <option value="March" >March</option>
+                                                        <option value="April" >April</option>
+                                                        <option value="May" >May</option>
+                                                        <option value="June" >June</option>
+                                                        <option value="July" >July</option>
+                                                        <option value="August" >August</option>
+                                                        <option value="September" >September</option>
+                                                        <option value="October" >October</option>
+                                                        <option value="November" >November</option>
+                                                        <option value="December" >December</option>
+                                                    </select>
+                                                    <label for="multicol-country">Month</label>
+                                                </div>
+                                            </div> --}}
+                                            <div class="col-md-6">
+                                                <div class="form-floating form-floating-outline">
+                                                    <select id="discount" name="discount_type" class="select2 form-select" data-allow-clear="true">
+                                                        <option value="">Please Select</option>
+                                                        @if(isset($invoice) && isset($invoice->discount_type))
+                                                        <option value="{{$invoice->discount_type}}" selected>{{ $invoice->discount_type }}</option>
+                                                        @endif
+                                                        <option value="New Client Discount">New Client Discount</option>
+                                                        <option value="New Year Discount">New Year Discount</option>
+                                                        <option value="X-max Discount">X-max Discount</option>
+                                                    </select>
+                                                    <label for="multicol-country">Discount Type</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-floating form-floating-outline">
+                                                    <div class="input-group input-group-merge">
+                                                        <span class="input-group-text">$</span>
+                                                        <div class="form-floating form-floating-outline">
+                                                            <input type="number" id="discount_amount" name="discount_amount" @if(isset($invoice) &&
+                                                                isset($invoice->discount_amount)) value="{{ $invoice->discount_amount }}" @endif
+                                                            class="form-control" placeholder="499"
+                                                            aria-label="Amount (to the nearest dollar)">
+                                                            <label>Discount Amount</label>
+                                                        </div>
+                                                        <span class="input-group-text">.00</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 col-12 mb-6">
+                                                <div class="form-floating form-floating-outline">
+                                                    <input type="text" class="form-control flatpickr-input active" name="invoice_due_date"
+                                                        @if(isset($invoice) && isset($invoice->invoice_due_date)) value="{{ $invoice->invoice_due_date }}"
+                                                    @endif
+                                                    placeholder="YYYY-MM-DD" id="flatpickr-date" readonly="readonly">
+                                                    <label for="flatpickr-date">Invoice Due Date</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-floating form-floating-outline">
+                                                    <select id="invoice_freq" name="invoice_freq" class="select2 form-select" data-allow-clear="true">
+                                                        <option value="">Please Select</option>
+                                                        @if(isset($invoice) && isset($invoice->invoice_frequency))
+                                                        <option value="{{$invoice->invoice_frequency}}" selected>{{ $invoice->invoice_frequency }}</option>
+                                                        @endif
+                                                        <option value="Monthly">Monthly</option>
+                                                        <option value="Bi-annually">Bi-annually</option>
+                                                        <option value="Annually">Annually</option>
+                                                    </select>
+                                                    <label for="multicol-country">Invoice Frequency</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 col-12 mb-6">
+                                                <div class="form-floating form-floating-outline">
+                                                    <input type="text" id="invoice_number" name="invoice_no" class="form-control" @php
+                                                        $date=Carbon\Carbon::now()->format('M Y');
+                                                    // dd($date);
+                                                    @endphp
+
+                                                    @if((isset($invoice)) && $invoice->month == $date)
+                                                    @if(isset($invoice)) value="{{ $invoice->invoice_number }}" @endif
+                                                    @endif
+                                                    placeholder="Invoice No." disabled/>
+                                                    <label for="Keyword">Invoice No.</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-floating form-floating-outline">
+                                                    <div class="input-group input-group-merge">
+                                                        <span class="input-group-text">$</span>
+                                                        <div class="form-floating form-floating-outline">
+                                                            <input type="number" id="invoice_amount" name="invoice_amount" class="form-control"
+                                                                placeholder="499" @if(isset($invoice) && isset($invoice->total_amount)) value="{{
+                                                            $invoice->total_amount }}" @endif
+                                                            aria-label="Amount (to the nearest dollar)">
+                                                            <label>Invoice Amount </label>
+                                                        </div>
+                                                        <span class="input-group-text">.00</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-12 text-right">
+                                                <div class="d-flex " style="gap: 0px 20px;">
+                                                    <button type="submit" class="btn btn-primary">Generate Invoice</button>
+                                                    @if (isset($invoice) && isset($invoice->invoice_number))
+                                                    <a  href="{{ route('front.invoiceView', $invoice->invoice_number) }}" target="_blank" class="btn btn-success" style="color: #fff">View Invoice</a>
+                                                    @endif
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </form>
                                     <div class="row py-4">
+                                        <h4>Invoices</h4>
                                         <div class="col-md-12">
                                             <div class="table-responsive">
                                                 <table id="invoice_service_table" class="table table-striped">
                                                     <thead>
                                                         <tr>
-                                                            <th>Invoiced Service</th>
-                                                            <th>Is Complementary</th>
-                                                            <th>Service Service ($)</th>
+                                                            <th>Sr</th>
+                                                            <th>Invoice Number</th>
+                                                            <th>Invoice Month</th>
+                                                            <th>Invoice Date</th>
+                                                            <th>Due Date</th>
+                                                            <th>Invoice Amount</th>
+
                                                         </tr>
                                                     </thead>
                                                     <tbody>
-
-                                                        @if(isset($invoice) && count($invoice->servicecharges) > 0)
-                                                        @foreach ($invoice->servicecharges as $item)
+                                                        @if(isset($all_invoices) && count($all_invoices) > 0)
+                                                        @foreach ($all_invoices as $key=>$item)
                                                         <tr>
-                                                            <td>{{ $item->service_name->name }}
-                                                                <input type="hidden" name="">
-                                                            </td>
-                                                            <td><input class="form-check-input" name="is_complementary" type="checkbox" value="true"
-                                                                    id="defaultCheck1" @if($item->is_complementary === 1) checked @endif readonly></td>
-                                                            @if($item->is_complementary == 0)
-                                                            <td>{{ $item->charged_price }}</td>
-                                                            @else
-                                                            <td>0</td>
-                                                            @endif
-
+                                                            <td>{{ $key + 1 }}</td>
+                                                            <td>{{ $item->invoice_number }}</td>
+                                                            <td>{{ $item->month }}</td>
+                                                            <td>{{ $item->activation_date }}</td>
+                                                            <td>{{ $item->invoice_due_date }}</td>
+                                                            <td>{{ $item->total_amount }}</td>
                                                         </tr>
                                                         @endforeach
                                                         @endif
@@ -1701,130 +1888,9 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                             </div>
                                         </div>
                                     </div>
-
-
-                                    <div class="row g-4 pt-3">
-                                        <div class="col-md-6 col-12 mb-6">
-                                            <div class="form-floating form-floating-outline">
-                                                <input type="text" id="year" class="form-control flatpickr-input active" format="YYYY" name="year"
-                                                @if(isset($invoice) && isset($invoice->year))
-                                                    value="{{ $invoice->year }}"
-                                                @endif
-                                                placeholder="YYYY-MM-DD" id="flatpickr-date" readonly="readonly">
-                                                <label for="flatpickr-date">Month</label>
-                                            </div>
-                                        </div>
-                                        {{-- <div class="col-md-6">
-                                            <div class="form-floating form-floating-outline">
-                                                <select id="month" name="month" class="select2 form-select" data-allow-clear="true">
-                                                    @if(isset($invoice) && isset($invoice->month))
-                                                    <option value="{{$invoice->month}}" selected>{{ $invoice->month }}</option>
-                                                    @endif
-                                                    <option value="">Please Select</option>
-                                                    <option value="January" >January</option>
-                                                    <option value="February" >February</option>
-                                                    <option value="March" >March</option>
-                                                    <option value="April" >April</option>
-                                                    <option value="May" >May</option>
-                                                    <option value="June" >June</option>
-                                                    <option value="July" >July</option>
-                                                    <option value="August" >August</option>
-                                                    <option value="September" >September</option>
-                                                    <option value="October" >October</option>
-                                                    <option value="November" >November</option>
-                                                    <option value="December" >December</option>
-                                                </select>
-                                                <label for="multicol-country">Month</label>
-                                            </div>
-                                        </div> --}}
-                                        <div class="col-md-6">
-                                            <div class="form-floating form-floating-outline">
-                                                <select id="discount" name="discount_type" class="select2 form-select" data-allow-clear="true">
-                                                    <option value="">Please Select</option>
-                                                    @if(isset($invoice) && isset($invoice->discount_type))
-                                                    <option value="{{$invoice->discount_type}}" selected>{{ $invoice->discount_type }}</option>
-                                                    @endif
-                                                    <option value="New Client Discount">New Client Discount</option>
-                                                    <option value="New Year Discount">New Year Discount</option>
-                                                    <option value="X-max Discount">X-max Discount</option>
-                                                </select>
-                                                <label for="multicol-country">Discount Type</label>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-floating form-floating-outline">
-                                                <div class="input-group input-group-merge">
-                                                    <span class="input-group-text">$</span>
-                                                    <div class="form-floating form-floating-outline">
-                                                        <input type="number" id="discount_amount" name="discount_amount" @if(isset($invoice) &&
-                                                            isset($invoice->discount_amount)) value="{{ $invoice->discount_amount }}" @endif
-                                                        class="form-control" placeholder="499"
-                                                        aria-label="Amount (to the nearest dollar)">
-                                                        <label>Discount Amount</label>
-                                                    </div>
-                                                    <span class="input-group-text">.00</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6 col-12 mb-6">
-                                            <div class="form-floating form-floating-outline">
-                                                <input type="text" class="form-control flatpickr-input active" name="invoice_due_date"
-                                                    @if(isset($invoice) && isset($invoice->invoice_due_date)) value="{{ $invoice->invoice_due_date }}"
-                                                @endif
-                                                placeholder="YYYY-MM-DD" id="flatpickr-date" readonly="readonly">
-                                                <label for="flatpickr-date">Invoice Due Date</label>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-floating form-floating-outline">
-                                                <select id="invoice_freq" name="invoice_freq" class="select2 form-select" data-allow-clear="true">
-                                                    <option value="">Please Select</option>
-                                                    @if(isset($invoice) && isset($invoice->invoice_frequency))
-                                                    <option value="{{$invoice->invoice_frequency}}" selected>{{ $invoice->invoice_frequency }}</option>
-                                                    @endif
-                                                    <option value="Monthly">Monthly</option>
-                                                    <option value="Bi-annually">Bi-annually</option>
-                                                    <option value="Annually">Annually</option>
-                                                </select>
-                                                <label for="multicol-country">Invoice Frequency</label>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6 col-12 mb-6">
-                                            <div class="form-floating form-floating-outline">
-                                                <input type="text" id="invoice_number" name="invoice_no" class="form-control" @php
-                                                    $date=Carbon\Carbon::now()->format('F');
-                                                // dd($date);
-                                                @endphp
-
-                                                @if((isset($invoice)) && $invoice->month == $date)
-                                                @if(isset($invoice)) value="{{ $invoice->invoice_number }}" @endif
-                                                @endif
-                                                placeholder="Invoice No." disabled/>
-                                                <label for="Keyword">Invoice No.</label>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-floating form-floating-outline">
-                                                <div class="input-group input-group-merge">
-                                                    <span class="input-group-text">$</span>
-                                                    <div class="form-floating form-floating-outline">
-                                                        <input type="number" id="invoice_amount" name="invoice_amount" class="form-control"
-                                                            placeholder="499" @if(isset($invoice) && isset($invoice->total_amount)) value="{{
-                                                        $invoice->total_amount }}" @endif
-                                                        aria-label="Amount (to the nearest dollar)">
-                                                        <label>Invoice Amount </label>
-                                                    </div>
-                                                    <span class="input-group-text">.00</span>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-md-12 text-right">
-                                            <button type="submit" class="btn btn-primary">Generate Invoice</button>
-                                        </div>
-                                    </div>
-                                </form>
+                                @endif
                                 <!-- /Invoice Form -->
+                                @if(isset($Payment_perm) && $Payment_perm->view == 1)
                                 <form id="make_payment" action="{{ route('payment.store') }}" method="POST">
                                     @csrf
                                     <div class="row g-4 py-3">
@@ -1925,7 +1991,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                     </div>
                                 </form>
                                 <div class="row py-4">
-                                    <h4>Invoices</h4>
+                                    <h4>Payments</h4>
                                     <div class="col-md-12">
                                         <div class="table-responsive">
                                             <table id="invoice_service_table" class="table table-striped">
@@ -1969,13 +2035,14 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                         </div>
                                     </div>
                                 </div>
+                                @endif
                                 <div class="row g-4 pt-4">
                                     <div class="col-12 d-flex justify-content-between">
                                         <button class="btn btn-outline-secondary btn-prev">
                                             <i class="mdi mdi-arrow-left me-sm-1"></i>
                                             <span class="align-middle d-sm-inline-block d-none">Previous</span>
                                         </button>
-                                        <button class="btn btn-primary btn-submit">Submit</button>
+                                        <button class="btn btn-primary btn-submit">Finish</button>
                                     </div>
                                 </div>
                             </div>
@@ -3126,8 +3193,31 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                     processData: false, // Important: do not process the data
                     contentType: false, // Important: content type is false
                     success: function (response) {
+                        console.log(response);
 
-                    console.log(response);
+                        var payments = response.payments;
+                        var tableContent = ''; // Initialize a variable to store the rows
+
+                        payments.forEach(function(payment, index) {
+                            var balance = payment.invoice.total_amount - payment.amount;
+                            tableContent += '<tr>\
+                                <td>' + (index + 1) + '</td>\
+                                <td>' + payment.invoice_number + '</td>\
+                                <td>' + payment.invoice.month + '</td>\
+                                <td>' + payment.invoice.activation_date + '</td>\
+                                <td>' + payment.invoice.invoice_due_date + '</td>\
+                                <td>' + payment.payment_type + '</td>\
+                                <td>' + payment.invoice.total_amount + '</td>\
+                                <td>' + payment.amount + '</td>\
+                                <td>' + balance + '</td>\
+                                <td>' + payment.marchent.name + '</td>\
+                            </tr>';
+                        });
+
+                        // Clear the table first and then append the new rows
+                        $('#invoice_service_table').empty().append(tableContent);
+
+
 
 
                         // Handle success response (display success message using SweetAlert2)

@@ -95,6 +95,7 @@ class InvoiceServiceChargesController extends Controller
             $charge_price = $request->amount;
         }
         $invoice = Invoice::where('sale_id', $request->sale_id6)->where('month', $monthName)->first();
+        // dd($invoice);
         if(isset($invoice)){
             $invoice->update([
                'invoice_active_status' => $request->invoice_status? 1 : 0,
@@ -133,6 +134,9 @@ class InvoiceServiceChargesController extends Controller
                 else {
                     $discount_amount = 0;
                 }
+                $old_invoice_charge = InvoiceServiceCharges::where('invoice_id', $invoice->id)->where('company_service_id', $value)->where('month', $request->year)->first();
+                // dd($old_invoice_charge);
+                if($old_invoice_charge == NULL){
                 $invoiceServiceCharge = InvoiceServiceCharges::create([
                     'invoice_id' => $invoice->id,
                     'company_service_id' => $value,
@@ -140,8 +144,9 @@ class InvoiceServiceChargesController extends Controller
                     'charged_price' => $request->amount[$key],
                     'discount_price' => $discount_amount,
                     'is_complementary' => $request->is_complementary[$key],
-                    'month' => $monthName
+                    'month' => $request->year
                 ]);
+                }
         }
         return response()->json([
             'message' => 'Invoice Genrated Succesfully!',

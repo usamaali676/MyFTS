@@ -115,6 +115,21 @@ class FrontController extends Controller
                 }
             }
 
+            public function getInvoice($invoiceNumber)
+            {
+                $invoice = Invoice::where('invoice_number', $invoiceNumber)->first();
+                if ($invoice) {
+                    return view('pages.invoice.view', compact('invoice'));
+                }
+            }
+            public function invoicePrint($invoiceNumber)
+            {
+                $invoice = Invoice::where('invoice_number', $invoiceNumber)->first();
+                if ($invoice) {
+                    return view('pages.invoice.print', compact('invoice'));
+                }
+            }
+
     }
 
 
