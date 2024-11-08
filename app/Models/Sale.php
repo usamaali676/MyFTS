@@ -14,6 +14,9 @@ class Sale extends Model
     public function closers() {
         return $this->hasMany(SaleCS::class, 'sale_id');
     }
+    public function lead(){
+        return $this->belongsTo(Lead::class, 'lead_id');
+    }
     public function business_hours()
     {
         return $this->hasMany(BusinessHours::class, 'sale_id');
