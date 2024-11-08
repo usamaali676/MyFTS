@@ -8,7 +8,7 @@ class Payment extends Model
 {
     //
     protected $fillable = ['invoice_id' ,'invoice_number' ,'merchant_id' ,'mop' ,'payment_type' ,'card_number' ,'amount' ,'trans_id' ,'trans_ss' ];
-    public function marchent() {
+    public function merchant() {
         return $this->belongsTo(MerchantAccount::class, 'merchant_id');
     }
     public function invoice() {

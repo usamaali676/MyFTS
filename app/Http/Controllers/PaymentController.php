@@ -34,14 +34,22 @@ class PaymentController extends Controller
         // dd($request->all());
         $request->validate([
             'invoice_id' => 'required',
-            'marchent' => 'required',
+            'merchant' => 'required',
             'mop' => 'required',
             'payment_amount' => 'required',
             'trans_id' => 'required',
         ]);
-        $payment = Payment::where('invoice_id', $request->invoice_id)->get();
-        $invoice = Invoice::find($request->invoice_id);
-        if (count($payment) > 0) {
+        $payment_amount = Payment::where('invoice_id', $request->invoice_id)->sum('amount');
+        // dd($payment_amount);
+        $full_payment = Payment::where('invoice_id', $request->invoice_id)->where('payment_type', "Full Payment")->first();
+        // dd($full_payment);
+        $invoice = Invoice::where('id', $request->invoice_id)->first();
+        // dd($invoice);
+
+
+            // dd($payments);
+        // dd($invoice->total_amount);
+        if (isset($full_payment) || $payment_amount >= $invoice->total_amount) {
             return response()->json([
                 'error' => 'Payment Already Charged',
             ], 422);
@@ -50,7 +58,7 @@ class PaymentController extends Controller
             $payment = new Payment();
             $payment->invoice_id = $request->invoice_id;
             $payment->invoice_number = $invoice->invoice_number;
-            $payment->merchant_id = $request->marchent;
+            $payment->merchant_id = $request->merchant;
             $payment->mop = $request->mop;
             $payment->payment_type = $request->payment_type;
             $payment->amount = $request->payment_amount;
@@ -64,11 +72,14 @@ class PaymentController extends Controller
             $sale = Sale::where('id', $invoice->sale_id)->first();
             $all_invoices =  Invoice::where('sale_id', $sale->id)->get();
             $invoiceIds = $all_invoices->pluck('id')->toArray();
-            $payments = Payment::whereIn('invoice_id', $invoiceIds)->with('invoice', 'marchent' )->get();
+            $payments = Payment::whereIn('invoice_id', $invoiceIds)
+            ->with('invoice', 'merchant')// Fixed 'merchant' to 'merchant'
+            ->get();
+
 
 
             return response()->json([
-                'message' => 'Payment Added Successfully',
+                'message' => 'Payment Charged Successfully',
                 'payments' => $payments,
             ], 200);
         }
