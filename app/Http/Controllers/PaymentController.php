@@ -39,19 +39,42 @@ class PaymentController extends Controller
             'payment_amount' => 'required',
             'trans_id' => 'required',
         ]);
-        $payment_amount = Payment::where('invoice_id', $request->invoice_id)->sum('amount');
+        $payment_amount = Payment::where('invoice_id', $request->invoice_id)->where('payment_type', "Partials Payment")->first();
         // dd($payment_amount);
         $full_payment = Payment::where('invoice_id', $request->invoice_id)->where('payment_type', "Full Payment")->first();
         // dd($full_payment);
         $invoice = Invoice::where('id', $request->invoice_id)->first();
         // dd($invoice);
+        $last_balnce = Payment::where('invoice_id', $invoice->id)->where('payment_type',"Partials Payment")->first();
+        // dd($last_balnce);
+        if(isset($last_balnce) ){
+            if($last_balnce->balance > 0){
+            $balance = $last_balnce->balance - $request->payment_amount;
+            }
+            else{
+                return response()->json([
+                    'error' => 'Invoice Amount Exceeded',
+                ], 422);
+            }
+        }
+        else{
+            $balance = $invoice->total_amount - $request->payment_amount;
+        }
 
-
-            // dd($payments);
         // dd($invoice->total_amount);
-        if (isset($full_payment) || $payment_amount >= $invoice->total_amount) {
+        if ($request->payment_amount > $invoice->total_amount ) {
+            return response()->json([
+                'error' => 'Invalid Amount',
+            ], 422);
+        }
+        elseif(isset($full_payment)){
             return response()->json([
                 'error' => 'Payment Already Charged',
+            ], 422);
+        }
+        elseif(isset($payment_amount) && $request->payment_amount > $payment_amount->balance){
+            return response()->json([
+                'error' => 'Invoice Amount Exceeded',
             ], 422);
         }
         else{
@@ -62,6 +85,7 @@ class PaymentController extends Controller
             $payment->mop = $request->mop;
             $payment->payment_type = $request->payment_type;
             $payment->amount = $request->payment_amount;
+            $payment->balance = $balance;
             $payment->card_number = $request->card_number;
             $payment->trans_id = $request->trans_id;
             if(isset($request->trans_ss)){

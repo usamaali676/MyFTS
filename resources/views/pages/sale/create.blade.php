@@ -146,7 +146,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                         </use>
                                     </svg>
                                 </span>
-                                <span class="bs-stepper-label">Invoice</span>
+                                <span class="bs-stepper-label">Invoice & Payments</span>
                             </button>
                         </div>
                     </div>
@@ -1822,9 +1822,10 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
 
                                             <div class="col-md-12 text-right">
                                                 <div class="d-flex " style="gap: 0px 20px;">
-                                                    <button type="submit" class="btn btn-primary">Generate Invoice</button>
                                                     @if (isset($invoice) && isset($invoice->invoice_number))
-                                                    <a  href="{{ route('front.invoiceView', $invoice->invoice_number) }}" target="_blank" class="btn btn-success" style="color: #fff">View Invoice</a>
+                                                        <a  href="{{ route('front.invoiceView', $invoice->invoice_number) }}" target="_blank" class="btn btn-success" style="color: #fff">View Invoice</a>
+                                                    @else
+                                                        <button type="submit" class="btn btn-primary">Generate Invoice</button>
                                                     @endif
                                                 </div>
                                             </div>
@@ -1990,9 +1991,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                 <tbody>
                                                     @if(isset($payments) && count($payments) > 0)
                                                     @foreach ($payments as $key=>$item)
-                                                    @php
-                                                        $balance = $item->invoice->total_amount - $item->amount;
-                                                    @endphp
+
                                                     <tr>
                                                         <td>{{ $key + 1 }}</td>
                                                         <td>{{ $item->invoice->invoice_number }}</td>
@@ -2002,7 +2001,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                         <td>{{ $item->payment_type }}</td>
                                                         <td>{{ $item->invoice->total_amount }}</td>
                                                         <td>{{ $item->amount }}</td>
-                                                        <td>{{ $balance }}</td>
+                                                        <td>{{ $item->balance }}</td>
                                                         <td>{{ $item->merchant->name }}</td>
                                                     </tr>
                                                     @endforeach
@@ -3208,7 +3207,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                         var tableContent = ''; // Initialize a variable to store the rows
 
                         payments.forEach(function(payment, index) {
-                            var balance = payment.invoice.total_amount - payment.amount;
+
                             tableContent += '<tr>\
                                 <td>' + (index + 1) + '</td>\
                                 <td>' + payment.invoice_number + '</td>\
@@ -3218,7 +3217,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                 <td>' + payment.payment_type + '</td>\
                                 <td>' + payment.invoice.total_amount + '</td>\
                                 <td>' + payment.amount + '</td>\
-                                <td>' + balance + '</td>\
+                                <td>' + payment.balance  + '</td>\
                                 <td>' + payment.merchant.name + '</td>\
                             </tr>';
                         });
@@ -3244,7 +3243,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
 
 
                         // Optionally reset the form only on success
-                        // $('#saleForm')[0].reset();
+                        $('#make_payment')[0].reset();
                         // This will reset the form fields
                     },
                     error: function (xhr) {
