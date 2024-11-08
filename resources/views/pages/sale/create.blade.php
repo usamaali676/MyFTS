@@ -1832,7 +1832,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
 
                                         </div>
                                     </form>
-                                    <div class="row py-4">
+                                    {{-- <div class="row py-4">
                                         <h4>Invoices</h4>
                                         <div class="col-md-12">
                                             <div class="table-responsive">
@@ -1866,7 +1866,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                 </table>
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> --}}
                                 @endif
                                 <!-- /Invoice Form -->
                                 @if(isset($Payment_perm) && $Payment_perm->view == 1)
@@ -3048,23 +3048,24 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                     contentType: false, // Important: content type is false
                     success: function (response) {
 
-                    console.log(response.invoice);
 
-                    var invoice = response.invoice;
-                    var table_content = ''
-                    invoice.forEach(function(invoice, index) {
-                            tableContent += '<tr>\
-                                <td>' + (index + 1) + '</td>\
-                                <td>' + invoice.invoice_number + '</td>\
-                                <td>' + invoice.month + '</td>\
-                                <td>' + invoice.activation_date + '</td>\
-                                <td>' + invoice.invoice_due_date + '</td>\
-                                <td>' + invoice.amount + '</td>\
-                            </tr>';
-                        });
+                    // var invoice = response.invoice;
+                    // console.log(invoice);
 
-                        // Clear the table first and then append the new rows
-                        $('#invoice_table_gen tbody').empty().append(tableContent);
+                    // var table_content = ''
+                    // invoice.forEach(function(invoice, index) {
+                    //         tableContent += '<tr>\
+                    //             <td>' + (index + 1) + '</td>\
+                    //             <td>' + invoice.invoice_number + '</td>\
+                    //             <td>' + invoice.month + '</td>\
+                    //             <td>' + invoice.activation_date + '</td>\
+                    //             <td>' + invoice.invoice_due_date + '</td>\
+                    //             <td>' + invoice.amount + '</td>\
+                    //         </tr>';
+                    //     });
+
+                    //     // Clear the table first and then append the new rows
+                    //     $('#invoice_table_gen tbody').empty().append(tableContent);
 
 
 
