@@ -1236,22 +1236,29 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                 <label for="multicol-closers">Select Customer Support Representative</label>
                                             </div>
                                         </div>
-                                        <div class="col-md-6 select2-primary">
-                                            <div class="row">
-                                                <div class="col-md-3"><h6>Client Status</h6></div>
-                                                <div class="col-md-3">Active</div>
-                                            </div>
+                                        <div class="col-sm-6">
+                                            <label class="switch switch-lg">
+                                                <input type="checkbox" class="switch-input" name="sale_status" @if(isset($sale) &&
+                                                    $sale->status == 1) checked @else readonly @endif >
+                                                <span class="switch-toggle-slider">
+                                                    <span class="switch-on">
+                                                        <i class="ri-check-line"></i>
+                                                    </span>
+                                                    <span class="switch-off">
+                                                        <i class="ri-close-line"></i>
+                                                    </span>
+                                                </span>
+                                                <span class="switch-label">Sale Active Status</span>
+                                            </label>
                                         </div>
                                         <div class="col-md-6 select2-primary">
                                             <div class="row">
                                                 <div class="col-md-3"><h6>Activation Date</h6></div>
-                                                <div class="col-md-3">01/Oct/2024</div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6 select2-primary">
-                                            <div class="row">
-                                                <div class="col-md-3"><h6>Mode of Payment</h6></div>
-                                                <div class="col-md-3">Credit Card</div>
+                                                @if(isset($sale) && $sale->activation_date != NULL)
+                                                <div class="col-md-3">{{ $sale->activation_date }}</div>
+                                                @else
+                                                <div class="col-md-3">N/A</div>
+                                                @endif
                                             </div>
                                         </div>
                                         {{-- <div class="col-12 d-flex justify-content-between">
@@ -1621,7 +1628,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                             <i class="ri-close-line"></i>
                                                         </span>
                                                     </span>
-                                                    <span class="switch-label">Sale Active Status</span>
+                                                    <span class="switch-label">Invoice Active Status</span>
                                                 </label>
                                             </div>
                                             <div class="col-md-6 col-12 mb-6">
@@ -1630,7 +1637,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                         @if(isset($invoice) && isset($invoice->activation_date)) value="{{ $invoice->activation_date }}"
                                                     @endif
                                                     placeholder="YYYY-MM-DD" id="flatpickr-date" readonly="readonly">
-                                                    <label for="flatpickr-date">Activation Date</label>
+                                                    <label for="flatpickr-date">Invoice Date</label>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
@@ -1729,7 +1736,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                         <div class="row g-4 pt-3">
                                             <div class="col-md-6 col-12 mb-6">
                                                 <div class="form-floating form-floating-outline">
-                                                    <input type="text" id="year" class="form-control flatpickr-input active" format="YYYY" name="year"
+                                                    <input type="text" id="month" class="form-control flatpickr-input active" format="YYYY" name="month"
                                                     @if(isset($invoice) && isset($invoice->month))
                                                         value="{{ $invoice->month }}"
                                                     @endif
@@ -1812,7 +1819,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                             <input type="number" id="invoice_amount" name="invoice_amount" class="form-control"
                                                                 placeholder="499" @if(isset($invoice) && isset($invoice->total_amount)) value="{{
                                                             $invoice->total_amount }}" @endif
-                                                            aria-label="Amount (to the nearest dollar)">
+                                                            aria-label="Amount (to the nearest dollar)" readonly>
                                                             <label>Invoice Amount </label>
                                                         </div>
                                                         <span class="input-group-text">.00</span>
@@ -1923,7 +1930,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                     class="form-control billing-card-mask"
                                                     placeholder="4541 2541 2547 2577"
                                                     name="card_number"
-                                                    aria-describedby="paymentCard" />
+                                                    aria-describedby="paymentCard" disabled />
                                                 <label for="billings-card-num">Card number</label>
                                                 </div>
                                                 <span class="input-group-text cursor-pointer p-1" id="paymentCard"
@@ -1944,7 +1951,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-floating form-floating-outline">
-                                                <input type="text" id="payment_amount" name="payment_amount" class="form-control"  >
+                                                <input type="text" id="payment_amount" name="payment_amount" class="form-control"  readonly>
                                                 <label for="payment_amount">Payment Amount</label>
                                             </div>
                                         </div>
@@ -2080,7 +2087,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
     </script>
 
     <script>
-        flatpickr("#year", {
+        flatpickr("#month", {
             plugins: [
             new monthSelectPlugin({
             shorthand: true, //defaults to false
@@ -2160,7 +2167,9 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
             const email = document.getElementById('basic-default-email').value;
             const websiteUrl = document.getElementsByName('website_url')[0].value;
             const clientName = document.getElementsByName('client_name')[0].value;
-            // const socialLinkElement = document.getElementsByName('social_link')[0];
+            // const socialLinkElement = document.querySelector(".social_link")[0];
+            // console.log(socialLinkElement);
+
             // if (!socialLinkElement) {
             //     alert('Social link element not found!');
             //     return false;
@@ -2609,8 +2618,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
     </script>
     <script>
         $(document).ready(function () {
-            $('.service_delete').click(function (e) {
-                e.preventDefault();
+            $(document).on('click', '.service_delete', function() {
                 var id = $(this).attr('data-id');
                 var result = confirm("Want to delete?");
                 // alert(id);
@@ -2969,62 +2977,73 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
     </script>
 
     <script>
-        $(document).ready(function () {
-            $('#add_service').click(function () {
-                var selectedOption = $('#company_service_charge option:selected');
-                // Get the value of the selected option (ID or whatever you set in the value attribute)
-                var service = selectedOption.val();
-                // Get the value of the 'data-name' attribute of the selected option
-                var service_name = selectedOption.data('name');
-                var amount = $('#service_amount').val();
-                var check = $('#complementery_check').prop('checked');
-                var totalAmount = 0;
-                var serviceExists = false;
-                $('#invoice_service_table tr').each(function() {
-                    var existingServiceId = $(this).find('input[name="service_id[]"]').val();
-                    if (existingServiceId == service) {
-                        serviceExists = true;
-                        return false; // Stop iterating as we found the service
-                    }
-                });
+$(document).ready(function () {
+    $('#add_service').click(function () {
+        var selectedOption = $('#company_service_charge option:selected');
+        var service = selectedOption.val(); // Get the selected service ID
+        var service_name = selectedOption.data('name'); // Get the service name
+        var amount = $('#service_amount').val(); // Get the service amount
+        var check = $('#complementery_check').prop('checked'); // Check if the service is complementary
+        var totalAmount = parseFloat($('#invoice_amount').val()) || 0; // Start with the current total
+        var serviceExists = false;
 
-                // If the service is already added, show an alert
-                if (serviceExists) {
-                    alert('This service has already been added to the invoice.');
-                    return; // Exit the function without adding the service again
-                }
-                $('#invoice_service_table tr').each(function() {
-                    var rowAmount = $(this).find('input[name="amount[]"]').val();
-                    totalAmount += parseFloat(rowAmount) || 0; // Accumulate the amount, if valid
-                });
-               // alert(service_name);
-               if (service !== '' && service_name !== '' && amount !== '') {
-                invoice_table = '<tr>' +
-                                '<td>' + service_name + ' ' +
-                                    '<input type="hidden" name="service_id[]" value="' + service + '">' +
-                                '</td>' +
-                                '<td><input class="form-check-input"  type="checkbox" ' + (check == true ? 'value="1"' : 'value="0"') + ' id="defaultCheck" ' + (check == true ? 'checked' : '') + ' readonly></td>' +
-                                    '<input type="hidden" name="is_complementary[]" ' + (check == true ? 'value="1"' : 'value="0"') + '  >' +
-                                '<td>' + amount + ' ' +
-                                    '<input type="hidden" name="amount[]" value="' + amount + '">' +
-                                '</td>' +
-                                '</tr>';
-
-                $('#invoice_service_table').append(invoice_table);
-                $('#company_service_charge').prop('selectedIndex', -1);
-                $('#service_amount').val('');
-                $('#complementery_check').prop('checked', false);
-                    // Add the current amount to the totalAmount
-                    totalAmount += parseFloat(amount); // Add current amount to the total
-
-                // Update the total input with the new total
-                $('#invoice_amount').val(totalAmount.toFixed(2));
-                }
-                else{
-                    alert('Please fill in all the required fields.');
-                }
-            })
+        // Check if the service is already added to the table
+        $('#invoice_service_table tr').each(function() {
+            var existingServiceId = $(this).find('input[name="service_id[]"]').val();
+            if (existingServiceId == service) {
+                serviceExists = true;
+                return false; // Stop iterating once the service is found
+            }
         });
+
+        // If the service already exists, alert and exit
+        if (serviceExists) {
+            alert('This service has already been added to the invoice.');
+            return; // Exit the function without adding the service again
+        }
+
+        // Check if all fields are filled in
+        if (service !== '' && service_name !== '' && amount !== '') {
+            // Prepare the new row HTML
+            var invoice_table = '<tr>' +
+                '<td>' + service_name + ' ' +
+                    '<input type="hidden" name="service_id[]" value="' + service + '">' +
+                '</td>' +
+                '<td><input class="form-check-input" type="checkbox" ' + (check ? 'value="1"' : 'value="0"') + ' id="defaultCheck" ' + (check ? 'checked' : '') + ' readonly></td>' +
+                '<input type="hidden" name="is_complementary[]" value="' + (check ? '1' : '0') + '" >' +
+                '<td>' + amount + ' ' +
+                    '<input type="hidden" name="amount[]" value="' + amount + '">' +
+                '</td>' +
+            '</tr>';
+
+            // Append the new row to the table
+            $('#invoice_service_table').append(invoice_table);
+            $('#company_service_charge').prop('selectedIndex', -1);
+            $('#service_amount').val('');
+            $('#complementery_check').prop('checked', false);
+
+            // If the service is NOT complementary, add the amount to the total
+            if (!check) {
+                totalAmount += parseFloat(amount); // Add the amount to the total if it's not complementary
+            }
+
+            // Update the total amount in the invoice input field
+            $('#invoice_amount').val(totalAmount.toFixed(2));
+        } else {
+            alert('Please fill in all the required fields.');
+        }
+    });
+
+    // Update the total amount when discount is applied
+    $('#discount_amount').change(function() {
+        var discountAmount = parseFloat($(this).val());
+        var invoiceAmount = parseFloat($('#invoice_amount').val());
+        var totalAmount = invoiceAmount - discountAmount;
+        $('#invoice_amount').val(totalAmount.toFixed(2));
+    });
+});
+
+
     </script>
 
     <script>
@@ -3179,6 +3198,32 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
 
                     }
                 });
+            })
+        });
+    </script>
+    <script>
+        $(document).ready(function () {
+           $('#mop').change(function () {
+                var mop  = this.value;
+                if(mop == "Credit Card"){
+                    $('#billings-card-num').prop('disabled', false);
+                }
+                else{
+                    $('#billings-card-num').prop('disabled', true);
+                }
+           });
+        });
+    </script>
+    <script>
+        $(document).ready(function () {
+            $('#payment_type').change(function () {
+                var type = this.value;
+                if(type == "Full Payment"){
+                    $('#payment_amount').prop('readonly', true)
+                }
+                else{
+                    $('#payment_amount').prop('readonly', false)
+                }
             })
         });
     </script>

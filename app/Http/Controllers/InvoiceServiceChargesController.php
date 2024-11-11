@@ -73,6 +73,7 @@ class InvoiceServiceChargesController extends Controller
         // dd($request->all());
         $request->validate([
             'sale_id6' => 'required',
+            'month' => 'required',
         ]);
         $unique_id = 'FTS'. '_' . Str::random(5) . '_' . time();
         $date = Carbon::now(); // or any other Carbon instance
@@ -105,7 +106,7 @@ class InvoiceServiceChargesController extends Controller
                 'invoice_due_date' => $request->invoice_due_date,
                 'total_amount' => $request->invoice_amount,
                 'invoice_freq' =>   $request->invoice_freq,
-                'month' => $request->year,
+                'month' => $request->month,
                 // 'year' => $year,
             ]);
         }
@@ -120,7 +121,7 @@ class InvoiceServiceChargesController extends Controller
                 'invoice_due_date' => $request->invoice_due_date,
                 'total_amount' => $request->invoice_amount,
                 'invoice_freq' =>   $request->invoice_freq,
-                'month' => $request->year,
+                'month' => $request->month,
                 // 'year' => $year,
                 // 'month' => $monthName
             ]);
@@ -134,7 +135,7 @@ class InvoiceServiceChargesController extends Controller
                 else {
                     $discount_amount = 0;
                 }
-                $old_invoice_charge = InvoiceServiceCharges::where('invoice_id', $invoice->id)->where('company_service_id', $value)->where('month', $request->year)->first();
+                $old_invoice_charge = InvoiceServiceCharges::where('invoice_id', $invoice->id)->where('company_service_id', $value)->where('month', $request->month)->first();
                 // dd($old_invoice_charge);
                 if($old_invoice_charge == NULL){
                 $invoiceServiceCharge = InvoiceServiceCharges::create([
@@ -144,7 +145,7 @@ class InvoiceServiceChargesController extends Controller
                     'charged_price' => $request->amount[$key],
                     'discount_price' => $discount_amount,
                     'is_complementary' => $request->is_complementary[$key],
-                    'month' => $request->year
+                    'month' => $request->month
                 ]);
                 }
         }
