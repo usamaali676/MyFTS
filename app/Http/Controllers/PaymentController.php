@@ -6,6 +6,7 @@ use App\Helpers\GlobalHelper;
 use App\Models\Invoice;
 use App\Models\Payment;
 use App\Models\Sale;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class PaymentController extends Controller
@@ -94,6 +95,10 @@ class PaymentController extends Controller
             $payment->save();
 
             $sale = Sale::where('id', $invoice->sale_id)->first();
+            $sale->update([
+                'status' => true,
+                'activation_date' => Carbon::now(),
+            ]);
             $all_invoices =  Invoice::where('sale_id', $sale->id)->get();
             $invoiceIds = $all_invoices->pluck('id')->toArray();
             $payments = Payment::whereIn('invoice_id', $invoiceIds)

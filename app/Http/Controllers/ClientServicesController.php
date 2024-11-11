@@ -144,29 +144,38 @@ class ClientServicesController extends Controller
     public function destroy( Request $request)
     {
             // Find the client service by ID, return a 404 error if not found
-            $client_service = ClientServices::findOrFail($request->id);
+            $client_service = ClientServices::find($request->id);
             // dd($client_service->sales);
             // Delete related sales
-            if(isset($client_service->sale))
-            {
-                $client_service->sales()->detach();
-            }
+            if(isset($client_service)){
+                if(isset($client_service->sale))
+                {
+                    $client_service->sales()->detach();
+                }
 
-            $relservices = SaleClientServiceCompanyService::where('client_service_id', $client_service->id)->get();
-            foreach ($relservices as $relservice) {
-                $relservice->delete();
-            }
+                $relservices = SaleClientServiceCompanyService::where('client_service_id', $client_service->id)->get();
+                foreach ($relservices as $relservice) {
+                    $relservice->delete();
+                }
 
-            // dd($client_service->companyServicesForSale($client_service->sales->id));
-            // Detach or delete company services
+                // dd($client_service->companyServicesForSale($client_service->sales->id));
+                // Detach or delete company services
 
-            // Finally, delete the client service itself
-            $client_service->delete();
+                // Finally, delete the client service itself
+                $client_service->delete();
 
                 return response()->json([
                     'message' => 'Service Deleted Succesfully!',
 
                 ], 200);
+            }
+            else {
+                return response()->json([
+                    'error' => 'Service Already Deleted!',
+                ], 422);
+            }
+
+
     }
 
 

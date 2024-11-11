@@ -94,6 +94,7 @@ class SaleController extends Controller
             $sale = Sale::find($request->sale_id);
             $sale->update([
                 'signup_date' => $request->signup_date,
+                'status' => $request->sale_status
             ]);
             $lead = Lead::find($request->lead_id);
             // dd($lead);
