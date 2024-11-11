@@ -1828,12 +1828,11 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                             </div>
 
                                             <div class="col-md-12 text-right">
-                                                <div class="d-flex " style="gap: 0px 20px;">
-                                                    @if (isset($invoice) && isset($invoice->invoice_number))
-                                                        <a  href="{{ route('front.invoiceView', $invoice->invoice_number) }}" target="_blank" class="btn btn-success" style="color: #fff">View Invoice</a>
-                                                    @else
-                                                        <button type="submit" class="btn btn-primary">Generate Invoice</button>
-                                                    @endif
+                                                <div class="invoice-button d-flex " style="gap: 0px 20px;">
+
+                                                        <a id="view-invoice" @if (isset($invoice) && isset($invoice->invoice_number)) style="display: block !important;"  href="{{ route('front.invoiceView', $invoice->invoice_number) }}" @else style="display: none !important;" @endif  target="_blank" class="btn btn-success" style="color: #fff">View Invoice</a>
+                                                        <button id="genrate-invoice" @if (isset($invoice) && isset($invoice->invoice_number)) style="display: none !important;" @else style="display: block !important;" @endif  type="submit" class="btn btn-primary">Generate Invoice</button>
+
                                                 </div>
                                             </div>
 
@@ -3066,6 +3065,12 @@ $(document).ready(function () {
                     processData: false, // Important: do not process the data
                     contentType: false, // Important: content type is false
                     success: function (response) {
+                        var invoice = response.invoice;
+                        $('#genrate-invoice').attr('style', "display: none !important");
+                        $('#view-invoice').attr('style', "display: block !important; color: #fff !important");
+                        $('#view-invoice').attr('href', "/front/invoice/"+ invoice.invoice_number +  "")
+
+
 
 
                     // var invoice = response.invoice;
