@@ -74,6 +74,8 @@ class InvoiceServiceChargesController extends Controller
         $request->validate([
             'sale_id6' => 'required',
             'month' => 'required',
+            'activation_date' => 'required',
+            'invoice_due_date' => 'required',
         ]);
         $unique_id = 'FTS'. '_' . Str::random(5) . '_' . time();
         $date = Carbon::now(); // or any other Carbon instance
