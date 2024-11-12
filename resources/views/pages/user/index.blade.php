@@ -16,7 +16,7 @@
               <div class="card">
                 <h5 class="card-header">Responsive Datatable</h5>
                 <div class="card-datatable table-responsive">
-                  <table class="dt-responsive table table-bordered">
+                  <table id="recodetable" class="table table-bordered">
                     <thead>
                       <tr>
                         <th></th>
@@ -33,6 +33,23 @@
                             <td>{{ $item->name }}</td>
                             <td>{{ $item->email }}</td>
                             <td>{{ $item->role->name }}</td>
+                            <td>
+                                <div class="d-inline-block text-nowrap">
+                                    <button
+                                    class="btn btn-sm btn-icon btn-text-secondary rounded-pill dropdown-toggle hide-arrow"
+                                    data-bs-toggle="dropdown" aria-expanded="false"><i class="mdi mdi-dots-vertical mdi-20px"></i></button>
+                                    <div class="dropdown-menu dropdown-menu-end m-0" style=""><a
+                                    href="{{ route('user.edit', $item->id) }}" class="dropdown-item"><i
+                                        class="mdi mdi-pencil-outline me-2"></i><span>Edit</span></a>
+                                        {{-- <button type="button" class="btn btn-primary" id="confirm-color">Alert</button> --}}
+                                        <a  type="button"
+                                        data-id="{{ $item->id }}"
+                                        data-route="user"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#basicModal"
+                                        class="dropdown-item delete-record"><i class="mdi mdi-delete-outline me-2"></i><span>Delete</span></a>
+                                </div>
+                            </td>
                           </tr>
                         @endforeach
                     </tbody>
@@ -59,4 +76,8 @@
 @section('js')
 <script src="{{ asset('assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js') }}"></script>
 <script src="{{ asset('assets/js/tables-datatables-advanced.js') }}"></script>
+<script>
+    $('#recodetable').DataTable();
+
+</script>
 @endsection

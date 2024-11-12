@@ -36,6 +36,8 @@ class FrontController extends Controller
                 ->orwhere('off_email', 'LIKE', "%{$searchTerm}%")
                 ->get();
 
+                $invoice = Invoice::where('invoice_number', 'LIKE', "%{$searchTerm}%")->get();
+
                 // Search Keywords
                 // $keywords = Keyword::where('word', 'LIKE', "%{$searchTerm}%")->get();
 
@@ -47,6 +49,9 @@ class FrontController extends Controller
                     'users' => $users,
                     'role' => $role,
                     'leads' => $lead,
+                    'invoice' => $invoice,
+                    // 'keywords' => $keywords,
+                    // 'serviceAreas' => $serviceAreas,
                     // 'keywords' => $keywords,
                     // 'serviceAreas' => $serviceAreas,
                 ];

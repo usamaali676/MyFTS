@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\BusinessCategory;
 use App\Models\Lead;
 use App\Models\LeadCloser;
+use App\Models\Role;
 use App\Models\SubCategory;
 use App\Models\User;
 use Carbon\Carbon;
@@ -30,7 +31,8 @@ class LeadController extends Controller
     public function create()
     {
         $categories = BusinessCategory::all();
-        $closers = User::where('user_type', "Closer")->get();
+        $role = Role::where('name', "Closer")->first();
+        $closers = User::where('role_id', $role->id)->get();
         return view('pages.lead.create', compact('categories', 'closers'));
     }
 
@@ -95,8 +97,8 @@ class LeadController extends Controller
         $sub_categories = $lead->sub_categories;
         $categories = BusinessCategory::all();
         $sub_categories_id = $lead->sub_categories->pluck('id')->toArray();
-        $closers = User::where('user_type', "Closer")
-        ->get();
+        $role = Role::where('name', "Closer")->first();
+        $closers = User::where('role_id', $role->id)->get();
         // dd($sub_categories_id);
         $related_subcategories = SubCategory::where('business_category_id',  $lead->category_id)
         ->whereNotIn('id', $sub_categories_id)
