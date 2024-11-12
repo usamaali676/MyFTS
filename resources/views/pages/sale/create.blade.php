@@ -1221,12 +1221,12 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                     @foreach ($sale->Customer_support as $item)
                                                     <option value="{{ $item->id }}" selected>{{ $item->user->name }}</option>
                                                     @endforeach
-                                                    @foreach ($closers as $item)
+                                                    @foreach ($csr as $item)
                                                     <option value="{{ $item->id }}">{{ $item->name }}</option>
                                                     @endforeach
                                                     @else
                                                     <option value="">Please Select</option>
-                                                    @foreach ($closers as $item)
+                                                    @foreach ($csr as $item)
                                                     <option value="{{ $item->id }}">{{ $item->name }}</option>
                                                     @endforeach
                                                     @endif

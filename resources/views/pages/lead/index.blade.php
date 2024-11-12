@@ -43,8 +43,14 @@
                       </tr>
                     </thead>
                     <tbody>
+                        @auth
+                            @php
+                                $user = Auth::user();
+                            @endphp
+
                         @foreach ($leads as $item)
-                          <tr>
+                        @if ($user->id == $item->saler_id || $item->closers->contains('id', $user->id))
+                        <tr>
                             <td>{{ $loop->index +1 }}</td>
                             <td>{{ $item->business_name_adv}}</td>
                             <td>{{ $item->business_number_adv }}</td>
@@ -71,8 +77,11 @@
                                 </div>
                         </div></td>
                           </tr>
+                        @endif
+
 
                         @endforeach
+                        @endauth
                     </tbody>
                     <tfoot>
                       <tr>

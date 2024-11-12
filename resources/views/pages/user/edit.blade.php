@@ -13,7 +13,7 @@
               <!-- Multi Column with Form Separator -->
 
               <div class="card mb-4">
-                <form class="card-body" action="{{ route('user.store') }}" method="POST">
+                <form class="card-body" action="{{ route('user.update', $user->id ) }}" method="POST">
                   @csrf
                   @if ($errors->any())
                   <div class="alert alert-danger">
@@ -30,11 +30,16 @@
                         <div class="form-floating form-floating-outline">
                           <select id="role" name="role_id"  class="select2 form-select" data-allow-clear="true">
                             <option value="">Select</option>
-                            @foreach ($role as $item)
-                            @if($item->id != 1)
-                            <option value="{{$item->id}}">{{$item->name}}</option>
+                            @if(isset($user->role_id))
+                                <option value="{{$user->role_id}}" selected>{{$user->role->name}}</option>
+                            @else
+                                @foreach ($role as $item)
+                                @if($item->id != 1)
+                                <option value="{{$item->id}}">{{$item->name}}</option>
+                                @endif
+                                @endforeach
                             @endif
-                            @endforeach
+
                           </select>
                           <label for="role">Role</label>
                         </div>
@@ -49,6 +54,7 @@
                             name="email"
                             placeholder="john.doe"
                             aria-label="john.doe"
+                            value="{{ $user->email }}"
                             aria-describedby="multicol-email2" />
                           <label for="multicol-email">Email</label>
                         </div>
@@ -99,7 +105,7 @@
                   <div class="row g-4">
                     <div class="col-md-12">
                       <div class="form-floating form-floating-outline">
-                        <input type="text" name="name" id="multicol-first-name" class="form-control" placeholder="John" />
+                        <input type="text" name="name" id="multicol-first-name" value="{{ $user->name }}" class="form-control" placeholder="John" />
                         <label for="multicol-first-name">Full Name</label>
                       </div>
                     </div>

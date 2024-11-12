@@ -10,6 +10,7 @@ use App\Models\Lead;
 use App\Models\LeadCloser;
 use App\Models\MerchantAccount;
 use App\Models\Payment;
+use App\Models\Role;
 use App\Models\Sale;
 use App\Models\SaleCS;
 use App\Models\SocialLink;
@@ -49,8 +50,10 @@ class SaleController extends Controller
         $social_links = DB::select("SHOW COLUMNS FROM social_links LIKE 'social_name'");
         $social_links = $social_links[0]->Type; // Get the type string
         $social_links = explode("','", substr($social_links, 6, -2));
-        $closers = User::where('user_type', "Closer")
-        ->get();
+        $role = Role::where('name', "Closer")->first();
+        $closers = User::where('role_id', $role->id)->get();
+        $csrole = Role::where('name', "Customer Support")->first();
+        $csr = User::where('role_id', $csrole->id)->get();
         $sale = Sale::where('lead_id', $lead->id)->first();
         $mehchant = MerchantAccount::all();
 
@@ -78,9 +81,9 @@ class SaleController extends Controller
                 $clientService->setRelation('companyServicesForSale', $clientService->companyServicesForSale($sale->id)->get());
                 return $clientService;
             });
-            return view('pages.sale.create', compact('lead', 'client_enum', 'call_enum', 'social_links', 'closers', 'sale', 'company_services', 'client_services', 'invoice', 'mehchant' , 'all_invoices', 'payments'));
+            return view('pages.sale.create', compact('lead', 'client_enum', 'call_enum', 'social_links', 'closers', 'sale', 'company_services', 'client_services', 'invoice', 'mehchant' , 'all_invoices', 'payments', 'csr'));
         } else {
-            return view('pages.sale.create', compact('lead', 'client_enum', 'call_enum', 'social_links', 'closers', 'sale', 'company_services', 'mehchant'));
+            return view('pages.sale.create', compact('lead', 'client_enum', 'call_enum', 'social_links', 'closers', 'sale', 'company_services', 'mehchant', 'csr'));
         }
 
 

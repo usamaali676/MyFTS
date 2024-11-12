@@ -36,6 +36,7 @@ id="layout-navbar">
             </div>
             <div class="tt-dataset tt-dataset-roles"></div>
             <div class="tt-dataset tt-dataset-leads"></div>
+            <div class="tt-dataset tt-dataset-invoice"></div>
         </div>
         {{-- <div class="tt-menu navbar-search-suggestion"
             style="position: absolute; top: 100%; left: 0px; z-index: 100; ">
