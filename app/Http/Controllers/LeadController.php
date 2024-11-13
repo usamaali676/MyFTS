@@ -136,27 +136,17 @@ class LeadController extends Controller
         $lead->sub_categories()->sync($request->sub_category);
         // $lead->closers()->sync($request->closers);
         if(isset($request->closers)){
-        foreach ($request->closers as $users) {
-            $remainingclosers = LeadCloser::where('lead_id', $lead->id)->where('closer_id','!=',  $users)->get();
+            $remainingclosers = LeadCloser::where('lead_id', $lead->id)->get();
             if(isset($remainingclosers)){
                 foreach ($remainingclosers as $closer) {
                     $closer->delete();
                 }
             }
-            $closers = LeadCloser::where('lead_id', $lead->id)->where('closer_id', $users)->first();
-            // dd($closers);
-            if($closers){
-                $closers->update([
-                    'closer_id' => $users,
-                    'updated_by' => Auth::user()->id,
-                ]);
-            }
-            else{
+        foreach ($request->closers as $users) {
                 LeadCloser::create([
                     'lead_id' => $lead->id,
                     'closer_id' => $users,
                 ]);
-            }
          }
         }
         Alert::Success('Success', "Lead Updated Successfully");

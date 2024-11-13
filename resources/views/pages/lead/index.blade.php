@@ -38,7 +38,8 @@
                         <th>Email</th>
                         <th>Category</th>
                         <th>Saler</th>
-                        <th>Status</th>
+                        <th>Call Status</th>
+                        <th>Closers</th>
                         <th>Action</th>
                       </tr>
                     </thead>
@@ -57,7 +58,14 @@
                             <td>{{ $item->off_email}}</td>
                             <td><span class="badge rounded-pill bg-label-primary me-1">{{ $item->category->name }}</span></td>
                             <td>{{ $item->saler->name }}</td>
+
                             <td>{{ $item->call_status }}</td>
+                            <td>
+                                {{-- <p>{{ $item->closers }}</p> --}}
+                                @foreach ($item->closers as $user)
+                                    <span class="badge rounded-pill bg-label-primary me-1">{{ $user->user->name }}</span>
+                                @endforeach
+                            </td>
                             <td>
                                 <div class="d-inline-block text-nowrap">
                                     <a href="{{ route('sale.create', $item->id) }}" class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect" data-bs-toggle="tooltip" title="Preview"><i class="ri-send-plane-2-line ri-20px"></i></a>
