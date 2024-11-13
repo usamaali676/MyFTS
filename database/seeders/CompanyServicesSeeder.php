@@ -14,9 +14,13 @@ class CompanyServicesSeeder extends Seeder
      */
     public function run(): void
     {
-        $services = ['Firm Tech Sol', 'Firmtech LLC', 'Witrobo', 'Firm Tech Biz', 'Orion Logix'];
+        $services = ['SEO', 'LandingPage', 'GMB'];
         foreach ($services as $service) {
-            MerchantAccount::create(['name' => $service]);
+            CompanyServices::create([
+                'name' => $service,
+                'price' => '100',
+                'category'=> "Marketing",
+        ]);
         }
     }
 }
