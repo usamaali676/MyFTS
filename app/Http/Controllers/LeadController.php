@@ -21,7 +21,9 @@ class LeadController extends Controller
      */
     public function index()
     {
-        $leads = Lead::orderBy('id', 'DESC')->get();
+        $leads = Lead::with('closers') // Eager load the closers relationship directly in the query
+        ->orderBy('id', 'DESC')
+        ->get();
         return view('pages.lead.index', compact('leads'));
     }
 
@@ -135,19 +137,20 @@ class LeadController extends Controller
         ]);
         $lead->sub_categories()->sync($request->sub_category);
         // $lead->closers()->sync($request->closers);
-        if(isset($request->closers)){
+        // if(isset($request->closers)){
             $remainingclosers = LeadCloser::where('lead_id', $lead->id)->get();
             if(isset($remainingclosers)){
                 foreach ($remainingclosers as $closer) {
                     $closer->delete();
                 }
             }
-        foreach ($request->closers as $users) {
+        if(isset($request->closers)){
+            foreach ($request->closers as $users) {
                 LeadCloser::create([
                     'lead_id' => $lead->id,
                     'closer_id' => $users,
                 ]);
-         }
+            }
         }
         Alert::Success('Success', "Lead Updated Successfully");
         return redirect()->route('lead.index');
