@@ -1238,8 +1238,18 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                         </div>
                                         <div class="col-sm-6">
                                             <label class="switch switch-lg">
-                                                <input type="checkbox" class="switch-input" name="sale_status" @if(isset($sale) &&
-                                                    $sale->status == 1) checked @else readonly @endif >
+
+                                                <input type="checkbox" class="switch-input" name="sale_status"
+                                                    @if(isset($sale) &&
+                                                    $sale->status == 1) checked
+                                                    @endif
+                                                    @if($user->role_id == 1 || $user->role->name == "Customer Support")
+                                                    {{-- <p>{{ $user->role_id }}</p> --}}
+                                                        @readonly(false)
+                                                    @else
+                                                        @readonly(true)
+                                                    @endif
+                                                    >
                                                 <span class="switch-toggle-slider">
                                                     <span class="switch-on">
                                                         <i class="ri-check-line"></i>
