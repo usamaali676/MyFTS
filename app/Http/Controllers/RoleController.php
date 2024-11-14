@@ -108,6 +108,7 @@ class RoleController extends Controller
     public function update(Request $request,  $id)
     {
             // Validate the incoming request
+            // dd($request->all());
             $request->validate([
                 'modalRoleName' => 'required|string|max:255',
             ]);
@@ -121,28 +122,59 @@ class RoleController extends Controller
             $role->save();
 
             // Update permissions
-            if(isset($request->permissions)){
-                foreach ($request->permissions as $permName => $permData) {
-                    $permission = Permission::where('role_id', $role->id)->where('name', $permName)->first();
-                    if ($permission) {
-                        $permission->create = isset($permData['create']);
-                        $permission->view = isset($permData['view']);
-                        $permission->edit = isset($permData['edit']);
-                        $permission->delete = isset($permData['delete']);
-                        $permission->save();
-                    } else {
-                        // If the permission does not exist, you might want to create it (optional)
-                        Permission::create([
-                            'role_id' => $role->id,
-                            'name' => $permName,
-                            'create' => isset($permData['create']),
-                            'view' => isset($permData['view']),
-                            'edit' => isset($permData['edit']),
-                            'delete' => isset($permData['delete']),
-                        ]);
-                    }
+            $permissions  = GlobalHelper::Permissions();
+            foreach ($permissions as $permName) {
+                $permData = $request->permissions[$permName] ?? [
+                    'create' => 0,
+                    'view' => 0,
+                    'edit' => 0,
+                    'delete' => 0,
+                ];
+                // dd($permData['edit']);
+
+                // Update or create the permission
+                $permission = Permission::where('role_id', $role->id)->where('name', $permName)->first();
+                // dd($permission->edit);
+                if ($permission) {
+                    $permission->create =   (isset($permData['create']) && $permData['create'] == 'on') ? 1 : 0;  // Convert 'on' to 1, otherwise 0
+                    $permission->view =     (isset($permData['view']) && $permData['view'] == 'on') ? 1 : 0;    // Convert 'on' to 1, otherwise 0
+                    $permission->edit =  (isset($permData['edit']) && $permData['edit'] == 'on') ? 1 : 0;      // Convert 'on' to 1, otherwise 0
+                    $permission->delete = (isset($permData['delete']) && $permData['delete'] == 'on') ? 1 : 0;   // Convert 'on' to 1, otherwise 0
+                    $permission->save();
+                } else {
+                    Permission::create([
+                        'role_id' => $role->id,
+                        'name' => $permName,
+                        'create' => $permData['create'],
+                        'view' => $permData['view'],
+                        'edit' => $permData['edit'],
+                        'delete' => $permData['delete'],
+                    ]);
                 }
             }
+
+            // if(isset($request->permissions)){
+            //     foreach ($request->permissions as $permName => $permData) {
+            //         $permission = Permission::where('role_id', $role->id)->where('name', $permName)->first();
+            //         if ($permission) {
+            //             $permission->create = isset($permData['create']);
+            //             $permission->view = isset($permData['view']);
+            //             $permission->edit = isset($permData['edit']);
+            //             $permission->delete = isset($permData['delete']);
+            //             $permission->save();
+            //         } else {
+            //             // If the permission does not exist, you might want to create it (optional)
+            //             Permission::create([
+            //                 'role_id' => $role->id,
+            //                 'name' => $permName,
+            //                 'create' => isset($permData['create']),
+            //                 'view' => isset($permData['view']),
+            //                 'edit' => isset($permData['edit']),
+            //                 'delete' => isset($permData['delete']),
+            //             ]);
+            //         }
+            //     }
+            // }
             Alert::success('success', "Role Update Successfully");
             return redirect()->route('role.index');
     }

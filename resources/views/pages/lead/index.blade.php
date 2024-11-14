@@ -40,6 +40,7 @@
                         <th>Saler</th>
                         <th>Call Status</th>
                         <th>Closers</th>
+                        <th>Sale Status</th>
                         <th>Action</th>
                       </tr>
                     </thead>
@@ -48,7 +49,7 @@
                             @php
                                 $user = Auth::user();
                             @endphp
-                            {{-- <p>{{ $user->role->id }}</p> --}}
+                            {{-- <p>{{ $sale }}</p> --}}
 
                         @if($user->role_id == 1 || $user->role->name == "Customer Support")
                         {{-- <p>fdgsdfg</p> --}}
@@ -62,11 +63,20 @@
                                 <td>{{ $item->saler->name }}</td>
 
                                 <td>{{ $item->call_status }}</td>
+
                                 <td>
                                     {{-- <p>{{ $item->closers }}</p> --}}
                                     @foreach ($item->closers as $user)
                                         <span class="badge rounded-pill bg-label-primary me-1">{{ $user->user->name }}</span>
                                     @endforeach
+                                </td>
+                                <td>
+                                    {{-- <p>{{ $item->sale }}</p> --}}
+                                    @if(isset($item->sale) && $item->sale->status == 1)
+                                        <span class="badge rounded-pill bg-success">Active</span>
+                                    @else
+                                    <span class="badge rounded-pill bg-danger">Inactive</span>
+                                    @endif
                                 </td>
                                 <td>
                                     <div class="d-inline-block text-nowrap">
@@ -107,6 +117,13 @@
                                             @foreach ($item->closers as $list)
                                                 <span class="badge rounded-pill bg-label-primary me-1">{{ $list->user->name }}</span>
                                             @endforeach
+                                        </td>
+                                        <td>
+                                            @if(isset($item->sale) && $item->sale->status == 1)
+                                                <span class="badge rounded-pill bg-success">Active</span>
+                                            @else
+                                                <span class="badge rounded-pill bg-danger">Inactive</span>
+                                            @endif
                                         </td>
                                         <td>
                                             <div class="d-inline-block text-nowrap">

@@ -6,6 +6,7 @@ use App\Models\BusinessCategory;
 use App\Models\Lead;
 use App\Models\LeadCloser;
 use App\Models\Role;
+use App\Models\Sale;
 use App\Models\SubCategory;
 use App\Models\User;
 use Carbon\Carbon;
@@ -24,6 +25,7 @@ class LeadController extends Controller
         $leads = Lead::with('closers') // Eager load the closers relationship directly in the query
         ->orderBy('id', 'DESC')
         ->get();
+        // $sale = Sale::where('lead_id', $leads->id)->first();
         return view('pages.lead.index', compact('leads'));
     }
 
