@@ -50,7 +50,7 @@
                             @endphp
                             {{-- <p>{{ $user->role->id }}</p> --}}
 
-                        @if($user->role_id == 1)
+                        @if($user->role_id == 1 || $user->role->name == "Customer Support")
                         {{-- <p>fdgsdfg</p> --}}
                             @foreach ($leads as $item)
                             <tr>
