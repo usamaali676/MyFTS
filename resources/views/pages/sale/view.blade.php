@@ -39,19 +39,27 @@
                                 ><span class="fw-medium">{{ $sale->lead->business_number_adv }}</span>
                               </li>
                               @endif
-                              <li class="list-inline-item">
-                                <i class="mdi mdi-map-marker-outline me-1 mdi-20px"></i
-                                ><span class="fw-medium">{{ $sale->lead->client_address }}</span>
-                              </li>
-                              <li class="list-inline-item">
-                                <i class="mdi mdi-calendar-blank-outline me-1 mdi-20px"></i
-                                ><span class="fw-medium"> Joined April 2021</span>
-                              </li>
+
+                             @if (isset($sale ->lead->client_address) )
+                                 <li class="list-inline-item">
+                                <i class="mdi mdi-map-marker-outline me-1 mdi-20px"></i>
+                                    <span class="fw-medium">{{ $sale->lead->client_address }}</span>
+                               </li>
+                             @endif
+                             @if (isset($sale->activation_date))
+                             <li class="list-inline-item">
+                               <i class="mdi mdi-calendar-blank-outline me-1 mdi-20px"></i
+                               ><span class="fw-medium"> {{$sale->activation_date}}</span>
+                             </li>
+                             @endif
                             </ul>
                           </div>
-                          <a href="javascript:void(0)" class="btn btn-primary">
-                            <i class="mdi mdi-account-check-outline me-1"></i>Connected
-                          </a>
+                            @if (isset($sale->status))
+                                <a href="javascript:void(0)" class="btn btn-primary">
+                                    <i class="mdi mdi-account-check-outline me-1"></i>
+                                    {{ $sale->status == 1 ? 'Active' : 'De-active' }}
+                                </a>
+                            @endif
                         </div>
                       </div>
                     </div>
@@ -97,41 +105,52 @@
                     <div class="card-body">
                       <small class="card-text text-uppercase">About</small>
                       <ul class="list-unstyled my-3 py-1">
-                        <li class="d-flex align-items-center mb-3">
-                          <i class="mdi mdi-account-outline mdi-24px"></i
-                          ><span class="fw-medium mx-2">Full Name:</span> <span>John Doe</span>
-                        </li>
-                        <li class="d-flex align-items-center mb-3">
-                          <i class="mdi mdi-check mdi-24px"></i><span class="fw-medium mx-2">Status:</span>
-                          <span>Active</span>
-                        </li>
-                        <li class="d-flex align-items-center mb-3">
-                          <i class="mdi mdi-star-outline mdi-24px"></i><span class="fw-medium mx-2">Role:</span>
-                          <span>Developer</span>
-                        </li>
-                        <li class="d-flex align-items-center mb-3">
-                          <i class="mdi mdi-flag-outline mdi-24px"></i><span class="fw-medium mx-2">Country:</span>
-                          <span>USA</span>
-                        </li>
-                        <li class="d-flex align-items-center mb-3">
-                          <i class="mdi mdi-translate mdi-24px"></i><span class="fw-medium mx-2">Languages:</span>
-                          <span>English</span>
-                        </li>
+                        @if (isset($sale->lead->client_name))
+                            <li class="d-flex align-items-center mb-3">
+                                <i class="mdi mdi-account-outline mdi-24px"></i
+                                ><span class="fw-medium mx-2">Full Name:</span> <span>{{$sale->lead->client_name}}</span>
+                            </li>
+                        @endif
+
+                        @if (isset($sale->client_nature))
+                            <li class="d-flex align-items-center mb-3">
+                                <i class="mdi mdi-star-outline mdi-24px"></i><span class="fw-medium mx-2">Client Nature:</span>
+                                <span>{{$sale->client_nature}}</span>
+                            </li>
+                        @endif
+                        @if (isset($sale->lead->client_address))
+                            <li class="d-flex align-items-center mb-3">
+                                <i class="mdi mdi-flag-outline mdi-24px"></i><span class="fw-medium mx-2">Address:</span>
+                                <span>{{$sale->lead->client_address}}</span>
+                            </li>
+                        @endif
+                        @if (isset($sale->time_zone))
+                            <li class="d-flex align-items-center mb-3">
+                                <i class="mdi mdi-translate mdi-24px"></i><span class="fw-medium mx-2">Time Zone:</span>
+                                <span>{{$sale->time_zone}}</span>
+                            </li>
+                        @endif
                       </ul>
                       <small class="card-text text-uppercase">Contacts</small>
                       <ul class="list-unstyled my-3 py-1">
-                        <li class="d-flex align-items-center mb-3">
-                          <i class="mdi mdi-phone-outline mdi-24px"></i><span class="fw-medium mx-2">Contact:</span>
-                          <span>(123) 456-7890</span>
-                        </li>
-                        <li class="d-flex align-items-center mb-3">
-                          <i class="mdi mdi-message-outline mdi-24px"></i><span class="fw-medium mx-2">Skype:</span>
-                          <span>john.doe</span>
-                        </li>
-                        <li class="d-flex align-items-center mb-3">
-                          <i class="mdi mdi-email-outline mdi-24px"></i><span class="fw-medium mx-2">Email:</span>
-                          <span>john.doe@example.com</span>
-                        </li>
+                        @if (isset($sale->lead->business_number_adv))
+                            <li class="d-flex align-items-center mb-3">
+                                <i class="mdi mdi-phone-outline mdi-24px"></i><span class="fw-medium mx-2">Contact:</span>
+                                <span>{{$sale->lead->business_number_adv}}</span>
+                            </li>
+                        @endif
+                        @if (isset($sale->lead->off_email))
+                            <li class="d-flex align-items-center mb-3">
+                                <i class="mdi mdi-email-outline mdi-24px"></i><span class="fw-medium mx-2">Email:</span>
+                                <span>{{$sale->lead->off_email}}</span>
+                            </li>
+                        @endif
+                        @if (isset($sale->call_type))
+                            <li class="d-flex align-items-center mb-3">
+                                <i class="mdi mdi-message-outline mdi-24px"></i><span class="fw-medium mx-2">Call Type:</span>
+                                <span>{{$sale->call_type}}</span>
+                            </li>
+                        @endif
                       </ul>
                       <small class="card-text text-uppercase">Teams</small>
                       <ul class="list-unstyled mb-0 mt-3 pt-1">
