@@ -292,9 +292,10 @@ class SaleController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Sale $sale)
+    public function show($id)
     {
-        //
+        $sale = Sale::find($id);
+        return view('pages.sale.view', compact('sale'));
     }
 
     /**
