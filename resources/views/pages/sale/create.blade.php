@@ -2344,14 +2344,14 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                     // Handle success response (display success message using SweetAlert2)
                     Swal.fire({
                        position: 'top-end', // Position the toast at the top-right corner
-                        icon: 'danger', // Change this to 'error', 'warning', etc., based on your requirement
+                        icon: 'success', // Change this to 'error', 'warning', etc., based on your requirement
                         title: 'Sale Saved Successfully', //
                         showConfirmButton: false, // Remove the confirm button
                         timer: 1500, // Duration in milliseconds before the toast disappears
                         toast: true, // Enable the toast feature
-                        didOpen: () => {
-                        Swal.showLoading(); // Optionally show a loading indicator if needed
-                        }
+                        // didOpen: () => {
+                        // Swal.showLoading(); // Optionally show a loading indicator if needed
+                        // }
                     });
 
 
@@ -2373,10 +2373,13 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
 
                         // Display SweetAlert2 for validation errors
                         Swal.fire({
+                            position: 'top-end',
                             icon: 'error',
                             title: 'Validation Error',
                             html: errorHtml, // Use the generated error HTML
-                            timer: 4000, // Auto-close after 4 seconds (optional)
+                            showConfirmButton: false, // Remove the confirm button
+                            timer: 1500, // Duration in milliseconds before the toast disappears
+                            toast: true,
                         });
                     }
 
@@ -2420,11 +2423,13 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
 
                     // Handle success response (display success message using SweetAlert2)
                     Swal.fire({
-                        icon: 'success',
-                        title: 'Success',
-                        text: response.message,
-                        timer: 2000, // Automatically close after 2 seconds
-                        showConfirmButton: false
+                       position: 'top-end', // Position the toast at the top-right corner
+                        icon: 'success', // Change this to 'error', 'warning', etc., based on your requirement
+                        title: 'Sale Info Saved Successfully', //
+                        showConfirmButton: false, // Remove the confirm button
+                        timer: 1500, // Duration in milliseconds before the toast disappears
+                        toast: true, // Enable the toast feature
+
                     });
 
 
@@ -2446,19 +2451,25 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
 
                         // Display SweetAlert2 for validation errors
                         Swal.fire({
+                            position: 'top-end',
                             icon: 'error',
                             title: 'Validation Error',
                             html: errorHtml, // Use the generated error HTML
-                            timer: 4000, // Auto-close after 4 seconds (optional)
+                            showConfirmButton: false, // Remove the confirm button
+                            timer: 1500, // Duration in milliseconds before the toast disappears
+                            toast: true,
                         });
                     }
                     else if (xhr.responseJSON.error) {
                         // Show custom error message with SweetAlert2
                         Swal.fire({
+                            position: 'top-end',
                             icon: 'error',
                             title: 'Error',
                             text: xhr.responseJSON.error, // Show the custom error message
-                            timer: 4000, // Auto-close after 4 seconds (optional)
+                            showConfirmButton: false, // Remove the confirm button
+                            timer: 1500, // Duration in milliseconds before the toast disappears
+                            toast: true,
                         });
                     }
 
@@ -2605,12 +2616,14 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
 
                         // Handle success response (display success message using SweetAlert2)
                         Swal.fire({
-                            icon: 'success',
-                            title: 'Success',
-                            text: response.message,
-                            timer: 2000, // Automatically close after 2 seconds
-                            showConfirmButton: false
-                        });
+                       position: 'top-end', // Position the toast at the top-right corner
+                        icon: 'success', // Change this to 'error', 'warning', etc., based on your requirement
+                        title: 'Service Added Successfully', //
+                        showConfirmButton: false, // Remove the confirm button
+                        timer: 1500, // Duration in milliseconds before the toast disappears
+                        toast: true, // Enable the toast feature
+
+                    });
 
                         // Optionally reset the form only on success
                         $('#serviceform')[0].reset();
@@ -2629,19 +2642,25 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
 
                             // Display SweetAlert2 for validation errors
                             Swal.fire({
+                                position: 'top-end',
                                 icon: 'error',
                                 title: 'Validation Error',
                                 html: errorHtml, // Use the generated error HTML
-                                timer: 4000, // Auto-close after 4 seconds (optional)
+                                showConfirmButton: false, // Remove the confirm button
+                                timer: 1500, // Duration in milliseconds before the toast disappears
+                                toast: true,
                             });
                         }
                         else if (xhr.responseJSON.error) {
                             // Show custom error message with SweetAlert2
                             Swal.fire({
+                                position: 'top-end',
                                 icon: 'error',
                                 title: 'Error',
                                 text: xhr.responseJSON.error, // Show the custom error message
-                                timer: 4000, // Auto-close after 4 seconds (optional)
+                                showConfirmButton: false, // Remove the confirm button
+                                timer: 1500, // Duration in milliseconds before the toast disappears
+                                toast: true,
                             });
                         }
 
@@ -2666,11 +2685,13 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                     success: function (response) {
 
                         Swal.fire({
-                        icon: 'success',
-                        title: 'Success',
-                        text: response.message,
-                        timer: 2000, // Automatically close after 2 seconds
-                        showConfirmButton: false
+                       position: 'top-end', // Position the toast at the top-right corner
+                        icon: 'error', // Change this to 'error', 'warning', etc., based on your requirement
+                        title: 'Service Deleted Successfully', //
+                        showConfirmButton: false, // Remove the confirm button
+                        timer: 1500, // Duration in milliseconds before the toast disappears
+                        toast: true, // Enable the toast feature
+
                     });
                     },
                     error: function (xhr) {
@@ -2686,19 +2707,25 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
 
                             // Display SweetAlert2 for validation errors
                             Swal.fire({
+                                position: 'top-end',
                                 icon: 'error',
                                 title: 'Validation Error',
                                 html: errorHtml, // Use the generated error HTML
-                                timer: 4000, // Auto-close after 4 seconds (optional)
+                                showConfirmButton: false, // Remove the confirm button
+                                timer: 1500, // Duration in milliseconds before the toast disappears
+                                toast: true, // Auto-close after 4 seconds (optional)
                             });
                         }
                         else if (xhr.responseJSON.error) {
                             // Show custom error message with SweetAlert2
                             Swal.fire({
+                                position: 'top-end',
                                 icon: 'error',
                                 title: 'Error',
                                 text: xhr.responseJSON.error, // Show the custom error message
-                                timer: 4000, // Auto-close after 4 seconds (optional)
+                                showConfirmButton: false, // Remove the confirm button
+                                timer: 1500, // Duration in milliseconds before the toast disappears
+                                toast: true,
                             });
                         }
 
@@ -2753,11 +2780,13 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
 
                         // Handle success response (display success message using SweetAlert2)
                         Swal.fire({
+                            position: 'top-end',
                             icon: 'success',
                             title: 'Success',
                             text: response.message,
-                            timer: 2000, // Automatically close after 2 seconds
-                            showConfirmButton: false
+                            showConfirmButton: false, // Remove the confirm button
+                            timer: 1500, // Duration in milliseconds before the toast disappears
+                            toast: true,
                         });
 
 
@@ -2779,19 +2808,25 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
 
                             // Display SweetAlert2 for validation errors
                             Swal.fire({
+                                position: 'top-end',
                                 icon: 'error',
                                 title: 'Validation Error',
                                 html: errorHtml, // Use the generated error HTML
-                                timer: 4000, // Auto-close after 4 seconds (optional)
+                                showConfirmButton: false, // Remove the confirm button
+                                timer: 1500, // Duration in milliseconds before the toast disappears
+                                toast: true,
                             });
                         }
                         else if (xhr.responseJSON.error) {
                             // Show custom error message with SweetAlert2
                             Swal.fire({
+                                position: 'top-end',
                                 icon: 'error',
                                 title: 'Error',
                                 text: xhr.responseJSON.error, // Show the custom error message
-                                timer: 4000, // Auto-close after 4 seconds (optional)
+                                showConfirmButton: false, // Remove the confirm button
+                                timer: 1500, // Duration in milliseconds before the toast disappears
+                                toast: true,
                             });
                         }
 
@@ -2882,10 +2917,13 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
 
                         // Handle success response (display success message using SweetAlert2)
                         Swal.fire({
+                            position: 'top-end',
                             icon: 'success',
                             title: 'Success',
                             text: response.message,
-                            timer: 2000, // Automatically close after 2 seconds
+                            showConfirmButton: false, // Remove the confirm button
+                            timer: 1500, // Duration in milliseconds before the toast disappears
+                            toast: true,
                             showConfirmButton: false
                         });
 
@@ -2907,19 +2945,25 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
 
                             // Display SweetAlert2 for validation errors
                             Swal.fire({
+                                position: 'top-end',
                                 icon: 'error',
                                 title: 'Validation Error',
                                 html: errorHtml, // Use the generated error HTML
-                                timer: 4000, // Auto-close after 4 seconds (optional)
+                                showConfirmButton: false, // Remove the confirm button
+                                timer: 1500, // Duration in milliseconds before the toast disappears
+                                toast: true,
                             });
                         }
                         else if (xhr.responseJSON.error) {
                             // Show custom error message with SweetAlert2
                             Swal.fire({
+                                position: 'top-end',
                                 icon: 'error',
                                 title: 'Error',
                                 text: xhr.responseJSON.error, // Show the custom error message
-                                timer: 4000, // Auto-close after 4 seconds (optional)
+                                showConfirmButton: false, // Remove the confirm button
+                                timer: 1500, // Duration in milliseconds before the toast disappears
+                                toast: true,
                             });
                         }
 
@@ -2963,10 +3007,13 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
 
                         // Handle success response (display success message using SweetAlert2)
                         Swal.fire({
+                            position: 'top-end',
                             icon: 'success',
                             title: 'Success',
                             text: response.message,
-                            timer: 2000, // Automatically close after 2 seconds
+                           showConfirmButton: false, // Remove the confirm button
+                            timer: 1500, // Duration in milliseconds before the toast disappears
+                            toast: true,
                             showConfirmButton: false
                         });
 
@@ -2988,19 +3035,25 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
 
                             // Display SweetAlert2 for validation errors
                             Swal.fire({
+                                position: 'top-end',
                                 icon: 'error',
                                 title: 'Validation Error',
                                 html: errorHtml, // Use the generated error HTML
-                                timer: 4000, // Auto-close after 4 seconds (optional)
+                                showConfirmButton: false, // Remove the confirm button
+                                timer: 1500, // Duration in milliseconds before the toast disappears
+                                toast: true,
                             });
                         }
                         else if (xhr.responseJSON.error) {
                             // Show custom error message with SweetAlert2
                             Swal.fire({
+                                position: 'top-end',
                                 icon: 'error',
                                 title: 'Error',
                                 text: xhr.responseJSON.error, // Show the custom error message
-                                timer: 4000, // Auto-close after 4 seconds (optional)
+                                showConfirmButton: false, // Remove the confirm button
+                                timer: 1500, // Duration in milliseconds before the toast disappears
+                                toast: true,
                             });
                         }
 
@@ -3174,10 +3227,13 @@ $(document).ready(function () {
 
                         // Handle success response (display success message using SweetAlert2)
                         Swal.fire({
+                            position: 'top-end',
                             icon: 'success',
                             title: 'Success',
                             text: response.message,
-                            timer: 2000, // Automatically close after 2 seconds
+                            showConfirmButton: false, // Remove the confirm button
+                            timer: 1500, // Duration in milliseconds before the toast disappears
+                            toast: true,
                             showConfirmButton: false
                         });
 
@@ -3200,19 +3256,25 @@ $(document).ready(function () {
 
                             // Display SweetAlert2 for validation errors
                             Swal.fire({
+                                position: 'top-end',
                                 icon: 'error',
                                 title: 'Validation Error',
                                 html: errorHtml, // Use the generated error HTML
-                                timer: 4000, // Auto-close after 4 seconds (optional)
+                                showConfirmButton: false, // Remove the confirm button
+                                timer: 1500, // Duration in milliseconds before the toast disappears
+                                toast: true,
                             });
                         }
                         else if (xhr.responseJSON.error) {
                             // Show custom error message with SweetAlert2
                             Swal.fire({
+                                position: 'top-end',
                                 icon: 'error',
                                 title: 'Error',
                                 text: xhr.responseJSON.error, // Show the custom error message
-                                timer: 4000, // Auto-close after 4 seconds (optional)
+                                showConfirmButton: false, // Remove the confirm button
+                                timer: 1500, // Duration in milliseconds before the toast disappears
+                                toast: true,
                             });
                         }
 
@@ -3320,10 +3382,13 @@ $(document).ready(function () {
 
                         // Handle success response (display success message using SweetAlert2)
                         Swal.fire({
+                            position: 'top-end',
                             icon: 'success',
                             title: 'Success',
                             text: response.message,
-                            timer: 2000, // Automatically close after 2 seconds
+                            showConfirmButton: false, // Remove the confirm button
+                            timer: 1500, // Duration in milliseconds before the toast disappears
+                            toast: true,
                             showConfirmButton: false
                         });
 
@@ -3346,19 +3411,25 @@ $(document).ready(function () {
 
                             // Display SweetAlert2 for validation errors
                             Swal.fire({
+                                position: 'top-end',
                                 icon: 'error',
                                 title: 'Validation Error',
                                 html: errorHtml, // Use the generated error HTML
-                                timer: 4000, // Auto-close after 4 seconds (optional)
+                                showConfirmButton: false, // Remove the confirm button
+                                timer: 1500, // Duration in milliseconds before the toast disappears
+                                toast: true,
                             });
                         }
                         else if (xhr.responseJSON.error) {
                             // Show custom error message with SweetAlert2
                             Swal.fire({
+                                position: 'top-end',
                                 icon: 'error',
                                 title: 'Error',
                                 text: xhr.responseJSON.error, // Show the custom error message
-                                timer: 4000, // Auto-close after 4 seconds (optional)
+                                showConfirmButton: false, // Remove the confirm button
+                                timer: 1500, // Duration in milliseconds before the toast disappears
+                                toast: true,
                             });
                         }
 
