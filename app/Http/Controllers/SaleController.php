@@ -292,9 +292,9 @@ class SaleController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Sale $sale)
+    public function show($id)
     {
-        //
+        return view('sale.view');
     }
 
     /**
