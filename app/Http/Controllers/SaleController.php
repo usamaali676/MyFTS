@@ -294,7 +294,8 @@ class SaleController extends Controller
      */
     public function show($id)
     {
-        return view('sale.view');
+        $sale = Sale::find($id);
+        return view('pages.sale.view', compact('sale'));
     }
 
     /**
