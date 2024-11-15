@@ -8,7 +8,9 @@
             <!-- Content -->
 
             <div class="container-xxl flex-grow-1 container-p-y">
+
               <h4 class="py-3 mb-4"><span class="text-muted fw-light">Sale /</span> Detail</h4>
+
 
               <!-- Header -->
               <div class="row">
@@ -60,6 +62,7 @@
                                     {{ $sale->status == 1 ? 'Active' : 'De-active' }}
                                 </a>
                             @endif
+
                         </div>
                       </div>
                     </div>
@@ -164,6 +167,7 @@
                             @endforeach
                         @endif
 
+
                       </ul>
                     </div>
                   </div>
@@ -202,6 +206,7 @@
                             </div>
                         </li>
 
+
                       </ul>
                     </div>
                   </div>
@@ -217,11 +222,13 @@
                       <div class="card-action-element">
                         <div class="dropdown">
 
+
                         </div>
                       </div>
                     </div>
                     <div class="card-body pt-3 pb-0">
                       <ul class="timeline mb-0">
+
                         @if(isset($sale->clientServices))
                             @foreach ($sale->clientServices as $services)
                             <li class="timeline-item timeline-item-transparent">
@@ -239,6 +246,7 @@
                                 </li> --}}
                             @endforeach
                         @endif
+
                       </ul>
                     </div>
                   </div>
@@ -252,12 +260,12 @@
                           <div class="card-action-element">
                             <div class="dropdown">
 
-
                             </div>
                           </div>
                         </div>
                         <div class="card-body">
                           <ul class="list-unstyled mb-0">
+
                             @if (isset($sale->keyword))
                                 @foreach ($sale->keyword as $keywords)
                                 <li class="mb-3">
@@ -275,6 +283,7 @@
                                   </li>
                                 @endforeach
                             @endif
+
                           </ul>
                         </div>
                       </div>
@@ -284,15 +293,18 @@
                     <div class="col-lg-12 col-xl-6">
                       <div class="card card-action mb-4">
                         <div class="card-header align-items-center">
+
                           <h5 class="card-action-title mb-0">Service Areas</h5>
                           <div class="card-action-element">
                             <div class="dropdown">
+
 
                             </div>
                           </div>
                         </div>
                         <div class="card-body">
                           <ul class="list-unstyled mb-0">
+
                             @if(isset($sale->service_area))
                                 @foreach($sale->service_area as $area)
                                 <li class="mb-3">
@@ -318,20 +330,24 @@
                                   </li>
                                 @endforeach
                             @endif
+
                           </ul>
                         </div>
                       </div>
                     </div>
                     <!--/ Teams -->
                   </div>
+
                   {{-- <p>{{ $sale->invoice }}</p> --}}
                   @if(isset($sale->invoice))
+
                   <!-- Projects table -->
                   <div class="card mb-4">
                     <div class="card-datatable table-responsive">
                       <table class="datatable-project table">
                         <thead class="table-light">
                           <tr>
+
                             <th>sr#</th>
                             <th>Invoice No.</th>
                             <th class="text-nowrap">Invoice Month</th>
@@ -351,11 +367,14 @@
                             @endforeach
 
                         </tbody>
+
                       </table>
                     </div>
                   </div>
                   <!--/ Projects table -->
+
                   @endif
+
                 </div>
               </div>
               <!--/ User Profile Content -->
