@@ -95,10 +95,18 @@ class SaleController extends Controller
         // dd($request->all());
         if (isset($request->sale_id)) {
             $sale = Sale::find($request->sale_id);
-            $sale->update([
-                'signup_date' => $request->signup_date,
-                'status' => $request->sale_status
-            ]);
+            $user = Auth::user();
+            if($user->role_id == 1 || $user->role->name == "Customer Support"){
+                $sale->update([
+                    'signup_date' => $request->signup_date,
+                    'status' => $request->sale_status  ? 1 : 0,
+                ]);
+            }
+            else{
+                $sale->update([
+                    'signup_date' => $request->signup_date,
+                ]);
+            }
             $lead = Lead::find($request->lead_id);
             // dd($lead);
             if (isset($request->closers)) {

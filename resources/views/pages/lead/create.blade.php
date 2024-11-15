@@ -188,6 +188,79 @@
                 </div>
 
         </div>
+        {{-- Add button --}}
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div id="repeater">
+                          <!-- Add Button -->
+                          <div class="repeater-footer py-4" style="display: flex; justify-content: flex-end;">
+                            <a class="btn btn-primary repeater-add-btn" style="color: #fff">Add</a>
+                        </div>
+                        <!-- Existing repeater items (if any) will display here -->
+
+                            <div class="items">
+                                <div class="item-content">
+                                    <div class="row py-2">
+                                        <div class="col-md-4">
+                                            <div class="form-floating form-floating-outline">
+                                                <select name="platform[]" class="form-select" data-allow-clear="true">
+                                                    <option value="">Please Select</option>
+                                                    <option value="phone">Phone</option>
+                                                    <option value="email">Email</option>
+                                                    <option value="url">URL</option>
+                                                </select>
+                                                <label> Platform</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-floating form-floating-outline">
+                                                <input type="text" class="form-control" name="value[]" placeholder="Social Link" />
+                                                <label>Value</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <a class="btn btn-outline-danger remove-btn" style="color: #ff4d49" onclick="$(this).closest('.items').remove()">Remove</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        <!-- Hidden Template for New Repeater Item -->
+                        <div class="items d-none" id="repeater-template">
+                            <div class="item-content">
+                                <div class="row py-2">
+                                    <div class="col-md-4">
+                                        <div class="form-floating form-floating-outline">
+                                            <select name="platform[]" class="form-select" data-allow-clear="true">
+                                                <option value="">Please Select</option>
+                                                <option value="phone">Phone</option>
+                                                <option value="email">Email</option>
+                                                <option value="url">URL</option>
+                                            </select>
+                                            <label> Platform</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-floating form-floating-outline">
+                                            <input type="text" class="form-control" name="value[]" placeholder="Value" />
+                                            <label>Value</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <a class="btn btn-outline-danger remove-btn" style="color: #ff4d49" onclick="$(this).closest('.items').remove()">Remove</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
 
         <div class="pt-4">
             <button type="submit" class="btn btn-primary me-sm-3 me-1">Submit</button>
@@ -221,6 +294,18 @@
   utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/24.6.0/build/js/utils.min.js"
 });
 </script>
+<script src="{{ asset('assets/js/repeater.js') }}"></script>
+<script>
+    $(document).ready(function () {
+        // Add a new repeater item on Add button click
+        $('.repeater-add-btn').on('click', function () {
+            let repeaterItem = $('#repeater-template').clone();
+            repeaterItem.removeClass('d-none').removeAttr('id');
+            $('#repeater').append(repeaterItem);
+        });
+    });
+</script>
+
 <script>
     $('#category').change(function (e) {
     e.preventDefault();
