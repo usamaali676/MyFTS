@@ -204,7 +204,7 @@
                                     <div class="row py-2">
                                         <div class="col-md-4">
                                             <div class="form-floating form-floating-outline">
-                                                <select name="social_name[]" class="form-select" data-allow-clear="true">
+                                                <select name="platform[]" class="form-select" data-allow-clear="true">
                                                     <option value="">Please Select</option>
                                                     <option value="phone">Phone</option>
                                                     <option value="email">Email</option>
@@ -215,7 +215,7 @@
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-floating form-floating-outline">
-                                                <input type="text" class="form-control" name="social_link[]" placeholder="Social Link" />
+                                                <input type="text" class="form-control" name="value[]" placeholder="Social Link" />
                                                 <label>Value</label>
                                             </div>
                                         </div>
@@ -233,19 +233,19 @@
                                 <div class="row py-2">
                                     <div class="col-md-4">
                                         <div class="form-floating form-floating-outline">
-                                            <select name="social_name[]" class="form-select" data-allow-clear="true">
+                                            <select name="platform[]" class="form-select" data-allow-clear="true">
                                                 <option value="">Please Select</option>
-
-                                                    <option value="{{ $item }}">{{ $item }}</option>
-
+                                                <option value="phone">Phone</option>
+                                                <option value="email">Email</option>
+                                                <option value="url">URL</option>
                                             </select>
-                                            <label>Social Platform</label>
+                                            <label> Platform</label>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-floating form-floating-outline">
-                                            <input type="text" class="form-control" name="social_link[]" placeholder="Social Link" />
-                                            <label>Social Link</label>
+                                            <input type="text" class="form-control" name="value[]" placeholder="Value" />
+                                            <label>Value</label>
                                         </div>
                                     </div>
                                     <div class="col-md-2">

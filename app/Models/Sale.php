@@ -53,6 +53,6 @@ class Sale extends Model
         return $this->hasMany(Keyword::class,'sale_id');
     }
     public function invoice(){
-        return $this->belongsTo(Invoice::class,'sale_id');
+        return $this->hasMany(Invoice::class,'sale_id');
     }
 }

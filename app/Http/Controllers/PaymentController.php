@@ -46,7 +46,8 @@ class PaymentController extends Controller
         // dd($full_payment);
         $invoice = Invoice::where('id', $request->invoice_id)->first();
         // dd($invoice);
-        $last_balnce = Payment::where('invoice_id', $invoice->id)->where('payment_type',"Partials Payment")->first();
+        $last_balnce = Payment::where('invoice_id', $invoice->id)->where('payment_type',"Partials Payment")->orderBy('id', 'desc') // Specify your custom column
+        ->first();
         // dd($last_balnce);
         if(isset($last_balnce) ){
             if($last_balnce->balance > 0){
