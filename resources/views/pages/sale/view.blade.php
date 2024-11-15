@@ -1,4 +1,7 @@
 @extends('layouts.dashboard')
+@section('css')
+<link rel="stylesheet" href="{{ asset('assets/vendor/css/pages/page-profile.css') }}" />
+@endsection
 @section('content')
           <!-- Content wrapper -->
           <div class="content-wrapper">
@@ -25,16 +28,20 @@
                         <div
                           class="d-flex align-items-md-end align-items-sm-start align-items-center justify-content-md-between justify-content-start mx-4 flex-md-row flex-column gap-4">
                           <div class="user-profile-info">
-                            <h4>John Doe</h4>
+                            @if (isset($sale->lead->business_name_adv))
+                                <h4>{{ $sale->lead->business_name_adv }}</h4>
+                            @endif
                             <ul
                               class="list-inline mb-0 d-flex align-items-center flex-wrap justify-content-sm-start justify-content-center gap-2">
+                              @if (isset($sale->lead->business_number_adv))
                               <li class="list-inline-item">
-                                <i class="mdi mdi-invert-colors me-1 mdi-20px"></i
-                                ><span class="fw-medium">UX Designer</span>
+                                <i class="mdi mdi-phone me-1 mdi-20px"></i
+                                ><span class="fw-medium">{{ $sale->lead->business_number_adv }}</span>
                               </li>
+                              @endif
                               <li class="list-inline-item">
                                 <i class="mdi mdi-map-marker-outline me-1 mdi-20px"></i
-                                ><span class="fw-medium">Vatican City</span>
+                                ><span class="fw-medium">{{ $sale->lead->client_address }}</span>
                               </li>
                               <li class="list-inline-item">
                                 <i class="mdi mdi-calendar-blank-outline me-1 mdi-20px"></i
@@ -54,7 +61,7 @@
               <!--/ Header -->
 
               <!-- Navbar pills -->
-              <div class="row">
+              {{-- <div class="row">
                 <div class="col-md-12">
                   <ul class="nav nav-pills flex-column flex-sm-row mb-4">
                     <li class="nav-item">
@@ -79,7 +86,7 @@
                     </li>
                   </ul>
                 </div>
-              </div>
+              </div> --}}
               <!--/ Navbar pills -->
 
               <!-- User Profile Content -->
@@ -567,42 +574,7 @@
             </div>
             <!-- / Content -->
 
-            <!-- Footer -->
-            <footer class="content-footer footer bg-footer-theme">
-              <div class="container-xxl">
-                <div
-                  class="footer-container d-flex align-items-center justify-content-between py-3 flex-md-row flex-column">
-                  <div class="mb-2 mb-md-0">
-                    ©
-                    <script>
-                      document.write(new Date().getFullYear());
-                    </script>
-                    , made with <span class="text-danger"><i class="tf-icons mdi mdi-heart"></i></span> by
-                    <a href="https://pixinvent.com" target="_blank" class="footer-link fw-medium">Pixinvent</a>
-                  </div>
-                  <div class="d-none d-lg-inline-block">
-                    <a href="https://themeforest.net/licenses/standard" class="footer-link me-4" target="_blank"
-                      >License</a
-                    >
-                    <a href="https://1.envato.market/pixinvent_portfolio" target="_blank" class="footer-link me-4"
-                      >More Themes</a
-                    >
 
-                    <a
-                      href="https://demos.pixinvent.com/materialize-html-admin-template/documentation/"
-                      target="_blank"
-                      class="footer-link me-4"
-                      >Documentation</a
-                    >
-
-                    <a href="https://pixinvent.ticksy.com/" target="_blank" class="footer-link d-none d-sm-inline-block"
-                      >Support</a
-                    >
-                  </div>
-                </div>
-              </div>
-            </footer>
-            <!-- / Footer -->
 
             <div class="content-backdrop fade"></div>
           </div>

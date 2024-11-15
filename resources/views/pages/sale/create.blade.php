@@ -29,6 +29,7 @@
     href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css"
     rel="stylesheet"
 />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@7.12.15/dist/sweetalert2.min.css">
 
 {{-- <link rel="stylesheet" href="{{ asset('assets/vendor/libs/jquery-timepicker/jquery-timepicker.css') }}" />
 <link rel="stylesheet" href="{{ asset('assets/vendor/libs/pickr/pickr-themes.css') }}" /> --}}
@@ -71,7 +72,9 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
     <!-- Content -->
 
     <div class="container-xxl flex-grow-1 container-p-y">
-        <h4 class="py-3 mb-4"><span class="text-muted fw-light">Sale /</span> Client Details</h4>
+        <div class="d-flex">
+            <h4 class="py-3 mb-4"><span class="text-muted fw-light">Sale /</span> Client Details</h4>
+        </div>
 
         <!-- Default -->
         <div class="row">
@@ -2033,12 +2036,27 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                 @endif
                                 <div class="row g-4 pt-4">
                                     <div class="col-12 d-flex justify-content-between">
+                                        <a class="btn btn-outline-secondary btn-prev" style="color: #6d788d" disabled>
+                                            <i class="mdi mdi-arrow-left me-sm-1"></i>
+                                            <span class="align-middle d-sm-inline-block d-none">Previous</span>
+                                        </a>
+                                        <div class="last-buttons d-flex" style="gap: 20px;">
+
+                                                <a  id="preview-sale" class="btn btn-outline-primary waves-effect"  @if(isset($sale)) href="{{ route('sale.detail', $sale->id) }}" @disabled(false) @else href="#" @disabled(true) @endif>Preview</a>
+
+                                        <a class="btn btn-primary btn-next" style="color: #fff">
+                                            <span class="align-middle d-sm-inline-block d-none me-sm-1">Next</span>
+                                            <i class="mdi mdi-arrow-right"></i>
+                                        </a>
+                                        </div>
+                                    </div>
+                                    {{-- <div class="col-12 d-flex justify-content-between">
                                         <button class="btn btn-outline-secondary btn-prev">
                                             <i class="mdi mdi-arrow-left me-sm-1"></i>
                                             <span class="align-middle d-sm-inline-block d-none">Previous</span>
                                         </button>
                                         <button class="btn btn-primary btn-submit">Finish</button>
-                                    </div>
+                                    </div> --}}
                                 </div>
                             </div>
                     </div>
@@ -2250,6 +2268,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
         }
     </script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    {{-- <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10.10.1/dist/sweetalert2.all.min.js"></script> --}}
     <script src="{{ asset('assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js') }}"></script>
     <script src="{{ asset('assets/js/tables-datatables-advanced.js') }}"></script>
     <script>
@@ -2321,10 +2340,11 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                     $('#sale_id5').val(response.sale.id);
                     $('#sale_id6').val(response.sale.id);
                     $('#first_next').prop('disabled', false);
+                    $('#preview-sale').prop('disabled', false);
                     // Handle success response (display success message using SweetAlert2)
                     Swal.fire({
                        position: 'top-end', // Position the toast at the top-right corner
-                        icon: 'success', // Change this to 'error', 'warning', etc., based on your requirement
+                        icon: 'danger', // Change this to 'error', 'warning', etc., based on your requirement
                         title: 'Sale Saved Successfully', //
                         showConfirmButton: false, // Remove the confirm button
                         timer: 1500, // Duration in milliseconds before the toast disappears
