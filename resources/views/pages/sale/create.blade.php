@@ -1238,8 +1238,20 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                         </div>
                                         <div class="col-sm-6">
                                             <label class="switch switch-lg">
-                                                <input type="checkbox" class="switch-input" name="sale_status" @if(isset($sale) &&
-                                                    $sale->status == 1) checked @else readonly @endif >
+
+                                                <input type="checkbox" class="switch-input" name="sale_status"
+                                                    @if(isset($sale) &&
+                                                    $sale->status == 1) checked
+                                                        @if($user->role_id == 1 || $user->role->name == "Customer Support")
+                                                        {{-- <p>{{ $user->role_id }}</p> --}}
+                                                            @readonly(false)
+                                                        @else
+                                                            @readonly(true)
+                                                        @endif
+                                                    @else
+                                                        @readonly(true)
+                                                    @endif
+                                                    >
                                                 <span class="switch-toggle-slider">
                                                     <span class="switch-on">
                                                         <i class="ri-check-line"></i>
@@ -2311,11 +2323,15 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                     $('#first_next').prop('disabled', false);
                     // Handle success response (display success message using SweetAlert2)
                     Swal.fire({
-                        icon: 'success',
-                        title: 'Success',
-                        text: response.message,
-                        timer: 2000, // Automatically close after 2 seconds
-                        showConfirmButton: false
+                       position: 'top-end', // Position the toast at the top-right corner
+                        icon: 'success', // Change this to 'error', 'warning', etc., based on your requirement
+                        title: 'Sale Saved Successfully', //
+                        showConfirmButton: false, // Remove the confirm button
+                        timer: 1500, // Duration in milliseconds before the toast disappears
+                        toast: true, // Enable the toast feature
+                        didOpen: () => {
+                        Swal.showLoading(); // Optionally show a loading indicator if needed
+                        }
                     });
 
 

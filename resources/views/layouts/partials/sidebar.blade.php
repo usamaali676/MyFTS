@@ -64,7 +64,12 @@
                     fill="currentColor" fill-opacity="0.38" />
             </svg>
         </a>
+        @php
+            $user = Auth::user();
+        @endphp
     </div>
+    <span class="badge rounded-pill bg-primary" style="text-align: center; width: fit-content; margin: auto; padding: 7px 10px">{{ $user->name }}</span>
+
 
     <div class="menu-inner-shadow"></div>
 

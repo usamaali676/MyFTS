@@ -26,4 +26,7 @@ class Lead extends Model
     public function closers() {
         return $this->hasMany(LeadCloser::class, 'lead_id');
     }
+    public function sale(){
+        return $this->hasOne(Sale::class, 'lead_id');
+    }
 }

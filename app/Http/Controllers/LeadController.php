@@ -6,6 +6,7 @@ use App\Models\BusinessCategory;
 use App\Models\Lead;
 use App\Models\LeadCloser;
 use App\Models\Role;
+use App\Models\Sale;
 use App\Models\SubCategory;
 use App\Models\User;
 use Carbon\Carbon;
@@ -21,7 +22,10 @@ class LeadController extends Controller
      */
     public function index()
     {
-        $leads = Lead::orderBy('id', 'DESC')->get();
+        $leads = Lead::with('closers') // Eager load the closers relationship directly in the query
+        ->orderBy('id', 'DESC')
+        ->get();
+        // $sale = Sale::where('lead_id', $leads->id)->first();
         return view('pages.lead.index', compact('leads'));
     }
 
@@ -135,29 +139,20 @@ class LeadController extends Controller
         ]);
         $lead->sub_categories()->sync($request->sub_category);
         // $lead->closers()->sync($request->closers);
-        if(isset($request->closers)){
-        foreach ($request->closers as $users) {
-            $remainingclosers = LeadCloser::where('lead_id', $lead->id)->where('closer_id','!=',  $users)->get();
+        // if(isset($request->closers)){
+            $remainingclosers = LeadCloser::where('lead_id', $lead->id)->get();
             if(isset($remainingclosers)){
                 foreach ($remainingclosers as $closer) {
                     $closer->delete();
                 }
             }
-            $closers = LeadCloser::where('lead_id', $lead->id)->where('closer_id', $users)->first();
-            // dd($closers);
-            if($closers){
-                $closers->update([
-                    'closer_id' => $users,
-                    'updated_by' => Auth::user()->id,
-                ]);
-            }
-            else{
+        if(isset($request->closers)){
+            foreach ($request->closers as $users) {
                 LeadCloser::create([
                     'lead_id' => $lead->id,
                     'closer_id' => $users,
                 ]);
             }
-         }
         }
         Alert::Success('Success', "Lead Updated Successfully");
         return redirect()->route('lead.index');

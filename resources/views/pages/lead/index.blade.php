@@ -38,7 +38,9 @@
                         <th>Email</th>
                         <th>Category</th>
                         <th>Saler</th>
-                        <th>Status</th>
+                        <th>Call Status</th>
+                        <th>Closers</th>
+                        <th>Sale Status</th>
                         <th>Action</th>
                       </tr>
                     </thead>
@@ -47,40 +49,104 @@
                             @php
                                 $user = Auth::user();
                             @endphp
+                            {{-- <p>{{ $sale }}</p> --}}
 
-                        @foreach ($leads as $item)
-                        @if ($user->id == $item->saler_id || $item->closers->contains('id', $user->id))
-                        <tr>
-                            <td>{{ $loop->index +1 }}</td>
-                            <td>{{ $item->business_name_adv}}</td>
-                            <td>{{ $item->business_number_adv }}</td>
-                            <td>{{ $item->off_email}}</td>
-                            <td><span class="badge rounded-pill bg-label-primary me-1">{{ $item->category->name }}</span></td>
-                            <td>{{ $item->saler->name }}</td>
-                            <td>{{ $item->call_status }}</td>
-                            <td>
-                                <div class="d-inline-block text-nowrap">
-                                    <a href="{{ route('sale.create', $item->id) }}" class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect" data-bs-toggle="tooltip" title="Preview"><i class="ri-send-plane-2-line ri-20px"></i></a>
-                                    <button
-                                    class="btn btn-sm btn-icon btn-text-secondary rounded-pill dropdown-toggle hide-arrow"
-                                    data-bs-toggle="dropdown" aria-expanded="false"><i class="mdi mdi-dots-vertical mdi-20px"></i></button>
-                                    <div class="dropdown-menu dropdown-menu-end m-0" style=""><a
-                                    href="{{ route('lead.edit', $item->id) }}" class="dropdown-item"><i
-                                        class="mdi mdi-pencil-outline me-2"></i><span>Edit</span></a>
-                                        {{-- <button type="button" class="btn btn-primary" id="confirm-color">Alert</button> --}}
-                                        <a  type="button"
-                                        data-id="{{ $item->id }}"
-                                        data-route="lead"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#basicModal"
-                                        class="dropdown-item delete-record"><i class="mdi mdi-delete-outline me-2"></i><span>Delete</span></a>
-                                </div>
-                        </div></td>
-                          </tr>
+                        @if($user->role_id == 1 || $user->role->name == "Customer Support")
+                        {{-- <p>fdgsdfg</p> --}}
+                            @foreach ($leads as $item)
+                            <tr>
+                                <td>{{ $loop->index +1 }}</td>
+                                <td>{{ $item->business_name_adv}}</td>
+                                <td>{{ $item->business_number_adv }}</td>
+                                <td>{{ $item->off_email}}</td>
+                                <td><span class="badge rounded-pill bg-label-primary me-1">{{ $item->category->name }}</span></td>
+                                <td>{{ $item->saler->name }}</td>
+
+                                <td>{{ $item->call_status }}</td>
+
+                                <td>
+                                    {{-- <p>{{ $item->closers }}</p> --}}
+                                    @foreach ($item->closers as $user)
+                                        <span class="badge rounded-pill bg-label-primary me-1">{{ $user->user->name }}</span>
+                                    @endforeach
+                                </td>
+                                <td>
+                                    {{-- <p>{{ $item->sale }}</p> --}}
+                                    @if(isset($item->sale) && $item->sale->status == 1)
+                                        <span class="badge rounded-pill bg-success">Active</span>
+                                    @else
+                                    <span class="badge rounded-pill bg-danger">Inactive</span>
+                                    @endif
+                                </td>
+                                <td>
+                                    <div class="d-inline-block text-nowrap">
+                                        <a href="{{ route('sale.create', $item->id) }}" class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect" data-bs-toggle="tooltip" title="Preview"><i class="ri-send-plane-2-line ri-20px"></i></a>
+                                        <button
+                                        class="btn btn-sm btn-icon btn-text-secondary rounded-pill dropdown-toggle hide-arrow"
+                                        data-bs-toggle="dropdown" aria-expanded="false"><i class="mdi mdi-dots-vertical mdi-20px"></i></button>
+                                        <div class="dropdown-menu dropdown-menu-end m-0" style=""><a
+                                        href="{{ route('lead.edit', $item->id) }}" class="dropdown-item"><i
+                                            class="mdi mdi-pencil-outline me-2"></i><span>Edit</span></a>
+                                            {{-- <button type="button" class="btn btn-primary" id="confirm-color">Alert</button> --}}
+                                            <a  type="button"
+                                            data-id="{{ $item->id }}"
+                                            data-route="lead"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#basicModal"
+                                            class="dropdown-item delete-record"><i class="mdi mdi-delete-outline me-2"></i><span>Delete</span></a>
+                                    </div>
+                            </div></td>
+                            </tr>
+                            @endforeach
+                        @else
+                            @foreach ($leads as $item)
+                            @if ($user->id == $item->saler_id || $item->closers->contains('closer_id', $user->id))
+                                {{-- <p>{{ $item->saler_id }}</p> --}}
+                                {{-- <p>{{ $user->id }}</p> --}}
+                                    <tr>
+                                        <td>{{ $loop->index +1 }}</td>
+                                        <td>{{ $item->business_name_adv}}</td>
+                                        <td>{{ $item->business_number_adv }}</td>
+                                        <td>{{ $item->off_email}}</td>
+                                        <td><span class="badge rounded-pill bg-label-primary me-1">{{ $item->category->name }}</span></td>
+                                        <td>{{ $item->saler->name }}</td>
+
+                                        <td>{{ $item->call_status }}</td>
+                                        <td>
+                                            {{-- <p>{{ $item->closers }}</p> --}}
+                                            @foreach ($item->closers as $list)
+                                                <span class="badge rounded-pill bg-label-primary me-1">{{ $list->user->name }}</span>
+                                            @endforeach
+                                        </td>
+                                        <td>
+                                            @if(isset($item->sale) && $item->sale->status == 1)
+                                                <span class="badge rounded-pill bg-success">Active</span>
+                                            @else
+                                                <span class="badge rounded-pill bg-danger">Inactive</span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            <div class="d-inline-block text-nowrap">
+                                                <a href="{{ route('sale.create', $item->id) }}" class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect" data-bs-toggle="tooltip" title="Preview"><i class="ri-send-plane-2-line ri-20px"></i></a>
+                                                <button
+                                                class="btn btn-sm btn-icon btn-text-secondary rounded-pill dropdown-toggle hide-arrow"
+                                                data-bs-toggle="dropdown" aria-expanded="false"><i class="mdi mdi-dots-vertical mdi-20px"></i></button>
+                                                <div class="dropdown-menu dropdown-menu-end m-0" style=""><a
+                                                href="{{ route('lead.edit', $item->id) }}" class="dropdown-item"><i
+                                                    class="mdi mdi-pencil-outline me-2"></i><span>Edit</span></a>
+                                                    {{-- <button type="button" class="btn btn-primary" id="confirm-color">Alert</button> --}}
+                                                    <a  type="button"
+                                                    data-id="{{ $item->id }}"
+                                                    data-route="lead"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#basicModal"
+                                                    class="dropdown-item delete-record"><i class="mdi mdi-delete-outline me-2"></i><span>Delete</span></a>
+                                            </div>
+                                    </div></td>
+                                    </tr>
+                                @endif
+                            @endforeach
                         @endif
-
-
-                        @endforeach
                         @endauth
                     </tbody>
                     <tfoot>
