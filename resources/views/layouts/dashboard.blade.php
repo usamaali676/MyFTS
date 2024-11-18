@@ -115,21 +115,25 @@
     <script src="{{ asset('assets/js/dashboards-analytics.js') }}"></script>
     @yield('js')
     <script>
-         document.addEventListener('DOMContentLoaded', function() {
-        const deleteButtons = document.querySelectorAll('.delete-record');
-        const deleteConfirmButton = document.getElementById('deleteConfirmButton');
+        document.addEventListener('DOMContentLoaded', function() {
+            const deleteConfirmButton = document.getElementById('deleteConfirmButton');
 
-        deleteButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                const itemId = this.getAttribute('data-id');
+            // Use event delegation to listen for clicks on dynamically added .delete-record elements
+            $('#recodetable').on('click', '.delete-record', function() {
+                const itemId = $(this).data('id');  // Get the data-id from the clicked button
+                const routeName = $(this).data('route');  // Get the data-route from the clicked button
 
-                const routeName = this.getAttribute('data-route');
+                // Construct the delete URL dynamically
                 const deleteUrl = `{{ url('${routeName}/delete', 'id') }}`.replace('id', itemId);
+
+                // Set the URL in the confirmation button's href
                 deleteConfirmButton.setAttribute('href', deleteUrl);
+
+
             });
         });
-    });
     </script>
+
     <script>
         $('.navbar-nav').click(function (e) {
             e.preventDefault();

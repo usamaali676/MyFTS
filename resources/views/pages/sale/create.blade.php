@@ -1921,13 +1921,14 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                 <label for="multicol-country">Select Merchant</label>
                                             </div>
                                         </div>
+
                                         <div class="col-md-6">
                                             <div class="form-floating form-floating-outline">
                                                 <select id="mop" name="mop" class="select2 form-select" data-allow-clear="true">
                                                     <option value="">Please Select</option>
                                                     <option value="Credit Card">Credit Card</option>
                                                     <option value="PayPal">PayPal</option>
-                                                    <option value="Zeele">Zeele</option>
+                                                    <option value="Zelle">Zelle</option>
                                                     <option value="Cash App">Cash App</option>
                                                     <option value="Bank Transfer">Bank Transfer</option>
                                                     <option value="other">other</option>
@@ -1936,20 +1937,9 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                             </div>
                                         </div>
                                         <div class="col-md-6">
-                                            <div class="input-group input-group-merge">
-                                                <div class="form-floating form-floating-outline">
-                                                <input
-                                                    type="text"
-                                                    id="billings-card-num"
-                                                    class="form-control billing-card-mask"
-                                                    placeholder="4541 2541 2547 2577"
-                                                    name="card_number"
-                                                    aria-describedby="paymentCard" disabled />
-                                                <label for="billings-card-num">Card number</label>
-                                                </div>
-                                                <span class="input-group-text cursor-pointer p-1" id="paymentCard"
-                                                ><span class="card-type w-px-50"></span
-                                                ></span>
+                                            <div  id="embed_mop" class="input-group input-group-merge">
+
+                                                <span class="input-group-text cursor-pointer p-1" id="paymentCard"><span class="card-type w-px-50"></span></span>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
@@ -3306,17 +3296,44 @@ $(document).ready(function () {
     </script>
     <script>
         $(document).ready(function () {
-           $('#mop').change(function () {
-                var mop  = this.value;
-                if(mop == "Credit Card"){
-                    $('#billings-card-num').prop('disabled', false);
+            $('#mop').change(function () {
+                var mop = this.value;
+                alert(mop);
+
+                if (mop == "Credit Card") {
+                    var input = ' <div class="form-floating form-floating-outline">\
+                                    <input\
+                                        type="text"\
+                                        id="billings-card-num"\
+                                        class="form-control billing-card-mask"\
+                                        placeholder="4541 2541 2547 2577"\
+                                        name="card_number"\
+                                        aria-describedby="paymentCard"  />\
+                                    <label for="billings-card-num">Card number</label>\
+                                  </div>';
+
+                    $('#embed_mop').html(input);
+                    var script = document.createElement('script');
+                        script.src = "{{ asset('assets/js/front-page-payment.js') }}"; // Adjust this if necessary
+                        script.onload = function() {
+                            // Initialize Select2 after the script loads
+                            $('.select2').select2(); // Reinitialize Select2 for the new select elements
+                        };
+                        document.head.appendChild(script);
+                    // $('#billings-card-num').prop('disabled', false);  // If you want to enable it, uncomment this line
                 }
-                else{
+                else if (mop == "PayPal") {
+                    // If PayPal is selected, make sure that #billings-card-num is disabled
                     $('#billings-card-num').prop('disabled', true);
                 }
-           });
+                else if (mop == "zelle") {
+                    // Add any logic you need for Zelle here
+                    console.log("Zelle selected");
+                }
+            });
         });
     </script>
+
     <script>
         $(document).ready(function () {
             $('#payment_type').change(function () {
@@ -3439,6 +3456,7 @@ $(document).ready(function () {
             });
         });
     </script>
+
 
 @endsection
 

@@ -32,6 +32,11 @@
                             <option value="">Select</option>
                             @if(isset($user->role_id))
                                 <option value="{{$user->role_id}}" selected>{{$user->role->name}}</option>
+                                @foreach ($role as $item)
+                                @if($item->id != 1)
+                                <option value="{{$item->id}}">{{$item->name}}</option>
+                                @endif
+                                @endforeach
                             @else
                                 @foreach ($role as $item)
                                 @if($item->id != 1)
