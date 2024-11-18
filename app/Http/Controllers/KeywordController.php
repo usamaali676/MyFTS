@@ -89,8 +89,14 @@ class KeywordController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Keyword $keyword)
+    public function destroy(Request $request)
     {
-        //
+        $keyword = Keyword::find($request->id);
+        $keyword->delete();
+
+        // $rem_keyword = K
+        return response()->json([
+           'message' => 'Keyword deleted successfully!'
+        ], 200);
     }
 }

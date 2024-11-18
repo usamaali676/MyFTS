@@ -19,6 +19,8 @@ return new class extends Migration
             $table->enum('mop', ['Credit Card','PayPal','Zeele','Cash App','Bank Transfer', 'other'])->default('other');
             $table->enum('payment_type', ['Full Payment', 'Partials Payment', 'Advance Payment'])->default('Full Payment');
             $table->string('card_number');
+            $table->string('paypal_email');
+
             $table->decimal('amount', 10, 2);
             $table->decimal('balance', 10, 2)->default(0);
             $table->char('trans_id')->nullable();

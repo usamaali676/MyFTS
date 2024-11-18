@@ -92,8 +92,12 @@ class ServiceAreaController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(ServiceArea $serviceArea)
+    public function destroy(Request $request)
     {
-        //
+        $area = ServiceArea::find($request->id);
+        $area->delete();
+        return response()->json([
+           'message' => 'Area deleted successfully!'
+        ], 200);
     }
 }
