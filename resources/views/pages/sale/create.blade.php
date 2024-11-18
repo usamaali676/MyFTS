@@ -1502,6 +1502,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                     <thead>
                                                         <tr>
                                                             <th>Service Area</th>
+                                                            <th>Action</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
@@ -1509,6 +1510,8 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                         @foreach ($sale->service_area as $area)
                                                         <tr>
                                                             <td>{{ $area->country }}, {{ $area->state }}, {{ $area->city }}</td>
+                                                            <td><a  type="button" id="{{ $area->id }}"
+                                                                class="dropdown-item delete-record area_delete" data-confirm="Are you sure to delete this item?"><i class="mdi mdi-delete-outline me-2"></i><span>Delete</span></a></td>
                                                         </tr>
                                                         @endforeach
                                                         @endif
@@ -1540,8 +1543,8 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                             <div id="social-links" class="content">
                                 @if(isset($Keyword_perm) && $Keyword_perm->view == 1)
                                     <div class="content-header mb-3">
-                                        <h6 class="mb-0">Keywords</h6>
-                                        <small>Add Keywords against Areas</small>
+                                        <h6 class="mb-0">Services/Sub-services/Keywords</h6>
+                                        <small>Add Services/Sub-services/Keywords against Areas</small>
                                     </div>
                                     <form id="keywordadd" action="{{ route('keyword.store') }}" method="POST">
                                         @csrf
@@ -1594,6 +1597,8 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                                 <td>{{ $keyword->keyword }}</td>
                                                                 {{-- <td>{{ $keyword->area }}</td> --}}
                                                                 <td>{{ $keyword->area->country }}, {{ $keyword->area->state }}, {{ $keyword->area->city }}</td>
+                                                                <td> <a  type="button" id="{{ $keyword->id }}"
+                                                                    class="dropdown-item delete-record keyword_delete" data-confirm="Are you sure to delete this item?"><i class="mdi mdi-delete-outline me-2"></i><span>Delete</span></a></td>
 
                                                             </tr>
                                                             @endforeach
@@ -1921,13 +1926,14 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                 <label for="multicol-country">Select Merchant</label>
                                             </div>
                                         </div>
+
                                         <div class="col-md-6">
                                             <div class="form-floating form-floating-outline">
                                                 <select id="mop" name="mop" class="select2 form-select" data-allow-clear="true">
                                                     <option value="">Please Select</option>
                                                     <option value="Credit Card">Credit Card</option>
                                                     <option value="PayPal">PayPal</option>
-                                                    <option value="Zeele">Zeele</option>
+                                                    <option value="Zelle">Zelle</option>
                                                     <option value="Cash App">Cash App</option>
                                                     <option value="Bank Transfer">Bank Transfer</option>
                                                     <option value="other">other</option>
@@ -1936,20 +1942,9 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                             </div>
                                         </div>
                                         <div class="col-md-6">
-                                            <div class="input-group input-group-merge">
-                                                <div class="form-floating form-floating-outline">
-                                                <input
-                                                    type="text"
-                                                    id="billings-card-num"
-                                                    class="form-control billing-card-mask"
-                                                    placeholder="4541 2541 2547 2577"
-                                                    name="card_number"
-                                                    aria-describedby="paymentCard" disabled />
-                                                <label for="billings-card-num">Card number</label>
-                                                </div>
-                                                <span class="input-group-text cursor-pointer p-1" id="paymentCard"
-                                                ><span class="card-type w-px-50"></span
-                                                ></span>
+                                            <div  id="embed_mop" class="input-group input-group-merge">
+
+                                                <span class="input-group-text cursor-pointer p-1" id="paymentCard"><span class="card-type w-px-50"></span></span>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
@@ -2903,6 +2898,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
 
                         var list = '<tr>\
                                     <td>'+response.servicearea.country+', '+ response.servicearea.state +', '+response.servicearea.city+'</td>\
+                                    <td><td><a  type="button" id="'+response.servicearea.id +'" class="dropdown-item delete-record area_delete" data-confirm="Are you sure to delete this item?"><i class="mdi mdi-delete-outline me-2"></i><span>Delete</span></a></td></td>\
                                     </tr>'
                         $('#areas_we_serve').append(list);
                         var option = '<option value="'+response.servicearea.id+'">'+response.servicearea.country+', '+ response.servicearea.state +', '+response.servicearea.city+'</option>'
@@ -2974,6 +2970,72 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
         });
     </script>
 
+<script>
+    $(document).ready(function () {
+        // Use event delegation to attach the click event to the table or a parent element
+        $('#areas_we_serve').on('click', '.area_delete', function() {
+            var id = $(this).attr('id'); // Get the ID of the keyword to be deleted
+            var row = $(this).closest('tr'); // Get the parent row of the clicked delete button
+
+            $.ajax({
+                url: "{{ route('serviceArea.delete')}}",  // Ensure this route is correct
+                type: "GET",
+                data: {id: id},
+                success: function (response) {
+                    // Show success message using SweetAlert
+                    Swal.fire({
+                        position: 'top-end',
+                        icon: 'success',
+                        title: 'Success Service Area Deleted',
+                        text: response.message,
+                        showConfirmButton: false,
+                        timer: 1500,
+                        toast: true,
+                    });
+
+                    // Remove the deleted row from the table
+                    row.remove(); // Remove the <tr> containing the deleted keyword
+                },
+                error: function (xhr) {
+                    // Handle validation errors or other issues
+                    let errors = xhr.responseJSON.errors;
+                    if (errors) {
+                        let errorHtml = '<div class="alert alert-danger"><ul>';
+                        $.each(errors, function (key, value) {
+                            errorHtml += '<li>' + value + '</li>';
+                        });
+                        errorHtml += '</ul></div>';
+                        $('#service_area').prepend(errorHtml);
+
+                        // Display SweetAlert2 for validation errors
+                        Swal.fire({
+                            position: 'top-end',
+                            icon: 'error',
+                            title: 'Validation Error',
+                            html: errorHtml, // Use the generated error HTML
+                            showConfirmButton: false,
+                            timer: 1500,
+                            toast: true,
+                        });
+                    } else if (xhr.responseJSON.error) {
+                        // Custom error message for server-side issues
+                        Swal.fire({
+                            position: 'top-end',
+                            icon: 'error',
+                            title: 'Error',
+                            text: xhr.responseJSON.error,
+                            showConfirmButton: false,
+                            timer: 1500,
+                            toast: true,
+                        });
+                    }
+                }
+            });
+        });
+    });
+
+</script>
+
     <script>
         $(document).ready(function () {
             $('#keywordadd').on('submit', function (e) {
@@ -2999,10 +3061,13 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                         var row = '<tr>\
                                     <td>'+response.keyword.keyword+'</td>\
                                     <td>'+response.area.country+', '+response.area.state+', '+response.area.city+'</td>\
+                                    <td><a  type="button" id="'+ response.keyword.id+'" class="dropdown-item delete-record keyword_delete" data-confirm="Are you sure to delete this item?"><i class="mdi mdi-delete-outline me-2"></i><span>Delete</span></a></td>\
                                   </tr>'
                         $('#keyword_table').append(row);
                         $('#keyword').val('');
                         $('areas_dropdown').val(response.area.id)
+
+
 
 
                         // Handle success response (display success message using SweetAlert2)
@@ -3065,71 +3130,137 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
     </script>
 
     <script>
-$(document).ready(function () {
-    $('#add_service').click(function () {
-        var selectedOption = $('#company_service_charge option:selected');
-        var service = selectedOption.val(); // Get the selected service ID
-        var service_name = selectedOption.data('name'); // Get the service name
-        var amount = $('#service_amount').val(); // Get the service amount
-        var check = $('#complementery_check').prop('checked'); // Check if the service is complementary
-        var totalAmount = parseFloat($('#invoice_amount').val()) || 0; // Start with the current total
-        var serviceExists = false;
+        $(document).ready(function () {
+            // Use event delegation to attach the click event to the table or a parent element
+            $('#keyword_table').on('click', '.keyword_delete', function() {
+                var id = $(this).attr('id'); // Get the ID of the keyword to be deleted
+                var row = $(this).closest('tr'); // Get the parent row of the clicked delete button
 
-        // Check if the service is already added to the table
-        $('#invoice_service_table tr').each(function() {
-            var existingServiceId = $(this).find('input[name="service_id[]"]').val();
-            if (existingServiceId == service) {
-                serviceExists = true;
-                return false; // Stop iterating once the service is found
-            }
+                $.ajax({
+                    url: "{{ route('keyword.delete')}}",  // Ensure this route is correct
+                    type: "GET",
+                    data: {id: id},
+                    success: function (response) {
+                        // Show success message using SweetAlert
+                        Swal.fire({
+                            position: 'top-end',
+                            icon: 'success',
+                            title: 'Success Keyword Deleted',
+                            text: response.message,
+                            showConfirmButton: false,
+                            timer: 1500,
+                            toast: true,
+                        });
+
+                        // Remove the deleted row from the table
+                        row.remove(); // Remove the <tr> containing the deleted keyword
+                    },
+                    error: function (xhr) {
+                        // Handle validation errors or other issues
+                        let errors = xhr.responseJSON.errors;
+                        if (errors) {
+                            let errorHtml = '<div class="alert alert-danger"><ul>';
+                            $.each(errors, function (key, value) {
+                                errorHtml += '<li>' + value + '</li>';
+                            });
+                            errorHtml += '</ul></div>';
+                            $('#service_area').prepend(errorHtml);
+
+                            // Display SweetAlert2 for validation errors
+                            Swal.fire({
+                                position: 'top-end',
+                                icon: 'error',
+                                title: 'Validation Error',
+                                html: errorHtml, // Use the generated error HTML
+                                showConfirmButton: false,
+                                timer: 1500,
+                                toast: true,
+                            });
+                        } else if (xhr.responseJSON.error) {
+                            // Custom error message for server-side issues
+                            Swal.fire({
+                                position: 'top-end',
+                                icon: 'error',
+                                title: 'Error',
+                                text: xhr.responseJSON.error,
+                                showConfirmButton: false,
+                                timer: 1500,
+                                toast: true,
+                            });
+                        }
+                    }
+                });
+            });
         });
 
-        // If the service already exists, alert and exit
-        if (serviceExists) {
-            alert('This service has already been added to the invoice.');
-            return; // Exit the function without adding the service again
-        }
+    </script>
 
-        // Check if all fields are filled in
-        if (service !== '' && service_name !== '' && amount !== '') {
-            // Prepare the new row HTML
-            var invoice_table = '<tr>' +
-                '<td>' + service_name + ' ' +
-                    '<input type="hidden" name="service_id[]" value="' + service + '">' +
-                '</td>' +
-                '<td><input class="form-check-input" type="checkbox" ' + (check ? 'value="1"' : 'value="0"') + ' id="defaultCheck" ' + (check ? 'checked' : '') + ' readonly></td>' +
-                '<input type="hidden" name="is_complementary[]" value="' + (check ? '1' : '0') + '" >' +
-                '<td>' + amount + ' ' +
-                    '<input type="hidden" name="amount[]" value="' + amount + '">' +
-                '</td>' +
-            '</tr>';
+    <script>
+        $(document).ready(function () {
+            $('#add_service').click(function () {
+                var selectedOption = $('#company_service_charge option:selected');
+                var service = selectedOption.val(); // Get the selected service ID
+                var service_name = selectedOption.data('name'); // Get the service name
+                var amount = $('#service_amount').val(); // Get the service amount
+                var check = $('#complementery_check').prop('checked'); // Check if the service is complementary
+                var totalAmount = parseFloat($('#invoice_amount').val()) || 0; // Start with the current total
+                var serviceExists = false;
 
-            // Append the new row to the table
-            $('#invoice_service_table').append(invoice_table);
-            $('#company_service_charge').prop('selectedIndex', -1);
-            $('#service_amount').val('');
-            $('#complementery_check').prop('checked', false);
+                // Check if the service is already added to the table
+                $('#invoice_service_table tr').each(function() {
+                    var existingServiceId = $(this).find('input[name="service_id[]"]').val();
+                    if (existingServiceId == service) {
+                        serviceExists = true;
+                        return false; // Stop iterating once the service is found
+                    }
+                });
 
-            // If the service is NOT complementary, add the amount to the total
-            if (!check) {
-                totalAmount += parseFloat(amount); // Add the amount to the total if it's not complementary
-            }
+                // If the service already exists, alert and exit
+                if (serviceExists) {
+                    alert('This service has already been added to the invoice.');
+                    return; // Exit the function without adding the service again
+                }
 
-            // Update the total amount in the invoice input field
-            $('#invoice_amount').val(totalAmount.toFixed(2));
-        } else {
-            alert('Please fill in all the required fields.');
-        }
-    });
+                // Check if all fields are filled in
+                if (service !== '' && service_name !== '' && amount !== '') {
+                    // Prepare the new row HTML
+                    var invoice_table = '<tr>' +
+                        '<td>' + service_name + ' ' +
+                            '<input type="hidden" name="service_id[]" value="' + service + '">' +
+                        '</td>' +
+                        '<td><input class="form-check-input" type="checkbox" ' + (check ? 'value="1"' : 'value="0"') + ' id="defaultCheck" ' + (check ? 'checked' : '') + ' readonly></td>' +
+                        '<input type="hidden" name="is_complementary[]" value="' + (check ? '1' : '0') + '" >' +
+                        '<td>' + amount + ' ' +
+                            '<input type="hidden" name="amount[]" value="' + amount + '">' +
+                        '</td>' +
+                    '</tr>';
 
-    // Update the total amount when discount is applied
-    $('#discount_amount').change(function() {
-        var discountAmount = parseFloat($(this).val());
-        var invoiceAmount = parseFloat($('#invoice_amount').val());
-        var totalAmount = invoiceAmount - discountAmount;
-        $('#invoice_amount').val(totalAmount.toFixed(2));
-    });
-});
+                    // Append the new row to the table
+                    $('#invoice_service_table').append(invoice_table);
+                    $('#company_service_charge').prop('selectedIndex', -1);
+                    $('#service_amount').val('');
+                    $('#complementery_check').prop('checked', false);
+
+                    // If the service is NOT complementary, add the amount to the total
+                    if (!check) {
+                        totalAmount += parseFloat(amount); // Add the amount to the total if it's not complementary
+                    }
+
+                    // Update the total amount in the invoice input field
+                    $('#invoice_amount').val(totalAmount.toFixed(2));
+                } else {
+                    alert('Please fill in all the required fields.');
+                }
+            });
+
+            // Update the total amount when discount is applied
+            $('#discount_amount').change(function() {
+                var discountAmount = parseFloat($(this).val());
+                var invoiceAmount = parseFloat($('#invoice_amount').val());
+                var totalAmount = invoiceAmount - discountAmount;
+                $('#invoice_amount').val(totalAmount.toFixed(2));
+            });
+        });
 
 
     </script>
@@ -3306,17 +3437,53 @@ $(document).ready(function () {
     </script>
     <script>
         $(document).ready(function () {
-           $('#mop').change(function () {
-                var mop  = this.value;
-                if(mop == "Credit Card"){
-                    $('#billings-card-num').prop('disabled', false);
+            $('#mop').change(function () {
+                var mop = this.value;
+                // alert(mop);
+
+                if (mop == "Credit Card") {
+                    var input = ' <div class="form-floating form-floating-outline">\
+                                    <input\
+                                        type="text"\
+                                        id="billings-card-num"\
+                                        class="form-control billing-card-mask"\
+                                        placeholder="4541 2541 2547 2577"\
+                                        name="card_number"\
+                                        aria-describedby="paymentCard"  />\
+                                    <label for="billings-card-num">Card number</label>\
+                                  </div>';
+
+                    $('#embed_mop').html(input);
+                    var script = document.createElement('script');
+                        script.src = "{{ asset('assets/js/front-page-payment.js') }}"; // Adjust this if necessary
+                        script.onload = function() {
+                            // Initialize Select2 after the script loads
+                            // $('.billing-card-mask').formCheckInputPayment(); // Reinitialize Select2 for the new select elements
+                        };
+                        document.head.appendChild(script);
+                    // $('#billings-card-num').prop('disabled', false);  // If you want to enable it, uncomment this line
                 }
-                else{
-                    $('#billings-card-num').prop('disabled', true);
+                else if (mop == "PayPal") {
+                    // If PayPal is selected, make sure that #billings-card-num is disabled
+                    var input = ' <div class="form-floating form-floating-outline">\
+                                    <input\
+                                        type="email"\
+                                        class="form-control \"\
+                                        name="paypal"\
+                                          />\
+                                    <label for="paypal">Paypal</label>\
+                                  </div>';
+
+                    $('#embed_mop').html(input);
                 }
-           });
+                else if (mop == "zelle") {
+                    // Add any logic you need for Zelle here
+                    console.log("Zelle selected");
+                }
+            });
         });
     </script>
+
     <script>
         $(document).ready(function () {
             $('#payment_type').change(function () {
@@ -3439,6 +3606,7 @@ $(document).ready(function () {
             });
         });
     </script>
+
 
 @endsection
 

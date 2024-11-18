@@ -123,6 +123,7 @@ Route::controller(RoleController::class)
     ->middleware(PermissionMiddelware::class)
     ->group(function () {
         Route::post('store', 'store')->name('store');
+        Route::get('delete', 'destroy')->name('delete');
     });
 
     Route::controller(KeywordController::class)
@@ -131,6 +132,7 @@ Route::controller(RoleController::class)
     ->middleware(PermissionMiddelware::class)
     ->group(function () {
         Route::post('store', 'store')->name('store');
+        Route::get('delete', 'destroy')->name('delete');
     });
 
     Route::controller(InvoiceServiceChargesController::class)

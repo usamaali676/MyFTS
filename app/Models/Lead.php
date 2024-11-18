@@ -29,4 +29,8 @@ class Lead extends Model
     public function sale(){
         return $this->hasOne(Sale::class, 'lead_id');
     }
+    public function company_services()
+    {
+        return $this->belongsToMany(CompanyServices::class, );
+    }
 }

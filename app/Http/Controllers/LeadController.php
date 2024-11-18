@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\BusinessCategory;
+use App\Models\CompanyServices;
 use App\Models\Lead;
+use App\Models\LeadAdditionalInfo;
 use App\Models\LeadCloser;
 use App\Models\Role;
 use App\Models\Sale;
@@ -37,7 +39,8 @@ class LeadController extends Controller
         $categories = BusinessCategory::all();
         $role = Role::where('name', "Closer")->first();
         $closers = User::where('role_id', $role->id)->get();
-        return view('pages.lead.create', compact('categories', 'closers'));
+        $company_services = CompanyServices::all();
+        return view('pages.lead.create', compact('categories', 'closers', 'company_services'));
     }
 
     /**
@@ -69,6 +72,7 @@ class LeadController extends Controller
             'created_by' => Auth::user()->id,
         ]);
         $lead->sub_categories()->attach($request->sub_category);
+        $lead->company_services()->attach($request->service);
         // $lead->closers()->attach($request->closers);
         if(isset($request->closers)){
             foreach ($request->closers as $users) {
@@ -76,6 +80,15 @@ class LeadController extends Controller
                     'lead_id' => $lead->id,
                     'closer_id' => $users,
                     'created_by' => Auth::user()->id,
+                ]);
+            }
+        }
+        if(isset($request->name) && $request->value){
+            foreach($request->name as $key => $name){
+                LeadAdditionalInfo::create([
+                    'lead_id' => $lead->id,
+                    'name' => $name,
+                    'value' => $request->value[$key],
                 ]);
             }
         }
