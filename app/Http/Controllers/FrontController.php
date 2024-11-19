@@ -6,6 +6,7 @@ use App\Models\BankAccount;
 use App\Models\Cashapp;
 use App\Models\Invoice;
 use App\Models\Lead;
+use App\Models\Payment;
 use App\Models\Role;
 use App\Models\SubCategory;
 use App\Models\User;
@@ -118,8 +119,11 @@ class FrontController extends Controller
             public function getInvoicePrice(Request $request)
             {
                 if($request->ajax()){
-                    $invoice = Invoice::where('id' , $request->id)->get();
-                    return response()->json(['invoice' => $invoice]);
+                    $invoice = Invoice::where('id' , $request->id)->first();
+                    // dd($invoice->id);
+                    $payment = Payment::where('invoice_id', $invoice->id)->orderBy('id', 'desc') // Specify your custom column
+                    ->first();
+                    return response()->json(['invoice' => $invoice, 'payment' => $payment]);
                 }
             }
 
