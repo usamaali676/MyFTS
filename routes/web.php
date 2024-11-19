@@ -37,6 +37,9 @@ Route::controller(FrontController::class)
     Route::get('/invoice-price', 'getInvoicePrice')->name('invoicePrice');
     Route::get('/invoice/{invoiceNumber}', 'getInvoice')->name('invoiceView');
     Route::get('/print/{invoiceNumber}', 'invoicePrint')->name('invoicePrint');
+    Route::get('/getzelle', 'getzelle')->name('getzelle');
+    Route::get('/getcash', 'getcash')->name('getcash');
+    Route::get('/getbank', 'getbank')->name('getbank');
 });
 
 Route::controller(RoleController::class)

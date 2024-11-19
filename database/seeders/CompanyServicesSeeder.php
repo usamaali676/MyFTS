@@ -2,8 +2,11 @@
 
 namespace Database\Seeders;
 
+use App\Models\BankAccount;
+use App\Models\Cashapp;
 use App\Models\CompanyServices;
 use App\Models\MerchantAccount;
+use App\Models\ZelleAccount;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -14,12 +17,11 @@ class CompanyServicesSeeder extends Seeder
      */
     public function run(): void
     {
-        $services = ['SEO', 'LandingPage', 'GMB'];
+        $services = ['Account1', 'Account2', 'Account3'];
         foreach ($services as $service) {
-            CompanyServices::create([
+            BankAccount::create([
                 'name' => $service,
-                'price' => '100',
-                'category'=> "Marketing",
+                
         ]);
         }
     }

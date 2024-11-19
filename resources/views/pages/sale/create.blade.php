@@ -1944,7 +1944,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                         <div class="col-md-6">
                                             <div  id="embed_mop" class="input-group input-group-merge">
 
-                                                <span class="input-group-text cursor-pointer p-1" id="paymentCard"><span class="card-type w-px-50"></span></span>
+                                                {{-- <span class="input-group-text cursor-pointer p-1" id="paymentCard"><span class="card-type w-px-50"></span></span> --}}
                                             </div>
                                         </div>
                                         <div class="col-md-6">
@@ -2838,7 +2838,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
             $.get('{{ route('front.countries') }}', function(data) {
                 $.each(data, function(index, country) {
                     // console.log(country);
-                    $('#countries').append(`<option value="${country.name}">${country.name}</option>`);
+                    $('#countries').append(`<option value="${country.name}">${country.name} ${country.iso2}</option>`);
                 });
             });
 
@@ -3469,16 +3469,125 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                     <input\
                                         type="email"\
                                         class="form-control \"\
-                                        name="paypal"\
+                                        name="paypal_email"\
                                           />\
                                     <label for="paypal">Paypal</label>\
                                   </div>';
 
                     $('#embed_mop').html(input);
                 }
-                else if (mop == "zelle") {
+                else if (mop == "Zelle") {
                     // Add any logic you need for Zelle here
-                    console.log("Zelle selected");
+                    $.ajax({
+                        type: "GET",
+                        url: "{{ route('front.getzelle') }}",
+                        success: function (response) {
+                            // Validate response structure
+                            if (response && response.zelle && Array.isArray(response.zelle)) {
+                                console.log(response);
+
+                                // Map the response data to options
+                                var options = $.map(response.zelle, function (zelle) {
+                                    return '<option value="' + zelle.id + '">' + zelle.name + '</option>';
+                                });
+
+                                // Build the select input with the dynamic options
+                                var input = '<div class="form-floating form-floating-outline">' +
+                                                '<select id="zelle" name="zelle_id" class="select2 form-select" data-allow-clear="true">' +
+                                                    '<option value="">Please Select</option>' + options + '</select>' +
+                                                '<label for="mop">Zelle Accounts</label>' +
+                                            '</div>';
+
+                                // Clear previous content and inject new content
+                                $('#embed_mop').html(input);
+
+                                // Initialize or reinitialize Select2 (if needed)
+                                $('#zelle').select2();
+                            } else {
+                                console.error('Invalid response structure:', response);
+                                // Handle invalid response structure
+                            }
+                        },
+                        error: function (xhr, status, error) {
+                            console.error('AJAX request failed:', status, error);
+                            // Handle the error appropriately
+                        }
+                    });
+
+                }
+                else if (mop == "Cash App"){
+                    $.ajax({
+                        type: "GET",
+                        url: "{{ route('front.getcash') }}",
+                        success: function (response) {
+                            // Validate response structure
+                            if (response && response.cash && Array.isArray(response.cash)) {
+                                console.log(response);
+
+                                // Map the response data to options
+                                var options = $.map(response.cash, function (cash) {
+                                    return '<option value="' + cash.id + '">' + cash.name + '</option>';
+                                });
+
+                                // Build the select input with the dynamic options
+                                var input = '<div class="form-floating form-floating-outline">' +
+                                                '<select id="cash" name="cashapp_id" class="select2 form-select" data-allow-clear="true">' +
+                                                    '<option value="">Please Select</option>' + options + '</select>' +
+                                                '<label for="mop">Cash Apps</label>' +
+                                            '</div>';
+
+                                // Clear previous content and inject new content
+                                $('#embed_mop').html(input);
+
+                                // Initialize or reinitialize Select2 (if needed)
+                                $('#cash').select2();
+                            } else {
+                                console.error('Invalid response structure:', response);
+                                // Handle invalid response structure
+                            }
+                        },
+                        error: function (xhr, status, error) {
+                            console.error('AJAX request failed:', status, error);
+                            // Handle the error appropriately
+                        }
+                    });
+                }
+                else if (mop == "Bank Transfer"){
+                    $.ajax({
+                        type: "GET",
+                        url: "{{ route('front.getbank') }}",
+                        success: function (response) {
+                            // Validate response structure
+                            if (response && response.bank && Array.isArray(response.bank)) {
+                                console.log(response);
+
+                                // Map the response data to options
+                                var options = $.map(response.bank, function (bank) {
+                                    return '<option value="' + bank.id + '">' + bank.name + '</option>';
+                                });
+
+                                // Build the select input with the dynamic options
+                                var input = '<div class="form-floating form-floating-outline">' +
+                                                '<select id="bank" name="bank_transfer_id" class="select2 form-select" data-allow-clear="true">' +
+                                                    '<option value="">Please Select</option>' + options + '</select>' +
+                                                '<label for="mop">Bank Accounts</label>' +
+                                            '</div>';
+
+                                // Clear previous content and inject new content
+                                $('#embed_mop').html(input);
+
+                                // Initialize or reinitialize Select2 (if needed)
+                                $('#bank').select2();
+                            } else {
+                                console.error('Invalid response structure:', response);
+                                // Handle invalid response structure
+                            }
+                        },
+                        error: function (xhr, status, error) {
+                            console.error('AJAX request failed:', status, error);
+                            // Handle the error appropriately
+                        }
+                    });
                 }
             });
         });
@@ -3517,13 +3626,14 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                     processData: false, // Important: do not process the data
                     contentType: false, // Important: content type is false
                     success: function (response) {
-
+                        var payment = response.current_payment;
+                    //    console.log(payment);
+                       
                         var payments = response.payments;
                         console.log(payments);
                         var tableContent = ''; // Initialize a variable to store the rows
 
                         payments.forEach(function(payment, index) {
-
                             tableContent += '<tr>\
                                 <td>' + (index + 1) + '</td>\
                                 <td>' + payment.invoice_number + '</td>\
@@ -3540,6 +3650,8 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
 
                         // Clear the table first and then append the new rows
                         $('#payment_table tbody').empty().append(tableContent);
+
+                        $('invoice_number_id').val(payment.id);
 
 
                         // alert("dskfjsdkljf");

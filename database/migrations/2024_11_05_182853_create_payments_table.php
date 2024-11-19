@@ -18,13 +18,18 @@ return new class extends Migration
             $table->unsignedBigInteger('merchant_id');
             $table->enum('mop', ['Credit Card','PayPal','Zeele','Cash App','Bank Transfer', 'other'])->default('other');
             $table->enum('payment_type', ['Full Payment', 'Partials Payment', 'Advance Payment'])->default('Full Payment');
-            $table->string('card_number');
-            $table->string('paypal_email');
-
+            $table->string('card_number')->nullable();
+            $table->string('paypal_email')->nullable();
+            $table->unsignedBigInteger('cashapp_id')->nullable();
+            $table->unsignedBigInteger('zelle_id')->nullable();
+            $table->unsignedBigInteger('bank_transfer_id')->nullable();
             $table->decimal('amount', 10, 2);
             $table->decimal('balance', 10, 2)->default(0);
             $table->char('trans_id')->nullable();
             $table->string('trans_ss')->nullable();
+            $table->foreign('cashapp_id')->references('id')->on('cashapps')->onDelete()->constrained()->onDelete('cascade');
+            $table->foreign('zelle_id')->references('id')->on('zelle_accounts')->onDelete()->constrained()->onDelete('cascade');
+            $table->foreign('bank_transfer_id')->references('id')->on('bank_accounts')->onDelete()->constrained()->onDelete('cascade');
             $table->foreign('merchant_id')->references('id')->on('merchant_accounts')->onDelete()->constrained()->onDelete('cascade');
             $table->foreign('invoice_id')->references('id')->on('invoices')->onDelete('cascade');
             $table->softDeletes();

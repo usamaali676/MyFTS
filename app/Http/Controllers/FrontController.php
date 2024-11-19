@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BankAccount;
+use App\Models\Cashapp;
 use App\Models\Invoice;
 use App\Models\Lead;
 use App\Models\Role;
 use App\Models\SubCategory;
 use App\Models\User;
+use App\Models\ZelleAccount;
 use Illuminate\Http\Request;
 
 class FrontController extends Controller
@@ -133,6 +136,19 @@ class FrontController extends Controller
                 if ($invoice) {
                     return view('pages.invoice.print', compact('invoice'));
                 }
+            }
+
+            public function getzelle(){
+                $zelle = ZelleAccount::all();
+                return response()->json(['zelle' => $zelle]);
+            }
+            public function getcash(){
+                $cash = Cashapp::all();
+                return response()->json(['cash' => $cash]);
+            }
+            public function getbank(){
+                $bank = BankAccount::all();
+                return response()->json(['bank' => $bank]);
             }
 
     }
