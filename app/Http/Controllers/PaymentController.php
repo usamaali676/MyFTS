@@ -86,9 +86,28 @@ class PaymentController extends Controller
             $payment->merchant_id = $request->merchant;
             $payment->mop = $request->mop;
             $payment->payment_type = $request->payment_type;
+            if(isset($request->card_number)){
+                $payment->card_number = $request->card_number;
+
+            }
+            if(isset($request->paypal_email)){
+                $payment->paypal_email = $request->paypal_email;
+
+            }
+            if(isset($request->zelle_id)){
+                $payment->zelle_id = $request->zelle_id;
+
+            }
+            if(isset($request->cashapp_id)){
+                $payment->cashapp_id = $request->cashapp_id;
+
+            }
+            if(isset($request->bank_transfer_id)){
+                $payment->bank_transfer_id = $request->bank_transfer_id;
+
+            }
             $payment->amount = $request->payment_amount;
             $payment->balance = $balance;
-            $payment->card_number = $request->card_number;
             $payment->trans_id = $request->trans_id;
             if(isset($request->trans_ss)){
             $payment->trans_ss	= GlobalHelper::fts_upload_img($request->trans_ss, 'recipts' );
@@ -110,6 +129,7 @@ class PaymentController extends Controller
 
             return response()->json([
                 'message' => 'Payment Charged Successfully',
+                'current_payment' => $payment,
                 'payments' => $payments,
             ], 200);
         }
