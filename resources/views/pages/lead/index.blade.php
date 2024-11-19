@@ -88,7 +88,7 @@
                                         href="{{ route('lead.edit', $item->id) }}" class="dropdown-item"><i
                                             class="mdi mdi-pencil-outline me-2"></i><span>Edit</span></a>
                                             @if(isset($item) && isset($item->sale))
-                                                  <a  href="{{route('sale.show', $item->sale->id)}}" class="dropdown-item" target="_blank"><i class="mdi mdi-pencil-outline me-2"></i><span>Preview</span></a>
+                                                  <a  href="{{route('sale.detail', $item->sale->id)}}" class="dropdown-item" target="_blank"><i class="mdi mdi-pencil-outline me-2"></i><span>Preview</span></a>
                                                   @else
                                                   <a  href="#" class="dropdown-item" disable><i class="mdi mdi-eye me-2"></i><span>Preview</span></a>
                                               @endif
@@ -139,7 +139,7 @@
                                                 <div class="dropdown-menu dropdown-menu-end m-0" style="">
                                                   <a href="{{ route('lead.edit', $item->id) }}" class="dropdown-item"><i class="mdi mdi-pencil-outline me-2"></i><span>Edit</span></a>
                                                   @if(isset($item) && isset($item->sale))
-                                                  <a  href="{{route('sale.show', $item->sale->id)}}" class="dropdown-item"><i class="mdi mdi-pencil-outline me-2"></i><span>Preview</span></a>
+                                                  <a  href="{{route('sale.detail', $item->sale->id)}}" class="dropdown-item"><i class="mdi mdi-pencil-outline me-2"></i><span>Preview</span></a>
                                                   @else
                                                   <a  href="#" class="dropdown-item"><i class="mdi mdi-pencil-outline me-2"></i><span>Preview</span></a>
                                                   @endif
