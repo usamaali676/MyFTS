@@ -3667,7 +3667,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
 
                         // Clear the table first and then append the new rows
                         $('#payment_table tbody').empty().append(tableContent);
-                        $('#merchant').val(payment.merchant.name)
+                        $('#merchant').val(payment.merchant.name);
                         $('invoice_number_id').val(payment.id);
 
 
