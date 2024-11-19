@@ -3436,10 +3436,16 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                     url: "{{ route('front.invoicePrice') }}",
                     data: {id: id},
                     success: function (response) {
-                        // console.log(response);
-                        var invoice = response.invoice[0];
+                        console.log(response.payment);
+                        var invoice = response.invoice;
                         // console.log(invoice.total_amount);
-                        $('#payment_amount').val(invoice.balance);
+                        var payment = response.payment;
+                        if(payment){
+                            $('#payment_amount').val(payment.balance);
+                        }
+                        else{
+                            $('#payment_amount').val(invoice.total_amount);
+                        }
 
                     }
                 });

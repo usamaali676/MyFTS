@@ -16,7 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('invoice_id');
             $table->string('invoice_number');
             $table->unsignedBigInteger('merchant_id');
-            $table->enum('mop', ['Credit Card','PayPal','Zeele','Cash App','Bank Transfer', 'other'])->default('other');
+            $table->enum('mop', ['Credit Card','PayPal','Zelle','Cash App','Bank Transfer', 'other'])->default('other');
             $table->enum('payment_type', ['Full Payment', 'Partials Payment', 'Advance Payment'])->default('Full Payment');
             $table->string('card_number')->nullable();
             $table->string('paypal_email')->nullable();
