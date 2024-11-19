@@ -139,7 +139,7 @@
                                         <option value="Interested">Interested</option>
                                         <option value="Do Not Caller List">Do Not Caller List</option>
                                         <option value="Asked to Callback">Asked to Callback</option>
-                                        <option value="No Picked">Not Picked</option>
+                                        <option value="Not Picked">Not Picked</option>
                                         <option value="Picked">Picked</option>
                                         <option value="Busy">Busy</option>
                                         <option value="Cancelled">Cancelled</option>

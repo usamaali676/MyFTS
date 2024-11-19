@@ -143,11 +143,15 @@
                                 @else
                                 <option value="">Please Select</option>
                                 @endif
-                                <option value="Interested">Interested</option>
-                                <option value="Do Not Caller List">Do Not Caller List</option>
-                                <option value="Asked to Callback">Asked to Callback</option>
-                                <option value="No Picked">No Picked</option>
-                                <option value="Picked">Picked</option>
+                                        <option value="Interested">Interested</option>
+                                        <option value="Do Not Caller List">Do Not Caller List</option>
+                                        <option value="Asked to Callback">Asked to Callback</option>
+                                        <option value="Not Picked">Not Picked</option>
+                                        <option value="Picked">Picked</option>
+                                        <option value="Busy">Busy</option>
+                                        <option value="Cancelled">Cancelled</option>
+                                        <option value="Disconnected Number">Disconnected Number</option>
+                                        <option value="Call Dropped">Call Dropped</option>
                             </select>
                             <label for="call-status">Call Status</label>
                         </div>
@@ -172,8 +176,17 @@
                                 @endif
 
                                 <option value="Interested">Interested</option>
-                                <option value="Do Not Caller List">Do Not Caller List</option>
-                                <option value="Do Not Intrested">Do Not Intrested</option>
+                                        <option value="Do Not Caller List">Do Not Caller List</option>
+                                        <option value="Do Not Intrested">Do Not Intrested</option>
+                                        <option value="Qualified">Qualified</option>
+                                        <option value="Unqualified">Unqualified</option>
+                                        <option value="In Progress">In Progress</option>
+                                        <option value="Converted">Converted</option>
+                                        <option value="Closed - Lost">Closed - Lost</option>
+                                        <option value="Closed - Won">Closed - Won</option>
+                                        <option value="Follow-Up">Follow-Up</option>
+                                        <option value="Recycled">Recycled</option>
+                                        <option value="Duplicate">Duplicate</option>
 
                             </select>
                             <label for="lead-status">Lead Status</label>

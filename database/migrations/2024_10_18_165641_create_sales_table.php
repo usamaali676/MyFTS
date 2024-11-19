@@ -17,7 +17,7 @@ return new class extends Migration
             $table->enum('client_nature', ['New', 'Existing']);
             $table->enum('call_type', ['Business Hours Only', 'Weekdays Only', '24/7']);
             $table->string('time_zone')->nullable();
-            $table->date('signup_date');
+            $table->date('signup_date')->nullable();
             $table->date('activation_date')->nullable();
             $table->softDeletes();
             $table->unsignedBigInteger('created_by')->nullable();
