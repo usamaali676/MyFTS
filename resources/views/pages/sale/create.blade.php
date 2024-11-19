@@ -2838,7 +2838,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
             $.get('{{ route('front.countries') }}', function(data) {
                 $.each(data, function(index, country) {
                     // console.log(country);
-                    $('#countries').append(`<option value="${country.name}">${country.name} ${country.iso2}</option>`);
+                    $('#countries').append(`<option value="${country.name}">${country.name} (${country.iso2})</option>`);
                 });
             });
 
@@ -2852,7 +2852,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                 if (countryId) {
                     $.get(`https://myfts.firmtech.biz/front/states/${countryId}`, function(data) {
                         $.each(data, function(index, state) {
-                            $('#states').append(`<option value="${state.name}">${state.name} ${state.state_code}</option>`);
+                            $('#states').append(`<option value="${state.name}">${state.name} (${state.state_code})</option>`);
                         });
                     });
                 }
@@ -3285,11 +3285,22 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                     processData: false, // Important: do not process the data
                     contentType: false, // Important: content type is false
                     success: function (response) {
+                        console.log(response);
+                        var all_invoices = response.all_invoices;
                         var invoice = response.invoice;
                         $('#genrate-invoice').attr('style', "display: none !important");
                         $('#view-invoice').attr('style', "display: block !important; color: #fff !important");
-                        $('#view-invoice').attr('href', "/front/invoice/"+ invoice.invoice_number +  "")
+                        $('#view-invoice').attr('href', "/front/invoice/"+ invoice.invoice_number +  "");
+                        $('#invoice_number').val(invoice.invoice_number);
 
+                        if(all_invoices){
+
+                            var option = $.map(all_invoices, function (invoice, ) {
+                                return '<option value="' + invoice.id + '">' + invoice.invoice_number +' </option>';
+                            });
+                            
+                            $('#invoice_number_id').append(option)
+                        }
 
 
 
@@ -3428,7 +3439,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                         // console.log(response);
                         var invoice = response.invoice[0];
                         // console.log(invoice.total_amount);
-                        $('#payment_amount').val(invoice.total_amount);
+                        $('#payment_amount').val(invoice.balance);
 
                     }
                 });

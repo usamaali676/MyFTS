@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\CompanyServices;
 use App\Models\Invoice;
 use App\Models\InvoiceServiceCharges;
+use App\Models\Sale;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -77,6 +78,7 @@ class InvoiceServiceChargesController extends Controller
             'activation_date' => 'required',
             'invoice_due_date' => 'required',
         ]);
+        $sale = Sale::find($request->sale_id6);
         $unique_id = 'FTS'. '_' . Str::random(5) . '_' . time();
         $date = Carbon::now(); // or any other Carbon instance
         $monthName = $date->format('M Y');
@@ -151,9 +153,11 @@ class InvoiceServiceChargesController extends Controller
                 ]);
                 }
         }
+        $all_invoices = $sale->invoice;
         return response()->json([
             'message' => 'Invoice Genrated Succesfully!',
             'invoice' => $invoice->load(['servicecharges.service_name']),
+            'all_invoices' => $all_invoices,
         ], 200);
     }
         // if(isset($invoice)){
