@@ -87,6 +87,11 @@
                                         <div class="dropdown-menu dropdown-menu-end m-0" style=""><a
                                         href="{{ route('lead.edit', $item->id) }}" class="dropdown-item"><i
                                             class="mdi mdi-pencil-outline me-2"></i><span>Edit</span></a>
+                                            @if(isset($item) && isset($item->sale))
+                                                  <a  href="{{route('sale.show', $item->sale->id)}}" class="dropdown-item" target="_blank"><i class="mdi mdi-pencil-outline me-2"></i><span>Preview</span></a>
+                                                  @else
+                                                  <a  href="#" class="dropdown-item" disable><i class="mdi mdi-eye me-2"></i><span>Preview</span></a>
+                                              @endif
                                             {{-- <button type="button" class="btn btn-primary" id="confirm-color">Alert</button> --}}
                                             <a  type="button"
                                             data-id="{{ $item->id }}"
@@ -131,9 +136,13 @@
                                                 <button
                                                 class="btn btn-sm btn-icon btn-text-secondary rounded-pill dropdown-toggle hide-arrow"
                                                 data-bs-toggle="dropdown" aria-expanded="false"><i class="mdi mdi-dots-vertical mdi-20px"></i></button>
-                                                <div class="dropdown-menu dropdown-menu-end m-0" style=""><a
-                                                href="{{ route('lead.edit', $item->id) }}" class="dropdown-item"><i
-                                                    class="mdi mdi-pencil-outline me-2"></i><span>Edit</span></a>
+                                                <div class="dropdown-menu dropdown-menu-end m-0" style="">
+                                                  <a href="{{ route('lead.edit', $item->id) }}" class="dropdown-item"><i class="mdi mdi-pencil-outline me-2"></i><span>Edit</span></a>
+                                                  @if(isset($item) && isset($item->sale))
+                                                  <a  href="{{route('sale.show', $item->sale->id)}}" class="dropdown-item"><i class="mdi mdi-pencil-outline me-2"></i><span>Preview</span></a>
+                                                  @else
+                                                  <a  href="#" class="dropdown-item"><i class="mdi mdi-pencil-outline me-2"></i><span>Preview</span></a>
+                                                  @endif
                                                     {{-- <button type="button" class="btn btn-primary" id="confirm-color">Alert</button> --}}
                                                     <a  type="button"
                                                     data-id="{{ $item->id }}"

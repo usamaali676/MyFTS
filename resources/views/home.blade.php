@@ -1,16 +1,21 @@
+@auth
+@php
+$user = Auth::user();
+@endphp
+@endauth
 @extends('layouts.dashboard')
 
 @section('content')
 <div class="container-xxl flex-grow-1 container-p-y">
     <div class="row gy-4">
       <!-- Gamification Card -->
-      <div class="col-md-12 col-lg-8">
+      <div class="col-md-12 col-lg-12">
         <div class="card h-100">
           <div class="d-flex align-items-end row">
             <div class="col-md-6 order-2 order-md-1">
               <div class="card-body">
-                <h4 class="card-title pb-xl-2">Congratulations John!🎉</h4>
-                <p class="mb-0">You have done <span class="h6 mb-0">68%</span>😎 more sales today.</p>
+                <h4 class="card-title pb-xl-2">Welcome {{$user->name}}!🎉</h4>
+                {{-- <p class="mb-0">You have done <span class="h6 mb-0">68%</span>😎 more sales today.</p> --}}
                 <p>Check your new badge in your profile.</p>
                 <a href="javascript:;" class="btn btn-primary">View Profile</a>
               </div>
@@ -31,7 +36,7 @@
       <!--/ Gamification Card -->
 
       <!-- Statistics Total Order -->
-      <div class="col-lg-2 col-sm-6">
+      {{-- <div class="col-lg-2 col-sm-6">
         <div class="card h-100">
           <div class="card-body">
             <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
@@ -52,11 +57,11 @@
             </div>
           </div>
         </div>
-      </div>
+      </div> --}}
       <!--/ Statistics Total Order -->
 
       <!-- Sessions line chart -->
-      <div class="col-lg-2 col-sm-6">
+      {{-- <div class="col-lg-2 col-sm-6">
         <div class="card h-100">
           <div class="card-header pb-0">
             <div class="d-flex align-items-end mb-1 flex-wrap gap-2">
@@ -69,11 +74,11 @@
             <div id="sessions"></div>
           </div>
         </div>
-      </div>
+      </div> --}}
       <!--/ Sessions line chart -->
 
       <!-- Total Transactions & Report Chart -->
-      <div class="col-12 col-xl-8">
+      {{-- <div class="col-12 col-xl-8">
         <div class="card h-100">
           <div class="row">
             <div class="col-md-7 col-12 order-2 order-md-0">
@@ -146,11 +151,11 @@
             </div>
           </div>
         </div>
-      </div>
+      </div> --}}
       <!--/ Total Transactions & Report Chart -->
 
       <!-- Performance Chart -->
-      <div class="col-12 col-xl-4 col-md-6">
+      {{-- <div class="col-12 col-xl-4 col-md-6">
         <div class="card h-100">
           <div class="card-header pb-1">
             <div class="d-flex justify-content-between">
@@ -177,11 +182,11 @@
             <div id="performanceChart"></div>
           </div>
         </div>
-      </div>
+      </div> --}}
       <!--/ Performance Chart -->
 
       <!-- Project Statistics -->
-      <div class="col-md-6 col-xl-4">
+      {{-- <div class="col-md-6 col-xl-4">
         <div class="card h-100">
           <div class="card-header d-flex align-items-center justify-content-between">
             <h5 class="card-title m-0 me-2">Project Statistics</h5>
@@ -291,11 +296,11 @@
             </ul>
           </div>
         </div>
-      </div>
+      </div> --}}
       <!--/ Project Statistics -->
 
       <!-- Multiple widgets -->
-      <div class="col-md-6 col-xl-4">
+      {{-- <div class="col-md-6 col-xl-4">
         <div class="row g-4">
           <!-- Total Revenue chart -->
           <div class="col-md-6 col-sm-6">
@@ -376,11 +381,11 @@
           </div>
           <!--/ overview Radial chart -->
         </div>
-      </div>
+      </div> --}}
       <!--/ Multiple widgets -->
 
       <!-- Sales Country Chart -->
-      <div class="col-12 col-xl-4 col-md-6">
+      {{-- <div class="col-12 col-xl-4 col-md-6">
         <div class="card h-100">
           <div class="card-header">
             <div class="d-flex justify-content-between">
@@ -408,7 +413,7 @@
             <div id="salesCountryChart"></div>
           </div>
         </div>
-      </div>
+      </div> --}}
       <!--/ Sales Country Chart -->
 
 

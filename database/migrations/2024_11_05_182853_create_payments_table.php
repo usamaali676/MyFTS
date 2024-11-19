@@ -27,10 +27,10 @@ return new class extends Migration
             $table->decimal('balance', 10, 2)->default(0);
             $table->char('trans_id')->nullable();
             $table->string('trans_ss')->nullable();
-            $table->foreign('cashapp_id')->references('id')->on('cashapps')->onDelete()->constrained()->onDelete('cascade');
-            $table->foreign('zelle_id')->references('id')->on('zelle_accounts')->onDelete()->constrained()->onDelete('cascade');
-            $table->foreign('bank_transfer_id')->references('id')->on('bank_accounts')->onDelete()->constrained()->onDelete('cascade');
-            $table->foreign('merchant_id')->references('id')->on('merchant_accounts')->onDelete()->constrained()->onDelete('cascade');
+            $table->foreign('cashapp_id')->references('id')->on('cashapps');
+            $table->foreign('zelle_id')->references('id')->on('zelle_accounts');
+            $table->foreign('bank_transfer_id')->references('id')->on('bank_accounts');
+            $table->foreign('merchant_id')->references('id')->on('merchant_accounts');
             $table->foreign('invoice_id')->references('id')->on('invoices')->onDelete('cascade');
             $table->softDeletes();
             $table->timestamps();

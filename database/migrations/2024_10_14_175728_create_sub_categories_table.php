@@ -29,9 +29,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        // Schema::dropIfExists('sub_categories');
-        Schema::create('sub_categories', function (Blueprint $table) {
-            $table->dropSoftDeletes();
-        });
+        Schema::dropIfExists('sub_categories');
+        // Schema::create('sub_categories', function (Blueprint $table) {
+        //     $table->dropSoftDeletes();
+        // });
     }
 };

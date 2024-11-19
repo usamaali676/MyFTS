@@ -28,8 +28,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('business_categories');
-        Schema::create('business_categories', function (Blueprint $table) {
-            $table->dropSoftDeletes();
-        });
+        // Schema::create('business_categories', function (Blueprint $table) {
+        //     $table->dropSoftDeletes();
+        // });
     }
 };

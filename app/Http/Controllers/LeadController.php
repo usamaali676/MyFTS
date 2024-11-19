@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\BusinessCategory;
 use App\Models\CompanyServices;
+use App\Models\CompanyServicesLead;
 use App\Models\Lead;
 use App\Models\LeadAdditionalInfo;
 use App\Models\LeadCloser;
@@ -48,7 +49,7 @@ class LeadController extends Controller
      */
     public function store(Request $request)
     {
-        dd($request->all());
+        // dd($request->all());
         $formattedCallBackTime = Carbon::parse($request->call_back_time)->format('Y-m-d H:i:s'); // e.g., 2024-10-15 14:30:00
         $request->validate([
             'business_name' => 'required',
@@ -70,6 +71,8 @@ class LeadController extends Controller
             'call_status' => $request->call_status,
             'call_back_time' => $formattedCallBackTime,
             'created_by' => Auth::user()->id,
+            'additional_number' => $request->add_business_number,
+            'additional_email' => $request->add_email,
         ]);
         $lead->sub_categories()->attach($request->sub_category);
         $lead->company_services()->attach($request->service);
@@ -83,15 +86,15 @@ class LeadController extends Controller
                 ]);
             }
         }
-        if(isset($request->name) && $request->value){
-            foreach($request->name as $key => $name){
-                LeadAdditionalInfo::create([
-                    'lead_id' => $lead->id,
-                    'name' => $name,
-                    'value' => $request->value[$key],
-                ]);
-            }
-        }
+        // if(isset($request->service)){
+        //     foreach ($request->service as $service) {
+        //         CompanyServicesLead::create([
+        //             'lead_id' => $lead->id,
+        //             'company_services_id' => $service,
+        //         ]);
+        //     }
+        // }
+
         Alert::Success('Success', "Lead Genrated Successfully");
         return redirect()->route('lead.index');
     }
@@ -116,12 +119,13 @@ class LeadController extends Controller
         $sub_categories_id = $lead->sub_categories->pluck('id')->toArray();
         $role = Role::where('name', "Closer")->first();
         $closers = User::where('role_id', $role->id)->get();
-        // dd($sub_categories_id);
+        $selected_company_services = $lead->company_services;
+        $company_services = CompanyServices::all();
         $related_subcategories = SubCategory::where('business_category_id',  $lead->category_id)
         ->whereNotIn('id', $sub_categories_id)
         ->get();
         // dd($lead->closers);
-        return view('pages.lead.edit', compact('lead', 'sub_categories', 'categories','related_subcategories', 'closers' ));
+        return view('pages.lead.edit', compact('lead', 'sub_categories', 'categories','related_subcategories', 'closers', 'company_services', 'selected_company_services' ));
     }
 
     /**
@@ -149,9 +153,11 @@ class LeadController extends Controller
             'call_status' => $request->call_status,
             'call_back_time' => $formattedCallBackTime,
             'updated_by' => Auth::user()->id,
+            'additional_number' => $request->add_business_number,
+            'additional_email' => $request->add_email,
         ]);
         $lead->sub_categories()->sync($request->sub_category);
-        // $lead->closers()->sync($request->closers);
+        $lead->company_services()->sync($request->service);
         // if(isset($request->closers)){
             $remainingclosers = LeadCloser::where('lead_id', $lead->id)->get();
             if(isset($remainingclosers)){
