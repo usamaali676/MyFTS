@@ -69,6 +69,7 @@
         @endphp
     </div>
     <span class="badge rounded-pill bg-primary" style="text-align: center; width: fit-content; margin: auto; padding: 7px 10px">{{ $user->name }}</span>
+    <p style="text-align: center; margin-bottom: 0px;" >{{ $user->role->name }}</p>
 
 
     <div class="menu-inner-shadow"></div>
@@ -89,7 +90,7 @@
         <li class="menu-header fw-medium mt-4">
             <span class="menu-header-text" data-i18n="Apps & Pages">Apps &amp; Pages</span>
         </li>
-
+        @if(isset($user) && $user->role_id == 1)
         <li class="menu-item">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons mdi mdi-shield-outline"></i>
@@ -108,6 +109,7 @@
                 </li> --}}
             </ul>
         </li>
+        @endif
         <li class="menu-item">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons mdi mdi-table"></i>

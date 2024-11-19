@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('sales', function (Blueprint $table) {
             $table->boolean('status')->default(false);
-            
+
 
         });
     }

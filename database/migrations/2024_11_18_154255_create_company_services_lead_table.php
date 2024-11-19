@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('company_services_id');
             $table->unsignedBigInteger('lead_id');
-            $table->foreign('company_services_id')->references('id')->on('company_services')->constrained()->onDelete('cascade');
-            $table->foreign('lead_id')->references('id')->on('leads')->constrained()->onDelete('cascade');
+            $table->foreign('company_services_id')->references('id')->on('company_services');
+            $table->foreign('lead_id')->references('id')->on('leads');
             $table->timestamps();
         });
     }
@@ -26,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('company_services_leads');
+        Schema::dropIfExists('company_services_lead');
     }
 };

@@ -14,7 +14,12 @@ class RolesSeeder extends Seeder
      */
     public function run(): void
     {
-        // $route = GlobalHelper::Permissions();
-        // dd($route);
+        $roles = ['Creator','TSR', 'Executives', 'Customer Support', 'Closer'];
+        foreach ($roles as $role) {
+            Role::create([
+                'name' => $role,
+
+        ]);
+        }
     }
 }

@@ -27,11 +27,12 @@
 
 
 
+        <form class="card-body" method="POST" action="{{ route('lead.update', $lead->id) }}" id="leadForm" onsubmit="return validateForm()">
+            @csrf
         <!-- Multi Column with Form Separator -->
-        <div class="card mb-4">
+        <div class="card mb-4 px-3 py-5">
             <h5 class="card-header">Insert Data of Sale</h5>
-            <form class="card-body" method="POST" action="{{ route('lead.update', $lead->id) }}" id="leadForm" onsubmit="return validateForm()">
-                @csrf
+
                 <div class="row g-4">
                     <div class="col-md-6">
                         <div class="form-floating form-floating-outline">
@@ -201,9 +202,100 @@
                             <label for="multicol-closers">Select Closers</label>
                         </div>
                     </div>
+                    <div class="col-md-6 select2-primary">
+                        <div class="form-floating form-floating-outline">
+                            <select id="multicol-service" name="service[]" class="select2 form-select" multiple>
+                                <option value="">Please Select</option>
+                                @if(isset($selected_company_services))
+                                @foreach ($selected_company_services as $item)
+                                    <option value="{{ $item->id }}" selected>{{ $item->name }}</option>
+                                @endforeach
+                                @else
+                                <option value="">Please Select</option>
+                                @endif
+                                @foreach ($company_services as $service)
+                                <option value="{{ $service->id }}">{{ $service->name }}</option>
+                                @endforeach
+
+                            </select>
+                            <label for="multicol-service">Pitched Services</label>
+                        </div>
+                    </div>
                 </div>
 
         </div>
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h6>Additional Contact Info</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating form-floating-outline">
+                                <input type="tel"  id="business_number2" style="height: calc(2.940725rem + 2px);"
+                                    name="add_business_number" class="form-control" value="{{ $lead->additional_number }}"  />
+                                <label for="multicol-last-name">Additional Business Number</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-2">
+                                <div class="input-group input-group-merge">
+                                    <div class="form-floating form-floating-outline">
+                                        <input type="email" id="basic-default-email2" name="add_email" class="form-control"
+                                            placeholder="john.doe" aria-label="john.doe"
+                                            aria-describedby="basic-default-email2" value="{{ $lead->additional_email }}">
+                                        <label for="basic-default-email">Optional Email</label>
+                                    </div>
+                                    <span class="input-group-text" id="basic-default-email2">@example.com</span>
+                                </div>
+                                <div class="form-text">You can use letters, numbers &amp; periods</div>
+                            </div>
+                        </div>
+                    </div>
+                    {{-- <div id="repeater">
+
+                            <div class="items">
+                                <div class="item-content">
+                                    <div class="row py-2">
+                                        <div class="col-md-4">
+                                            <div class="form-floating form-floating-outline">
+                                                <select name="platform_name[]" class="form-control">
+                                                    <option value="">Please Select</option>
+                                                    <option value="phone">Phone</option>
+                                                    <option value="email">Email</option>
+                                                    <option value="url">URL</option>
+                                                </select>
+                                                <label> Platform</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-floating form-floating-outline">
+                                                <input type="text" class="form-control" name="platform_value[]" placeholder="Value" />
+                                                <label>Value</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <a class="btn btn-outline-danger remove-btn" style="color: #ff4d49" onclick="$(this).closest('.items').remove()">Remove</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="items" >
+                            </div>
+
+                            <div class="repeater-footer py-4" style="display: flex; justify-content: flex-end;">
+                                <a class="btn btn-primary repeater-add-btn" style="color: #fff">Add</a>
+                            </div>
+
+                    </div> --}}
+
+                        <!-- Hidden Template for New Repeater Item -->
+                </div>
+            </div>
+        </div>
+
 
         <div class="pt-4">
             <button type="submit" class="btn btn-primary me-sm-3 me-1">Submit</button>
