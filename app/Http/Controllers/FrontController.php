@@ -67,7 +67,7 @@ class FrontController extends Controller
                 $special_countries = [];
                 foreach ($countries as $country)
                 {
-                    if($country['id'] == 233 || $country['id'] == 39){
+                    if($country['id'] == 1 || $country['id'] == 2){
                         $special_countries[] =  $country;
                     }
                 }

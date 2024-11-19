@@ -2852,7 +2852,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                 if (countryId) {
                     $.get(`https://myfts.firmtech.biz/front/states/${countryId}`, function(data) {
                         $.each(data, function(index, state) {
-                            $('#states').append(`<option value="${state.name}">${state.name}</option>`);
+                            $('#states').append(`<option value="${state.name}">${state.name} ${state.state_code}</option>`);
                         });
                     });
                 }
@@ -2898,7 +2898,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
 
                         var list = '<tr>\
                                     <td>'+response.servicearea.country+', '+ response.servicearea.state +', '+response.servicearea.city+'</td>\
-                                    <td><td><a  type="button" id="'+response.servicearea.id +'" class="dropdown-item delete-record area_delete" data-confirm="Are you sure to delete this item?"><i class="mdi mdi-delete-outline me-2"></i><span>Delete</span></a></td></td>\
+                                    <td><a  type="button" id="'+response.servicearea.id +'" class="dropdown-item delete-record area_delete" data-confirm="Are you sure to delete this item?"><i class="mdi mdi-delete-outline me-2"></i><span>Delete</span></a></td>\
                                     </tr>'
                         $('#areas_we_serve').append(list);
                         var option = '<option value="'+response.servicearea.id+'">'+response.servicearea.country+', '+ response.servicearea.state +', '+response.servicearea.city+'</option>'
