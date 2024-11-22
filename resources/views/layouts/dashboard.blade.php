@@ -236,23 +236,7 @@
                                                 </div>'
                             $('.tt-dataset-invoice').html(invoicesearchResultHtml);
 
-                            let categorysearchResultHtml = '';
-                            let invappendvalue = '';
 
-                        if(searchData.invoice.length > 0){
-                            searchData.invoice.forEach(item => {
-                                invoiceappendvalue += '<a href="#"><div><span class="align-middle">'+ item.invoice_number + '</span></div></a>';
-                            });
-                        }
-                        else{
-                            invoiceappendvalue += '<p class="py-2 mb-0"><i class="mdi mdi-alert-circle-outline me-2 mdi-14px"></i> No Results Found</p>'
-                            }
-
-                            invoicesearchResultHtml = '<div class="not-found px-3 py-2">\
-                                                    <h6 class="suggestions-header text-primary mb-2">Invoices</h6>\
-                                                    ' + invoiceappendvalue + '\
-                                                </div>'
-                            $('.tt-dataset-invoice').html(invoicesearchResultHtml);
                     },
                     error: function (xhr, status, error) {
                         console.error("Error occurred: " + error);

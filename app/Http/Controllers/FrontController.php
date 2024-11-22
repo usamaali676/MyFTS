@@ -41,8 +41,7 @@ class FrontController extends Controller
                 ->get();
 
                 $invoice = Invoice::where('invoice_number', 'LIKE', "%{$searchTerm}%")->get();
-                
-                $invoice = Invoice::where('invoice_number', 'LIKE', "%{$searchTerm}%")->get();
+
 
                 // Search Keywords
                 // $keywords = Keyword::where('word', 'LIKE', "%{$searchTerm}%")->get();
