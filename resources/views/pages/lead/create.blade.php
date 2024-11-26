@@ -518,7 +518,7 @@ $('#call-status').change(function (e) {
 
 
             if (countryId) {
-                $.get(`https://myfts.firmtech.biz/front/states/${countryId}`, function(data) {
+                $.get(`/front/states/${countryId}`, function(data) {
                     $.each(data, function(index, state) {
                         $('#states').append(`<option value="${state.name}">${state.name} (${state.state_code})</option>`);
                     });
@@ -533,7 +533,7 @@ $('#call-status').change(function (e) {
             $('#cities').empty().append('<option value="">Select City</option>').prop('disabled', false);
 
             if (stateId) {
-                $.get(`https://myfts.firmtech.biz/front/cities/${stateId}/${conrtyId}`, function(data) {
+                $.get(`/front/cities/${stateId}/${conrtyId}`, function(data) {
                     $.each(data, function(index, city) {
                         $('#cities').append(`<option value="${city.name}">${city.name}</option>`);
                     });
