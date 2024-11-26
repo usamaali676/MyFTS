@@ -2847,7 +2847,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                 const countryId = $(this).val();
                 $('#states').empty().append('<option value="">Select State</option>').prop('disabled', false);
                 $('#cities').empty().append('<option value="">Select City</option>').prop('disabled', true);
-                // console.log(count);
+                
 
                 if (countryId) {
                     $.get(`https://myfts.firmtech.biz/front/states/${countryId}`, function(data) {
@@ -3298,7 +3298,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                             var option = $.map(all_invoices, function (invoice, ) {
                                 return '<option value="' + invoice.id + '">' + invoice.invoice_number +' </option>';
                             });
-                            
+
                             $('#invoice_number_id').append(option)
                         }
 
@@ -3645,7 +3645,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                     success: function (response) {
                         var payment = response.current_payment;
                     //    console.log(payment);
-                       
+
                         var payments = response.payments;
                         console.log(payments);
                         var tableContent = ''; // Initialize a variable to store the rows

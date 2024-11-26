@@ -14,8 +14,6 @@
 
             <div class="container-xxl flex-grow-1 container-p-y">
                 <h4 class="py-3 mb-4"><span class="text-muted fw-light">Lead/</span> All</h4>
-
-
               <!-- Responsive Datatable -->
               <div class="card">
                 <div class="card-header border-bottom">
@@ -58,17 +56,23 @@
                                 <td>{{ $loop->index +1 }}</td>
                                 <td>{{ $item->business_name_adv}}</td>
                                 <td>{{ $item->business_number_adv }}</td>
-                                <td>{{ $item->off_email}}</td>
+                                @if ((isset($item->off_email)))
+                                    <td>{{ $item->off_email}}</td>
+                                @else
+                                    <td>N/A</td>
+                                @endif
                                 <td><span class="badge rounded-pill bg-label-primary me-1">{{ $item->category->name }}</span></td>
                                 <td>{{ $item->saler->name }}</td>
-
                                 <td>{{ $item->call_status }}</td>
-
                                 <td>
                                     {{-- <p>{{ $item->closers }}</p> --}}
-                                    @foreach ($item->closers as $user)
-                                        <span class="badge rounded-pill bg-label-primary me-1">{{ $user->user->name }}</span>
-                                    @endforeach
+                                    @if (isset($item->closers) && count($item->closers) > 0)
+                                        @foreach ($item->closers as $list)
+                                            <span class="badge rounded-pill bg-label-primary me-1">{{ $list->user->name }}</span>
+                                        @endforeach
+                                    @else
+                                        N/A
+                                    @endif
                                 </td>
                                 <td>
                                     {{-- <p>{{ $item->sale }}</p> --}}
@@ -89,9 +93,9 @@
                                             class="mdi mdi-pencil-outline me-2"></i><span>Edit</span></a>
                                             @if(isset($item) && isset($item->sale))
                                                   <a  href="{{route('sale.detail', $item->sale->id)}}" class="dropdown-item" target="_blank"><i class="mdi mdi-pencil-outline me-2"></i><span>Preview</span></a>
-                                                  @else
+                                            @else
                                                   <a  href="#" class="dropdown-item" disable><i class="mdi mdi-eye me-2"></i><span>Preview</span></a>
-                                              @endif
+                                            @endif
                                             {{-- <button type="button" class="btn btn-primary" id="confirm-color">Alert</button> --}}
                                             <a  type="button"
                                             data-id="{{ $item->id }}"
@@ -112,16 +116,23 @@
                                         <td>{{ $loop->index +1 }}</td>
                                         <td>{{ $item->business_name_adv}}</td>
                                         <td>{{ $item->business_number_adv }}</td>
-                                        <td>{{ $item->off_email}}</td>
+                                        @if ((isset($item->off_email)))
+                                            <td>{{ $item->off_email}}</td>
+                                        @else
+                                        <td>N/A</td>
+                                        @endif
                                         <td><span class="badge rounded-pill bg-label-primary me-1">{{ $item->category->name }}</span></td>
                                         <td>{{ $item->saler->name }}</td>
-
                                         <td>{{ $item->call_status }}</td>
                                         <td>
                                             {{-- <p>{{ $item->closers }}</p> --}}
+                                           @if (isset($item->closers) && count($item->closers) > 0)
                                             @foreach ($item->closers as $list)
                                                 <span class="badge rounded-pill bg-label-primary me-1">{{ $list->user->name }}</span>
                                             @endforeach
+                                           @else
+                                            N/A
+                                           @endif
                                         </td>
                                         <td>
                                             @if(isset($item->sale) && $item->sale->status == 1)
