@@ -25,7 +25,7 @@ class InvoiceServiceChargesController extends Controller
      */
     public function create(Request $request)
     {
-        dd($request->all());
+        // dd($request->all());
         $request->validate([
             'invoice_id' => 'required',
             'invoice_amount' => 'required',

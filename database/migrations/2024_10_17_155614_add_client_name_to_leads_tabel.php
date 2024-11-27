@@ -12,9 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('leads', function (Blueprint $table) {
-            $table->string('client_name')->nullable();
-            $table->string('client_address')->nullable();
-            $table->string('client_designation')->nullable();
+            $table->string('country')->nullable();
+            $table->string('state')->nullable();
+            $table->string('city')->nullable();
+            $table->string('zip_code')->nullable();
+
         });
     }
 

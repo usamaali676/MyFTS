@@ -113,16 +113,8 @@
                         <div class="form-floating form-floating-outline">
                             <input type="text" class="form-control " name="client_name"
                                 placeholder="Client Name" aria-label="client_name" value="{{ $lead->client_name }}"
-                                onkeydown="return /[a-zA-Z\s]/.test(event.key) || event.key === 'Backspace' || event.key === 'Tab';"/>
+                                onkeydown="return /[a-zA-Z\s]/.test(event.key) || event.key === 'Backspace' || event.key === 'Tab';" required/>
                             <label for="client_name">Client Name</label>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-floating form-floating-outline">
-                            <input type="text" class="form-control " name="client_address"
-                                placeholder="Client Address" aria-label="client_address" value="{{ $lead->client_address }}"
-                                onkeydown="return /[a-zA-Z0-9\/\-\_\:\ \,]/.test(event.key) || event.key === 'Backspace' || event.key === 'Tab';"/>
-                            <label for="client_address">Client Address</label>
                         </div>
                     </div>
                     <div class="col-md-6">
@@ -131,6 +123,48 @@
                                 placeholder="Client Designation" aria-label="client_designation" value="{{ $lead->client_designation }}"
                                 onkeydown="return /[a-zA-Z\s]/.test(event.key) || event.key === 'Backspace' || event.key === 'Tab';"/>
                             <label for="client_designation">Client Designation</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating form-floating-outline">
+                            <select id="countries" name="country" class="select2 form-select" data-allow-clear="true" >
+                                <option value="">Please Select</option>
+                                @if(isset($lead->country))
+                                <option value="{{$lead->country}}" selected>{{$lead->country}}</option>
+                                @endif
+                            </select>
+                            <label for="multicol-country">Countries</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating form-floating-outline">
+                            <select id="states" name="states" class="select2 form-select" data-allow-clear="true" >
+                                <option value="">Please Select</option>
+                                @if (isset($lead->state))
+                                <option value="{{$lead->state}}" selected>{{$lead->state}}</option>
+                                @endif
+                            </select>
+                            <label for="multicol-country">States</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating form-floating-outline">
+                            <select id="cities" name="cities" class="select2 form-select" data-allow-clear="true" >
+                                <option value="">Please Select</option>
+                                @if (isset($lead->city))
+                                    <option value="{{$lead->city}}" selected>{{$lead->city}}</option>
+                                @endif
+                            </select>
+                            <label for="multicol-country">Cities</label>
+
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-floating form-floating-outline">
+                            <input type="text" class="form-control " name="zip_code"
+                                placeholder="ZIP Code" value="{{ $lead->zip_code }}" aria-label="zip_code"
+                                 />
+                            <label for="zip_code">ZIP Code</label>
                         </div>
                     </div>
                     <div class="col-md-6">
@@ -217,7 +251,7 @@
                     </div>
                     <div class="col-md-6 select2-primary">
                         <div class="form-floating form-floating-outline">
-                            <select id="multicol-service" name="service[]" class="select2 form-select" multiple>
+                            <select id="multicol-service" name="service[]" class="select2 form-select" multiple required>
                                 <option value="">Please Select</option>
                                 @if(isset($selected_company_services))
                                 @foreach ($selected_company_services as $item)
@@ -450,45 +484,112 @@
         const clientName = document.getElementsByName('client_name')[0].value;
         const clientAddress = document.getElementsByName('client_address')[0].value;
 
-        // Validate business name (only letters and spaces)
-        if (!/^[a-zA-Z\s]*$/.test(businessName)) {
-            alert('Invalid Business Name. Only letters and spaces are allowed.');
+        // Check if business name is set and validate it
+        if (businessName && businessName.trim() !== "") {
+            // Validate business name (only letters and spaces)
+            if (!/^[a-zA-Z\s]*$/.test(businessName)) {
+                alert('Invalid Business Name. Only letters and spaces are allowed.');
+                return false;
+            }
+        } else {
+            alert('Business Name is required.');
             return false;
         }
 
-        // Validate business number (only digits)
-        if (!iti.isValidNumber()) {
-            alert('Invalid Phone Number. Please enter a valid phone number.');
+        // Check if business number is set and validate phone number
+        if (businessNumber && businessNumber.trim() !== "") {
+            if (!iti.isValidNumber()) { // Assuming you use a library like intl-tel-input
+                alert('Invalid Phone Number. Please enter a valid phone number.');
+                return false;
+            }
+        } else {
+            alert('Business Number (Phone) is required.');
             return false;
         }
 
-        // Validate website URL (must be a valid URL with domain)
-        const urlPattern = /^(https?:\/\/)?([a-zA-Z0-9\-]+\.)+[a-zA-Z]{2,}(\/[^\s]*)?$/;
-        if (!urlPattern.test(websiteUrl)) {
-            alert('Invalid Website URL. Please enter a valid URL (e.g., http://example.com).');
+        // Check if website URL is set and validate it
+        if (websiteUrl && websiteUrl.trim() !== "") {
+            // Validate website URL (must be a valid URL with domain)
+            const urlPattern = /^(https?:\/\/)?([a-zA-Z0-9\-]+\.)+[a-zA-Z]{2,}(\/[^\s]*)?$/;
+            if (!urlPattern.test(websiteUrl)) {
+                alert('Invalid Website URL. Please enter a valid URL (e.g., http://example.com).');
+                return false;
+            }
+        }
+
+        // Check if email is set and validate it
+        if (email && email.trim() !== "") {
+            // Validate email format (must contain "@" and a valid domain)
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/;
+            if (!emailPattern.test(email)) {
+                alert('Invalid Email. Please enter a valid email address (e.g., user@example.com).');
+                return false;
+            }
+        }
+
+        // Check if client name is set and validate it
+        if (clientName && clientName.trim() !== "") {
+            // Validate client name (only letters and spaces)
+            if (!/^[a-zA-Z\s]*$/.test(clientName)) {
+                alert('Invalid Client Name. Only letters and spaces are allowed.');
+                return false;
+            }
+        } else {
+            alert('Client Name is required.');
             return false;
         }
 
-        // Validate email format (must contain "@" and a valid domain)
-        const emailPattern = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/;
-        if (!emailPattern.test(email)) {
-            alert('Invalid Email. Please enter a valid email address (e.g., user@example.com).');
-            return false;
-        }
-
-        // Validate client name (only letters and spaces)
-        if (!/^[a-zA-Z\s]*$/.test(clientName)) {
-            alert('Invalid Client Name. Only letters and spaces are allowed.');
-            return false;
-        }
-
-        // Validate client address (allowing letters, digits, and certain symbols)
-        if (!/^[a-zA-Z0-9\/\-\_\:\, ]*$/.test(clientAddress)) {
-            alert('Invalid Client Address. Only letters, numbers, and certain symbols are allowed.');
-            return false;
+        // Check if client address is set and validate it
+        if (clientAddress && clientAddress.trim() !== "") {
+            // Validate client address (allowing letters, digits, and certain symbols)
+            if (!/^[a-zA-Z0-9\/\-\_\:\, ]*$/.test(clientAddress)) {
+                alert('Invalid Client Address. Only letters, numbers, and certain symbols are allowed.');
+                return false;
+            }
         }
 
         return true; // All validations passed
     }
 </script>
+<script>
+    $(document).ready(function() {
+        // Load countries
+        $.get('{{ route('front.countries') }}', function(data) {
+            $.each(data, function(index, country) {
+                // console.log(country);
+                $('#countries').append(`<option value="${country.name}">${country.name} (${country.iso2})</option>`);
+            });
+        });
+
+        // Load states on country select
+        $('#countries').on('change', function() {
+            const countryId = $(this).val();
+            $('#states').empty().append('<option value="">Select State</option>').prop('disabled', false);
+            $('#cities').empty().append('<option value="">Select City</option>').prop('disabled', true);
+
+            if (countryId) {
+                $.get(`/front/states/${countryId}`, function(data) {
+                    $.each(data, function(index, state) {
+                        $('#states').append(`<option value="${state.name}">${state.name} (${state.state_code})</option>`);
+                    });
+                });
+            }
+        });
+        // Load cities on state select
+        $('#states').on('change', function() {
+            const conrtyId = $('#countries').val();
+            const stateId = $(this).val();
+            $('#cities').empty().append('<option value="">Select City</option>').prop('disabled', false);
+
+            if (stateId) {
+                $.get(`/front/cities/${stateId}/${conrtyId}`, function(data) {
+                    $.each(data, function(index, city) {
+                        $('#cities').append(`<option value="${city.name}">${city.name}</option>`);
+                    });
+                });
+            }
+        });
+    });
+</script>
+
 @endsection

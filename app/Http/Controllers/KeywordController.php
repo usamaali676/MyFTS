@@ -35,7 +35,6 @@ class KeywordController extends Controller
             $request->validate([
                 'keyword' => 'required|string|max:255',
                 'sale_id5' => 'required',
-                'area_id' => 'required'
             ]);
             $keyword = Keyword::create([
                 'sale_id' => $request->sale_id5,
@@ -55,7 +54,7 @@ class KeywordController extends Controller
             Log::error($e->getMessage());
 
             return response()->json([
-                'error' => 'An error occurred while creating the Keyword. Please try again.'
+                'error' => $e->getMessage(),
             ], 422);
         }
 
