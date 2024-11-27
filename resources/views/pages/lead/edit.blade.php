@@ -151,11 +151,12 @@
                         <div class="form-floating form-floating-outline">
                             <select id="cities" name="cities" class="select2 form-select" data-allow-clear="true" >
                                 <option value="">Please Select</option>
+                                @if (isset($lead->city))
+                                    <option value="{{$lead->city}}" selected>{{$lead->city}}</option>
+                                @endif
                             </select>
                             <label for="multicol-country">Cities</label>
-                            @if (isset($lead->city))
-                                <option value="{{$lead->city}}" selected>{{$lead->city}}</option>
-                            @endif
+
                         </div>
                     </div>
                     <div class="col-md-6">
@@ -549,6 +550,46 @@
 
         return true; // All validations passed
     }
+</script>
+<script>
+    $(document).ready(function() {
+        // Load countries
+        $.get('{{ route('front.countries') }}', function(data) {
+            $.each(data, function(index, country) {
+                // console.log(country);
+                $('#countries').append(`<option value="${country.name}">${country.name} (${country.iso2})</option>`);
+            });
+        });
+
+        // Load states on country select
+        $('#countries').on('change', function() {
+            const countryId = $(this).val();
+            $('#states').empty().append('<option value="">Select State</option>').prop('disabled', false);
+            $('#cities').empty().append('<option value="">Select City</option>').prop('disabled', true);
+
+            if (countryId) {
+                $.get(`/front/states/${countryId}`, function(data) {
+                    $.each(data, function(index, state) {
+                        $('#states').append(`<option value="${state.name}">${state.name} (${state.state_code})</option>`);
+                    });
+                });
+            }
+        });
+        // Load cities on state select
+        $('#states').on('change', function() {
+            const conrtyId = $('#countries').val();
+            const stateId = $(this).val();
+            $('#cities').empty().append('<option value="">Select City</option>').prop('disabled', false);
+
+            if (stateId) {
+                $.get(`/front/cities/${stateId}/${conrtyId}`, function(data) {
+                    $.each(data, function(index, city) {
+                        $('#cities').append(`<option value="${city.name}">${city.name}</option>`);
+                    });
+                });
+            }
+        });
+    });
 </script>
 
 @endsection

@@ -267,326 +267,117 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                     @if(isset($sale) && isset($sale->time_zone))
                                                     <option value="{{$sale->time_zone}}" selected>{{ $sale->time_zone }}</option>
                                                     @endif
-                                                        <optgroup label="US Time Zones">
-                                                            <option value="America/New_York">Eastern Time (ET)</option>
-                                                            <option value="America/Chicago">Central Time (CT)</option>
-                                                            <option value="America/Denver">Mountain Time (MT)</option>
-                                                            <option value="America/Los_Angeles">Pacific Time (PT)</option>
-                                                            <option value="America/Anchorage">Alaska Time (AKT)</option>
-                                                            <option value="Pacific/Honolulu">Hawaii-Aleutian Time (HAST)</option>
-                                                        </optgroup>
+                                                    <optgroup label="US Time Zones">
+                                                        <option value="Eastern Time (ET)">Eastern Time (ET)</option>
+                                                        <option value="Central Time (CT)">Central Time (CT)</option>
+                                                        <option value="Mountain Time (MT)">Mountain Time (MT)</option>
+                                                        <option value="Pacific Time (PT)">Pacific Time (PT)</option>
+                                                        <option value="Alaska Time (AKT)">Alaska Time (AKT)</option>
+                                                        <option value="Hawaii-Aleutian Time (HAST)">Hawaii-Aleutian Time (HAST)</option>
+                                                    </optgroup>
 
                                                         <optgroup label="Global Time Zones">
-                                                            <option value="Africa/Abidjan">GMT (Abidjan)</option>
-                                                            <option value="Africa/Accra">GMT (Accra)</option>
-                                                            <option value="Africa/Addis_Ababa">EAT (Addis Ababa)</option>
-                                                            <option value="Africa/Algiers">CET (Algiers)</option>
-                                                            <option value="Africa/Asmara">EAT (Asmara)</option>
-                                                            <option value="Africa/Bangui">WAT (Bangui)</option>
-                                                            <option value="Africa/Banjul">GMT (Banjul)</option>
-                                                            <option value="Africa/Bissau">GMT (Bissau)</option>
-                                                            <option value="Africa/Blantyre">CAT (Blantyre)</option>
-                                                            <option value="Africa/Brazzaville">WAT (Brazzaville)</option>
-                                                            <option value="Africa/Bujumbura">CAT (Bujumbura)</option>
-                                                            <option value="Africa/Cairo">EET (Cairo)</option>
-                                                            <option value="Africa/Casablanca">WET (Casablanca)</option>
-                                                            <option value="Africa/Ceuta">CET (Ceuta)</option>
-                                                            <option value="Africa/Conakry">GMT (Conakry)</option>
-                                                            <option value="Africa/Dakar">GMT (Dakar)</option>
-                                                            <option value="Africa/Dar_es_Salaam">EAT (Dar es Salaam)</option>
-                                                            <option value="Africa/Djibouti">EAT (Djibouti)</option>
-                                                            <option value="Africa/El_Aaiun">WET (El Aaiun)</option>
-                                                            <option value="Africa/Freetown">GMT (Freetown)</option>
-                                                            <option value="Africa/Gaborone">CAT (Gaborone)</option>
-                                                            <option value="Africa/Harare">CAT (Harare)</option>
-                                                            <option value="Africa/Johannesburg">SAST (Johannesburg)</option>
-                                                            <option value="Africa/Juba">CAT (Juba)</option>
-                                                            <option value="Africa/Kampala">EAT (Kampala)</option>
-                                                            <option value="Africa/Khartoum">CAT (Khartoum)</option>
-                                                            <option value="Africa/Kigali">CAT (Kigali)</option>
-                                                            <option value="Africa/Kinshasa">WAT (Kinshasa)</option>
-                                                            <option value="Africa/Lagos">WAT (Lagos)</option>
-                                                            <option value="Africa/Libreville">WAT (Libreville)</option>
-                                                            <option value="Africa/Lome">GMT (Lome)</option>
-                                                            <option value="Africa/Luanda">WAT (Luanda)</option>
-                                                            <option value="Africa/Lubumbashi">CAT (Lubumbashi)</option>
-                                                            <option value="Africa/Lusaka">CAT (Lusaka)</option>
-                                                            <option value="Africa/Malabo">WAT (Malabo)</option>
-                                                            <option value="Africa/Maputo">CAT (Maputo)</option>
-                                                            <option value="Africa/Maseru">CAT (Maseru)</option>
-                                                            <option value="Africa/Mbabane">SAST (Mbabane)</option>
-                                                            <option value="Africa/Mogadishu">EAT (Mogadishu)</option>
-                                                            <option value="Africa/Nairobi">EAT (Nairobi)</option>
-                                                            <option value="Africa/Niamey">WAT (Niamey)</option>
-                                                            <option value="Africa/Nouakchott">GMT (Nouakchott)</option>
-                                                            <option value="Africa/Ouagadougou">GMT (Ouagadougou)</option>
-                                                            <option value="Africa/Porto-Novo">WAT (Porto-Novo)</option>
-                                                            <option value="Africa/Sao_Tome">GMT (Sao Tome)</option>
-                                                            <option value="Africa/Tunis">CET (Tunis)</option>
-                                                            <option value="Africa/Tripoli">EET (Tripoli)</option>
-                                                            <option value="America/Adak">HAST (Adak)</option>
-                                                            <option value="America/Anchorage">AKST (Anchorage)</option>
-                                                            <option value="America/Anguilla">AST (Anguilla)</option>
-                                                            <option value="America/Antigua">AST (Antigua)</option>
-                                                            <option value="America/Argentina/Buenos_Aires">ART (Buenos Aires)</option>
-                                                            <option value="America/Argentina/Catamarca">ART (Catamarca)</option>
-                                                            <option value="America/Argentina/ComodRivadavia">ART (ComodRivadavia)</option>
-                                                            <option value="America/Argentina/Cordoba">ART (Cordoba)</option>
-                                                            <option value="America/Argentina/Jujuy">ART (Jujuy)</option>
-                                                            <option value="America/Argentina/La_Rioja">ART (La Rioja)</option>
-                                                            <option value="America/Argentina/Mendoza">ART (Mendoza)</option>
-                                                            <option value="America/Argentina/Rosario">ART (Rosario)</option>
-                                                            <option value="America/Argentina/Tucuman">ART (Tucuman)</option>
-                                                            <option value="America/Argentina/Ushuaia">ART (Ushuaia)</option>
-                                                            <option value="America/Aruba">AST (Aruba)</option>
-                                                            <option value="America/Asuncion">PYT (Asuncion)</option>
-                                                            <option value="America/Atikokan">EST (Atikokan)</option>
-                                                            <option value="America/Barbados">AST (Barbados)</option>
-                                                            <option value="America/Belize">CST (Belize)</option>
-                                                            <option value="America/Blanc-Sablon">AST (Blanc-Sablon)</option>
-                                                            <option value="America/Boa_Vista">AMT (Boa Vista)</option>
-                                                            <option value="America/Bogota">COT (Bogota)</option>
-                                                            <option value="America/Boise">MDT (Boise)</option>
-                                                            <option value="America/Cambridge_Bay">MDT (Cambridge Bay)</option>
-                                                            <option value="America/Cancun">EST (Cancun)</option>
-                                                            <option value="America/Caracas">VET (Caracas)</option>
-                                                            <option value="America/Cayman">EST (Cayman)</option>
-                                                            <option value="America/Chicago">CST (Chicago)</option>
-                                                            <option value="America/Chihuahua">MDT (Chihuahua)</option>
-                                                            <option value="America/Costa_Rica">CST (Costa Rica)</option>
-                                                            <option value="America/Creston">MST (Creston)</option>
-                                                            <option value="America/Cuiaba">AMT (Cuiaba)</option>
-                                                            <option value="America/Curacao">AST (Curacao)</option>
-                                                            <option value="America/Dawson">PST (Dawson)</option>
-                                                            <option value="America/Dawson_Creek">MST (Dawson Creek)</option>
-                                                            <option value="America/Denver">MDT (Denver)</option>
-                                                            <option value="America/Detroit">EDT (Detroit)</option>
-                                                            <option value="America/Dominica">AST (Dominica)</option>
-                                                            <option value="America/Edmonton">MDT (Edmonton)</option>
-                                                            <option value="America/Eirunepe">ACT (Eirunepe)</option>
-                                                            <option value="America/El_Salvador">CST (El Salvador)</option>
-                                                            <option value="America/Fortaleza">BRT (Fortaleza)</option>
-                                                            <option value="America/Fort_Wayne">EST (Fort Wayne)</option>
-                                                            <option value="America/Glace_Bay">AST (Glace Bay)</option>
-                                                            <option value="America/Godthab">WGT (Godthab)</option>
-                                                            <option value="America/Goose_Bay">AST (Goose Bay)</option>
-                                                            <option value="America/Grand_Turk">EST (Grand Turk)</option>
-                                                            <option value="America/Grenada">AST (Grenada)</option>
-                                                            <option value="America/Guadeloupe">AST (Guadeloupe)</option>
-                                                            <option value="America/Guatemala">CST (Guatemala)</option>
-                                                            <option value="America/Guyana">GYT (Guyana)</option>
-                                                            <option value="America/Halifax">AST (Halifax)</option>
-                                                            <option value="America/Havana">CST (Havana)</option>
-                                                            <option value="America/Hermosillo">MST (Hermosillo)</option>
-                                                            <option value="America/Indiana/Indianapolis">EST (Indianapolis)</option>
-                                                            <option value="America/Indiana/Knox">CST (Knox)</option>
-                                                            <option value="America/Indiana/Marengo">EST (Marengo)</option>
-                                                            <option value="America/Indiana/Petersburg">EST (Petersburg)</option>
-                                                            <option value="America/Indiana/Tell_City">CST (Tell City)</option>
-                                                            <option value="America/Indiana/Vevay">EST (Vevay)</option>
-                                                            <option value="America/Indiana/Winamac">EST (Winamac)</option>
-                                                            <option value="America/Indianapolis">EDT (Indianapolis)</option>
-                                                            <option value="America/Inuvik">MDT (Inuvik)</option>
-                                                            <option value="America/Iqaluit">EDT (Iqaluit)</option>
-                                                            <option value="America/Jamaica">EST (Jamaica)</option>
-                                                            <option value="America/Juneau">AKDT (Juneau)</option>
-                                                            <option value="America/Kentucky/Louisville">EDT (Louisville)</option>
-                                                            <option value="America/Kentucky/Monticello">EDT (Monticello)</option>
-                                                            <option value="America/Kralendijk">AST (Kralendijk)</option>
-                                                            <option value="America/La_Paz">BOT (La Paz)</option>
-                                                            <option value="America/Lima">PET (Lima)</option>
-                                                            <option value="America/Los_Angeles">PDT (Los Angeles)</option>
-                                                            <option value="America/Maceio">BRT (Maceio)</option>
-                                                            <option value="America/Managua">CST (Managua)</option>
-                                                            <option value="America/Manaus">AMT (Manaus)</option>
-                                                            <option value="America/Marigot">AST (Marigot)</option>
-                                                            <option value="America/Martinique">AST (Martinique)</option>
-                                                            <option value="America/Matamoros">CST (Matamoros)</option>
-                                                            <option value="America/Mexico_City">CST (Mexico City)</option>
-                                                            <option value="America/Miquelon">PMST (Miquelon)</option>
-                                                            <option value="America/Moncton">AST (Moncton)</option>
-                                                            <option value="America/Montreal">EDT (Montreal)</option>
-                                                            <option value="America/Montserrat">AST (Montserrat)</option>
-                                                            <option value="America/Nassau">EST (Nassau)</option>
-                                                            <option value="America/New_York">EDT (New York)</option>
-                                                            <option value="America/Nipigon">EST (Nipigon)</option>
-                                                            <option value="America/Nome">AKDT (Nome)</option>
-                                                            <option value="America/Noronha">FNT (Noronha)</option>
-                                                            <option value="America/North_Dakota/Beulah">CST (Beulah)</option>
-                                                            <option value="America/North_Dakota/Center">CST (Center)</option>
-                                                            <option value="America/North_Dakota/New_Salem">CST (New Salem)</option>
-                                                            <option value="America/Ojinaga">MDT (Ojinaga)</option>
-                                                            <option value="America/Panama">EST (Panama)</option>
-                                                            <option value="America/Phoenix">MST (Phoenix)</option>
-                                                            <option value="America/Port-au-Prince">EST (Port-au-Prince)</option>
-                                                            <option value="America/Porto_Velho">AMT (Porto Velho)</option>
-                                                            <option value="America/Puerto_Rico">AST (Puerto Rico)</option>
-                                                            <option value="America/Punta_Arenas">CLT (Punta Arenas)</option>
-                                                            <option value="America/Rainy_River">CST (Rainy River)</option>
-                                                            <option value="America/Ramallah">EET (Ramallah)</option>
-                                                            <option value="America/Rankin_Inlet">CST (Rankin Inlet)</option>
-                                                            <option value="America/Recife">BRT (Recife)</option>
-                                                            <option value="America/Regina">CST (Regina)</option>
-                                                            <option value="America/Resolute">CST (Resolute)</option>
-                                                            <option value="America/Rio_Branco">ACT (Rio Branco)</option>
-                                                            <option value="America/Santarem">AMT (Santarem)</option>
-                                                            <option value="America/Santiago">CLT (Santiago)</option>
-                                                            <option value="America/Santo_Domingo">AST (Santo Domingo)</option>
-                                                            <option value="America/Sao_Paulo">BRT (Sao Paulo)</option>
-                                                            <option value="America/Scoresbysund">EGT (Scoresbysund)</option>
-                                                            <option value="America/Sitka">AKDT (Sitka)</option>
-                                                            <option value="America/St_Barthelemy">AST (St Barthelemy)</option>
-                                                            <option value="America/St_Johns">NST (St Johns)</option>
-                                                            <option value="America/St_Kitts">AST (St Kitts)</option>
-                                                            <option value="America/St_Lucia">AST (St Lucia)</option>
-                                                            <option value="America/St_Thomas">AST (St Thomas)</option>
-                                                            <option value="America/St_Vincent">AST (St Vincent)</option>
-                                                            <option value="America/Swift_Current">CST (Swift Current)</option>
-                                                            <option value="America/Tegucigalpa">CST (Tegucigalpa)</option>
-                                                            <option value="America/Thule">WGT (Thule)</option>
-                                                            <option value="America/Thunder_Bay">EST (Thunder Bay)</option>
-                                                            <option value="America/Toronto">EDT (Toronto)</option>
-                                                            <option value="America/Tortola">AST (Tortola)</option>
-                                                            <option value="America/Vancouver">PDT (Vancouver)</option>
-                                                            <option value="America/Winnipeg">CST (Winnipeg)</option>
-                                                            <option value="America/Yakutat">AKDT (Yakutat)</option>
-                                                            <option value="America/Yellowknife">MDT (Yellowknife)</option>
-                                                            <option value="Antarctica/Casey">CAST (Casey)</option>
-                                                            <option value="Antarctica/Davis">DAVT (Davis)</option>
-                                                            <option value="Antarctica/DumontDUrville">DDT (Dumont d'Urville)</option>
-                                                            <option value="Antarctica/Macquarie">MIST (Macquarie)</option>
-                                                            <option value="Antarctica/McMurdo">NZDT (McMurdo)</option>
-                                                            <option value="Antarctica/Palmer">CLT (Palmer)</option>
-                                                            <option value="Antarctica/Syowa">SYOT (Syowa)</option>
-                                                            <option value="Antarctica/Troll">UTC (Troll)</option>
-                                                            <option value="Antarctica/Vostok">VOST (Vostok)</option>
-                                                            <option value="Arctic/Longyearbyen">CET (Longyearbyen)</option>
-                                                            <option value="Asia/Aden">AST (Aden)</option>
-                                                            <option value="Asia/Almaty">ALMT (Almaty)</option>
-                                                            <option value="Asia/Amman">EET (Amman)</option>
-                                                            <option value="Asia/Aqtau">AQTT (Aqtau)</option>
-                                                            <option value="Asia/Aqtobe">AQTT (Aqtobe)</option>
-                                                            <option value="Asia/Ashgabat">TMT (Ashgabat)</option>
-                                                            <option value="Asia/Ashkhabad">TMT (Ashkhabad)</option>
-                                                            <option value="Asia/Bahrain">AST (Bahrain)</option>
-                                                            <option value="Asia/Bangkok">ICT (Bangkok)</option>
-                                                            <option value="Asia/Barnaul">ALMT (Barnaul)</option>
-                                                            <option value="Asia/Beirut">EET (Beirut)</option>
-                                                            <option value="Asia/Bishkek">KGT (Bishkek)</option>
-                                                            <option value="Asia/Brunei">BNT (Brunei)</option>
-                                                            <option value="Asia/Chita">IRKT (Chita)</option>
-                                                            <option value="Asia/Choibalsan">ULAT (Choibalsan)</option>
-                                                            <option value="Asia/Colombo">IST (Colombo)</option>
-                                                            <option value="Asia/Damascus">EET (Damascus)</option>
-                                                            <option value="Asia/Dhaka">BST (Dhaka)</option>
-                                                            <option value="Asia/Dili">TLT (Dili)</option>
-                                                            <option value="Asia/Dubai">GST (Dubai)</option>
-                                                            <option value="Asia/Dushanbe">TJT (Dushanbe)</option>
-                                                            <option value="Asia/Famagusta">EET (Famagusta)</option>
-                                                            <option value="Asia/Gaza">EET (Gaza)</option>
-                                                            <option value="Asia/Hebron">EET (Hebron)</option>
-                                                            <option value="Asia/Ho_Chi_Minh">ICT (Ho Chi Minh)</option>
-                                                            <option value="Asia/Hong_Kong">HKT (Hong Kong)</option>
-                                                            <option value="Asia/Hovd">HOVT (Hovd)</option>
-                                                            <option value="Asia/Irkutsk">IRKT (Irkutsk)</option>
-                                                            <option value="Asia/Jakarta">WIB (Jakarta)</option>
-                                                            <option value="Asia/Jayapura">WIT (Jayapura)</option>
-                                                            <option value="Asia/Jerusalem">IST (Jerusalem)</option>
-                                                            <option value="Asia/Kabul">AFT (Kabul)</option>
-                                                            <option value="Asia/Kamchatka">PETT (Kamchatka)</option>
-                                                            <option value="Asia/Karachi">PKT (Karachi)</option>
-                                                            <option value="Asia/Katmandu">NPT (Kathmandu)</option>
-                                                            <option value="Asia/Kolkata">IST (Kolkata)</option>
-                                                            <option value="Asia/Krasnoyarsk">KRAT (Krasnoyarsk)</option>
-                                                            <option value="Asia/Kuala_Lumpur">MYT (Kuala Lumpur)</option>
-                                                            <option value="Asia/Kuching">MYT (Kuching)</option>
-                                                            <option value="Asia/Macau">CST (Macau)</option>
-                                                            <option value="Asia/Magadan">MAGT (Magadan)</option>
-                                                            <option value="Asia/Makassar">WITA (Makassar)</option>
-                                                            <option value="Asia/Manila">PHT (Manila)</option>
-                                                            <option value="Asia/Muscat">GST (Muscat)</option>
-                                                            <option value="Asia/Nicosia">EET (Nicosia)</option>
-                                                            <option value="Asia/Novokuznetsk">KRAST (Novokuznetsk)</option>
-                                                            <option value="Asia/Novosibirsk">NOVT (Novosibirsk)</option>
-                                                            <option value="Asia/Omsk">OMST (Omsk)</option>
-                                                            <option value="Asia/Oral">ORAT (Oral)</option>
-                                                            <option value="Asia/Phnom_Penh">ICT (Phnom Penh)</option>
-                                                            <option value="Asia/Pontianak">WIB (Pontianak)</option>
-                                                            <option value="Asia/Pyongyang">KST (Pyongyang)</option>
-                                                            <option value="Asia/Qatar">AST (Qatar)</option>
-                                                            <option value="Asia/Qyzylorda">QYZT (Qyzylorda)</option>
-                                                            <option value="Asia/Riyadh">AST (Riyadh)</option>
-                                                            <option value="Asia/Sakhalin">PETT (Sakhalin)</option>
-                                                            <option value="Asia/Samarkand">UZT (Samarkand)</option>
-                                                            <option value="Asia/Taipei">CST (Taipei)</option>
-                                                            <option value="Asia/Tashkent">UZT (Tashkent)</option>
-                                                            <option value="Asia/Tbilisi">GET (Tbilisi)</option>
-                                                            <option value="Asia/Tehran">IRST (Tehran)</option>
-                                                            <option value="Asia/Thimphu">BTT (Thimphu)</option>
-                                                            <option value="Asia/Tokyo">JST (Tokyo)</option>
-                                                            <option value="Asia/Ulaanbaatar">ULAT (Ulaanbaatar)</option>
-                                                            <option value="Asia/Urumqi">XJT (Urumqi)</option>
-                                                            <option value="Asia/Vientiane">ICT (Vientiane)</option>
-                                                            <option value="Asia/Vladivostok">VLAT (Vladivostok)</option>
-                                                            <option value="Asia/Yakutsk">YAKT (Yakutsk)</option>
-                                                            <option value="Asia/Yerevan">AMT (Yerevan)</option>
-                                                            <option value="Atlantic/Azores">AZOT (Azores)</option>
-                                                            <option value="Atlantic/Bermuda">AST (Bermuda)</option>
-                                                            <option value="Atlantic/Canary">WET (Canary)</option>
-                                                            <option value="Atlantic/Cape_Verde">CVT (Cape Verde)</option>
-                                                            <option value="Atlantic/Faeroe">WET (Faeroe)</option>
-                                                            <option value="Atlantic/Jan_Mayen">CET (Jan Mayen)</option>
-                                                            <option value="Atlantic/Madeira">WET (Madeira)</option>
-                                                            <option value="Atlantic/Reykjavik">GMT (Reykjavik)</option>
-                                                            <option value="Atlantic/South_Georgia">GST (South Georgia)</option>
-                                                            <option value="Atlantic/Stanley">FKT (Stanley)</option>
-                                                            <option value="Australia/Adelaide">ACDT (Adelaide)</option>
-                                                            <option value="Australia/Brisbane">AEST (Brisbane)</option>
-                                                            <option value="Australia/Broken_Hill">ACDT (Broken Hill)</option>
-                                                            <option value="Australia/Currie">AEDT (Currie)</option>
-                                                            <option value="Australia/Darwin">ACST (Darwin)</option>
-                                                            <option value="Australia/Eucla">ACWST (Eucla)</option>
-                                                            <option value="Australia/Hobart">AEDT (Hobart)</option>
-                                                            <option value="Australia/Lindeman">AEST (Lindeman)</option>
-                                                            <option value="Australia/Melbourne">AEDT (Melbourne)</option>
-                                                            <option value="Australia/Perth">AWST (Perth)</option>
-                                                            <option value="Australia/Sydney">AEDT (Sydney)</option>
-                                                            <option value="Australia/Tasmania">AEDT (Tasmania)</option>
-                                                            <option value="Australia/Brisbane">AEST (Brisbane)</option>
-                                                            <option value="Australia/Currie">AEDT (Currie)</option>
-                                                            <option value="Australia/Darwin">ACST (Darwin)</option>
-                                                            <option value="Australia/Eucla">ACWST (Eucla)</option>
-                                                            <option value="Australia/Hobart">AEDT (Hobart)</option>
-                                                            <option value="Australia/Lindeman">AEST (Lindeman)</option>
-                                                            <option value="Australia/Melbourne">AEDT (Melbourne)</option>
-                                                            <option value="Australia/Perth">AWST (Perth)</option>
-                                                            <option value="Australia/Sydney">AEDT (Sydney)</option>
-                                                            <option value="Australia/Tasmania">AEDT (Tasmania)</option>
-                                                            <option value="Etc/GMT+12">GMT-12:00</option>
-                                                            <option value="Etc/GMT+11">GMT-11:00</option>
-                                                            <option value="Etc/GMT+10">GMT-10:00</option>
-                                                            <option value="Etc/GMT+9">GMT-9:00</option>
-                                                            <option value="Etc/GMT+8">GMT-8:00</option>
-                                                            <option value="Etc/GMT+7">GMT-7:00</option>
-                                                            <option value="Etc/GMT+6">GMT-6:00</option>
-                                                            <option value="Etc/GMT+5">GMT-5:00</option>
-                                                            <option value="Etc/GMT+4">GMT-4:00</option>
-                                                            <option value="Etc/GMT+3">GMT-3:00</option>
-                                                            <option value="Etc/GMT+2">GMT-2:00</option>
-                                                            <option value="Etc/GMT+1">GMT-1:00</option>
-                                                            <option value="Etc/GMT">GMT</option>
-                                                            <option value="Etc/GMT-1">GMT+1:00</option>
-                                                            <option value="Etc/GMT-2">GMT+2:00</option>
-                                                            <option value="Etc/GMT-3">GMT+3:00</option>
-                                                            <option value="Etc/GMT-4">GMT+4:00</option>
-                                                            <option value="Etc/GMT-5">GMT+5:00</option>
-                                                            <option value="Etc/GMT-6">GMT+6:00</option>
-                                                            <option value="Etc/GMT-7">GMT+7:00</option>
-                                                            <option value="Etc/GMT-8">GMT+8:00</option>
-                                                            <option value="Etc/GMT-9">GMT+9:00</option>
-                                                            <option value="Etc/GMT-10">GMT+10:00</option>
-                                                            <option value="Etc/GMT-11">GMT+11:00</option>
-                                                            <option value="Etc/GMT-12">GMT+12:00</option>
+                                                            <!-- Africa -->
+                                                            <option value="GMT (Abidjan)">GMT (Abidjan)</option>
+                                                            <option value="GMT (Accra)">GMT (Accra)</option>
+                                                            <option value="EAT (Addis Ababa)">EAT (Addis Ababa)</option>
+                                                            <option value="CET (Algiers)">CET (Algiers)</option>
+                                                            <option value="EAT (Asmara)">EAT (Asmara)</option>
+                                                            <option value="WAT (Bangui)">WAT (Bangui)</option>
+                                                            <option value="GMT (Banjul)">GMT (Banjul)</option>
+                                                            <option value="GMT (Bissau)">GMT (Bissau)</option>
+                                                            <option value="CAT (Blantyre)">CAT (Blantyre)</option>
+                                                            <option value="WAT (Brazzaville)">WAT (Brazzaville)</option>
+                                                            <option value="CAT (Bujumbura)">CAT (Bujumbura)</option>
+                                                            <option value="EET (Cairo)">EET (Cairo)</option>
+                                                            <option value="WET (Casablanca)">WET (Casablanca)</option>
+                                                            <option value="CET (Ceuta)">CET (Ceuta)</option>
+                                                            <option value="GMT (Conakry)">GMT (Conakry)</option>
+                                                            <option value="GMT (Dakar)">GMT (Dakar)</option>
+                                                            <option value="EAT (Dar es Salaam)">EAT (Dar es Salaam)</option>
+                                                            <option value="EAT (Djibouti)">EAT (Djibouti)</option>
+                                                            <option value="WET (El Aaiun)">WET (El Aaiun)</option>
+                                                            <option value="GMT (Freetown)">GMT (Freetown)</option>
+                                                            <option value="CAT (Gaborone)">CAT (Gaborone)</option>
+                                                            <option value="CAT (Harare)">CAT (Harare)</option>
+                                                            <option value="SAST (Johannesburg)">SAST (Johannesburg)</option>
+                                                            <option value="CAT (Juba)">CAT (Juba)</option>
+                                                            <option value="EAT (Kampala)">EAT (Kampala)</option>
+                                                            <option value="CAT (Khartoum)">CAT (Khartoum)</option>
+                                                            <option value="CAT (Kigali)">CAT (Kigali)</option>
+                                                            <option value="WAT (Kinshasa)">WAT (Kinshasa)</option>
+                                                            <option value="WAT (Lagos)">WAT (Lagos)</option>
+                                                            <option value="WAT (Libreville)">WAT (Libreville)</option>
+                                                            <option value="GMT (Lome)">GMT (Lome)</option>
+                                                            <option value="WAT (Luanda)">WAT (Luanda)</option>
+
+                                                            <!-- Asia -->
+                                                            <option value="India Standard Time (IST)">India Standard Time (IST)</option>
+                                                            <option value="China Standard Time (CST)">China Standard Time (CST)</option>
+                                                            <option value="Japan Standard Time (JST)">Japan Standard Time (JST)</option>
+                                                            <option value="Malaysia Time (MYT)">Malaysia Time (MYT)</option>
+                                                            <option value="Singapore Time (SGT)">Singapore Time (SGT)</option>
+                                                            <option value="Korea Standard Time (KST)">Korea Standard Time (KST)</option>
+                                                            <option value="Gulf Standard Time (GST)">Gulf Standard Time (GST)</option>
+                                                            <option value="Arabian Standard Time (AST)">Arabian Standard Time (AST)</option>
+                                                            <option value="Philippine Time (PHT)">Philippine Time (PHT)</option>
+                                                            <option value="Hong Kong Time (HKT)">Hong Kong Time (HKT)</option>
+
+                                                            <!-- Europe -->
+                                                            <option value="Greenwich Mean Time (GMT)">Greenwich Mean Time (GMT)</option>
+                                                            <option value="Central European Time (CET)">Central European Time (CET)</option>
+                                                            <option value="Central European Time (CET)">Central European Time (CET)</option>
+                                                            <option value="Central European Time (CET)">Central European Time (CET)</option>
+                                                            <option value="Central European Time (CET)">Central European Time (CET)</option>
+                                                            <option value="Central European Time (CET)">Central European Time (CET)</option>
+                                                            <option value="Eastern European Time (EET)">Eastern European Time (EET)</option>
+                                                            <option value="Moscow Time (MSK)">Moscow Time (MSK)</option>
+                                                            <option value="Turkey Time (TRT)">Turkey Time (TRT)</option>
+
+                                                            <!-- North America -->
+                                                            <option value="Eastern Time (ET)">Eastern Time (ET)</option>
+                                                            <option value="Pacific Time (PT)">Pacific Time (PT)</option>
+                                                            <option value="Central Time (CT)">Central Time (CT)</option>
+
+                                                            <!-- Oceania -->
+                                                            <option value="Australian Eastern Standard Time (AEST)">Australian Eastern Standard Time (AEST)</option>
+                                                            <option value="Australian Western Standard Time (AWST)">Australian Western Standard Time (AWST)</option>
+                                                            <option value="New Zealand Standard Time (NZST)">New Zealand Standard Time (NZST)</option>
+                                                            <option value="Chamorro Standard Time (ChST)">Chamorro Standard Time (ChST)</option>
+                                                            <option value="Fiji Standard Time (FJT)">Fiji Standard Time (FJT)</option>
+
+                                                            <!-- South America -->
+                                                            <option value="Brasília Time (BRT)">Brasília Time (BRT)</option>
+                                                            <option value="Argentina Time (ART)">Argentina Time (ART)</option>
+                                                            <option value="Peru Time (PET)">Peru Time (PET)</option>
+                                                            <option value="Uruguay Time (UYT)">Uruguay Time (UYT)</option>
+
+                                                            <!-- UTC Offsets -->
+                                                            <option value="UTC+0">UTC+0</option>
+                                                            <option value="UTC+1">UTC+1</option>
+                                                            <option value="UTC+2">UTC+2</option>
+                                                            <option value="UTC+3">UTC+3</option>
+                                                            <option value="UTC+4">UTC+4</option>
+                                                            <option value="UTC+5">UTC+5</option>
+                                                            <option value="UTC+6">UTC+6</option>
+                                                            <option value="UTC+7">UTC+7</option>
+                                                            <option value="UTC+8">UTC+8</option>
+                                                            <option value="UTC+9">UTC+9</option>
+                                                            <option value="UTC+10">UTC+10</option>
+                                                            <option value="UTC+11">UTC+11</option>
+                                                            <option value="UTC+12">UTC+12</option>
+                                                            <option value="UTC-1">UTC-1</option>
+                                                            <option value="UTC-2">UTC-2</option>
+                                                            <option value="UTC-3">UTC-3</option>
+                                                            <option value="UTC-4">UTC-4</option>
+                                                            <option value="UTC-5">UTC-5</option>
+                                                            <option value="UTC-6">UTC-6</option>
+                                                            <option value="UTC-7">UTC-7</option>
+                                                            <option value="UTC-8">UTC-8</option>
+                                                            <option value="UTC-9">UTC-9</option>
+                                                            <option value="UTC-10">UTC-10</option>
+                                                            <option value="UTC-11">UTC-11</option>
+                                                            <option value="UTC-12">UTC-12</option>
                                                         </optgroup>
                                                     </select>
 
@@ -697,315 +488,14 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                     @endforeach
                                                 </div>
                                             @endif
-                                            {{-- <div class="col-md-12" style="display: flex; flex-direction: column; gap: 25px;">
-                                                <!-- Day -->
-                                                <div class="row opening-day">
-                                                    <div class="col-md-2">
-                                                        <h5>Monday <input type="hidden" name="day[]" value="Monday"></h5>
-                                                    </div>
-                                                    <div class="col-md-3 form-floating form-floating-outline">
-                                                        <input type="time" class="form-control flatpickr-input" value="@if(isset($sale && $sale->business_hours))  @endif" name="open[]" id="monday_open">
-                                                    </div>
-                                                    <div class="col-md-3 form-floating form-floating-outline">
-                                                        <input type="time" class="form-control flatpickr-input" value="@if(isset($sale && $sale->business_hours))  @endif" name="closed[]" id="monday_closed">
-                                                    </div>
-                                                    <div class="col-md-2 d-flex" style="gap: 20px;">
-                                                        <div class="form-check custom-option custom-option-basic checked">
-                                                            <label class="form-check-label custom-option-content" for="customRadioTemp1">
-                                                                <input  data-day="check" data-day-name="monday" name="monday_check" class="form-check-input" type="radio" value="open" id="customRadioTemp1"
-                                                                    checked="">
-                                                                <span class="custom-option-header">
-                                                                    <span class="h6 mb-0">Open</span>
-                                                                </span>
-                                                            </label>
-                                                        </div>
-                                                        <div class="form-check custom-option custom-option-basic">
-                                                            <label class="form-check-label custom-option-content" for="customRadioTemp2">
-                                                                <input  data-day="check" data-day-name="monday" name="monday_check" class="form-check-input" type="radio" value="closed"
-                                                                    id="customRadioTemp2">
-                                                                <span class="custom-option-header">
-                                                                    <span class="h6 mb-0">Closed</span>
-                                                                </span>
-                                                            </label>
-                                                        </div>
-                                                        <div class="form-check custom-option custom-option-basic">
-                                                            <label class="form-check-label custom-option-content" for="customRadioTemp3">
-                                                                <input  data-day="check" data-day-name="monday" name="monday_check" class="form-check-input" type="radio" value="24/7"
-                                                                    id="customRadioTemp3">
-                                                                <span class="custom-option-header">
-                                                                    <span class="h6 mb-0">24/7</span>
-                                                                </span>
-                                                            </label>
-                                                        </div>
 
-                                                    </div>
-                                                </div>
-                                                <!-- Day / End -->
+                                            <!-- Copy buttons -->
+                                            <div class="col-md-12" style="margin-top: 20px;">
+                                                <button type="button" id="copyToAll" class="btn btn-primary">Copy to All Days</button>
+                                                <button type="button" id="copyToWorkingDays" class="btn btn-secondary">Copy to Working Days (Mon-Fri)</button>
+                                            </div>
 
-                                                <!-- Day -->
-                                                <div class="row opening-day">
-                                                    <div class="col-md-2">
-                                                        <h5>Tuesday <input type="hidden" name="day[]" value="Tuesday"></h5>
-                                                    </div>
-                                                    <div class="col-md-3 form-floating form-floating-outline">
-                                                        <input type="time" class="form-control flatpickr-input " value="@if(isset($sale && $sale->business_hours))  @endif" name="open[]" id="tuesday_open">
-                                                    </div>
-                                                    <div class="col-md-3 form-floating form-floating-outline">
-                                                        <input type="time" class="form-control flatpickr-input " value="@if(isset($sale && $sale->business_hours))  @endif" name="closed[]" id="tuesday_closed">
-                                                    </div>
-                                                    <div class="col-md-2 d-flex" style="gap: 20px;">
-                                                        <div class="form-check custom-option custom-option-basic checked">
-                                                            <label class="form-check-label custom-option-content" for="customRadioTemp4">
-                                                                <input  data-day="check" data-day-name="tuesday" name="tuesday_check" class="form-check-input" type="radio" value="open" id="customRadioTemp4"
-                                                                    checked="">
-                                                                <span class="custom-option-header">
-                                                                    <span class="h6 mb-0">Open</span>
-                                                                </span>
-                                                            </label>
-                                                        </div>
-                                                        <div class="form-check custom-option custom-option-basic">
-                                                            <label class="form-check-label custom-option-content" for="customRadioTemp5">
-                                                                <input  data-day="check" data-day-name="tuesday" name="tuesday_check" class="form-check-input" type="radio" value="closed"
-                                                                    id="customRadioTemp5">
-                                                                <span class="custom-option-header">
-                                                                    <span class="h6 mb-0">Closed</span>
-                                                                </span>
-                                                            </label>
-                                                        </div>
-                                                        <div class="form-check custom-option custom-option-basic">
-                                                            <label class="form-check-label custom-option-content" for="customRadioTemp6">
-                                                                <input  data-day="check" data-day-name="tuesday" name="tuesday_check" class="form-check-input" type="radio" value="24/7"
-                                                                    id="customRadioTemp6">
-                                                                <span class="custom-option-header">
-                                                                    <span class="h6 mb-0">24/7</span>
-                                                                </span>
-                                                            </label>
-                                                        </div>
 
-                                                    </div>
-                                                </div>
-                                                <!-- Day / End -->
-
-                                                <!-- Day -->
-                                                <div class="row opening-day">
-                                                    <div class="col-md-2">
-                                                        <h5>Wednesday <input type="hidden" name="day[]" value="Wednesday"></h5>
-                                                    </div>
-                                                    <div class="col-md-3 form-floating form-floating-outline">
-                                                        <input type="time" class="form-control flatpickr-input " value="@if(isset($sale && $sale->business_hours))  @endif" name="open[]" id="wednesday_open">
-                                                    </div>
-                                                    <div class="col-md-3 form-floating form-floating-outline">
-                                                        <input type="time" class="form-control flatpickr-input " value="@if(isset($sale && $sale->business_hours))  @endif" name="closed[]" id="wednesday_closed">
-                                                    </div>
-                                                    <div class="col-md-2 d-flex" style="gap: 20px;">
-                                                        <div class="form-check custom-option custom-option-basic checked">
-                                                            <label class="form-check-label custom-option-content" for="customRadioTemp7">
-                                                                <input  data-day="check" data-day-name="wednesday" name="wednesday_check" class="form-check-input" type="radio" value="open" id="customRadioTemp7"
-                                                                    checked="">
-                                                                <span class="custom-option-header">
-                                                                    <span class="h6 mb-0">Open</span>
-                                                                </span>
-                                                            </label>
-                                                        </div>
-                                                        <div class="form-check custom-option custom-option-basic">
-                                                            <label class="form-check-label custom-option-content" for="customRadioTemp8">
-                                                                <input  data-day="check" data-day-name="wednesday" name="wednesday_check" class="form-check-input" type="radio" value="closed"
-                                                                    id="customRadioTemp8">
-                                                                <span class="custom-option-header">
-                                                                    <span class="h6 mb-0">Closed</span>
-                                                                </span>
-                                                            </label>
-                                                        </div>
-                                                        <div class="form-check custom-option custom-option-basic">
-                                                            <label class="form-check-label custom-option-content" for="customRadioTemp9">
-                                                                <input  data-day="check" data-day-name="wednesday" name="wednesday_check" class="form-check-input" type="radio" value="24/7"
-                                                                    id="customRadioTemp9">
-                                                                <span class="custom-option-header">
-                                                                    <span class="h6 mb-0">24/7</span>
-                                                                </span>
-                                                            </label>
-                                                        </div>
-
-                                                    </div>
-                                                </div>
-                                                <!-- Day / End -->
-
-                                                <!-- Day -->
-                                                <div class="row opening-day">
-                                                    <div class="col-md-2">
-                                                        <h5>Thursday <input type="hidden" name="day[]" value="Thursday"></h5>
-                                                    </div>
-                                                    <div class="col-md-3 form-floating form-floating-outline">
-                                                        <input type="time" class="form-control flatpickr-input " value="@if(isset($sale && $sale->business_hours))  @endif" name="open[]" id="thursday_open">
-                                                    </div>
-                                                    <div class="col-md-3 form-floating form-floating-outline">
-                                                        <input type="time" class="form-control flatpickr-input " value="@if(isset($sale && $sale->business_hours))  @endif" name="closed[]" id="thursday_closed">
-                                                    </div>
-                                                    <div class="col-md-2 d-flex" style="gap: 20px;">
-                                                        <div class="form-check custom-option custom-option-basic checked">
-                                                            <label   class="form-check-label custom-option-content" for="customRadioTemp10">
-                                                                <input data-day="check" data-day-name="thursday" name="thursday_check" class="form-check-input" type="radio" value="open" id="customRadioTemp10"
-                                                                    checked="">
-                                                                <span class="custom-option-header">
-                                                                    <span class="h6 mb-0">Open</span>
-                                                                </span>
-                                                            </label>
-                                                        </div>
-                                                        <div class="form-check custom-option custom-option-basic">
-                                                            <label class="form-check-label custom-option-content" for="customRadioTemp11">
-                                                                <input data-day="check" data-day-name="thursday" name="thursday_check" class="form-check-input" type="radio" value="closed"
-                                                                    id="customRadioTemp11">
-                                                                <span class="custom-option-header">
-                                                                    <span  class="h6 mb-0">Closed</span>
-                                                                </span>
-                                                            </label>
-                                                        </div>
-                                                        <div class="form-check custom-option custom-option-basic">
-                                                            <label class="form-check-label custom-option-content" for="customRadioTemp12">
-                                                                <input data-day="check" data-day-name="thursday" name="thursday_check" class="form-check-input" type="radio" value="24/7"
-                                                                    id="customRadioTemp12">
-                                                                <span class="custom-option-header">
-                                                                    <span  class="h6 mb-0">24/7</span>
-                                                                </span>
-                                                            </label>
-                                                        </div>
-
-                                                    </div>
-                                                </div>
-                                                <!-- Day / End -->
-
-                                                <!-- Day -->
-                                                <div class="row opening-day">
-                                                    <div class="col-md-2">
-                                                        <h5>Friday <input type="hidden" name="day[]" value="Friday"></h5>
-                                                    </div>
-                                                    <div class="col-md-3 form-floating form-floating-outline">
-                                                        <input type="time" class="form-control flatpickr-input " value="@if(isset($sale && $sale->business_hours))  @endif" name="open[]" id="friday_open">
-                                                    </div>
-                                                    <div class="col-md-3 form-floating form-floating-outline">
-                                                        <input type="time" class="form-control flatpickr-input " value="@if(isset($sale && $sale->business_hours))  @endif" name="closed[]" id="friday_closed">
-                                                    </div>
-                                                    <div class="col-md-2 d-flex" style="gap: 20px;">
-                                                        <div class="form-check custom-option custom-option-basic checked">
-                                                            <label class="form-check-label custom-option-content" for="customRadioTemp13">
-                                                                <input  data-day="check" data-day-name="friday" name="friday_check" class="form-check-input" type="radio" value="open" id="customRadioTemp13"
-                                                                    checked="">
-                                                                <span class="custom-option-header">
-                                                                    <span class="h6 mb-0">Open</span>
-                                                                </span>
-                                                            </label>
-                                                        </div>
-                                                        <div class="form-check custom-option custom-option-basic">
-                                                            <label class="form-check-label custom-option-content" for="customRadioTemp14">
-                                                                <input  data-day="check" data-day-name="friday" name="friday_check" class="form-check-input" type="radio" value="closed"
-                                                                    id="customRadioTemp14">
-                                                                <span class="custom-option-header">
-                                                                    <span class="h6 mb-0">Closed</span>
-                                                                </span>
-                                                            </label>
-                                                        </div>
-                                                        <div class="form-check custom-option custom-option-basic">
-                                                            <label class="form-check-label custom-option-content" for="customRadioTemp15">
-                                                                <input  data-day="check" data-day-name="friday" name="friday_check" class="form-check-input" type="radio" value="24/7"
-                                                                    id="customRadioTemp15">
-                                                                <span class="custom-option-header">
-                                                                    <span class="h6 mb-0">24/7</span>
-                                                                </span>
-                                                            </label>
-                                                        </div>
-
-                                                    </div>
-                                                </div>
-                                                <!-- Day / End -->
-
-                                                <!-- Day -->
-                                                <div class="row opening-day">
-                                                    <div class="col-md-2">
-                                                        <h5>Saturday <input type="hidden" name="day[]" value="Saturday"></h5>
-                                                    </div>
-                                                    <div class="col-md-3 form-floating form-floating-outline">
-                                                        <input type="time" class="form-control flatpickr-input " value="@if(isset($sale && $sale->business_hours))  @endif" name="open[]" id="saturday_open">
-                                                    </div>
-                                                    <div class="col-md-3 form-floating form-floating-outline">
-                                                        <input type="time" class="form-control flatpickr-input " value="@if(isset($sale && $sale->business_hours))  @endif" name="closed[]" id="saturday_closed">
-                                                    </div>
-                                                    <div class="col-md-2 d-flex" style="gap: 20px;">
-                                                        <div class="form-check custom-option custom-option-basic checked">
-                                                            <label class="form-check-label custom-option-content" for="customRadioTemp16">
-                                                                <input  data-day="check" data-day-name="saturday" name="saturday_check" class="form-check-input" type="radio" value="open" id="customRadioTemp16"
-                                                                    checked="">
-                                                                <span class="custom-option-header">
-                                                                    <span class="h6 mb-0">Open</span>
-                                                                </span>
-                                                            </label>
-                                                        </div>
-                                                        <div class="form-check custom-option custom-option-basic">
-                                                            <label class="form-check-label custom-option-content" for="customRadioTemp17">
-                                                                <input  data-day="check" data-day-name="saturday" name="saturday_check" class="form-check-input" type="radio" value="closed"
-                                                                    id="customRadioTemp17">
-                                                                <span class="custom-option-header">
-                                                                    <span class="h6 mb-0">Closed</span>
-                                                                </span>
-                                                            </label>
-                                                        </div>
-                                                        <div class="form-check custom-option custom-option-basic">
-                                                            <label class="form-check-label custom-option-content" for="customRadioTemp18">
-                                                                <input  data-day="check" data-day-name="saturday" name="saturday_check" class="form-check-input" type="radio" value="24/7"
-                                                                    id="customRadioTemp18">
-                                                                <span class="custom-option-header">
-                                                                    <span class="h6 mb-0">24/7</span>
-                                                                </span>
-                                                            </label>
-                                                        </div>
-
-                                                    </div>
-                                                </div>
-                                                <!-- Day / End -->
-
-                                                <!-- Day -->
-                                                <div class="row opening-day">
-                                                    <div class="col-md-2">
-                                                        <h5>Sunday <input type="hidden" name="day[]" value="Sunday"></h5>
-                                                    </div>
-                                                    <div class="col-md-3 form-floating form-floating-outline">
-                                                        <input type="time" class="form-control flatpickr-input " value="@if(isset($sale && $sale->business_hours))  @endif" name="open[]" id="sunday_open">
-                                                    </div>
-                                                    <div class="col-md-3 form-floating form-floating-outline">
-                                                        <input type="time" class="form-control flatpickr-input " value="@if(isset($sale && $sale->business_hours))  @endif" name="closed[]" id="sunday_closed">
-                                                    </div>
-                                                    <div class="col-md-2 d-flex" style="gap: 20px;">
-                                                        <div class="form-check custom-option custom-option-basic checked">
-                                                            <label class="form-check-label custom-option-content" for="customRadioTemp19">
-                                                                <input  data-day="check" data-day-name="sunday" name="sunday_check" class="form-check-input" type="radio" value="open" id="customRadioTemp19"
-                                                                    checked="">
-                                                                <span class="custom-option-header">
-                                                                    <span class="h6 mb-0">Open</span>
-                                                                </span>
-                                                            </label>
-                                                        </div>
-                                                        <div class="form-check custom-option custom-option-basic">
-                                                            <label class="form-check-label custom-option-content" for="customRadioTemp20">
-                                                                <input  data-day="check" data-day-name="sunday" name="sunday_check" class="form-check-input" type="radio" value="closed"
-                                                                    id="customRadioTemp20">
-                                                                <span class="custom-option-header">
-                                                                    <span class="h6 mb-0">Closed</span>
-                                                                </span>
-                                                            </label>
-                                                        </div>
-                                                        <div class="form-check custom-option custom-option-basic">
-                                                            <label class="form-check-label custom-option-content" for="customRadioTemp21">
-                                                                <input  data-day="check" data-day-name="sunday" name="sunday_check" class="form-check-input" type="radio" value="24/7"
-                                                                    id="customRadioTemp21">
-                                                                <span class="custom-option-header">
-                                                                    <span class="h6 mb-0">24/7</span>
-                                                                </span>
-                                                            </label>
-                                                        </div>
-
-                                                    </div>
-                                                </div>
-                                                <!-- Day / End -->
-                                            </div> --}}
 
                                             <div class="content-header mb-3">
                                                 <h6 class="mb-0">Social Link</h6>
@@ -1596,7 +1086,11 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                             <tr>
                                                                 <td>{{ $keyword->keyword }}</td>
                                                                 {{-- <td>{{ $keyword->area }}</td> --}}
-                                                                <td>{{ $keyword->area->country }}, {{ $keyword->area->state }}, {{ $keyword->area->city }}</td>
+                                                                @if (isset($keyword->area) && $keyword->area != Null)
+                                                                   <td>{{ $keyword->area->country }}, {{ $keyword->area->state }}, {{ $keyword->area->city }}</td>
+                                                                @else
+                                                                <td>N/A</td>
+                                                                @endif
                                                                 <td> <a  type="button" id="{{ $keyword->id }}"
                                                                     class="dropdown-item delete-record keyword_delete" data-confirm="Are you sure to delete this item?"><i class="mdi mdi-delete-outline me-2"></i><span>Delete</span></a></td>
 
@@ -2182,6 +1676,62 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                 });
             });
         });
+    </script>
+
+    <script>
+        $(document).ready(function() {
+    // Function to copy times to all days (Monday-Sunday)
+    $('#copyToAll').click(function() {
+        var openTime = $('#monday_open').val();
+        var closedTime = $('#monday_closed').val();
+
+        // Loop through all days and set the same times
+        $('input[name^="open"]').each(function() {
+            $(this).val(openTime);
+        });
+        $('input[name^="closed"]').each(function() {
+            $(this).val(closedTime);
+        });
+    });
+
+    // Function to copy times to working days (Monday - Friday)
+    $('#copyToWorkingDays').click(function() {
+        var openTime = $('#monday_open').val();
+        var closedTime = $('#monday_closed').val();
+
+        // Set the working days (Monday - Friday) times
+        $('#monday_open').val(openTime);
+        $('#monday_closed').val(closedTime);
+        $('#tuesday_open').val(openTime);
+        $('#tuesday_closed').val(closedTime);
+        $('#wednesday_open').val(openTime);
+        $('#wednesday_closed').val(closedTime);
+        $('#thursday_open').val(openTime);
+        $('#thursday_closed').val(closedTime);
+        $('#friday_open').val(openTime);
+        $('#friday_closed').val(closedTime);
+    });
+
+    // Handle enabling/disabling of open/closed times based on radio buttons
+    $('input[data-day="check"]').change(function(e) {
+        e.preventDefault();
+        var selected = $(this).val(); // Get the value of the checked radio button
+        var day = $(this).data('day-name'); // Get the day from the data attribute
+
+        var openTimeInput = $('#' + day + '_open');
+        var closedTimeInput = $('#' + day + '_closed');
+
+        if (selected == "closed" || selected == "24/7") {
+            openTimeInput.prop('disabled', true);
+            closedTimeInput.prop('disabled', true);
+        } else {
+            openTimeInput.prop('disabled', false);
+            closedTimeInput.prop('disabled', false);
+        }
+    });
+});
+
+
     </script>
 
     <script>
@@ -2847,7 +2397,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                 const countryId = $(this).val();
                 $('#states').empty().append('<option value="">Select State</option>').prop('disabled', false);
                 $('#cities').empty().append('<option value="">Select City</option>').prop('disabled', true);
-                
+
 
                 if (countryId) {
                     $.get(`https://myfts.firmtech.biz/front/states/${countryId}`, function(data) {
@@ -3058,14 +2608,24 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
 
 
 
-                        var row = '<tr>\
-                                    <td>'+response.keyword.keyword+'</td>\
-                                    <td>'+response.area.country+', '+response.area.state+', '+response.area.city+'</td>\
-                                    <td><a  type="button" id="'+ response.keyword.id+'" class="dropdown-item delete-record keyword_delete" data-confirm="Are you sure to delete this item?"><i class="mdi mdi-delete-outline me-2"></i><span>Delete</span></a></td>\
-                                  </tr>'
+                        var row = '<tr>';
+
+                        row += '<td>' + response.keyword.keyword + '</td>';
+
+                        // Check if response.area is not null before showing the area fields
+                        if (response.area !== null) {
+                            row += '<td>' + response.area.country + ', ' + response.area.state + ', ' + response.area.city + '</td>';
+                        } else {
+                            row += '<td>N/A</td>'; // Default text if area is null
+                        }
+
+                        row += '<td><a type="button" id="' + response.keyword.id + '" class="dropdown-item delete-record keyword_delete" data-confirm="Are you sure to delete this item?"><i class="mdi mdi-delete-outline me-2"></i><span>Delete</span></a></td>';
+                        row += '</tr>';
+
                         $('#keyword_table').append(row);
                         $('#keyword').val('');
-                        $('areas_dropdown').val(response.area.id)
+                        $('areas_dropdown').val(response.area ? response.area.id : '');  // Ensure the dropdown is set or left blank if area is null
+
 
 
 
