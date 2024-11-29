@@ -276,7 +276,9 @@
                                           </div>
                                         <div class="me-2">
                                           <h6 class="mb-0">{{ $keywords->keyword }}</h6>
-                                          <small>{{ $keywords->area->country }}, {{ $keywords->area->state }}, {{ $keywords->area->city }}</small>
+                                          @if(isset($keywords->area))
+                                            <small>{{ $keywords->area->country }}, {{ $keywords->area->state }}, {{ $keywords->area->city }}</small>
+                                          @endif
                                         </div>
                                       </div>
                                     </div>

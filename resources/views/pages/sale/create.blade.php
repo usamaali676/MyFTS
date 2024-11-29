@@ -1148,8 +1148,8 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                             <div class="col-md-6 col-12 mb-6">
                                                 <div class="form-floating form-floating-outline">
                                                     <input type="text" class="form-control flatpickr-input active" name="activation_date"
-                                                        @if(isset($invoice) && isset($invoice->activation_date)) value="{{ $invoice->activation_date }}"
-                                                    @endif
+                                                        {{-- @if(isset($invoice) && isset($invoice->activation_date)) value="{{ $invoice->activation_date }}"
+                                                    @endif --}}
                                                     placeholder="YYYY-MM-DD" id="flatpickr-date" readonly="readonly">
                                                     <label for="flatpickr-date">Invoice Date</label>
                                                 </div>
@@ -1218,7 +1218,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                         </thead>
                                                         <tbody>
 
-                                                            @if(isset($invoice) && count($invoice->servicecharges) > 0)
+                                                            {{-- @if(isset($invoice) && count($invoice->servicecharges) > 0)
                                                             @foreach ($invoice->servicecharges as $item)
                                                             <tr>
                                                                 <td>{{ $item->service_name->name }}
@@ -1238,7 +1238,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
 
                                                             </tr>
                                                             @endforeach
-                                                            @endif
+                                                            @endif --}}
 
                                                         </tbody>
                                                     </table>
@@ -1251,9 +1251,9 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                             <div class="col-md-6 col-12 mb-6">
                                                 <div class="form-floating form-floating-outline">
                                                     <input type="text" id="month" class="form-control flatpickr-input active" format="YYYY" name="month"
-                                                    @if(isset($invoice) && isset($invoice->month))
+                                                    {{-- @if(isset($invoice) && isset($invoice->month))
                                                         value="{{ $invoice->month }}"
-                                                    @endif
+                                                    @endif --}}
                                                     placeholder="YYYY-MM-DD" id="flatpickr-date" readonly="readonly">
                                                     <label for="flatpickr-date">Month</label>
                                                 </div>
@@ -1263,9 +1263,9 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                 <div class="form-floating form-floating-outline">
                                                     <select id="discount" name="discount_type" class="select2 form-select" data-allow-clear="true">
                                                         <option value="">Please Select</option>
-                                                        @if(isset($invoice) && isset($invoice->discount_type))
+                                                        {{-- @if(isset($invoice) && isset($invoice->discount_type))
                                                         <option value="{{$invoice->discount_type}}" selected>{{ $invoice->discount_type }}</option>
-                                                        @endif
+                                                        @endif --}}
                                                         <option value="New Client Discount">New Client Discount</option>
                                                         <option value="New Year Discount">New Year Discount</option>
                                                         <option value="X-max Discount">X-max Discount</option>
@@ -1278,8 +1278,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                     <div class="input-group input-group-merge">
                                                         <span class="input-group-text">$</span>
                                                         <div class="form-floating form-floating-outline">
-                                                            <input type="number" id="discount_amount" name="discount_amount" @if(isset($invoice) &&
-                                                                isset($invoice->discount_amount)) value="{{ $invoice->discount_amount }}" @endif
+                                                            <input type="number" id="discount_amount" name="discount_amount"
                                                             class="form-control" placeholder="499"
                                                             aria-label="Amount (to the nearest dollar)">
                                                             <label>Discount Amount</label>
@@ -1291,8 +1290,8 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                             <div class="col-md-6 col-12 mb-6">
                                                 <div class="form-floating form-floating-outline">
                                                     <input type="text" class="form-control flatpickr-input active" name="invoice_due_date"
-                                                        @if(isset($invoice) && isset($invoice->invoice_due_date)) value="{{ $invoice->invoice_due_date }}"
-                                                    @endif
+                                                        {{-- @if(isset($invoice) && isset($invoice->invoice_due_date)) value="{{ $invoice->invoice_due_date }}"
+                                                    @endif --}}
                                                     placeholder="YYYY-MM-DD" id="flatpickr-date" readonly="readonly">
                                                     <label for="flatpickr-date">Invoice Due Date</label>
                                                 </div>
@@ -1301,9 +1300,9 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                 <div class="form-floating form-floating-outline">
                                                     <select id="invoice_freq" name="invoice_freq" class="select2 form-select" data-allow-clear="true">
                                                         <option value="">Please Select</option>
-                                                        @if(isset($invoice) && isset($invoice->invoice_frequency))
+                                                        {{-- @if(isset($invoice) && isset($invoice->invoice_frequency))
                                                         <option value="{{$invoice->invoice_frequency}}" selected>{{ $invoice->invoice_frequency }}</option>
-                                                        @endif
+                                                        @endif --}}
                                                         <option value="Monthly">Monthly</option>
                                                         <option value="Bi-annually">Bi-annually</option>
                                                         <option value="Annually">Annually</option>
@@ -1313,14 +1312,15 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                             </div>
                                             <div class="col-md-6 col-12 mb-6">
                                                 <div class="form-floating form-floating-outline">
-                                                    <input type="text" id="invoice_number" name="invoice_no" class="form-control" @php
+                                                    <input type="text" id="invoice_number" name="invoice_no" class="form-control"
+                                                     {{-- @php
                                                         $date=Carbon\Carbon::now()->format('M Y');
                                                     // dd($date);
                                                     @endphp
 
                                                     @if((isset($invoice)) && $invoice->month == $date)
                                                     @if(isset($invoice)) value="{{ $invoice->invoice_number }}" @endif
-                                                    @endif
+                                                    @endif --}}
                                                     placeholder="Invoice No." disabled/>
                                                     <label for="Keyword">Invoice No.</label>
                                                 </div>
@@ -1331,8 +1331,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                         <span class="input-group-text">$</span>
                                                         <div class="form-floating form-floating-outline">
                                                             <input type="number" id="invoice_amount" name="invoice_amount" class="form-control"
-                                                                placeholder="499" @if(isset($invoice) && isset($invoice->total_amount)) value="{{
-                                                            $invoice->total_amount }}" @endif
+                                                                placeholder="499"
                                                             aria-label="Amount (to the nearest dollar)" readonly>
                                                             <label>Invoice Amount </label>
                                                         </div>
@@ -1344,15 +1343,15 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                             <div class="col-md-12 text-right">
                                                 <div class="invoice-button d-flex " style="gap: 0px 20px;">
 
-                                                        <a id="view-invoice" @if (isset($invoice) && isset($invoice->invoice_number)) style="display: block !important;"  href="{{ route('front.invoiceView', $invoice->invoice_number) }}" @else style="display: none !important;" @endif  target="_blank" class="btn btn-success" style="color: #fff">View Invoice</a>
-                                                        <button id="genrate-invoice" @if (isset($invoice) && isset($invoice->invoice_number)) style="display: none !important;" @else style="display: block !important;" @endif  type="submit" class="btn btn-primary">Generate Invoice</button>
+                                                        {{-- <a id="view-invoice" @if (isset($invoice) && isset($invoice->invoice_number)) style="display: block !important;"  href="{{ route('front.invoiceView', $invoice->invoice_number) }}" @else style="display: none !important;" @endif  target="_blank" class="btn btn-success" style="color: #fff">View Invoice</a> --}}
+                                                        <button id="genrate-invoice"   type="submit" class="btn btn-primary">Generate Invoice</button>
 
                                                 </div>
                                             </div>
 
                                         </div>
                                     </form>
-                                    {{-- <div class="row py-4">
+                                    <div class="row py-4">
                                         <h4>Invoices</h4>
                                         <div class="col-md-12">
                                             <div class="table-responsive">
@@ -1386,7 +1385,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                 </table>
                                             </div>
                                         </div>
-                                    </div> --}}
+                                    </div>
                                 @endif
                                 <!-- /Invoice Form -->
                                 @if(isset($Payment_perm) && $Payment_perm->view == 1)
@@ -2848,8 +2847,8 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                         console.log(response);
                         var all_invoices = response.all_invoices;
                         var invoice = response.invoice;
-                        $('#genrate-invoice').attr('style', "display: none !important");
-                        $('#view-invoice').attr('style', "display: block !important; color: #fff !important");
+                        // $('#genrate-invoice').attr('style', "display: none !important");
+                        // $('#view-invoice').attr('style', "display: block !important; color: #fff !important");
                         $('#view-invoice').attr('href', "/front/invoice/"+ invoice.invoice_number +  "");
                         $('#invoice_number').val(invoice.invoice_number);
 
@@ -2864,23 +2863,23 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
 
 
 
-                    // var invoice = response.invoice;
+                    var invoice = response.all_invoices;
                     // console.log(invoice);
 
-                    // var table_content = ''
-                    // invoice.forEach(function(invoice, index) {
-                    //         tableContent += '<tr>\
-                    //             <td>' + (index + 1) + '</td>\
-                    //             <td>' + invoice.invoice_number + '</td>\
-                    //             <td>' + invoice.month + '</td>\
-                    //             <td>' + invoice.activation_date + '</td>\
-                    //             <td>' + invoice.invoice_due_date + '</td>\
-                    //             <td>' + invoice.amount + '</td>\
-                    //         </tr>';
-                    //     });
+                    var table_content = ''
+                    invoice.forEach(function(invoice, index) {
+                        table_content += '<tr>\
+                                <td>' + (index + 1) + '</td>\
+                                <td>' + invoice.invoice_number + '</td>\
+                                <td>' + invoice.month + '</td>\
+                                <td>' + invoice.activation_date + '</td>\
+                                <td>' + invoice.invoice_due_date + '</td>\
+                                <td>' + invoice.total_amount + '</td>\
+                            </tr>';
+                        });
 
-                    //     // Clear the table first and then append the new rows
-                    //     $('#invoice_table_gen tbody').empty().append(tableContent);
+                        // Clear the table first and then append the new rows
+                        $('#invoice_table_gen tbody').empty().append(table_content);
 
 
 
@@ -2942,7 +2941,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
 
 
                         // Optionally reset the form only on success
-                        // $('#saleForm')[0].reset();
+                         $('#add_service_charge')[0].reset();
                         // This will reset the form fields
                     },
                     error: function (xhr) {
@@ -3251,7 +3250,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
 
 
                         // Optionally reset the form only on success
-                        // $('#make_payment')[0].reset();
+                        $('#make_payment')[0].reset();
                         // This will reset the form fields
                     },
                     error: function (xhr) {

@@ -33,4 +33,8 @@ class Lead extends Model
     {
         return $this->belongsToMany(CompanyServices::class, );
     }
+    public function comment()
+    {
+        return $this->hasMany(Comments::class, 'lead_id');
+    }
 }
