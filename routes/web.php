@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ClientServicesController;
+use App\Http\Controllers\CommentsController;
 use App\Http\Controllers\FrontController;
 use App\Http\Controllers\InvoiceServiceChargesController;
 use App\Http\Controllers\KeywordController;
@@ -149,6 +150,14 @@ Route::controller(RoleController::class)
     Route::controller(PaymentController::class)
     ->prefix('payment')
     ->as('payment.')
+    ->middleware(PermissionMiddelware::class)
+    ->group(function () {
+        Route::post('store', 'store')->name('store');
+    });
+
+    Route::controller(CommentsController::class)
+    ->prefix('comment')
+    ->as('comment.')
     ->middleware(PermissionMiddelware::class)
     ->group(function () {
         Route::post('store', 'store')->name('store');

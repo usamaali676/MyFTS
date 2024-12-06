@@ -145,10 +145,10 @@ class RoleController extends Controller
                     Permission::create([
                         'role_id' => $role->id,
                         'name' => $permName,
-                        'create' => $permData['create'],
-                        'view' => $permData['view'],
-                        'edit' => $permData['edit'],
-                        'delete' => $permData['delete'],
+                        'create' => $permData['create'] ? 1 : 0,
+                        'view' => $permData['view'] ? 1 : 0,
+                        'edit' => $permData['edit'] ? 1 : 0,
+                        'delete' => $permData['delete'] ? 1 : 0,
                     ]);
                 }
             }

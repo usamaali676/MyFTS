@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Comments;
 use Illuminate\Http\Request;
+use Exception;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class CommentsController extends Controller
 {
@@ -28,7 +31,31 @@ class CommentsController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        try {
+            $request->validate([
+                'stage' => 'required',
+                'comment' => 'required',
+                'lead_id' => 'required',
+            ]);
+            $comment = Comments::create([
+                'Stage' => $request->stage,
+                'comment' => $request->comment,
+                'due_date' => $request->due_date,
+                'lead_id' => $request->lead_id,
+                'user_id' => Auth::user()->id,
+            ]);
+            $comments = Comments::where('lead_id', $comment->lead_id)->orderby('id', 'DESC')->with('user')->get();
+            return response()->json([
+                'message' => 'Comment Added Successfully!',
+                'comments' => $comments,
+            ], 200);
+        } catch (Exception $e) {
+            // Log the exception for debugging
+            Log::error($e->getMessage());
+            return response()->json([
+                'error' => $e->getMessage(),
+            ], 422);
+        }
     }
 
     /**
