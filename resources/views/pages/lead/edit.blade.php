@@ -674,7 +674,6 @@
                 contentType: false, // Important: content type is false
                 success: function (response) {
 
-
                     var comments = response.comments;
                     // console.log(invoice);
 
@@ -697,16 +696,9 @@
                         // Clear the table first and then append the new rows
                         $('#comment_table tbody').empty().append(table_content);
 
-
-
-
                     // $('#keyword_table').append(row);
                     // $('#keyword').val('');
                     // $('areas_dropdown').val(response.area ? response.area.id : '');  // Ensure the dropdown is set or left blank if area is null
-
-
-
-
 
                     // Handle success response (display success message using SweetAlert2)
                     Swal.fire({
@@ -719,8 +711,6 @@
                         toast: true,
                         showConfirmButton: false
                     });
-
-
                     // Optionally reset the form only on success
                     // $('#keywordadd')[0].reset();
                     // This will reset the form fields
@@ -735,7 +725,6 @@
                         });
                         errorHtml += '</ul></div>';
                         $('#saleForm').prepend(errorHtml); // Add errors to the form
-
                         // Display SweetAlert2 for validation errors
                         Swal.fire({
                             position: 'top-end',

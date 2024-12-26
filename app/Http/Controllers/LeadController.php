@@ -19,8 +19,10 @@ use Illuminate\Support\Facades\Auth;
 use RealRashid\SweetAlert\Facades\Alert;
 
 
+
 class LeadController extends Controller
 {
+
     /**
      * Display a listing of the resource.
      */

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ChargeBackController;
 use App\Http\Controllers\ClientServicesController;
 use App\Http\Controllers\CommentsController;
 use App\Http\Controllers\FrontController;
@@ -7,6 +8,7 @@ use App\Http\Controllers\InvoiceServiceChargesController;
 use App\Http\Controllers\KeywordController;
 use App\Http\Controllers\LeadController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\RefundController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SaleController;
 use App\Http\Controllers\ServiceAreaController;
@@ -41,6 +43,7 @@ Route::controller(FrontController::class)
     Route::get('/getzelle', 'getzelle')->name('getzelle');
     Route::get('/getcash', 'getcash')->name('getcash');
     Route::get('/getbank', 'getbank')->name('getbank');
+    Route::get('/get-refund', 'getRefund')->name('getRefund');
 });
 
 Route::controller(RoleController::class)
@@ -158,6 +161,22 @@ Route::controller(RoleController::class)
     Route::controller(CommentsController::class)
     ->prefix('comment')
     ->as('comment.')
+    ->middleware(PermissionMiddelware::class)
+    ->group(function () {
+        Route::post('store', 'store')->name('store');
+    });
+
+    Route::controller(RefundController::class)
+    ->prefix('refund')
+    ->as('refund.')
+    ->middleware(PermissionMiddelware::class)
+    ->group(function () {
+        Route::post('store', 'store')->name('store');
+    });
+
+    Route::controller(ChargeBackController::class)
+    ->prefix('chargeback')
+    ->as('chargeback.')
     ->middleware(PermissionMiddelware::class)
     ->group(function () {
         Route::post('store', 'store')->name('store');

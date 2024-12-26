@@ -155,6 +155,14 @@ class FrontController extends Controller
                 $bank = BankAccount::all();
                 return response()->json(['bank' => $bank]);
             }
+            public function getRefund(Request $request)
+            {
+                if($request->ajax()){
+                    $invoice = Invoice::where('id', $request->invoice_id)->first();
+                    // dd($invoice->id);
+                    return response()->json(['invoice' => $invoice]);
+                }
+            }
 
     }
 

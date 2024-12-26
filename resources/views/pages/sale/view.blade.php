@@ -50,7 +50,7 @@
                               </li>
                               @endif
 
-                             @if (isset($sale ->lead->client_address) )
+                             @if (isset($sale->lead->client_address) )
                                  <li class="list-inline-item">
                                 <i class="mdi mdi-map-marker-outline me-1 mdi-20px text-primary"></i>
                                     <span class="fw-medium">{{ $sale->lead->client_address }}</span>
@@ -174,8 +174,6 @@
                                 </li>
                             @endforeach
                         @endif
-
-
                       </ul>
                     </div>
                   </div>
@@ -347,7 +345,6 @@
                     </div>
                     <!--/ Teams -->
                   </div>
-
                   {{-- <p>{{ $sale->invoice }}</p> --}}
                   @if(isset($sale->invoice))
 
@@ -379,9 +376,7 @@
                     </div>
                   </div>
                   <!--/ Projects table -->
-
                   @endif
-
                 </div>
               </div>
               <div class="row">
@@ -494,8 +489,6 @@
                     </div>
                 </div>
             </div>
-
-
 
             <div class="content-backdrop fade"></div>
           </div>
