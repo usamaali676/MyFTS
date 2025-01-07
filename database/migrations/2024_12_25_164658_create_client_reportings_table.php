@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('client_reportings', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('sale_id');
+            $table->unsignedBigInteger('client_id');
             $table->enum('reporting_type', ['Landing Pages', 'SMM', 'GMB','Website Development', 'Other']);
             $table->unsignedBigInteger('created_by');
             $table->unsignedBigInteger('verified_by')->nullable();
@@ -22,6 +22,7 @@ return new class extends Migration
             $table->enum('report_status',['created', 'verified','dispatched']);
             $table->timestamp('report_verified_at')->nullable();
             $table->timestamp('dispatch_at')->nullable();
+            $table->foreign('client_id')->references('id')->on('clients');
             $table->foreign('created_by')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('verified_by')->references('id')->on('users')->onDelete('set null');
             $table->foreign('dispatched_by')->references('id')->on('users')->onDelete('set null');

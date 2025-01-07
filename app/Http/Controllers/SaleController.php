@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\BusinessHours;
 use App\Models\ChargeBack;
+use App\Models\Client;
 use App\Models\ClientServices;
 use App\Models\Comments;
 use App\Models\CompanyServices;
@@ -64,11 +65,14 @@ class SaleController extends Controller
         $chargeBack = ChargeBack::where('lead_id', '=', $lead->id)->get();
 
 
+
         // dd($sale->social_links);
 
 
         $company_services = CompanyServices::all();
         if (isset($sale)) {
+            $client = Client::where('sale_id', $sale->id)->first();
+            // dd($client);
             // $lastMonthName = Carbon::now()->subMonth()->format('F');
             // dd($lastMonthName);
             $lastMonthName = Carbon::now()->format('M Y');
@@ -87,7 +91,7 @@ class SaleController extends Controller
                 $clientService->setRelation('companyServicesForSale', $clientService->companyServicesForSale($sale->id)->get());
                 return $clientService;
             });
-            return view('pages.sale.create', compact('lead', 'client_enum', 'call_enum', 'social_links', 'closers', 'sale', 'company_services', 'client_services', 'invoice', 'mehchant' , 'all_invoices', 'payments', 'csr', 'comments','refunds','chargeBack'));
+            return view('pages.sale.create', compact('lead', 'client_enum', 'call_enum', 'social_links', 'closers', 'sale', 'company_services', 'client_services', 'invoice', 'mehchant' , 'all_invoices', 'payments', 'csr', 'comments','refunds','chargeBack','client'));
         } else {
             return view('pages.sale.create', compact('lead', 'client_enum', 'call_enum', 'social_links', 'closers', 'sale', 'company_services', 'mehchant', 'csr', 'comments','refunds', 'chargeBack'));
         }

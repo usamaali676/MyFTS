@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\GlobalHelper;
+use App\Models\Client;
+use App\Models\Holidays;
 use App\Models\Invoice;
 use App\Models\Payment;
 use App\Models\Sale;
@@ -117,15 +119,50 @@ class PaymentController extends Controller
             $sale = Sale::where('id', $invoice->sale_id)->first();
             $sale->update([
                 'status' => true,
-                'activation_date' => Carbon::now(),
+                // 'activation_date' => Carbon::now(),
             ]);
+            $activationDate = $sale->activation_date;
+
+            $activationDate = Carbon::parse($activationDate);
+
+            // Step 2: Set the reporting date to 4 days after the same day in the next month
+            $reportingDate = $activationDate->addMonth()->day($activationDate->day)->addDays(4);  // 4 days after the same day of the next month
+
+            // Step 3: Check if the day is Saturday or Sunday
+            while ($reportingDate->isWeekend()) {
+                // If it's Saturday or Sunday, move to the next Monday
+                $reportingDate->next(Carbon::MONDAY);
+            }
+
+            // Step 4: Get all holiday dates from the database
+            $holidays = Holidays::pluck('date')->toArray(); // Get holidays in 'Y-m-d' format
+
+            // Step 5: Check if the reporting date is in the holiday list
+            while (in_array($reportingDate->toDateString(), $holidays)) {
+                // If the date is a holiday, shift to the next working day
+                $reportingDate->addDay();
+
+                // Ensure the new date is not a weekend (Saturday/Sunday)
+                while ($reportingDate->isWeekend()) {
+                    $reportingDate->addDay();
+                }
+            }
+
+            // Final reporting date
+            $finalReportingDate = $reportingDate->toDateString();
+            $ext_client = Client::where('sale_id',  $sale->id)->first();
+            if($ext_client == null) {
+                $client = Client::create([
+                    'sale_id' => $sale->id,
+                    'status' => true,
+                    'reporting_date' => $finalReportingDate,
+                ]);
+            }
             $all_invoices =  Invoice::where('sale_id', $sale->id)->get();
             $invoiceIds = $all_invoices->pluck('id')->toArray();
             $payments = Payment::whereIn('invoice_id', $invoiceIds)
             ->with('invoice', 'merchant')// Fixed 'merchant' to 'merchant'
             ->get();
-
-
 
             return response()->json([
                 'message' => 'Payment Charged Successfully',

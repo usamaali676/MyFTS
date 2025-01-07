@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\ClientReporting;
+use Carbon\Carbon;
+use Exception;
 use Illuminate\Http\Request;
 
 class ClientReportingController extends Controller
@@ -28,7 +30,31 @@ class ClientReportingController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        try {
+            $request->validate([
+                'report_type' => 'required',
+                'client_id' =>'required',
+                'report_file' =>'required|file|mimes:pdf,doc,docx|max:2048',
+                'created_by' => 'required'
+            ]);
+            $report = ClientReporting::create([
+                'client_id' => $request->client_id,
+                'report_type' => $request->report_type,
+                'created_by' => $request->created_by,
+                'report_status' => 'created',
+                'created_at' => Carbon::now(),
+            //    'report_file' => $request->report_file->store('reports'),
+            ]);
+            return response()->json([
+               'message' => 'Report created successfully.',
+                'report' => $report
+            ], 201);
+        } catch (Exception $e) {
+            return response()->json([
+               'message' => 'An error occurred while creating the report.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
@@ -36,7 +62,7 @@ class ClientReportingController extends Controller
      */
     public function show(ClientReporting $clientReporting)
     {
-        //
+
     }
 
     /**

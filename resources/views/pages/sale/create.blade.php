@@ -28,6 +28,7 @@
 <link rel="stylesheet" href="{{ asset('assets/vendor/libs/quill/typography.css') }}" />
 <link rel="stylesheet" href="{{ asset('assets/vendor/libs/quill/katex.css') }}" />
 <link rel="stylesheet" href="{{ asset('assets/vendor/libs/quill/editor.css') }}" />
+{{-- <link rel="stylesheet" href="{{ asset('assets/vendor/libs/dropzone/dropzone.css') }}" /> --}}
 
 <link
     href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css"
@@ -65,6 +66,12 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
 .flatpickr-monthSelect-theme-dark .flatpickr-monthSelect-month{
     color: #000 !important;
 }
+/* ::file-selector-button {
+  display: none;
+} */
+/* ::-webkit-file-upload-button {
+   display: none;
+} */
 /* .light-style .flatpickr-calendar, .light-style .flatpickr-days{
     width: calc(19.375rem + 0* 2px) !important;
 } */
@@ -160,14 +167,14 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                             <button type="button" class="step-trigger">
                                 <span class="bs-stepper-icon">
                                     <svg viewBox="0 0 54 54">
-                                        <use xlink:href="../../assets/svg/icons/form-wizard-submit.svg#wizardSubmit">
+                                        <use xlink:href="../../assets/svg/icons/form-wizard-account.svg#wizardAccount">
                                         </use>
                                     </svg>
                                 </span>
                                 <span class="bs-stepper-label">Refund & Charge Backs</span>
                             </button>
                         </div>
-                        <div class="step" data-target="#reports">
+                        {{-- <div class="step" data-target="#reports">
                             <button type="button" class="step-trigger">
                                 <span class="bs-stepper-icon">
                                     <svg viewBox="0 0 54 54">
@@ -177,23 +184,24 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                 </span>
                                 <span class="bs-stepper-label">Reports</span>
                             </button>
-                        </div>
+                        </div> --}}
                     </div>
                     <div class="bs-stepper-content">
-                            <form id="saleForm" method="POST" action="{{ route('sale.store') }}" onsubmit="return validateForm()">
-                                @csrf
-                                @if ($errors->any())
-                                <div class="alert alert-danger">
-                                    <ul>
-                                        @foreach ($errors->all() as $error)
-                                        <li>{{ $error }}</li>
-                                        @endforeach
-                                    </ul>
-                                </div>
-                                @endif
-                                <div id="successMessage" style="display:none;" class="alert alert-success"></div>
+
                                 <!-- Account Details -->
                                 <div id="account-details" class="content">
+                                    <form id="saleForm" method="POST" action="{{ route('sale.store') }}" onsubmit="return validateForm()">
+                                        @csrf
+                                        @if ($errors->any())
+                                        <div class="alert alert-danger">
+                                            <ul>
+                                                @foreach ($errors->all() as $error)
+                                                <li>{{ $error }}</li>
+                                                @endforeach
+                                            </ul>
+                                        </div>
+                                        @endif
+                                        <div id="successMessage" style="display:none;" class="alert alert-success"></div>
                                     @if(isset($sale_perm) && $sale_perm->create == 1)
                                         <div class="content-header mb-3">
                                             <h6 class="mb-0">Lead Details</h6>
@@ -671,8 +679,9 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                             </div>
                                         </div>
                                     @endif
+                                    </form>
                                 </div>
-                            </form>
+
                             <!-- Personal Info -->
                             <div id="personal-info" class="content">
                                 @if(isset($Saleinfo) && $Saleinfo->view == 1)
@@ -1433,7 +1442,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-floating form-floating-outline">
-                                                <select id="merchant" name="merchant" class="select2 form-select" data-allow-clear="true">
+                                                <select id="merchant_select" name="merchant" class="select2 form-select" data-allow-clear="true">
                                                     <option value="">Please Select</option>
                                                     @if(isset($mehchant) && count($mehchant) > 0)
                                                         @foreach ($mehchant as $item)
@@ -1701,7 +1710,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
 
                                         </div>
                                     </form>
-                                @endif
+                                 @endif
                                     <div class="row py-4">
                                         <h4>Refunds</h4>
                                         <div class="col-md-12">
@@ -1879,19 +1888,89 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                     </div>
                                 </div>
                             </div>
-                            <div id="reports" class="content">
+                            {{-- <div id="reports" class="content">
                                 <div class="content-header mb-3">
                                     <h6 class="mb-0">Reports</h6>
                                     <small>Reports</small>
                                 </div>
                                 <div class="row g-4">
-                                    <div class="col-12">
-                                        <h5 class="card-header pb-3">Reports</h5>
-                                        <div class="card-body">
-                                            <textarea class="form-control" style="border-radius: 0px" name="chargeBack_reason" id="full-editor"
-                                                cols="30" rows="5"></textarea>
+                                    <form id="report_create" method="POST" action="{{ route('clientReport.store') }}">
+                                        @csrf
+                                        @if ($errors->any())
+                                        <div class="alert alert-danger">
+                                            <ul>
+                                                @foreach ($errors->all() as $error)
+                                                <li>{{ $error }}</li>
+                                                @endforeach
+                                            </ul>
                                         </div>
-                                    </div>
+                                        @endif
+                                        <div class="row g-4">
+                                            @if(isset($client))
+                                                <input type="hidden" name="client_id" value="{{ $client->id }}">
+                                            @endif
+                                            <div class="col-md-6 select2-primary">
+                                                <div class="form-floating form-floating-outline">
+                                                    <select id="select-report-type" name="report_type" class="select2 form-select">
+                                                        <option value="">Select Report Type</option>
+                                                        <option value="Landing Pages">Landing Pages</option>
+                                                        <option value="SMM">SMM</option>
+                                                        <option value="GMB">GMB</option>
+                                                        <option value="Website Development">Website Development</option>
+                                                        <option value="Other">Other</option>
+                                                    </select>
+                                                    <label for="select-invoice">Select Report Type</label>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-6 select2-primary">
+                                                <div class="form-floating form-floating-outline">
+                                                    <select id="select-created_by" name="created_by" class="select2 form-select">
+                                                        @auth
+                                                        <option value="{{ Auth::user()->name }}" selected @readonly(true)>{{ Auth::user()->name }}</option>
+                                                        @endauth
+
+
+                                                    </select>
+                                                    <label for="select-invoice">Select Created By</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 select2-primary">
+                                                <div class="form-floating form-floating-outline">
+                                                    <select id="select-verified_by" name="verified_by" class="select2 form-select">
+                                                        @auth
+                                                        <option value="{{ Auth::user()->name }}" selected @readonly(true)>{{ Auth::user()->name }}</option>
+                                                        @endauth
+
+
+                                                    </select>
+                                                    <label for="select-invoice">Select Verified By</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 select2-primary">
+                                                <div class="form-floating form-floating-outline">
+                                                    <select id="select-dispatched_by" name="despatched_by" class="select2 form-select">
+                                                        <option value="">Select Dispatched By</option>
+                                                        @foreach ($csr as $item)
+                                                            <option value="{{ $item->id }}">{{ $item->name }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                    <label for="select-invoice">Select Dispatched By</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-12">
+                                                <button class="btn btn-primary">
+                                                    <input type="file" name="report_file" id="" placeholder="Upload File" accept="application/pdf,application/doc,.doc, .docx,">
+                                                </button>
+                                            </div>
+                                            <div class="col-12">
+                                                <button class="btn btn-primary">
+                                                    <i class="fas fa-plus-circle me-2"></i>
+                                                    Add Report
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </form>
 
                                     <div class="col-12 d-flex justify-content-between">
                                         <a class="btn btn-outline-secondary btn-prev" style="color: #6d788d" disabled>
@@ -1899,7 +1978,6 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                             <span class="align-middle d-sm-inline-block d-none">Previous</span>
                                         </a>
                                         <div class="last-buttons d-flex" style="gap: 20px;">
-                                            {{-- <button class="btn btn-outline-primary waves-effect" type="submit">Save</button> --}}
                                             <a class="btn btn-primary btn-next" style="color: #fff">
                                                 <span class="align-middle d-sm-inline-block d-none me-sm-1">Next</span>
                                                 <i class="mdi mdi-arrow-right"></i>
@@ -1907,7 +1985,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </div> --}}
                     </div>
                 </div>
             </div>
@@ -2055,6 +2133,11 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
     <script src="{{ asset('assets/vendor/libs/jquery-timepicker/jquery-timepicker.js') }}"></script> --}}
     <script src="{{ asset('assets/vendor/libs/pickr/pickr.js') }}"></script>
     <script src="{{ asset('assets/js/forms-pickers.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/dropzone/dropzone.js') }}"></script>
+    <script src="{{ asset('assets/js/forms-file-upload.js') }}"></script>
+
+    <!-- Page JS -->
+    <script src="{{ asset('assets/js/forms-file-upload.js') }}"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/24.6.0/build/js/intlTelInput.min.js"
         integrity="sha512-/sRFlFRbcvObOo/SxW8pvmFZeMLvAF6hajRXeX15ekPgT4guXnfNSjLC98K/Tg2ObUgKX8vn9+Th5/mGHzZbEw=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -4140,6 +4223,109 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
 
 
 {{-- End Charge Back --}}
+
+{{-- Report --}}
+
+<script>
+    $(document).ready(function () {
+        $('#report_create').on('submit', function (e) {
+            e.preventDefault(); // Prevent the default form submission
+
+            // Store current form values before submission, particularly time and select elements
+
+
+            // Create a FormData object to handle form data
+            let formData = new FormData(this);
+
+            // Clear previous error messages
+
+            $.ajax({
+                url: $(this).attr('action'), // Form action URL
+                type: $(this).attr('method'), // POST method
+                data: formData,
+                processData: false, // Important: do not process the data
+                contentType: false, // Important: content type is false
+                success: function (response) {
+
+                    console.log(response);
+
+                    // var chargeBack = response.chargeBack;
+                    // var table_content = ''
+                    // chargeBack.forEach(function(chargeback, index) {
+                    //     table_content += '<tr>\
+                    //             <td>' + (index + 1) + '</td>\
+                    //             <td>' + chargeback.invoice.invoice_number + '</td>\
+                    //             <td>' + chargeback.claim_date + '</td>\
+                    //             <td>' + chargeback.merchant.name + '</td>\
+                    //         </tr>';
+                    //     });
+                    //     // Clear the table first and then append the new rows
+                    //     $('#chargeBack_table tbody').empty().append(table_content);
+
+
+
+
+
+                    // Handle success response (display success message using SweetAlert2)
+                    Swal.fire({
+                        position: 'top-end',
+                        icon: 'success',
+                        title: 'Success',
+                        text: response.message,
+                        showConfirmButton: false, // Remove the confirm button
+                        timer: 1500, // Duration in milliseconds before the toast disappears
+                        toast: true,
+                        showConfirmButton: false
+                    });
+
+
+                    // Optionally reset the form only on success
+                    $('#refund_form')[0].reset();
+                    // This will reset the form fields
+                },
+                error: function (xhr) {
+                    // Handle validation errors
+                    let errors = xhr.responseJSON.errors;
+                    if (errors) {
+                        let errorHtml = '<div class="alert alert-danger"><ul>';
+                        $.each(errors, function (key, value) {
+                            errorHtml += '<li>' + value + '</li>';
+                        });
+                        errorHtml += '</ul></div>';
+                        $('#service_area').prepend(errorHtml); // Add errors to the form
+
+                        // Display SweetAlert2 for validation errors
+                        Swal.fire({
+                            position: 'top-end',
+                            icon: 'error',
+                            title: 'Validation Error',
+                            html: errorHtml, // Use the generated error HTML
+                            showConfirmButton: false, // Remove the confirm button
+                            timer: 1500, // Duration in milliseconds before the toast disappears
+                            toast: true,
+                        });
+                    }
+                    else if (xhr.responseJSON.error) {
+                        // Show custom error message with SweetAlert2
+                        Swal.fire({
+                            position: 'top-end',
+                            icon: 'error',
+                            title: 'Error',
+                            text: xhr.responseJSON.error, // Show the custom error message
+                            showConfirmButton: false, // Remove the confirm button
+                            timer: 1500, // Duration in milliseconds before the toast disappears
+                            toast: true,
+                        });
+                    }
+
+                    // Restore time input and select values after error
+                }
+            });
+        });
+    });
+</script>
+
+{{-- End Report --}}
 @endsection
 
 

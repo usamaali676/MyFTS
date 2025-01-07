@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ChargeBackController;
+use App\Http\Controllers\ClientReportingController;
 use App\Http\Controllers\ClientServicesController;
 use App\Http\Controllers\CommentsController;
 use App\Http\Controllers\FrontController;
@@ -177,6 +178,15 @@ Route::controller(RoleController::class)
     Route::controller(ChargeBackController::class)
     ->prefix('chargeback')
     ->as('chargeback.')
+    ->middleware(PermissionMiddelware::class)
+    ->group(function () {
+        Route::post('store', 'store')->name('store');
+    });
+
+
+    Route::controller(ClientReportingController::class)
+    ->prefix('clientReport')
+    ->as('clientReport.')
     ->middleware(PermissionMiddelware::class)
     ->group(function () {
         Route::post('store', 'store')->name('store');
