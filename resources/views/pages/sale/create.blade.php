@@ -163,6 +163,9 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                 <span class="bs-stepper-label">Invoice & Payments</span>
                             </button>
                         </div>
+                        <div class="line">
+                            <i class="mdi mdi-chevron-right"></i>
+                        </div>
                         <div class="step" data-target="#refund-chargeback">
                             <button type="button" class="step-trigger">
                                 <span class="bs-stepper-icon">
