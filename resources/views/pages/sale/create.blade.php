@@ -24,6 +24,11 @@
 <link rel="stylesheet" href="{{ asset('assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css') }}" />
 <link rel="stylesheet" href="{{ asset('assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css') }}" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/plugins/monthSelect/style.min.css"  />
+<link rel="stylesheet" href="{{ asset('assets/vendor/libs/typeahead-js/typeahead.css') }}" />
+<link rel="stylesheet" href="{{ asset('assets/vendor/libs/quill/typography.css') }}" />
+<link rel="stylesheet" href="{{ asset('assets/vendor/libs/quill/katex.css') }}" />
+<link rel="stylesheet" href="{{ asset('assets/vendor/libs/quill/editor.css') }}" />
+{{-- <link rel="stylesheet" href="{{ asset('assets/vendor/libs/dropzone/dropzone.css') }}" /> --}}
 
 <link
     href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css"
@@ -61,6 +66,12 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
 .flatpickr-monthSelect-theme-dark .flatpickr-monthSelect-month{
     color: #000 !important;
 }
+/* ::file-selector-button {
+  display: none;
+} */
+/* ::-webkit-file-upload-button {
+   display: none;
+} */
 /* .light-style .flatpickr-calendar, .light-style .flatpickr-days{
     width: calc(19.375rem + 0* 2px) !important;
 } */
@@ -152,22 +163,48 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                 <span class="bs-stepper-label">Invoice & Payments</span>
                             </button>
                         </div>
+                        <div class="line">
+                            <i class="mdi mdi-chevron-right"></i>
+                        </div>
+                        <div class="step" data-target="#refund-chargeback">
+                            <button type="button" class="step-trigger">
+                                <span class="bs-stepper-icon">
+                                    <svg viewBox="0 0 54 54">
+                                        <use xlink:href="../../assets/svg/icons/form-wizard-account.svg#wizardAccount">
+                                        </use>
+                                    </svg>
+                                </span>
+                                <span class="bs-stepper-label">Refund & Charge Backs</span>
+                            </button>
+                        </div>
+                        {{-- <div class="step" data-target="#reports">
+                            <button type="button" class="step-trigger">
+                                <span class="bs-stepper-icon">
+                                    <svg viewBox="0 0 54 54">
+                                        <use xlink:href="../../assets/svg/icons/form-wizard-submit.svg#wizardSubmit">
+                                        </use>
+                                    </svg>
+                                </span>
+                                <span class="bs-stepper-label">Reports</span>
+                            </button>
+                        </div> --}}
                     </div>
                     <div class="bs-stepper-content">
-                            <form id="saleForm" method="POST" action="{{ route('sale.store') }}" onsubmit="return validateForm()">
-                                @csrf
-                                @if ($errors->any())
-                                <div class="alert alert-danger">
-                                    <ul>
-                                        @foreach ($errors->all() as $error)
-                                        <li>{{ $error }}</li>
-                                        @endforeach
-                                    </ul>
-                                </div>
-                                @endif
-                                <div id="successMessage" style="display:none;" class="alert alert-success"></div>
+
                                 <!-- Account Details -->
                                 <div id="account-details" class="content">
+                                    <form id="saleForm" method="POST" action="{{ route('sale.store') }}" onsubmit="return validateForm()">
+                                        @csrf
+                                        @if ($errors->any())
+                                        <div class="alert alert-danger">
+                                            <ul>
+                                                @foreach ($errors->all() as $error)
+                                                <li>{{ $error }}</li>
+                                                @endforeach
+                                            </ul>
+                                        </div>
+                                        @endif
+                                        <div id="successMessage" style="display:none;" class="alert alert-success"></div>
                                     @if(isset($sale_perm) && $sale_perm->create == 1)
                                         <div class="content-header mb-3">
                                             <h6 class="mb-0">Lead Details</h6>
@@ -645,8 +682,9 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                             </div>
                                         </div>
                                     @endif
+                                    </form>
                                 </div>
-                            </form>
+
                             <!-- Personal Info -->
                             <div id="personal-info" class="content">
                                 @if(isset($Saleinfo) && $Saleinfo->view == 1)
@@ -857,7 +895,6 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                                 @if(isset($sale) && $sale->clientServices->isNotEmpty())
                                                                 @foreach ($sale->clientServices as $index => $s_service)
                                                                 <tr>
-
                                                                     <td>{{ $s_service->name }}
                                                                         <input type="hidden"  name="client_service[{{ $index }}]" value="{{ $s_service->id }}" id="">
                                                                     </td>
@@ -1148,8 +1185,8 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                             <div class="col-md-6 col-12 mb-6">
                                                 <div class="form-floating form-floating-outline">
                                                     <input type="text" class="form-control flatpickr-input active" name="activation_date"
-                                                        @if(isset($invoice) && isset($invoice->activation_date)) value="{{ $invoice->activation_date }}"
-                                                    @endif
+                                                        {{-- @if(isset($invoice) && isset($invoice->activation_date)) value="{{ $invoice->activation_date }}"
+                                                    @endif --}}
                                                     placeholder="YYYY-MM-DD" id="flatpickr-date" readonly="readonly">
                                                     <label for="flatpickr-date">Invoice Date</label>
                                                 </div>
@@ -1218,7 +1255,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                         </thead>
                                                         <tbody>
 
-                                                            @if(isset($invoice) && count($invoice->servicecharges) > 0)
+                                                            {{-- @if(isset($invoice) && count($invoice->servicecharges) > 0)
                                                             @foreach ($invoice->servicecharges as $item)
                                                             <tr>
                                                                 <td>{{ $item->service_name->name }}
@@ -1238,7 +1275,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
 
                                                             </tr>
                                                             @endforeach
-                                                            @endif
+                                                            @endif --}}
 
                                                         </tbody>
                                                     </table>
@@ -1251,9 +1288,9 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                             <div class="col-md-6 col-12 mb-6">
                                                 <div class="form-floating form-floating-outline">
                                                     <input type="text" id="month" class="form-control flatpickr-input active" format="YYYY" name="month"
-                                                    @if(isset($invoice) && isset($invoice->month))
+                                                    {{-- @if(isset($invoice) && isset($invoice->month))
                                                         value="{{ $invoice->month }}"
-                                                    @endif
+                                                    @endif --}}
                                                     placeholder="YYYY-MM-DD" id="flatpickr-date" readonly="readonly">
                                                     <label for="flatpickr-date">Month</label>
                                                 </div>
@@ -1263,9 +1300,9 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                 <div class="form-floating form-floating-outline">
                                                     <select id="discount" name="discount_type" class="select2 form-select" data-allow-clear="true">
                                                         <option value="">Please Select</option>
-                                                        @if(isset($invoice) && isset($invoice->discount_type))
+                                                        {{-- @if(isset($invoice) && isset($invoice->discount_type))
                                                         <option value="{{$invoice->discount_type}}" selected>{{ $invoice->discount_type }}</option>
-                                                        @endif
+                                                        @endif --}}
                                                         <option value="New Client Discount">New Client Discount</option>
                                                         <option value="New Year Discount">New Year Discount</option>
                                                         <option value="X-max Discount">X-max Discount</option>
@@ -1278,8 +1315,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                     <div class="input-group input-group-merge">
                                                         <span class="input-group-text">$</span>
                                                         <div class="form-floating form-floating-outline">
-                                                            <input type="number" id="discount_amount" name="discount_amount" @if(isset($invoice) &&
-                                                                isset($invoice->discount_amount)) value="{{ $invoice->discount_amount }}" @endif
+                                                            <input type="number" id="discount_amount" name="discount_amount"
                                                             class="form-control" placeholder="499"
                                                             aria-label="Amount (to the nearest dollar)">
                                                             <label>Discount Amount</label>
@@ -1291,8 +1327,8 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                             <div class="col-md-6 col-12 mb-6">
                                                 <div class="form-floating form-floating-outline">
                                                     <input type="text" class="form-control flatpickr-input active" name="invoice_due_date"
-                                                        @if(isset($invoice) && isset($invoice->invoice_due_date)) value="{{ $invoice->invoice_due_date }}"
-                                                    @endif
+                                                        {{-- @if(isset($invoice) && isset($invoice->invoice_due_date)) value="{{ $invoice->invoice_due_date }}"
+                                                    @endif --}}
                                                     placeholder="YYYY-MM-DD" id="flatpickr-date" readonly="readonly">
                                                     <label for="flatpickr-date">Invoice Due Date</label>
                                                 </div>
@@ -1301,9 +1337,9 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                 <div class="form-floating form-floating-outline">
                                                     <select id="invoice_freq" name="invoice_freq" class="select2 form-select" data-allow-clear="true">
                                                         <option value="">Please Select</option>
-                                                        @if(isset($invoice) && isset($invoice->invoice_frequency))
+                                                        {{-- @if(isset($invoice) && isset($invoice->invoice_frequency))
                                                         <option value="{{$invoice->invoice_frequency}}" selected>{{ $invoice->invoice_frequency }}</option>
-                                                        @endif
+                                                        @endif --}}
                                                         <option value="Monthly">Monthly</option>
                                                         <option value="Bi-annually">Bi-annually</option>
                                                         <option value="Annually">Annually</option>
@@ -1313,14 +1349,15 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                             </div>
                                             <div class="col-md-6 col-12 mb-6">
                                                 <div class="form-floating form-floating-outline">
-                                                    <input type="text" id="invoice_number" name="invoice_no" class="form-control" @php
+                                                    <input type="text" id="invoice_number" name="invoice_no" class="form-control"
+                                                     {{-- @php
                                                         $date=Carbon\Carbon::now()->format('M Y');
                                                     // dd($date);
                                                     @endphp
 
                                                     @if((isset($invoice)) && $invoice->month == $date)
                                                     @if(isset($invoice)) value="{{ $invoice->invoice_number }}" @endif
-                                                    @endif
+                                                    @endif --}}
                                                     placeholder="Invoice No." disabled/>
                                                     <label for="Keyword">Invoice No.</label>
                                                 </div>
@@ -1331,8 +1368,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                         <span class="input-group-text">$</span>
                                                         <div class="form-floating form-floating-outline">
                                                             <input type="number" id="invoice_amount" name="invoice_amount" class="form-control"
-                                                                placeholder="499" @if(isset($invoice) && isset($invoice->total_amount)) value="{{
-                                                            $invoice->total_amount }}" @endif
+                                                                placeholder="499"
                                                             aria-label="Amount (to the nearest dollar)" readonly>
                                                             <label>Invoice Amount </label>
                                                         </div>
@@ -1344,15 +1380,15 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                             <div class="col-md-12 text-right">
                                                 <div class="invoice-button d-flex " style="gap: 0px 20px;">
 
-                                                        <a id="view-invoice" @if (isset($invoice) && isset($invoice->invoice_number)) style="display: block !important;"  href="{{ route('front.invoiceView', $invoice->invoice_number) }}" @else style="display: none !important;" @endif  target="_blank" class="btn btn-success" style="color: #fff">View Invoice</a>
-                                                        <button id="genrate-invoice" @if (isset($invoice) && isset($invoice->invoice_number)) style="display: none !important;" @else style="display: block !important;" @endif  type="submit" class="btn btn-primary">Generate Invoice</button>
+                                                        {{-- <a id="view-invoice" @if (isset($invoice) && isset($invoice->invoice_number)) style="display: block !important;"  href="{{ route('front.invoiceView', $invoice->invoice_number) }}" @else style="display: none !important;" @endif  target="_blank" class="btn btn-success" style="color: #fff">View Invoice</a> --}}
+                                                        <button id="genrate-invoice"   type="submit" class="btn btn-primary">Generate Invoice</button>
 
                                                 </div>
                                             </div>
 
                                         </div>
                                     </form>
-                                    {{-- <div class="row py-4">
+                                    <div class="row py-4">
                                         <h4>Invoices</h4>
                                         <div class="col-md-12">
                                             <div class="table-responsive">
@@ -1386,7 +1422,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                 </table>
                                             </div>
                                         </div>
-                                    </div> --}}
+                                    </div>
                                 @endif
                                 <!-- /Invoice Form -->
                                 @if(isset($Payment_perm) && $Payment_perm->view == 1)
@@ -1409,7 +1445,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-floating form-floating-outline">
-                                                <select id="merchant" name="merchant" class="select2 form-select" data-allow-clear="true">
+                                                <select id="merchant_select" name="merchant" class="select2 form-select" data-allow-clear="true">
                                                     <option value="">Please Select</option>
                                                     @if(isset($mehchant) && count($mehchant) > 0)
                                                         @foreach ($mehchant as $item)
@@ -1548,10 +1584,524 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                     </div> --}}
                                 </div>
                             </div>
+                            <div id="refund-chargeback" class="content">
+                                <div class="content-header mb-3">
+                                    <h6 class="mb-0">Refund</h6>
+                                    <small>Client Refunds</small>
+                                </div>
+                                <div class="row g-4">
+                                    @if(isset($Saleinfo) && $Saleinfo->view == 1)
+                                    <div class="content-header mb-3">
+
+                                    </div>
+                                   <form id="refund_form" method="POST" action="{{ route('refund.store') }}">
+                                        @csrf
+                                        @if ($errors->any())
+                                        <div class="alert alert-danger">
+                                            <ul>
+                                                @foreach ($errors->all() as $error)
+                                                <li>{{ $error }}</li>
+                                                @endforeach
+                                            </ul>
+                                        </div>
+                                        @endif
+                                        <div id="successMessage" style="display:none;" class="alert alert-success"></div>
+                                        <div class="row g-4">
+                                            <input type="hidden" name="lead_id" value="{{ $lead->id }}">
+                                            <div class="col-md-6 select2-primary">
+                                                <div class="form-floating form-floating-outline">
+                                                    <select id="refund_type" name="refund_type" class="select2 form-select">
+                                                        <option value="">Select Refund Type</option>
+                                                        <option value="Full">Full</option>
+                                                        <option value="Partial">Partial</option>
+                                                    </select>
+                                                    <label for="multicol-closers">Select Refund Type</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 select2-primary">
+                                                <div class="form-floating form-floating-outline">
+                                                    <select id="select-invoice" name="invoice_id" class="select2 form-select">
+                                                        <option value="">Select Invoice</option>
+                                                        @if(isset($sale) && isset($sale->invoice))
+                                                        @foreach ($sale->invoice as $invoice)
+                                                        <option value="{{ $invoice->id }}">{{ $invoice->invoice_number }}</option>
+                                                        @endforeach
+                                                        @endif
+                                                    </select>
+                                                    <label for="select-invoice">Select Invoice</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-floating form-floating-outline">
+                                                    <div class="input-group input-group-merge">
+                                                        <span class="input-group-text">$</span>
+                                                        <div class="form-floating form-floating-outline">
+                                                            <input type="number" id="refund_amount" name="refund_amount" class="form-control"
+                                                                placeholder="499" aria-label="Amount (to the nearest dollar)">
+                                                            <label>Amount</label>
+                                                        </div>
+                                                        <span class="input-group-text">.00</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 col-12 mb-6">
+                                                <div class="form-floating form-floating-outline">
+                                                    <input type="text" class="form-control flatpickr-input active" name="claim_date"
+                                                        placeholder="YYYY-MM-DD" id="flatpickr-date" readonly="readonly">
+                                                    <label for="flatpickr-date">Claim Date</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-floating form-floating-outline">
+                                                    <select id="merchant" name="merchant_id" class="select2 form-select" data-allow-clear="true">
+                                                        <option value="">Please Select</option>
+                                                        @if(isset($mehchant) && count($mehchant) > 0)
+                                                        @foreach ($mehchant as $item)
+                                                        <option value="{{$item->id }}">{{ $item->name }}</option>
+                                                        @endforeach
+                                                        @endif
+                                                    </select>
+                                                    <label for="multicol-country">Select Merchant</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <div class="form-floating form-floating-outline">
+                                                    <input type="text" id="first-name" class="form-control" placeholder="John"
+                                                        value="{{ $lead->saler->name }}" disabled />
+                                                    <label for="first-name">Sale Rep</label>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-6 select2-primary">
+                                                <div class="form-floating form-floating-outline" @readonly(true) @disabled(true)>
+                                                    <span>Closers</span>
+                                                    <div class="d-flex ">
+                                                        @if(isset($lead->closers))
+                                                        @foreach ($lead->closers as $item)
+                                                        <span class="badge rounded-pill bg-primary p-2" style="margin: 5px 20px 0px 0px">{{
+                                                            $item->user->name }}</span>
+                                                        @endforeach
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 select2-primary">
+                                                <div class="form-floating form-floating-outline" @readonly(true) @disabled(true)>
+                                                    <span>Customer Support Representator</span>
+                                                    <div class="d-flex ">
+                                                        @if(isset($sale) && isset($sale->Customer_support))
+                                                        @foreach ($sale->Customer_support as $item)
+                                                        <span class="badge rounded-pill bg-primary p-2" style="margin: 5px 20px 0px 0px">{{
+                                                            $item->user->name }}</span>
+                                                        @endforeach
+
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-12">
+
+                                                <h5 class="card-header pb-3">Refund Reason</h5>
+                                                <div class="card-body">
+                                                        <textarea class="form-control" style="border-radius: 0px" name="refund_reason" id="full-editor"
+                                                            cols="30" rows="5"></textarea>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12 text-right m-auto py-3">
+                                                <button type="submit" class="btn btn-primary">Submit</button>
+                                            </div>
+
+                                        </div>
+                                    </form>
+                                 @endif
+                                    <div class="row py-4">
+                                        <h4>Refunds</h4>
+                                        <div class="col-md-12">
+                                            <div class="table-responsive">
+                                                <table id="refund_table" class="table table-striped">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Sr</th>
+                                                            <th>Invoice Number</th>
+                                                            <th>Refund Type</th>
+                                                            <th>Refund Amount</th>
+                                                            <th>Claim Date</th>
+                                                            <th>Merchant Account</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @if(isset($refunds) && count($refunds) > 0)
+                                                        @foreach ($refunds as $key=>$item)
+                                                        <tr>
+                                                            <td>{{ $key + 1 }}</td>
+                                                            <td>{{ $item->invoice->invoice_number }}</td>
+                                                            <td>{{ $item->refund_type }}</td>
+                                                            <td>{{ $item->refund_amount }}</td>
+                                                            <td>{{ $item->claim_date }}</td>
+                                                            <td>{{ $item->merchant->name }}</td>
+                                                        </tr>
+                                                        @endforeach
+                                                        @endif
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="content-header mb-3">
+                                        <h6 class="mb-0">ChargeBack</h6>
+                                        <small>Client ChargeBack</small>
+                                    </div>
+                                    <form id="chargeback_form" method="POST" action="{{ route('chargeback.store') }}">
+                                        @csrf
+                                        @if ($errors->any())
+                                        <div class="alert alert-danger">
+                                            <ul>
+                                                @foreach ($errors->all() as $error)
+                                                <li>{{ $error }}</li>
+                                                @endforeach
+                                            </ul>
+                                        </div>
+                                        @endif
+                                        <div id="successMessage" style="display:none;" class="alert alert-success"></div>
+                                        <div class="row g-4">
+                                            <input type="hidden" name="lead_id" value="{{ $lead->id }}">
+                                            <div class="col-md-6 select2-primary">
+                                                <div class="form-floating form-floating-outline">
+                                                    <select id="select-invoice-chargeback" name="invoice_id" class="select2 form-select">
+                                                        <option value="">Select Invoice</option>
+                                                        @if(isset($sale) && isset($sale->invoice))
+                                                        @foreach ($sale->invoice as $invoice)
+                                                        <option value="{{ $invoice->id }}">{{ $invoice->invoice_number }}</option>
+                                                        @endforeach
+                                                        @endif
+                                                    </select>
+                                                    <label for="select-invoice">Select Invoice</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 col-12 mb-6">
+                                                <div class="form-floating form-floating-outline">
+                                                    <input type="text" class="form-control flatpickr-input active" name="claim_date"
+                                                        placeholder="YYYY-MM-DD" id="flatpickr-date" readonly="readonly">
+                                                    <label for="flatpickr-date">Claim Date</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-floating form-floating-outline">
+                                                    <select id="merchant-chargeback" name="merchant_id" class="select2 form-select" data-allow-clear="true">
+                                                        <option value="">Please Select</option>
+                                                        @if(isset($mehchant) && count($mehchant) > 0)
+                                                        @foreach ($mehchant as $item)
+                                                        <option value="{{$item->id }}">{{ $item->name }}</option>
+                                                        @endforeach
+                                                        @endif
+                                                    </select>
+                                                    <label for="multicol-country">Select Merchant</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <div class="form-floating form-floating-outline">
+                                                    <input type="text" id="first-name" class="form-control" placeholder="John"
+                                                        value="{{ $lead->saler->name }}" disabled />
+                                                    <label for="first-name">Sale Rep</label>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-6 select2-primary">
+                                                <div class="form-floating form-floating-outline" @readonly(true) @disabled(true)>
+                                                    <span>Closers</span>
+                                                    <div class="d-flex ">
+                                                        @if(isset($lead->closers))
+                                                        @foreach ($lead->closers as $item)
+                                                        <span class="badge rounded-pill bg-primary p-2" style="margin: 5px 20px 0px 0px">{{
+                                                            $item->user->name }}</span>
+                                                        @endforeach
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 select2-primary">
+                                                <div class="form-floating form-floating-outline" @readonly(true) @disabled(true)>
+                                                    <span>Customer Support Representator</span>
+                                                    <div class="d-flex ">
+                                                        @if(isset($sale) && isset($sale->Customer_support))
+                                                        @foreach ($sale->Customer_support as $item)
+                                                        <span class="badge rounded-pill bg-primary p-2" style="margin: 5px 20px 0px 0px">{{
+                                                            $item->user->name }}</span>
+                                                        @endforeach
+
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-12">
+
+                                                <h5 class="card-header pb-3">ChargeBack Reason</h5>
+                                                <div class="card-body">
+                                                        <textarea class="form-control" style="border-radius: 0px" name="chargeBack_reason" id="full-editor"
+                                                            cols="30" rows="5"></textarea>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12 text-right m-auto py-3">
+                                                <button type="submit" class="btn btn-primary">Submit</button>
+                                            </div>
+
+                                        </div>
+                                    </form>
+                                    <div class="row py-4">
+                                        <h4>ChargeBack</h4>
+                                        <div class="col-md-12">
+                                            <div class="table-responsive">
+                                                <table id="chargeBack_table" class="table table-striped">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Sr</th>
+                                                            <th>Invoice Number</th>
+                                                            <th>Claim Date</th>
+                                                            <th>Merchant Account</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @if(isset($chargeBack) && count($chargeBack) > 0)
+                                                        @foreach ($chargeBack as $key=>$item)
+                                                        <tr>
+                                                            <td>{{ $key + 1 }}</td>
+                                                            <td>{{ $item->invoice->invoice_number }}</td>
+                                                            <td>{{ $item->claim_date }}</td>
+                                                            <td>{{ $item->merchant->name }}</td>
+                                                        </tr>
+                                                        @endforeach
+                                                        @endif
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 d-flex justify-content-between">
+                                        <a class="btn btn-outline-secondary btn-prev" style="color: #6d788d" disabled>
+                                            <i class="mdi mdi-arrow-left me-sm-1"></i>
+                                            <span class="align-middle d-sm-inline-block d-none">Previous</span>
+                                        </a>
+                                        <div class="last-buttons d-flex" style="gap: 20px;">
+                                            {{-- <button class="btn btn-outline-primary waves-effect" type="submit">Save</button> --}}
+                                            <a class="btn btn-primary btn-next" style="color: #fff">
+                                                <span class="align-middle d-sm-inline-block d-none me-sm-1">Next</span>
+                                                <i class="mdi mdi-arrow-right"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {{-- <div id="reports" class="content">
+                                <div class="content-header mb-3">
+                                    <h6 class="mb-0">Reports</h6>
+                                    <small>Reports</small>
+                                </div>
+                                <div class="row g-4">
+                                    <form id="report_create" method="POST" action="{{ route('clientReport.store') }}">
+                                        @csrf
+                                        @if ($errors->any())
+                                        <div class="alert alert-danger">
+                                            <ul>
+                                                @foreach ($errors->all() as $error)
+                                                <li>{{ $error }}</li>
+                                                @endforeach
+                                            </ul>
+                                        </div>
+                                        @endif
+                                        <div class="row g-4">
+                                            @if(isset($client))
+                                                <input type="hidden" name="client_id" value="{{ $client->id }}">
+                                            @endif
+                                            <div class="col-md-6 select2-primary">
+                                                <div class="form-floating form-floating-outline">
+                                                    <select id="select-report-type" name="report_type" class="select2 form-select">
+                                                        <option value="">Select Report Type</option>
+                                                        <option value="Landing Pages">Landing Pages</option>
+                                                        <option value="SMM">SMM</option>
+                                                        <option value="GMB">GMB</option>
+                                                        <option value="Website Development">Website Development</option>
+                                                        <option value="Other">Other</option>
+                                                    </select>
+                                                    <label for="select-invoice">Select Report Type</label>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-6 select2-primary">
+                                                <div class="form-floating form-floating-outline">
+                                                    <select id="select-created_by" name="created_by" class="select2 form-select">
+                                                        @auth
+                                                        <option value="{{ Auth::user()->name }}" selected @readonly(true)>{{ Auth::user()->name }}</option>
+                                                        @endauth
+
+
+                                                    </select>
+                                                    <label for="select-invoice">Select Created By</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 select2-primary">
+                                                <div class="form-floating form-floating-outline">
+                                                    <select id="select-verified_by" name="verified_by" class="select2 form-select">
+                                                        @auth
+                                                        <option value="{{ Auth::user()->name }}" selected @readonly(true)>{{ Auth::user()->name }}</option>
+                                                        @endauth
+
+
+                                                    </select>
+                                                    <label for="select-invoice">Select Verified By</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 select2-primary">
+                                                <div class="form-floating form-floating-outline">
+                                                    <select id="select-dispatched_by" name="despatched_by" class="select2 form-select">
+                                                        <option value="">Select Dispatched By</option>
+                                                        @foreach ($csr as $item)
+                                                            <option value="{{ $item->id }}">{{ $item->name }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                    <label for="select-invoice">Select Dispatched By</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-12">
+                                                <button class="btn btn-primary">
+                                                    <input type="file" name="report_file" id="" placeholder="Upload File" accept="application/pdf,application/doc,.doc, .docx,">
+                                                </button>
+                                            </div>
+                                            <div class="col-12">
+                                                <button class="btn btn-primary">
+                                                    <i class="fas fa-plus-circle me-2"></i>
+                                                    Add Report
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </form>
+
+                                    <div class="col-12 d-flex justify-content-between">
+                                        <a class="btn btn-outline-secondary btn-prev" style="color: #6d788d" disabled>
+                                            <i class="mdi mdi-arrow-left me-sm-1"></i>
+                                            <span class="align-middle d-sm-inline-block d-none">Previous</span>
+                                        </a>
+                                        <div class="last-buttons d-flex" style="gap: 20px;">
+                                            <a class="btn btn-primary btn-next" style="color: #fff">
+                                                <span class="align-middle d-sm-inline-block d-none me-sm-1">Next</span>
+                                                <i class="mdi mdi-arrow-right"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div> --}}
                     </div>
                 </div>
             </div>
             <!-- /Default Icons Wizard -->
+
+            <div class="col-xl-12 col-lg-5 col-md-5">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col-xl-6 col-md-6 col-sm-3 m-auto">
+                                <h3 style="margin-bottom: 0px">Comments</h3>
+                            </div>
+                            <div class="col-xl-6 col-md-6 col-sm-3 text-end">
+                                <button data-bs-target="#addRoleModal" data-bs-toggle="modal"
+                                    class="btn btn-primary mb-3 text-nowrap add-new-role">
+                                    Add Comment
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-datatable table-responsive">
+                      <table id="comment_table" class="datatable-project table" >
+                        <thead class="table-light">
+                          <tr>
+                            <th>sr#</th>
+                            <th>Stage</th>
+                            <th >Due Date</th>
+                            <th>Responsible</th>
+                            <th class="text-nowrap">Comment</th>
+                            <th>Created At</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($comments as $key=>$comment)
+                            <tr>
+                                <td>{{ $key++ }}</td>
+                                <td>{{ $comment->Stage }}</td>
+                                <td>{{ $comment->due_date }}</td>
+                                <td>{{ $comment->user->name }}</td>
+                                <td>{{ $comment->comment }}</td>
+                                <td>{{ \Carbon\Carbon::parse($comment->created_at)->format('Y-m-d') }}</td> <!-- Formatted date (no time) -->
+                            </tr>
+                            @endforeach
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+            </div>
+          </div>
+          <!--/ User Profile Content -->
+        </div>
+        <!-- / Content -->
+
+        <div class="modal fade" id="addRoleModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered modal-add-new-role">
+                <div class="modal-content p-3 p-md-5">
+                    <button type="button" class="btn-close btn-pinned" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <div class="modal-body p-md-0">
+                        <div class="text-center mb-4">
+                            <h3 class="role-title mb-2 pb-0">Add New Comment</h3>
+                            {{-- <p>Set role permissions</p> --}}
+                        </div>
+                        <!-- Add role form -->
+                        <form id="add_comment" class="row g-3" method="POST" action="{{ route('comment.store') }}">
+                            @csrf
+                            <input type="hidden" name="lead_id" value="{{ $lead->id }}">
+                            <div class="col-6 mb-4">
+                                <div class="form-floating form-floating-outline">
+                                    <select id="stages" name="stage" class="select2 form-select" data-allow-clear="true" >
+                                        <option value="">Please Select</option>
+                                        <option value="Lead">Lead</option>
+                                        <option value="Oppertuniry">Oppertuniry</option>
+                                        <option value="Pre-Sale">Pre-Sale</option>
+                                        <option value="Close-Sale">Close-Sale</option>
+                                        <option value="Active">Active</option>
+                                        <option value="Deactive">Deactive</option>
+                                        <option value="IT">IT</option>
+                                        <option value="Bug">Bug</option>
+                                        <option value="Query">Query</option>
+                                        <option value="Resolved">Resolved</option>
+                                    </select>
+                                    <label for="multicol-country">Stage</label>
+                                </div>
+                            </div>
+
+                            <div class="col-6 mb-4">
+                                <div class="form-floating form-floating-outline">
+                                    <input type="text" class="form-control flatpickr-input active" name="due_date"
+                                    placeholder="YYYY-MM-DD" id="flatpickr-date">
+                                    <label for="flatpickr-date">Due Date</label>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-floating form-floating-outline mb-6">
+                                    <textarea class="form-control h-px-100" id="full-editor" name="comment" placeholder="Comments here..." spellcheck="false"></textarea>
+                                    <label for="exampleFormControlTextarea1">Write Comment</label>
+                                  </div>
+                            </div>
+
+
+                            <div class="col-6 text-center">
+                                <button type="submit" class="btn btn-primary me-sm-3 me-1">Submit</button>
+                                <button type="reset" class="btn btn-outline-secondary" data-bs-dismiss="modal"
+                                    aria-label="Close">
+                                    Cancel
+                                </button>
+                            </div>
+                        </form>
+                        <!--/ Add role form -->
+                    </div>
+                </div>
+            </div>
+        </div>
 
 
             <div class="content-backdrop fade"></div>
@@ -1574,10 +2124,23 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/index.js"></script>
     <script src="{{ asset('assets/vendor/libs/bootstrap-datepicker/bootstrap-datepicker.js') }}"></script>
     <script src="{{ asset('assets/js/front-page-payment.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/quill/katex.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/quill/quill.js') }}"></script>
+
+    <!-- Main JS -->
+    <script src="{{ asset('assets/js/main.js') }}"></script>
+
+    <!-- Page JS -->
+    <script src="{{ asset('assets/js/forms-editors.js') }}"></script>
     {{-- <script src="{{ asset('assets/vendor/libs/bootstrap-daterangepicker/bootstrap-daterangepicker.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/jquery-timepicker/jquery-timepicker.js') }}"></script> --}}
     <script src="{{ asset('assets/vendor/libs/pickr/pickr.js') }}"></script>
     <script src="{{ asset('assets/js/forms-pickers.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/dropzone/dropzone.js') }}"></script>
+    <script src="{{ asset('assets/js/forms-file-upload.js') }}"></script>
+
+    <!-- Page JS -->
+    <script src="{{ asset('assets/js/forms-file-upload.js') }}"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/24.6.0/build/js/intlTelInput.min.js"
         integrity="sha512-/sRFlFRbcvObOo/SxW8pvmFZeMLvAF6hajRXeX15ekPgT4guXnfNSjLC98K/Tg2ObUgKX8vn9+Th5/mGHzZbEw=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -1812,7 +2375,6 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
             return true; // All validations passed
         }
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     {{-- <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10.10.1/dist/sweetalert2.all.min.js"></script> --}}
     <script src="{{ asset('assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js') }}"></script>
     <script src="{{ asset('assets/js/tables-datatables-advanced.js') }}"></script>
@@ -2848,8 +3410,8 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                         console.log(response);
                         var all_invoices = response.all_invoices;
                         var invoice = response.invoice;
-                        $('#genrate-invoice').attr('style', "display: none !important");
-                        $('#view-invoice').attr('style', "display: block !important; color: #fff !important");
+                        // $('#genrate-invoice').attr('style', "display: none !important");
+                        // $('#view-invoice').attr('style', "display: block !important; color: #fff !important");
                         $('#view-invoice').attr('href', "/front/invoice/"+ invoice.invoice_number +  "");
                         $('#invoice_number').val(invoice.invoice_number);
 
@@ -2864,23 +3426,23 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
 
 
 
-                    // var invoice = response.invoice;
+                    var invoice = response.all_invoices;
                     // console.log(invoice);
 
-                    // var table_content = ''
-                    // invoice.forEach(function(invoice, index) {
-                    //         tableContent += '<tr>\
-                    //             <td>' + (index + 1) + '</td>\
-                    //             <td>' + invoice.invoice_number + '</td>\
-                    //             <td>' + invoice.month + '</td>\
-                    //             <td>' + invoice.activation_date + '</td>\
-                    //             <td>' + invoice.invoice_due_date + '</td>\
-                    //             <td>' + invoice.amount + '</td>\
-                    //         </tr>';
-                    //     });
+                    var table_content = ''
+                    invoice.forEach(function(invoice, index) {
+                        table_content += '<tr>\
+                                <td>' + (index + 1) + '</td>\
+                                <td>' + invoice.invoice_number + '</td>\
+                                <td>' + invoice.month + '</td>\
+                                <td>' + invoice.activation_date + '</td>\
+                                <td>' + invoice.invoice_due_date + '</td>\
+                                <td>' + invoice.total_amount + '</td>\
+                            </tr>';
+                        });
 
-                    //     // Clear the table first and then append the new rows
-                    //     $('#invoice_table_gen tbody').empty().append(tableContent);
+                        // Clear the table first and then append the new rows
+                        $('#invoice_table_gen tbody').empty().append(table_content);
 
 
 
@@ -2942,7 +3504,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
 
 
                         // Optionally reset the form only on success
-                        // $('#saleForm')[0].reset();
+                         $('#add_service_charge')[0].reset();
                         // This will reset the form fields
                     },
                     error: function (xhr) {
@@ -3251,7 +3813,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
 
 
                         // Optionally reset the form only on success
-                        // $('#make_payment')[0].reset();
+                        $('#make_payment')[0].reset();
                         // This will reset the form fields
                     },
                     error: function (xhr) {
@@ -3296,7 +3858,477 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
         });
     </script>
 
+<script>
+    $(document).ready(function () {
+        $('#add_comment').on('submit', function (e) {
+            e.preventDefault(); // Prevent the default form submission
 
+            // Store current form values before submission, particularly time and select elements
+
+            // Create a FormData object to handle form data
+            let formData = new FormData(this);
+
+            // Clear previous error messages
+
+            $.ajax({
+                url: $(this).attr('action'), // Form action URL
+                type: $(this).attr('method'), // POST method
+                data: formData,
+                processData: false, // Important: do not process the data
+                contentType: false, // Important: content type is false
+                success: function (response) {
+
+
+                    var comments = response.comments;
+                    // console.log(invoice);
+
+                    var table_content = ''
+                    comments.forEach(function(comments, index) {
+                        var createdAtDate = new Date(comments.created_at);
+                        // Format the date to 'YYYY-MM-DD' (no time)
+                        var formattedDate = createdAtDate.toISOString().split('T')[0]; // Extract date in 'YYYY-MM-DD' format
+
+                        table_content += '<tr>\
+                                <td>' + (index + 1) + '</td>\
+                                <td>' + comments.Stage + '</td>\
+                                <td>' + comments.due_date + '</td>\
+                                <td>' + comments.user.name + '</td>\
+                                <td>' + comments.comment + '</td>\
+                                <td>' + formattedDate + '</td>\
+                            </tr>';
+                        });
+
+                        // Clear the table first and then append the new rows
+                        $('#comment_table tbody').empty().append(table_content);
+
+                        $('#addRoleModal').modal('hide');
+
+
+
+
+                    // $('#keyword_table').append(row);
+                    // $('#keyword').val('');
+                    // $('areas_dropdown').val(response.area ? response.area.id : '');  // Ensure the dropdown is set or left blank if area is null
+
+
+
+
+
+                    // Handle success response (display success message using SweetAlert2)
+                    Swal.fire({
+                        position: 'top-end',
+                        icon: 'success',
+                        title: 'Success',
+                        text: response.message,
+                       showConfirmButton: false, // Remove the confirm button
+                        timer: 1500, // Duration in milliseconds before the toast disappears
+                        toast: true,
+                        showConfirmButton: false
+                    });
+
+
+                    // Optionally reset the form only on success
+                    // $('#keywordadd')[0].reset();
+                    // This will reset the form fields
+                },
+                error: function (xhr) {
+                    // Handle validation errors
+                    let errors = xhr.responseJSON.errors;
+                    if (errors) {
+                        let errorHtml = '<div class="alert alert-danger"><ul>';
+                        $.each(errors, function (key, value) {
+                            errorHtml += '<li>' + value + '</li>';
+                        });
+                        errorHtml += '</ul></div>';
+                        $('#saleForm').prepend(errorHtml); // Add errors to the form
+
+                        // Display SweetAlert2 for validation errors
+                        Swal.fire({
+                            position: 'top-end',
+                            icon: 'error',
+                            title: 'Validation Error',
+                            html: errorHtml, // Use the generated error HTML
+                            showConfirmButton: false, // Remove the confirm button
+                            timer: 1500, // Duration in milliseconds before the toast disappears
+                            toast: true,
+                        });
+                    }
+                    else if (xhr.responseJSON.error) {
+                        // Show custom error message with SweetAlert2
+                        Swal.fire({
+                            position: 'top-end',
+                            icon: 'error',
+                            title: 'Error',
+                            text: xhr.responseJSON.error, // Show the custom error message
+                            showConfirmButton: false, // Remove the confirm button
+                            timer: 1500, // Duration in milliseconds before the toast disappears
+                            toast: true,
+                        });
+                    }
+
+                    // Restore time input and select values after error
+                }
+            });
+        });
+    });
+</script>
+
+{{-- Refund --}}
+
+<script>
+    $(document).ready(function () {
+        $('#select-invoice').change(function (e) {
+            e.preventDefault();
+            let invoice_id = $(this).val();
+            let refund_type = $('#refund_type').val();
+            console.log(refund_type);
+
+            if(refund_type == "")
+            {
+                Swal.fire({
+                    position: 'top-end',
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Refund type is required.',
+                    showConfirmButton: false, // Remove the confirm button
+                    timer: 1500, // Duration in milliseconds before the toast disappears
+                    toast: true,
+                });
+                return false;
+            }
+            else{
+                $.ajax({
+                    type: "GET",
+                    url: "{{ route('front.getRefund') }}",
+                    data: {invoice_id: invoice_id, refund_type: refund_type},
+                    success: function (response) {
+                        var total = response.invoice.total_amount;
+                        if(refund_type == "Full"){
+                            $('#refund_amount').val(total);
+                            $('#refund_amount').attr('readonly', 'true');
+                        }
+                        else{
+                            $('#refund_amount').val(total);
+                            // $('#refund_amount').attr('disabled', 'false');
+                            $('#refund_amount').removeAttr('readonly');
+                        }
+                    }
+                });
+            }
+
+        });
+    });
+</script>
+
+
+
+
+<script>
+    $(document).ready(function () {
+        $('#refund_form').on('submit', function (e) {
+            e.preventDefault(); // Prevent the default form submission
+
+            // Store current form values before submission, particularly time and select elements
+
+
+            // Create a FormData object to handle form data
+            let formData = new FormData(this);
+
+            // Clear previous error messages
+
+            $.ajax({
+                url: $(this).attr('action'), // Form action URL
+                type: $(this).attr('method'), // POST method
+                data: formData,
+                processData: false, // Important: do not process the data
+                contentType: false, // Important: content type is false
+                success: function (response) {
+
+                    var refunds = response.refunds;
+                    var table_content = ''
+                    refunds.forEach(function(refund, index) {
+                        table_content += '<tr>\
+                                <td>' + (index + 1) + '</td>\
+                                <td>' + refund.invoice.invoice_number + '</td>\
+                                <td>' + refund.refund_type + '</td>\
+                                <td>' + refund.refund_amount+ '</td>\
+                                <td>' + refund.claim_date + '</td>\
+                                <td>' + refund.merchant.name + '</td>\
+                            </tr>';
+                        });
+                        // Clear the table first and then append the new rows
+                        $('#refund_table tbody').empty().append(table_content);
+
+
+
+
+
+                    // Handle success response (display success message using SweetAlert2)
+                    Swal.fire({
+                        position: 'top-end',
+                        icon: 'success',
+                        title: 'Success',
+                        text: response.message,
+                        showConfirmButton: false, // Remove the confirm button
+                        timer: 1500, // Duration in milliseconds before the toast disappears
+                        toast: true,
+                        showConfirmButton: false
+                    });
+
+
+                    // Optionally reset the form only on success
+                    $('#refund_form')[0].reset();
+                    // This will reset the form fields
+                },
+                error: function (xhr) {
+                    // Handle validation errors
+                    let errors = xhr.responseJSON.errors;
+                    if (errors) {
+                        let errorHtml = '<div class="alert alert-danger"><ul>';
+                        $.each(errors, function (key, value) {
+                            errorHtml += '<li>' + value + '</li>';
+                        });
+                        errorHtml += '</ul></div>';
+                        $('#service_area').prepend(errorHtml); // Add errors to the form
+
+                        // Display SweetAlert2 for validation errors
+                        Swal.fire({
+                            position: 'top-end',
+                            icon: 'error',
+                            title: 'Validation Error',
+                            html: errorHtml, // Use the generated error HTML
+                            showConfirmButton: false, // Remove the confirm button
+                            timer: 1500, // Duration in milliseconds before the toast disappears
+                            toast: true,
+                        });
+                    }
+                    else if (xhr.responseJSON.error) {
+                        // Show custom error message with SweetAlert2
+                        Swal.fire({
+                            position: 'top-end',
+                            icon: 'error',
+                            title: 'Error',
+                            text: xhr.responseJSON.error, // Show the custom error message
+                            showConfirmButton: false, // Remove the confirm button
+                            timer: 1500, // Duration in milliseconds before the toast disappears
+                            toast: true,
+                        });
+                    }
+
+                    // Restore time input and select values after error
+                }
+            });
+        });
+    });
+</script>
+{{-- End Refund --}}
+
+{{-- Charge Back --}}
+
+<script>
+    $(document).ready(function () {
+        $('#chargeback_form').on('submit', function (e) {
+            e.preventDefault(); // Prevent the default form submission
+
+            // Store current form values before submission, particularly time and select elements
+
+
+            // Create a FormData object to handle form data
+            let formData = new FormData(this);
+
+            // Clear previous error messages
+
+            $.ajax({
+                url: $(this).attr('action'), // Form action URL
+                type: $(this).attr('method'), // POST method
+                data: formData,
+                processData: false, // Important: do not process the data
+                contentType: false, // Important: content type is false
+                success: function (response) {
+
+                    console.log(response);
+
+                    var chargeBack = response.chargeBack;
+                    var table_content = ''
+                    chargeBack.forEach(function(chargeback, index) {
+                        table_content += '<tr>\
+                                <td>' + (index + 1) + '</td>\
+                                <td>' + chargeback.invoice.invoice_number + '</td>\
+                                <td>' + chargeback.claim_date + '</td>\
+                                <td>' + chargeback.merchant.name + '</td>\
+                            </tr>';
+                        });
+                        // Clear the table first and then append the new rows
+                        $('#chargeBack_table tbody').empty().append(table_content);
+
+
+
+
+
+                    // Handle success response (display success message using SweetAlert2)
+                    Swal.fire({
+                        position: 'top-end',
+                        icon: 'success',
+                        title: 'Success',
+                        text: response.message,
+                        showConfirmButton: false, // Remove the confirm button
+                        timer: 1500, // Duration in milliseconds before the toast disappears
+                        toast: true,
+                        showConfirmButton: false
+                    });
+
+
+                    // Optionally reset the form only on success
+                    $('#refund_form')[0].reset();
+                    // This will reset the form fields
+                },
+                error: function (xhr) {
+                    // Handle validation errors
+                    let errors = xhr.responseJSON.errors;
+                    if (errors) {
+                        let errorHtml = '<div class="alert alert-danger"><ul>';
+                        $.each(errors, function (key, value) {
+                            errorHtml += '<li>' + value + '</li>';
+                        });
+                        errorHtml += '</ul></div>';
+                        $('#service_area').prepend(errorHtml); // Add errors to the form
+
+                        // Display SweetAlert2 for validation errors
+                        Swal.fire({
+                            position: 'top-end',
+                            icon: 'error',
+                            title: 'Validation Error',
+                            html: errorHtml, // Use the generated error HTML
+                            showConfirmButton: false, // Remove the confirm button
+                            timer: 1500, // Duration in milliseconds before the toast disappears
+                            toast: true,
+                        });
+                    }
+                    else if (xhr.responseJSON.error) {
+                        // Show custom error message with SweetAlert2
+                        Swal.fire({
+                            position: 'top-end',
+                            icon: 'error',
+                            title: 'Error',
+                            text: xhr.responseJSON.error, // Show the custom error message
+                            showConfirmButton: false, // Remove the confirm button
+                            timer: 1500, // Duration in milliseconds before the toast disappears
+                            toast: true,
+                        });
+                    }
+
+                    // Restore time input and select values after error
+                }
+            });
+        });
+    });
+</script>
+
+
+{{-- End Charge Back --}}
+
+{{-- Report --}}
+
+<script>
+    $(document).ready(function () {
+        $('#report_create').on('submit', function (e) {
+            e.preventDefault(); // Prevent the default form submission
+
+            // Store current form values before submission, particularly time and select elements
+
+
+            // Create a FormData object to handle form data
+            let formData = new FormData(this);
+
+            // Clear previous error messages
+
+            $.ajax({
+                url: $(this).attr('action'), // Form action URL
+                type: $(this).attr('method'), // POST method
+                data: formData,
+                processData: false, // Important: do not process the data
+                contentType: false, // Important: content type is false
+                success: function (response) {
+
+                    console.log(response);
+
+                    // var chargeBack = response.chargeBack;
+                    // var table_content = ''
+                    // chargeBack.forEach(function(chargeback, index) {
+                    //     table_content += '<tr>\
+                    //             <td>' + (index + 1) + '</td>\
+                    //             <td>' + chargeback.invoice.invoice_number + '</td>\
+                    //             <td>' + chargeback.claim_date + '</td>\
+                    //             <td>' + chargeback.merchant.name + '</td>\
+                    //         </tr>';
+                    //     });
+                    //     // Clear the table first and then append the new rows
+                    //     $('#chargeBack_table tbody').empty().append(table_content);
+
+
+
+
+
+                    // Handle success response (display success message using SweetAlert2)
+                    Swal.fire({
+                        position: 'top-end',
+                        icon: 'success',
+                        title: 'Success',
+                        text: response.message,
+                        showConfirmButton: false, // Remove the confirm button
+                        timer: 1500, // Duration in milliseconds before the toast disappears
+                        toast: true,
+                        showConfirmButton: false
+                    });
+
+
+                    // Optionally reset the form only on success
+                    $('#refund_form')[0].reset();
+                    // This will reset the form fields
+                },
+                error: function (xhr) {
+                    // Handle validation errors
+                    let errors = xhr.responseJSON.errors;
+                    if (errors) {
+                        let errorHtml = '<div class="alert alert-danger"><ul>';
+                        $.each(errors, function (key, value) {
+                            errorHtml += '<li>' + value + '</li>';
+                        });
+                        errorHtml += '</ul></div>';
+                        $('#service_area').prepend(errorHtml); // Add errors to the form
+
+                        // Display SweetAlert2 for validation errors
+                        Swal.fire({
+                            position: 'top-end',
+                            icon: 'error',
+                            title: 'Validation Error',
+                            html: errorHtml, // Use the generated error HTML
+                            showConfirmButton: false, // Remove the confirm button
+                            timer: 1500, // Duration in milliseconds before the toast disappears
+                            toast: true,
+                        });
+                    }
+                    else if (xhr.responseJSON.error) {
+                        // Show custom error message with SweetAlert2
+                        Swal.fire({
+                            position: 'top-end',
+                            icon: 'error',
+                            title: 'Error',
+                            text: xhr.responseJSON.error, // Show the custom error message
+                            showConfirmButton: false, // Remove the confirm button
+                            timer: 1500, // Duration in milliseconds before the toast disappears
+                            toast: true,
+                        });
+                    }
+
+                    // Restore time input and select values after error
+                }
+            });
+        });
+    });
+</script>
+
+{{-- End Report --}}
 @endsection
 
 

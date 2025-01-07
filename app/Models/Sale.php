@@ -55,4 +55,5 @@ class Sale extends Model
     public function invoice(){
         return $this->hasMany(Invoice::class,'sale_id');
     }
+
 }

@@ -1,6 +1,14 @@
 @extends('layouts.dashboard')
 @section('css')
 <link rel="stylesheet" href="{{ asset('assets/vendor/css/pages/page-profile.css') }}" />
+<link rel="stylesheet" href="{{ asset('assets/vendor/libs/bootstrap-datepicker/bootstrap-datepicker.css') }}" />
+<link rel="stylesheet" href="{{ asset('assets/vendor/libs/flatpickr/flatpickr.css') }}" />
+<link rel="stylesheet" href="{{ asset('assets/vendor/libs/bootstrap-datepicker/bootstrap-datepicker.css') }}" />
+<link rel="stylesheet" href="{{ asset('assets/vendor/libs/typeahead-js/typeahead.css') }}" />
+<link rel="stylesheet" href="{{ asset('assets/vendor/libs/quill/typography.css') }}" />
+<link rel="stylesheet" href="{{ asset('assets/vendor/libs/quill/katex.css') }}" />
+<link rel="stylesheet" href="{{ asset('assets/vendor/libs/quill/editor.css') }}" />
+
 @endsection
 @section('content')
           <!-- Content wrapper -->
@@ -42,7 +50,7 @@
                               </li>
                               @endif
 
-                             @if (isset($sale ->lead->client_address) )
+                             @if (isset($sale->lead->client_address) )
                                  <li class="list-inline-item">
                                 <i class="mdi mdi-map-marker-outline me-1 mdi-20px text-primary"></i>
                                     <span class="fw-medium">{{ $sale->lead->client_address }}</span>
@@ -166,8 +174,6 @@
                                 </li>
                             @endforeach
                         @endif
-
-
                       </ul>
                     </div>
                   </div>
@@ -276,7 +282,9 @@
                                           </div>
                                         <div class="me-2">
                                           <h6 class="mb-0">{{ $keywords->keyword }}</h6>
-                                          <small>{{ $keywords->area->country }}, {{ $keywords->area->state }}, {{ $keywords->area->city }}</small>
+                                          @if(isset($keywords->area))
+                                            <small>{{ $keywords->area->country }}, {{ $keywords->area->state }}, {{ $keywords->area->city }}</small>
+                                          @endif
                                         </div>
                                       </div>
                                     </div>
@@ -337,7 +345,6 @@
                     </div>
                     <!--/ Teams -->
                   </div>
-
                   {{-- <p>{{ $sale->invoice }}</p> --}}
                   @if(isset($sale->invoice))
 
@@ -347,7 +354,6 @@
                       <table class="datatable-project table">
                         <thead class="table-light">
                           <tr>
-
                             <th>sr#</th>
                             <th>Invoice No.</th>
                             <th class="text-nowrap">Invoice Month</th>
@@ -365,25 +371,253 @@
                                 <td>{{ $item->invoice_due_date }}</td>
                             </tr>
                             @endforeach
-
                         </tbody>
-
                       </table>
                     </div>
                   </div>
                   <!--/ Projects table -->
-
                   @endif
+                </div>
+              </div>
+              <div class="row">
 
+                <div class="col-xl-12 col-lg-5 col-md-5">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <div class="row">
+                                <div class="col-xl-6 col-md-6 col-sm-3 m-auto">
+                                    <h3 style="margin-bottom: 0px">Comments</h3>
+                                </div>
+                                <div class="col-xl-6 col-md-6 col-sm-3 text-end">
+                                    <button data-bs-target="#addRoleModal" data-bs-toggle="modal"
+                                        class="btn btn-primary mb-3 text-nowrap add-new-role">
+                                        Add Comment
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-datatable table-responsive">
+                          <table id="comment_table" class="datatable-project table" >
+                            <thead class="table-light">
+                              <tr>
+                                <th>sr#</th>
+                                <th>Stage</th>
+                                <th >Due Date</th>
+                                <th>Responsible</th>
+                                <th class="text-nowrap">Comment</th>
+                                <th>Created At</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($comments as $key=>$comment)
+                                <tr>
+                                    <td>{{ $key++ }}</td>
+                                    <td>{{ $comment->Stage }}</td>
+                                    <td>{{ $comment->due_date }}</td>
+                                    <td>{{ $comment->user->name }}</td>
+                                    <td>{{ $comment->comment }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($comment->created_at)->format('Y-m-d') }}</td> <!-- Formatted date (no time) -->
+                                </tr>
+                                @endforeach
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
                 </div>
               </div>
               <!--/ User Profile Content -->
             </div>
             <!-- / Content -->
 
+            <div class="modal fade" id="addRoleModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-centered modal-add-new-role">
+                    <div class="modal-content p-3 p-md-5">
+                        <button type="button" class="btn-close btn-pinned" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <div class="modal-body p-md-0">
+                            <div class="text-center mb-4">
+                                <h3 class="role-title mb-2 pb-0">Add New Comment</h3>
+                                {{-- <p>Set role permissions</p> --}}
+                            </div>
+                            <!-- Add role form -->
+                            <form id="add_comment" class="row g-3" method="POST" action="{{ route('comment.store') }}">
+                                @csrf
+                                <input type="hidden" name="lead_id" value="{{ $sale->lead_id }}">
+                                <div class="col-6 mb-4">
+                                    <div class="form-floating form-floating-outline">
+                                        <select id="stages" name="stage" class="select2 form-select" data-allow-clear="true" >
+                                            <option value="">Please Select</option>
+                                            <option value="Lead">Lead</option>
+                                            <option value="Oppertuniry">Oppertuniry</option>
+                                            <option value="Pre-Sale">Pre-Sale</option>
+                                            <option value="Close-Sale">Close-Sale</option>
+                                            <option value="Active">Active</option>
+                                            <option value="Deactive">Deactive</option>
+                                            <option value="IT">IT</option>
+                                            <option value="Bug">Bug</option>
+                                            <option value="Query">Query</option>
+                                            <option value="Resolved">Resolved</option>
+                                        </select>
+                                        <label for="multicol-country">Stage</label>
+                                    </div>
+                                </div>
 
+                                <div class="col-6 mb-4">
+                                    <div class="form-floating form-floating-outline">
+                                        <input type="text" class="form-control flatpickr-input active" name="due_date"
+                                        placeholder="YYYY-MM-DD" id="flatpickr-date">
+                                        <label for="flatpickr-date">Due Date</label>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="form-floating form-floating-outline mb-6">
+                                        <textarea class="form-control h-px-100" id="full-editor" name="comment" placeholder="Comments here..." spellcheck="false"></textarea>
+                                        <label for="exampleFormControlTextarea1">Write Comment</label>
+                                      </div>
+                                </div>
+
+
+                                <div class="col-6 text-center">
+                                    <button type="submit" class="btn btn-primary me-sm-3 me-1">Submit</button>
+                                    <button type="reset" class="btn btn-outline-secondary" data-bs-dismiss="modal"
+                                        aria-label="Close">
+                                        Cancel
+                                    </button>
+                                </div>
+                            </form>
+                            <!--/ Add role form -->
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <div class="content-backdrop fade"></div>
           </div>
           <!-- Content wrapper -->
+@endsection
+@section('js')
+<script src="{{ asset('assets/vendor/libs/flatpickr/flatpickr.js') }}"></script>
+<script src="{{ asset('assets/vendor/libs/bootstrap-datepicker/bootstrap-datepicker.js') }}"></script>
+<script src="{{ asset('assets/vendor/libs/quill/katex.js') }}"></script>
+<script src="{{ asset('assets/vendor/libs/quill/quill.js') }}"></script>
+<script>
+    const threeDaysAgo = new Date();
+        threeDaysAgo.setDate(threeDaysAgo.getDate() - 0);
+        // Initialize Flatpickr
+        flatpickr("#flatpickr-date", {
+            minDate: threeDaysAgo // Set minimum date to 3 days ago
+        });
+</script>
+
+<script>
+    $(document).ready(function () {
+        $('#add_comment').on('submit', function (e) {
+            e.preventDefault(); // Prevent the default form submission
+
+            // Store current form values before submission, particularly time and select elements
+
+            // Create a FormData object to handle form data
+            let formData = new FormData(this);
+
+            // Clear previous error messages
+
+            $.ajax({
+                url: $(this).attr('action'), // Form action URL
+                type: $(this).attr('method'), // POST method
+                data: formData,
+                processData: false, // Important: do not process the data
+                contentType: false, // Important: content type is false
+                success: function (response) {
+
+
+                    var comments = response.comments;
+                    // console.log(invoice);
+
+                    var table_content = ''
+                    comments.forEach(function(comments, index) {
+                        var createdAtDate = new Date(comments.created_at);
+                        // Format the date to 'YYYY-MM-DD' (no time)
+                        var formattedDate = createdAtDate.toISOString().split('T')[0]; // Extract date in 'YYYY-MM-DD' format
+
+                        table_content += '<tr>\
+                                <td>' + (index + 1) + '</td>\
+                                <td>' + comments.Stage + '</td>\
+                                <td>' + comments.due_date + '</td>\
+                                <td>' + comments.user.name + '</td>\
+                                <td>' + comments.comment + '</td>\
+                                <td>' + formattedDate + '</td>\
+                            </tr>';
+                        });
+
+                        // Clear the table first and then append the new rows
+                        $('#comment_table tbody').empty().append(table_content);
+
+
+
+
+                    // $('#keyword_table').append(row);
+                    // $('#keyword').val('');
+                    // $('areas_dropdown').val(response.area ? response.area.id : '');  // Ensure the dropdown is set or left blank if area is null
+
+
+
+
+
+                    // Handle success response (display success message using SweetAlert2)
+                    Swal.fire({
+                        position: 'top-end',
+                        icon: 'success',
+                        title: 'Success',
+                        text: response.message,
+                       showConfirmButton: false, // Remove the confirm button
+                        timer: 1500, // Duration in milliseconds before the toast disappears
+                        toast: true,
+                        showConfirmButton: false
+                    });
+
+
+                    // Optionally reset the form only on success
+                    // $('#keywordadd')[0].reset();
+                    // This will reset the form fields
+                },
+                error: function (xhr) {
+                    // Handle validation errors
+                    let errors = xhr.responseJSON.errors;
+                    if (errors) {
+                        let errorHtml = '<div class="alert alert-danger"><ul>';
+                        $.each(errors, function (key, value) {
+                            errorHtml += '<li>' + value + '</li>';
+                        });
+                        errorHtml += '</ul></div>';
+                        $('#saleForm').prepend(errorHtml); // Add errors to the form
+
+                        // Display SweetAlert2 for validation errors
+                        Swal.fire({
+                            position: 'top-end',
+                            icon: 'error',
+                            title: 'Validation Error',
+                            html: errorHtml, // Use the generated error HTML
+                            showConfirmButton: false, // Remove the confirm button
+                            timer: 1500, // Duration in milliseconds before the toast disappears
+                            toast: true,
+                        });
+                    }
+                    else if (xhr.responseJSON.error) {
+                        // Show custom error message with SweetAlert2
+                        Swal.fire({
+                            position: 'top-end',
+                            icon: 'error',
+                            title: 'Error',
+                            text: xhr.responseJSON.error, // Show the custom error message
+                            showConfirmButton: false, // Remove the confirm button
+                            timer: 1500, // Duration in milliseconds before the toast disappears
+                            toast: true,
+                        });
+                    }
+
+                    // Restore time input and select values after error
+                }
+            });
+        });
+    });
+</script>
 @endsection

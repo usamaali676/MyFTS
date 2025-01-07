@@ -3,13 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Models\BusinessHours;
+use App\Models\ChargeBack;
+use App\Models\Client;
 use App\Models\ClientServices;
+use App\Models\Comments;
 use App\Models\CompanyServices;
 use App\Models\Invoice;
 use App\Models\Lead;
 use App\Models\LeadCloser;
 use App\Models\MerchantAccount;
 use App\Models\Payment;
+use App\Models\Refund;
 use App\Models\Role;
 use App\Models\Sale;
 use App\Models\SaleCS;
@@ -56,6 +60,10 @@ class SaleController extends Controller
         $csr = User::where('role_id', $csrole->id)->get();
         $sale = Sale::where('lead_id', $lead->id)->first();
         $mehchant = MerchantAccount::all();
+        $comments = Comments::where('lead_id', $lead->id)->orderby('id', 'DESC')->get();
+        $refunds = Refund::where('lead_id', '=', $lead->id)->get();
+        $chargeBack = ChargeBack::where('lead_id', '=', $lead->id)->get();
+
 
 
         // dd($sale->social_links);
@@ -63,6 +71,8 @@ class SaleController extends Controller
 
         $company_services = CompanyServices::all();
         if (isset($sale)) {
+            $client = Client::where('sale_id', $sale->id)->first();
+            // dd($client);
             // $lastMonthName = Carbon::now()->subMonth()->format('F');
             // dd($lastMonthName);
             $lastMonthName = Carbon::now()->format('M Y');
@@ -81,9 +91,9 @@ class SaleController extends Controller
                 $clientService->setRelation('companyServicesForSale', $clientService->companyServicesForSale($sale->id)->get());
                 return $clientService;
             });
-            return view('pages.sale.create', compact('lead', 'client_enum', 'call_enum', 'social_links', 'closers', 'sale', 'company_services', 'client_services', 'invoice', 'mehchant' , 'all_invoices', 'payments', 'csr'));
+            return view('pages.sale.create', compact('lead', 'client_enum', 'call_enum', 'social_links', 'closers', 'sale', 'company_services', 'client_services', 'invoice', 'mehchant' , 'all_invoices', 'payments', 'csr', 'comments','refunds','chargeBack','client'));
         } else {
-            return view('pages.sale.create', compact('lead', 'client_enum', 'call_enum', 'social_links', 'closers', 'sale', 'company_services', 'mehchant', 'csr'));
+            return view('pages.sale.create', compact('lead', 'client_enum', 'call_enum', 'social_links', 'closers', 'sale', 'company_services', 'mehchant', 'csr', 'comments','refunds', 'chargeBack'));
         }
 
 
@@ -303,7 +313,8 @@ class SaleController extends Controller
     public function show($id)
     {
         $sale = Sale::find($id);
-        return view('pages.sale.view', compact('sale'));
+        $comments = Comments::where('lead_id', $sale->lead_id)->orderby('id', 'DESC')->get();
+        return view('pages.sale.view', compact('sale', 'comments'));
     }
 
     /**

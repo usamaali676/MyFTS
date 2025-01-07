@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\BusinessCategory;
+use App\Models\Comments;
 use App\Models\CompanyServices;
 use App\Models\CompanyServicesLead;
 use App\Models\Lead;
@@ -18,8 +19,10 @@ use Illuminate\Support\Facades\Auth;
 use RealRashid\SweetAlert\Facades\Alert;
 
 
+
 class LeadController extends Controller
 {
+
     /**
      * Display a listing of the resource.
      */
@@ -127,8 +130,9 @@ class LeadController extends Controller
         $related_subcategories = SubCategory::where('business_category_id',  $lead->category_id)
         ->whereNotIn('id', $sub_categories_id)
         ->get();
+        $comments = Comments::where('lead_id', $lead->id)->orderby('id', 'DESC')->get();
         // dd($lead->closers);
-        return view('pages.lead.edit', compact('lead', 'sub_categories', 'categories','related_subcategories', 'closers', 'company_services', 'selected_company_services' ));
+        return view('pages.lead.edit', compact('lead', 'sub_categories', 'categories','related_subcategories', 'closers', 'company_services', 'selected_company_services', 'comments' ));
     }
 
     /**

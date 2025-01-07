@@ -79,9 +79,9 @@ class InvoiceServiceChargesController extends Controller
             'invoice_due_date' => 'required',
         ]);
         $sale = Sale::find($request->sale_id6);
-        $unique_id = 'FTS'. '_' . Str::random(5) . '_' . time();
+        $unique_id =  Str::random(5) . '_' . time();
         $date = Carbon::now(); // or any other Carbon instance
-        $monthName = $date->format('M Y');
+        // $monthName = $date->format('M Y');
         // dd($monthName);
         $year = $date->format('Y');
         // $company_service = CompanyServices::where('id', $request->company_service_charge)->first();
@@ -99,22 +99,22 @@ class InvoiceServiceChargesController extends Controller
             $complementary = 0;
             $charge_price = $request->amount;
         }
-        $invoice = Invoice::where('sale_id', $request->sale_id6)->where('month', $monthName)->first();
+        // $invoice = Invoice::where('sale_id', $request->sale_id6)->where('month', $monthName)->first();
         // dd($invoice);
-        if(isset($invoice)){
-            $invoice->update([
-               'invoice_active_status' => $request->invoice_status? 1 : 0,
-                'activation_date' => $request->activation_date,
-                'discount_type' => $request->discount_type,
-                'discount_amount' => $request->discount_amount,
-                'invoice_due_date' => $request->invoice_due_date,
-                'total_amount' => $request->invoice_amount,
-                'invoice_freq' =>   $request->invoice_freq,
-                'month' => $request->month,
-                // 'year' => $year,
-            ]);
-        }
-        else{
+        // if(isset($invoice)){
+        //     $invoice->update([
+        //        'invoice_active_status' => $request->invoice_status? 1 : 0,
+        //         'activation_date' => $request->activation_date,
+        //         'discount_type' => $request->discount_type,
+        //         'discount_amount' => $request->discount_amount,
+        //         'invoice_due_date' => $request->invoice_due_date,
+        //         'total_amount' => $request->invoice_amount,
+        //         'invoice_freq' =>   $request->invoice_freq,
+        //         'month' => $request->month,
+        //         // 'year' => $year,
+        //     ]);
+        // }
+        // else{
             $invoice = Invoice::create([
                 'sale_id' => $request->sale_id6,
                 'invoice_number' => $unique_id,
@@ -126,10 +126,9 @@ class InvoiceServiceChargesController extends Controller
                 'total_amount' => $request->invoice_amount,
                 'invoice_freq' =>   $request->invoice_freq,
                 'month' => $request->month,
-                // 'year' => $year,
-                // 'month' => $monthName
+
             ]);
-        }
+        // }
         if(isset($request->service_id) && count($request->service_id) > 0){
             foreach($request->service_id as $key => $value){
                 $company_service = CompanyServices::where('id', $value)->first();

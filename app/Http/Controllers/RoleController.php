@@ -58,11 +58,12 @@ class RoleController extends Controller
                 Permission::create([
                     'role_id' => $role->id,
                     'name' => $permName,
-                    'create' => isset($permData['create']),
-                    'view' => isset($permData['view']),
-                    'edit' => isset($permData['edit']),
-                    'delete' => isset($permData['delete']),
+                    'create' => isset($permData['create']) ? ($permData['create'] ? 1 : 0) : 0,
+                    'view' => isset($permData['view']) ? ($permData['view'] ? 1 : 0) : 0,
+                    'edit' => isset($permData['edit']) ? ($permData['edit'] ? 1 : 0) : 0,
+                    'delete' => isset($permData['delete']) ? ($permData['delete'] ? 1 : 0) : 0,
                 ]);
+
             }
         }
         return redirect()->back();
@@ -145,10 +146,10 @@ class RoleController extends Controller
                     Permission::create([
                         'role_id' => $role->id,
                         'name' => $permName,
-                        'create' => $permData['create'],
-                        'view' => $permData['view'],
-                        'edit' => $permData['edit'],
-                        'delete' => $permData['delete'],
+                        'create' => isset($permData['create']) ? ($permData['create'] ? 1 : 0) : 0,
+                        'view' => isset($permData['view']) ? ($permData['view'] ? 1 : 0) : 0,
+                        'edit' => isset($permData['edit']) ? ($permData['edit'] ? 1 : 0) : 0,
+                        'delete' => isset($permData['delete']) ? ($permData['delete'] ? 1 : 0) : 0,
                     ]);
                 }
             }
