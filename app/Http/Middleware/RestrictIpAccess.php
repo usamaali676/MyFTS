@@ -17,7 +17,8 @@ class RestrictIpAccess
      */
     protected $allowedIps = [
         '139.135.32.81',  // Replace with the allowed IP address
-        '127.0.0.1'
+        '127.0.0.1',
+        '182.188.109.240'
         // You can add more IPs here if needed
     ];
     public function handle(Request $request, Closure $next): Response
