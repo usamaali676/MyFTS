@@ -158,9 +158,19 @@ class FrontController extends Controller
             public function getRefund(Request $request)
             {
                 if($request->ajax()){
-                    $invoice = Invoice::where('id', $request->invoice_id)->first();
+                    // $invoice = Invoice::where('id', $request->invoice_id)->first();
+                    $payment = Payment::where('id', $request->payment_id)->with('invoice')->first();
                     // dd($invoice->id);
-                    return response()->json(['invoice' => $invoice]);
+                    return response()->json(['payment' => $payment]);
+                }
+            }
+            public function getchargeBack(Request $request)
+            {
+                if($request->ajax()){
+                    // $invoice = Invoice::where('id', $request->invoice_id)->first();
+                    $payment = Payment::where('id', $request->payment_id)->with('invoice')->first();
+                    // dd($invoice->id);
+                    return response()->json(['payment' => $payment]);
                 }
             }
 

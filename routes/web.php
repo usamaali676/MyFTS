@@ -45,6 +45,7 @@ Route::controller(FrontController::class)
     Route::get('/getcash', 'getcash')->name('getcash');
     Route::get('/getbank', 'getbank')->name('getbank');
     Route::get('/get-refund', 'getRefund')->name('getRefund');
+    Route::get('/get-chargeBack', 'getchargeBack')->name('getchargeBack');
 });
 
 Route::controller(RoleController::class)

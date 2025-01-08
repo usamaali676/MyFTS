@@ -33,6 +33,7 @@ class ChargeBackController extends Controller
         try {
             $request->validate([
                 'invoice_id' => 'required',
+                'payment_id' => 'required',
                 'claim_date' => 'required',
                 'merchant_id' => 'required',
             ]);
@@ -45,6 +46,7 @@ class ChargeBackController extends Controller
             $charge = ChargeBack::create([
                 'lead_id' => $request->input('lead_id'),
                 'invoice_id' => $request->input('invoice_id'),
+                'payment_id' => $request->input('payment_id'),
                 'claim_date' => $request->input('claim_date'),
                 'merchant_id' => $request->input('merchant_id'),
                 'claim_reason' => $request->input('chargeBack_reason'),

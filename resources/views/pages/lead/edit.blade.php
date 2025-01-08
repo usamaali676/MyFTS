@@ -77,7 +77,7 @@
                             <input type="text" id="business_name" name="business_name" class="form-control"
                                 placeholder="John" value="{{ $lead->business_name_adv }}"
                                 onkeydown="return /[a-zA-Z\s]/.test(event.key) || event.key === 'Backspace' || event.key === 'Tab';" />
-                            <label for="multicol-first-name">Business Name</label>
+                            <label for="multicol-first-name">Business Name <span style="color: #ff4d49">*</span></label>
                         </div>
                     </div>
                     <div class="col-md-6">
@@ -233,13 +233,19 @@
 
                                 @if(isset($lead->closers))
                                 @foreach ($lead->closers as $item)
-                                    <option value="{{ $item->closer_id }}" selected>{{ $item->user->name }}</option>
+                                    @php
+                                    $closerName = explode(' -', $item->user->name)[0];// Use the part after the hyphen, or the original text if no hyphen exists
+                                    @endphp
+                                    <option value="{{ $item->closer_id }}" selected>{{ $closerName }}</option>
                                 @endforeach
                                 @else
                                 <option value="">Please Select</option>
                                 @endif
                                 @foreach ($closers as $item)
-                                <option value="{{ $item->id }}">{{ $item->name }}</option>
+                                @php
+                                    $newcloserName = explode(' -',  $item->name)[0];// Use the part after the hyphen, or the original text if no hyphen exists
+                                    @endphp
+                                <option value="{{ $item->id }}">{{ $newcloserName }}</option>
                                 @endforeach
                                 {{-- <option value="en" selected>English</option>
                                 <option value="fr" selected>French</option>
