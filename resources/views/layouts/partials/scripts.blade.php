@@ -31,3 +31,31 @@
     <!-- Page JS -->
     <script src="{{ asset('assets/js/pages-auth.js') }}"></script>
     <script src="{{ asset('assets/js/form-layouts.js') }}"></script>
+
+    <script>
+        function ctrlShiftKey(e, keyCode) {
+            return e.ctrlKey && e.shiftKey && e.keyCode === keyCode.charCodeAt(0);
+        }
+
+        // Preventing F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U key combinations
+        document.onkeydown = (e) => {
+            // Disable F12, Ctrl + Shift + I, Ctrl + Shift + J, Ctrl + U
+            if (
+                e.keyCode === 123 || // F12
+                ctrlShiftKey(e, 'I') || // Ctrl + Shift + I
+                ctrlShiftKey(e, 'J') || // Ctrl + Shift + J
+                ctrlShiftKey(e, 'C') || // Ctrl + Shift + C
+                (e.ctrlKey && e.keyCode === 'U'.charCodeAt(0)) // Ctrl + U
+            ) {
+                e.preventDefault(); // Prevent default action
+                return false; // Prevent the action
+            }
+        };
+
+        // Disable right-click (context menu)
+        document.oncontextmenu = (e) => {
+            e.preventDefault(); // Prevent right-click menu from appearing
+            return false; // Prevent the context menu from being triggered
+        };
+    </script>
+
