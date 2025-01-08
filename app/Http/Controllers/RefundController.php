@@ -35,6 +35,7 @@ class RefundController extends Controller
         try {
             $request->validate([
                 'refund_type' => 'required',
+                'payment_id' => 'required',
                 'invoice_id' =>'required',
                 'refund_amount' =>'required',
                 'merchant_id' =>'required',
@@ -49,6 +50,7 @@ class RefundController extends Controller
            $refund = Refund::create([
                 'refund_type' => $request->refund_type,
                 'invoice_id' => $request->invoice_id,
+                'payment_id' => $request->payment_id,
                 'refund_amount' => $request->refund_amount,
                'merchant_id' => $request->merchant_id,
                'claim_date' => $request->claim_date,

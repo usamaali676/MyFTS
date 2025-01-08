@@ -31,7 +31,7 @@
                         <thead>
                             <tr>
                                 <th></th>
-                                <th>Name</th>
+                                <th>Business Name</th>
                                 <th>Number</th>
                                 <th>Email</th>
                                 <th>Category</th>
@@ -256,7 +256,9 @@
                                     @endforeach
                                 @else
                                     @foreach ($leads as $item)
-                                        @if ($item->closers->contains('closer_id', $user->id) && $item->sale == null)
+
+                                        {{-- @if ($item->closers->contains('closer_id', $user->id) && $item->sale == null) --}}
+                                        @if ($item->closers->contains('closer_id', $user->id))
                                             <tr>
                                                 <td>{{ $loop->index + 1 }}</td>
                                                 <td>{{ $item->business_name_adv }}</td>

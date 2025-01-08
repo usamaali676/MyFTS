@@ -14,13 +14,13 @@ class CompanyServicesSeeder extends Seeder
      */
     public function run(): void
     {
-        // $services = ['SEO', 'LandingPage', 'GMB', 'Website Development'];
-        $services = ['Activation Date'];
+        $services = ['Hosting'];
+        // $services = ['Activation Date'];
         foreach ($services as $service) {
             CompanyServices::create([
                 'name' => $service,
                 'price' => '100',
-                'category'=> "Marketing",
+                'category'=> "Development",
         ]);
         }
     }

@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class ChargeBack extends Model
 {
     protected $fillable = [
-        'invoice_id',	'lead_id',	'claim_date', 'merchant_id', 'chargeBack_reason',
+        'invoice_id',	'lead_id',	'claim_date', 'merchant_id', 'chargeBack_reason', 'payment_id'
     ];
 
     public function merchant() {

@@ -8447,7 +8447,7 @@ label.btn {
 .btn-icon.btn-sm, .btn-group-sm > .btn-icon.btn {
   width: calc(1.725rem + calc(1px * 2));
   height: calc(1.725rem + calc(1px * 2));
-  font-size: 0.8125rem;
+  font-size: 1.4rem !important;
 }
 .btn-icon.btn-xs, .btn-group-xs > .btn-icon.btn {
   width: calc(1.074rem + calc(1px * 2));

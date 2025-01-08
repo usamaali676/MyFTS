@@ -74,15 +74,15 @@
                                     <input type="text" id="business_name" name="business_name" class="form-control" required
                                         placeholder="John"
                                         onkeydown="return /[a-zA-Z\s]/.test(event.key) || event.key === 'Backspace' || event.key === 'Tab';" />
-                                    <label for="multicol-first-name">Business Name</label>
+                                    <label for="multicol-first-name">Business Name <span style="color: #ff4d49">*</span></label>
                                 </div>
 
                             </div>
                             <div class="col-md-6">
                                 <div class="form-floating form-floating-outline">
                                     <input type="tel"  id="business_number" style="height: calc(2.940725rem + 2px);"
-                                        name="business_number" class="form-control"  required/>
-                                    {{-- <label for="multicol-last-name">Business Number</label> --}}
+                                        name="business_number" class="form-control" placeholder=" "  required />
+                                    <label for="multicol-last-name" id="business_number_label" style="padding-left: 45px ">Business Number <span style="color: #ff4d49">*</span></label>
                                 </div>
                             </div>
 
@@ -210,7 +210,10 @@
                                     <select id="multicol-closers" name="closers[]" class="select2 form-select" multiple>
                                         <option value="">Please Select</option>
                                         @foreach ($closers as $user)
-                                        <option value="{{ $user->id }}">{{ $user->name }}</option>
+                                        @php
+                                            $closerName = explode(' -', $user->name)[0];// Use the part after the hyphen, or the original text if no hyphen exists
+                                        @endphp
+                                        <option value="{{ $user->id }}">{{ $closerName }}</option>
                                         @endforeach
                                         {{-- <option value="en" selected>English</option>
                                         <option value="fr" selected>French</option>
@@ -540,6 +543,23 @@ $('#call-status').change(function (e) {
                 });
             }
         });
+    });
+</script>
+
+<script>
+    const inputField = document.querySelector("#business_number");
+    const label = document.querySelector("#business_number_label");
+
+    // Hide the label when the input is focused
+    inputField.addEventListener("focus", function() {
+        label.style.display = "none"; // Hide label
+    });
+
+    // Show the label again when the input loses focus, but only if the field is empty
+    inputField.addEventListener("blur", function() {
+        if (inputField.value === "") {
+            label.style.display = "block"; // Show label if the input is empty
+        }
     });
 </script>
 
