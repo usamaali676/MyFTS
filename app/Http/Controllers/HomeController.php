@@ -26,6 +26,8 @@ class HomeController extends Controller
     {
         // $route = GlobalHelper::Permissions();
         // dd($route);
+        // $user = Auth::user();
+        // $totalRevenue =
         return view('home');
     }
 }
