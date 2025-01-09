@@ -14,10 +14,10 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
-    ->withMiddleware(new AppMiddleware)
-    // ->withMiddleware(function (Middleware $middleware) {
-    //     // $middleware->append(PermissionMiddelware::class);
-    // })
+    // ->withMiddleware(new AppMiddleware)
+    ->withMiddleware(function (Middleware $middleware) {
+        // $middleware->append(PermissionMiddelware::class);
+    })
     ->withExceptions(function (Exceptions $exceptions) {
         //
     })->create();

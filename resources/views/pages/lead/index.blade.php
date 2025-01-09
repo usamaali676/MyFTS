@@ -118,7 +118,7 @@
                                     @endforeach
                                 @elseif ($user->role->name == 'Customer Support')
                                     @foreach ($leads as $item)
-                                        @if (isset($item->sale) && $item->sale->status == 1)
+                                        {{-- @if (isset($item->sale) && $item->sale->status == 1) --}}
                                             <tr>
                                                 <td>{{ $loop->index + 1 }}</td>
                                                 <td>{{ $item->business_name_adv }}</td>
@@ -183,7 +183,7 @@
                                                     </div>
                                                 </td>
                                             </tr>
-                                        @endif
+                                        {{-- @endif --}}
                                     @endforeach
                                 @elseif($user->role->name == 'TSR')
                                     @foreach ($leads as $item)
