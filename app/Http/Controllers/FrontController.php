@@ -174,6 +174,31 @@ class FrontController extends Controller
                 }
             }
 
+            public function showVerifyForm()
+            {
+                return view('auth.otp');
+            }
+
+            public function verify(Request $request)
+            {
+                $request->validate([
+                    'otp' => 'required|digits:6',
+                ]);
+
+                $user = User::find(session('user_id'));
+
+                if ($user && $user->otp == $request->otp) {
+                    // Clear OTP and log in the user
+                    $user->otp = null;
+                    $user->save();
+
+                    auth()->login($user);
+                    return redirect('/');
+                }
+
+                return back()->withErrors(['otp' => 'Invalid OTP']);
+            }
+
     }
 
 

@@ -244,7 +244,7 @@
                             <h6>Additional Contact Info</h6>
                         </div>
                         <div class="card-body">
-                            <div class="row">
+                            {{-- <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-floating form-floating-outline">
                                         <input type="tel"  id="business_number2" style="height: calc(2.940725rem + 2px);"
@@ -266,9 +266,10 @@
                                         <div class="form-text">You can use letters, numbers &amp; periods</div>
                                     </div>
                                 </div>
-                            </div>
-                            {{-- <div id="repeater">
+                            </div> --}}
+                            <div id="repeater">
 
+                                    @if(isset())
                                     <div class="items">
                                         <div class="item-content">
                                             <div class="row py-2">
@@ -303,7 +304,7 @@
                                         <a class="btn btn-primary repeater-add-btn" style="color: #fff">Add</a>
                                     </div>
 
-                            </div> --}}
+                            </div>
 
                                 <!-- Hidden Template for New Repeater Item -->
                         </div>
@@ -351,7 +352,7 @@
 });
 </script>
 
-    {{-- <script src="{{ asset('assets/vendor/libs/jquery-repeater/jquery-repeater.js') }}"></script> --}}
+    <script src="{{ asset('assets/vendor/libs/jquery-repeater/jquery-repeater.js') }}"></script>
     {{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.repeater/1.2.1/jquery.repeater.js" integrity="sha512-bZAXvpVfp1+9AUHQzekEZaXclsgSlAeEnMJ6LfFAvjqYUVZfcuVXeQoN5LhD7Uw0Jy4NCY9q3kbdEXbwhZUmUQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script>
         $(document).ready(function() {
@@ -368,12 +369,12 @@
 
     </script> --}}
 
-{{-- <script src="{{ asset('assets/js/leadreapeter.js') }}"></script> --}}
-{{-- <script>
+<script src="{{ asset('assets/js/leadreapeter.js') }}"></script>
+<script>
     $(function(){
         $("#repeater").createRepeater_lead();
     });
-</script> --}}
+</script>
 {{-- <script>
     $(document).ready(function () {
         // Add a new repeater item on Add button click

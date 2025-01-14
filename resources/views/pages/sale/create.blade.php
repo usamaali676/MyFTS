@@ -2049,9 +2049,71 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
         </div>
 
 
+        <div class="modal fade" id="addcarddetail" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered modal-add-new-role">
+                <div class="modal-content p-3 p-md-5">
+                    <button type="button" class="btn-close btn-pinned" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <div class="modal-body p-md-0">
+                        <div class="text-center mb-4">
+                            <h3 class="role-title mb-2 pb-0">Add New Comment</h3>
+                            {{-- <p>Set role permissions</p> --}}
+                        </div>
+                        <!-- Add role form -->
+                        <form id="add_comment" class="row g-3" method="POST" action="{{ route('comment.store') }}">
+                            @csrf
+                            <input type="hidden" name="lead_id" value="{{ $lead->id }}">
+                            <div class="col-6 mb-4">
+                                <div class="form-floating form-floating-outline">
+                                    <select id="stages" name="stage" class="select2 form-select" data-allow-clear="true" >
+                                        <option value="">Please Select</option>
+                                        <option value="Lead">Lead</option>
+                                        <option value="Oppertuniry">Oppertuniry</option>
+                                        <option value="Pre-Sale">Pre-Sale</option>
+                                        <option value="Close-Sale">Close-Sale</option>
+                                        <option value="Active">Active</option>
+                                        <option value="Deactive">Deactive</option>
+                                        <option value="IT">IT</option>
+                                        <option value="Bug">Bug</option>
+                                        <option value="Query">Query</option>
+                                        <option value="Resolved">Resolved</option>
+                                    </select>
+                                    <label for="multicol-country">Stage</label>
+                                </div>
+                            </div>
+
+                            <div class="col-6 mb-4">
+                                <div class="form-floating form-floating-outline">
+                                    <input type="text" class="form-control flatpickr-input active" name="due_date"
+                                    placeholder="YYYY-MM-DD" id="flatpickr-date">
+                                    <label for="flatpickr-date">Due Date</label>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-floating form-floating-outline mb-6">
+                                    <textarea class="form-control h-px-100"  name="comment" placeholder="Comments here..." spellcheck="false"></textarea>
+                                    <label for="exampleFormControlTextarea1">Write Comment</label>
+                                  </div>
+                            </div>
+
+
+                            <div class="col-6 text-center">
+                                <button type="submit" class="btn btn-primary me-sm-3 me-1">Submit</button>
+                                <button type="reset" class="btn btn-outline-secondary" data-bs-dismiss="modal"
+                                    aria-label="Close">
+                                    Cancel
+                                </button>
+                            </div>
+                        </form>
+                        <!--/ Add role form -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
             <div class="content-backdrop fade"></div>
         </div>
         <!-- Content wrapper -->
+
     </div>
     @endsection
   @section('js')
@@ -3534,16 +3596,20 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                 // alert(mop);
 
                 if (mop == "Credit Card") {
-                    var input = ' <div class="form-floating form-floating-outline">\
-                                    <input\
-                                        type="text"\
-                                        id="billings-card-num"\
-                                        class="form-control billing-card-mask"\
-                                        placeholder="4541 2541 2547 2577"\
-                                        name="card_number"\
-                                        aria-describedby="paymentCard"  />\
-                                    <label for="billings-card-num">Card number</label>\
-                                  </div>';
+                    // var input = ' <div class="form-floating form-floating-outline">\
+                    //                 <input\
+                    //                     type="text"\
+                    //                     id="billings-card-num"\
+                    //                     class="form-control billing-card-mask"\
+                    //                     placeholder="4541 2541 2547 2577"\
+                    //                     name="card_number"\
+                    //                     aria-describedby="paymentCard"  />\
+                    //                 <label for="billings-card-num">Card number</label>\
+                    //               </div>';
+                    var input = '<button data-bs-target="#addcarddetail" data-bs-toggle="modal"
+                                    class="btn btn-primary mb-3 text-nowrap add-new-role">
+                                    Add Card
+                                </button>'
 
                     $('#embed_mop').html(input);
                     var script = document.createElement('script');
@@ -4318,6 +4384,9 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
 
 {{-- End Report --}}
 @endsection
+
+
+
 
 
 

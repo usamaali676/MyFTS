@@ -92,6 +92,15 @@ class LeadController extends Controller
                 ]);
             }
         }
+         if(isset($request->platform_name)){
+            foreach ($request->platform_name as $key => $name) {
+                LeadAdditionalInfo::create([
+                    'lead_id' => $lead->id,
+                    'name' => $name,
+                    'value' => $request->platform_value[$key],
+                ]);
+            }
+         }
         // if(isset($request->service)){
         //     foreach ($request->service as $service) {
         //         CompanyServicesLead::create([
@@ -181,6 +190,28 @@ class LeadController extends Controller
                     'lead_id' => $lead->id,
                     'closer_id' => $users,
                 ]);
+            }
+        }
+        if (isset($request->platform_name)) {
+            foreach ($request->platform_name as $key => $name) {
+                // Find the existing record by lead_id and name
+                $platform = LeadAdditionalInfo::where('lead_id', $lead->id)
+                                              ->where('name', $name)
+                                              ->first();
+
+                // If the record exists, update it, otherwise, create a new record
+                if ($platform) {
+                    $platform->update([
+                        'value' => $request->platform_value[$key],
+                    ]);
+                } else {
+                    // If no existing record, create a new one
+                    LeadAdditionalInfo::create([
+                        'lead_id' => $lead->id,
+                        'name' => $name,
+                        'value' => $request->platform_value[$key],
+                    ]);
+                }
             }
         }
         Alert::Success('Success', "Lead Updated Successfully");

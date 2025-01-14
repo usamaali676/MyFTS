@@ -37,4 +37,8 @@ class Lead extends Model
     {
         return $this->hasMany(Comments::class, 'lead_id');
     }
+    public function additional_info()
+    {
+        return $this->hasMany(LeadAdditionalInfo::class, 'lead_id');
+    }
 }

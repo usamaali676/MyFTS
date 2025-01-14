@@ -283,7 +283,7 @@
                     <h6>Additional Contact Info</h6>
                 </div>
                 <div class="card-body">
-                    <div class="row">
+                    {{-- <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating form-floating-outline">
                                 <input type="tel"  id="business_number2" style="height: calc(2.940725rem + 2px);"
@@ -305,7 +305,79 @@
                                 <div class="form-text">You can use letters, numbers &amp; periods</div>
                             </div>
                         </div>
-                    </div>
+                    </div> --}}
+                    <div id="repeater">
+
+                        @if(isset($lead->additional_info))
+                            @foreach ($lead->additional_info as $info)
+                                <div class="items">
+                                    <div class="item-content">
+                                        <div class="row py-2">
+                                            <div class="col-md-4">
+                                                <div class="form-floating form-floating-outline">
+                                                    <select name="platform_name[]" class="form-control">
+                                                        @if (isset($info->name))
+                                                            <option value="{{ $info->name }}" selected>{{ $info->name }}</option>
+                                                        @else
+                                                            <option value="">Please Select</option>
+                                                        @endif
+                                                        <option value="phone">Phone</option>
+                                                        <option value="email">Email</option>
+                                                        <option value="url">URL</option>
+                                                    </select>
+                                                    <label> Platform</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-floating form-floating-outline">
+                                                    <input type="text" class="form-control" value="{{ $info->value }}" name="platform_value[]" placeholder="Value" />
+                                                    <label>Value</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <a class="btn btn-outline-danger remove-btn" style="color: #ff4d49" onclick="$(this).closest('.items').remove()">Remove</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        @else
+                        <div class="items">
+                            <div class="item-content">
+                                <div class="row py-2">
+                                    <div class="col-md-4">
+                                        <div class="form-floating form-floating-outline">
+                                            <select name="platform_name[]" class="form-control">
+                                                <option value="">Please Select</option>
+                                                <option value="phone">Phone</option>
+                                                <option value="email">Email</option>
+                                                <option value="url">URL</option>
+                                            </select>
+                                            <label> Platform</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-floating form-floating-outline">
+                                            <input type="text" class="form-control" name="platform_value[]" placeholder="Value" />
+                                            <label>Value</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <a class="btn btn-outline-danger remove-btn" style="color: #ff4d49" onclick="$(this).closest('.items').remove()">Remove</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        @endif
+
+                        <div class="items" >
+                        </div>
+
+                        <div class="repeater-footer py-4" style="display: flex; justify-content: flex-end;">
+                            <a class="btn btn-primary repeater-add-btn" style="color: #fff">Add</a>
+                        </div>
+
+                </div>
                     {{-- <div id="repeater">
 
                             <div class="items">
@@ -490,6 +562,12 @@
   strictMode: true,
   utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/24.6.0/build/js/utils.min.js"
 });
+</script>
+<script src="{{ asset('assets/js/leadreapeter.js') }}"></script>
+<script>
+    $(function(){
+        $("#repeater").createRepeater_lead();
+    });
 </script>
 <script>
     $(document).ready(function () {
