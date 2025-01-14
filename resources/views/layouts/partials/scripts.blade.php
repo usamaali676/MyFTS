@@ -31,7 +31,7 @@
     <script src="{{ asset('assets/js/pages-auth.js') }}"></script>
     <script src="{{ asset('assets/js/form-layouts.js') }}"></script>
 
-    <script>
+    {{-- <script>
         function ctrlShiftKey(e, keyCode) {
             return e.ctrlKey && e.shiftKey && e.keyCode === keyCode.charCodeAt(0);
         }
@@ -56,5 +56,5 @@
             e.preventDefault(); // Prevent right-click menu from appearing
             return false; // Prevent the context menu from being triggered
         };
-    </script>
+    </script> --}}
 
