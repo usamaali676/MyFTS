@@ -1841,7 +1841,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                     </div>
                                 @endif
                                 {{-- End ChargeBack --}}
-
+                            @if(isset($clientreport_perm) && $clientreport_perm->view == 1)
                             <div id="reports" class="content">
                                 <div class="content-header mb-3">
                                     <h6 class="mb-0">Reports</h6>
@@ -1991,6 +1991,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
 
                                 </div>
                             </div>
+                            @endif
                     </div>
                 </div>
             </div>
