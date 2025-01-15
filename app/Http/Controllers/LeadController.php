@@ -52,7 +52,7 @@ class LeadController extends Controller
      */
     public function store(Request $request)
     {
-        // dd($request->all());
+
         $formattedCallBackTime = Carbon::parse($request->call_back_time)->format('Y-m-d H:i:s'); // e.g., 2024-10-15 14:30:00
         $request->validate([
             'business_name' => 'required',
@@ -92,7 +92,8 @@ class LeadController extends Controller
                 ]);
             }
         }
-         if(isset($request->platform_name)){
+        if (isset($request->platform_name) && count($request->platform_name) > 0 && !is_null($request->platform_name[0]) &&
+        isset($request->platform_value) && count($request->platform_value) > 0 && !is_null($request->platform_value[0])) {
             foreach ($request->platform_name as $key => $name) {
                 LeadAdditionalInfo::create([
                     'lead_id' => $lead->id,
@@ -192,7 +193,8 @@ class LeadController extends Controller
                 ]);
             }
         }
-        if (isset($request->platform_name)) {
+        if (isset($request->platform_name) && count($request->platform_name) > 0 && !is_null($request->platform_name[0]) &&
+        isset($request->platform_value) && count($request->platform_value) > 0 && !is_null($request->platform_value[0])) {
             foreach ($request->platform_name as $key => $name) {
                 // Find the existing record by lead_id and name
                 $platform = LeadAdditionalInfo::where('lead_id', $lead->id)
