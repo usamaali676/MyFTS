@@ -244,29 +244,7 @@
                             <h6>Additional Contact Info</h6>
                         </div>
                         <div class="card-body">
-                            {{-- <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-floating form-floating-outline">
-                                        <input type="tel"  id="business_number2" style="height: calc(2.940725rem + 2px);"
-                                            name="add_business_number" class="form-control"  />
-                                        <label for="multicol-last-name">Additional Business Number</label>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-2">
-                                        <div class="input-group input-group-merge">
-                                            <div class="form-floating form-floating-outline">
-                                                <input type="email" id="basic-default-email2" name="add_email" class="form-control"
-                                                    placeholder="john.doe" aria-label="john.doe"
-                                                    aria-describedby="basic-default-email2">
-                                                <label for="basic-default-email">Optional Email</label>
-                                            </div>
-                                            <span class="input-group-text" id="basic-default-email2">@example.com</span>
-                                        </div>
-                                        <div class="form-text">You can use letters, numbers &amp; periods</div>
-                                    </div>
-                                </div>
-                            </div> --}}
+
                             <div id="repeater">
 
 
