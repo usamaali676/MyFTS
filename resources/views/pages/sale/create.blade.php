@@ -10,6 +10,7 @@
     $Payment_perm = App\Models\Permission::where('role_id', $user->role_id)->where('name', "payment")->first();
     $refund_perm = App\Models\Permission::where('role_id', $user->role_id)->where('name', "refund")->first();
     $chargeBack_perm = App\Models\Permission::where('role_id', $user->role_id)->where('name', "chargeback")->first();
+    $clientreport_perm = App\Models\Permission::where('role_id', $user->role_id)->where('name', "clientreport")->first();
 @endphp
 @extends('layouts.dashboard')
 @section('css')
@@ -191,7 +192,11 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                 </button>
                             </div>
                         @endif
-                        {{-- <div class="step" data-target="#reports">
+                        @if(isset($clientreport_perm) && $clientreport_perm->view == 1)
+                        <div class="line">
+                            <i class="mdi mdi-chevron-right"></i>
+                        </div>
+                        <div class="step" data-target="#reports">
                             <button type="button" class="step-trigger">
                                 <span class="bs-stepper-icon">
                                     <svg viewBox="0 0 54 54">
@@ -201,7 +206,8 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                 </span>
                                 <span class="bs-stepper-label">Reports</span>
                             </button>
-                        </div> --}}
+                        </div>
+                        @endif
                     </div>
                     <div class="bs-stepper-content">
                                {{-- Client Details --}}
@@ -398,10 +404,10 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                                 <h5>{{ $business_hour }} <input type="hidden" name="day[]" value="{{ $business_hour }}"></h5>
                                                             </div>
                                                             <div class="col-md-3 form-floating form-floating-outline">
-                                                                <input type="time" class="form-control flatpickr-input" value="" name="open[]" id="{{ Str::lower($business_hour) }}_open">
+                                                                <input type="time" class="form-control flatpickr-input"  name="open[]" id="{{ Str::lower($business_hour) }}_open">
                                                             </div>
                                                             <div class="col-md-3 form-floating form-floating-outline">
-                                                                <input type="time" class="form-control flatpickr-input" value="" name="closed[]" id="{{ Str::lower($business_hour) }}_closed">
+                                                                <input type="time" class="form-control flatpickr-input"  name="closed[]" id="{{ Str::lower($business_hour) }}_closed">
                                                             </div>
                                                             <div class="col-md-2 d-flex" style="gap: 20px;">
                                                                 <div class="form-check custom-option custom-option-basic checked">
@@ -1835,8 +1841,8 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                     </div>
                                 @endif
                                 {{-- End ChargeBack --}}
-
-                            {{-- <div id="reports" class="content">
+                            @if(isset($clientreport_perm) && $clientreport_perm->view == 1)
+                            <div id="reports" class="content">
                                 <div class="content-header mb-3">
                                     <h6 class="mb-0">Reports</h6>
                                     <small>Reports</small>
@@ -1875,7 +1881,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                 <div class="form-floating form-floating-outline">
                                                     <select id="select-created_by" name="created_by" class="select2 form-select">
                                                         @auth
-                                                        <option value="{{ Auth::user()->name }}" selected @readonly(true)>{{ Auth::user()->name }}</option>
+                                                        <option value="{{ Auth::user()->id }}" selected @readonly(true)>{{ Auth::user()->name }}</option>
                                                         @endauth
 
 
@@ -1887,10 +1893,8 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                 <div class="form-floating form-floating-outline">
                                                     <select id="select-verified_by" name="verified_by" class="select2 form-select">
                                                         @auth
-                                                        <option value="{{ Auth::user()->name }}" selected @readonly(true)>{{ Auth::user()->name }}</option>
+                                                        <option value="{{ Auth::user()->id }}" selected @readonly(true)>{{ Auth::user()->name }}</option>
                                                         @endauth
-
-
                                                     </select>
                                                     <label for="select-invoice">Select Verified By</label>
                                                 </div>
@@ -1920,6 +1924,57 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                         </div>
                                     </form>
 
+                                    <div class="row py-4">
+                                        <h4>Reports</h4>
+                                        <div class="col-md-12">
+                                            <div class="table-responsive">
+                                                <table id="reporting_table" class="table table-striped">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Sr</th>
+                                                            <th>Client Name</th>
+                                                            <th>Report Type</th>
+                                                            <th>Schedule Date</th>
+                                                            <th>Reporting Date</th>
+                                                            <th>Created By</th>
+                                                            <th>Verified By</th>
+                                                            <th>Varification Date</th>
+                                                            <th>Dispatch</th>
+                                                            <th>Dispatch Date</th>
+                                                            <th>Status</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @foreach ($reports as $key=>$item)
+                                                        <tr>
+                                                            <td>{{ $key + 1 }}</td>
+                                                            <td>{{ $item->client->sale->lead->business_name_adv }}</td>
+                                                            <td>{{ $item->reporting_type }}</td>
+                                                            <td>{{ $item->client->reporting_date }}</td>
+                                                            <td>{{ \Carbon\Carbon::parse($item->created_at)->format('Y-m-d') }}</td>
+                                                            <td>{{ $item->createdBy->name }}</td>
+                                                            @if(isset($item->verified_by))
+                                                            <td>{{ $item->verifiedBy->name }}</td>
+                                                            @else
+                                                            <td>Not Verified</td>
+                                                            @endif
+                                                            <td>{{ $item->report_verified_at }}</td>
+                                                            @if(isset($item->dispatched_by))
+                                                            <td>{{ $item->dispatchedBy->name }}</td>
+                                                            @else
+                                                            <td>Not Dispatched</td>
+                                                            @endif
+                                                            <td>{{ $item->dispatch_at }}</td>
+                                                            <td>{{ $item->report_status }}</td>
+                                                        </tr>
+                                                        @endforeach
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
                                     <div class="col-12 d-flex justify-content-between">
                                         <a class="btn btn-outline-secondary btn-prev" style="color: #6d788d" disabled>
                                             <i class="mdi mdi-arrow-left me-sm-1"></i>
@@ -1932,8 +1987,11 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                             </a>
                                         </div>
                                     </div>
+
+
                                 </div>
-                            </div> --}}
+                            </div>
+                            @endif
                     </div>
                 </div>
             </div>
@@ -2257,7 +2315,13 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
         });
     </script>
 
-    <script>
+<script>
+
+
+
+
+
+
         $(document).ready(function() {
     // Function to copy times to all days (Monday-Sunday)
     $('#copyToAll').click(function() {
@@ -2270,6 +2334,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
         });
         $('input[name^="closed"]').each(function() {
             $(this).val(closedTime);
+            $(this).prop('disabled', false)
         });
     });
 
@@ -3606,9 +3671,9 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                     //                     aria-describedby="paymentCard"  />\
                     //                 <label for="billings-card-num">Card number</label>\
                     //               </div>';
-                    var input = '<button data-bs-target="#addcarddetail" data-bs-toggle="modal"
-                                    class="btn btn-primary mb-3 text-nowrap add-new-role">
-                                    Add Card
+                    var input = '<button data-bs-target="#addcarddetail" data-bs-toggle="modal" \
+                                    class="btn btn-primary mb-3 text-nowrap add-new-role">\
+                                    Add Card \
                                 </button>'
 
                     $('#embed_mop').html(input);
@@ -4306,18 +4371,46 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
 
                     console.log(response);
 
-                    // var chargeBack = response.chargeBack;
-                    // var table_content = ''
-                    // chargeBack.forEach(function(chargeback, index) {
-                    //     table_content += '<tr>\
-                    //             <td>' + (index + 1) + '</td>\
-                    //             <td>' + chargeback.invoice.invoice_number + '</td>\
-                    //             <td>' + chargeback.claim_date + '</td>\
-                    //             <td>' + chargeback.merchant.name + '</td>\
-                    //         </tr>';
-                    //     });
-                    //     // Clear the table first and then append the new rows
-                    //     $('#chargeBack_table tbody').empty().append(table_content);
+                    var reports = response.reports;
+                    var table_content = '';
+
+                    // Function to format date in Day-Month-Year (DD-MM-YYYY)
+                    function formatDate(dateString) {
+                        var date = new Date(dateString);
+                        var day = String(date.getDate()).padStart(2, '0'); // Add leading zero if single digit
+                        var month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based, so add 1
+                        var year = date.getFullYear();
+                        return day + '-' + month + '-' + year;
+                    }
+
+                    reports.forEach(function(report, index) {
+                        var verifiedBy = report.verified_by ? report.verified_by.name : 'Not Verified';
+                        var dispatchedBy = report.dispatched_by ? report.dispatched_by.name : 'Not Dispatched';
+
+                        // Format the dates
+                        var created_at = formatDate(report.created_at);
+                        var reporting_date = formatDate(report.client.reporting_date);
+                        var report_verified_at = report.report_verified_at ? formatDate(report.report_verified_at) : 'N/A';
+                        var dispatch_at = report.dispatch_at ? formatDate(report.dispatch_at) : 'N/A';
+
+                        table_content += '<tr>\
+                                            <td>' + (index + 1) + '</td>\
+                                            <td>' + report.client.sale.lead.business_name_adv + '</td>\
+                                            <td>' + report.reporting_type + '</td>\
+                                            <td>' + reporting_date + '</td>\
+                                            <td>' + created_at + '</td>\
+                                            <td>' + report.created_by.name + '</td>\
+                                            <td>' + verifiedBy + '</td>\
+                                            <td>' + report_verified_at + '</td>\
+                                            <td>' + dispatchedBy + '</td>\
+                                            <td>' + dispatch_at + '</td>\
+                                            <td>' + report.report_status + '</td>\
+                                        </tr>';
+                    });
+
+                    // Clear the table first and then append the new rows
+                    $('#reporting_table tbody').empty().append(table_content);
+
 
 
 

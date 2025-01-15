@@ -269,7 +269,7 @@
                             </div> --}}
                             <div id="repeater">
 
-                                    @if(isset())
+
                                     <div class="items">
                                         <div class="item-content">
                                             <div class="row py-2">
