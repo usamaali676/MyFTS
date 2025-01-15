@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\GlobalHelper;
 use App\Models\ClientReporting;
 use Carbon\Carbon;
 use Exception;
@@ -30,6 +31,7 @@ class ClientReportingController extends Controller
      */
     public function store(Request $request)
     {
+        // dd($request->all());
         try {
             $request->validate([
                 'report_type' => 'required',
@@ -39,15 +41,16 @@ class ClientReportingController extends Controller
             ]);
             $report = ClientReporting::create([
                 'client_id' => $request->client_id,
-                'report_type' => $request->report_type,
+                'reporting_type' => $request->report_type,
                 'created_by' => $request->created_by,
                 'report_status' => 'created',
                 'created_at' => Carbon::now(),
-            //    'report_file' => $request->report_file->store('reports'),
+                'report_file' => GlobalHelper::fts_upload_report($request->report_file, 'report'),
             ]);
+            $reports = ClientReporting::where('client_id', $request->client_id)->with('client', 'client.sale.lead', 'createdBy', 'verifiedBy', 'dispatchedBy')->get();
             return response()->json([
                'message' => 'Report created successfully.',
-                'report' => $report
+                'reports' => $reports
             ], 201);
         } catch (Exception $e) {
             return response()->json([

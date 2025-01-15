@@ -8,4 +8,9 @@ class Client extends Model
 {
     protected $fillable = ['sale_id','status','reporting_date',
     ];
+
+    public function sale(){
+        return $this->belongsTo(Sale::class);
+    }
 }
+
