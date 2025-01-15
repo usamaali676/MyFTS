@@ -227,7 +227,7 @@ class LeadController extends Controller
     public function destroy($id)
     {
         $lead = Lead::find($id);
-        $lead->delete_by = Auth::user()->id;
+        $lead->deleted_by = Auth::user()->id;
         $lead->save();
         $lead->delete();
         Alert::Success('Success', "Lead Deleted Successfully");
