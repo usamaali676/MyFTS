@@ -142,8 +142,8 @@
             <form class="d-inline" method="POST" action="{{ route('front.otp.verify.post') }}">
                 @csrf
                 <div class="form-floating form-floating-outline mb-3">
-                    <label for="otp">Enter OTP</label>
                     <input type="text" name="otp" id="otp" class="form-control" required>
+                    <label for="otp">Enter OTP</label>
                     @error('otp') <span class="text-danger">{{ $message }}</span> @enderror
                 </div>
                 <button type="submit" class="btn btn-primary d-grid w-100">Verify</button>
