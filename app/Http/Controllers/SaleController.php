@@ -73,7 +73,12 @@ class SaleController extends Controller
         $company_services = CompanyServices::all();
         if (isset($sale)) {
             $client = Client::where('sale_id', $sale->id)->first();
+            if(isset($client)) {
             $reports = ClientReporting::where('client_id', $client->id)->get();
+            }
+            else{
+                $reports = NULL;
+            }
 
             // dd($client);
             // $lastMonthName = Carbon::now()->subMonth()->format('F');
