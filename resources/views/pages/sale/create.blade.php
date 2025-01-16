@@ -1989,8 +1989,6 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                             </a>
                                         </div>
                                     </div>
-
-
                                 </div>
                             </div>
                             @endif
