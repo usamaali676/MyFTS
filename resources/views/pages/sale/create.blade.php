@@ -1945,29 +1945,31 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                         </tr>
                                                     </thead>
                                                     <tbody>
-                                                        @foreach ($reports as $key=>$item)
-                                                        <tr>
-                                                            <td>{{ $key + 1 }}</td>
-                                                            <td>{{ $item->client->sale->lead->business_name_adv }}</td>
-                                                            <td>{{ $item->reporting_type }}</td>
-                                                            <td>{{ $item->client->reporting_date }}</td>
-                                                            <td>{{ \Carbon\Carbon::parse($item->created_at)->format('Y-m-d') }}</td>
-                                                            <td>{{ $item->createdBy->name }}</td>
-                                                            @if(isset($item->verified_by))
-                                                            <td>{{ $item->verifiedBy->name }}</td>
-                                                            @else
-                                                            <td>Not Verified</td>
-                                                            @endif
-                                                            <td>{{ $item->report_verified_at }}</td>
-                                                            @if(isset($item->dispatched_by))
-                                                            <td>{{ $item->dispatchedBy->name }}</td>
-                                                            @else
-                                                            <td>Not Dispatched</td>
-                                                            @endif
-                                                            <td>{{ $item->dispatch_at }}</td>
-                                                            <td>{{ $item->report_status }}</td>
-                                                        </tr>
-                                                        @endforeach
+                                                        @if (isset($reports) && count($reports) > 0)
+                                                            @foreach ($reports as $key=>$item)
+                                                            <tr>
+                                                                <td>{{ $key + 1 }}</td>
+                                                                <td>{{ $item->client->sale->lead->business_name_adv }}</td>
+                                                                <td>{{ $item->reporting_type }}</td>
+                                                                <td>{{ $item->client->reporting_date }}</td>
+                                                                <td>{{ \Carbon\Carbon::parse($item->created_at)->format('Y-m-d') }}</td>
+                                                                <td>{{ $item->createdBy->name }}</td>
+                                                                @if(isset($item->verified_by))
+                                                                <td>{{ $item->verifiedBy->name }}</td>
+                                                                @else
+                                                                <td>Not Verified</td>
+                                                                @endif
+                                                                <td>{{ $item->report_verified_at }}</td>
+                                                                @if(isset($item->dispatched_by))
+                                                                <td>{{ $item->dispatchedBy->name }}</td>
+                                                                @else
+                                                                <td>Not Dispatched</td>
+                                                                @endif
+                                                                <td>{{ $item->dispatch_at }}</td>
+                                                                <td>{{ $item->report_status }}</td>
+                                                            </tr>
+                                                            @endforeach
+                                                        @endif
                                                     </tbody>
                                                 </table>
                                             </div>
