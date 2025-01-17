@@ -35,7 +35,7 @@
                                 <th>Number</th>
                                 <th>Email</th>
                                 <th>Category</th>
-                                <th>Saler</th>
+                                <th>Seller</th>
                                 <th>Call Status</th>
                                 <th>Closers</th>
                                 <th>Sale Status</th>
@@ -342,7 +342,8 @@
                                 <th>Name</th>
                                 <th>Number</th>
                                 <th>Email</th>
-                                <th>Saler</th>
+                                <th>Category</th>
+                                <th>Seller</th>
                                 <th>Status</th>
                                 <th>Action</th>
                             </tr>

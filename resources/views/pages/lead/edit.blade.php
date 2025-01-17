@@ -29,6 +29,15 @@
 
         <form class="card-body" method="POST" action="{{ route('lead.update', $lead->id) }}" id="leadForm" onsubmit="return validateForm()">
             @csrf
+            @if ($errors->any())
+            <div class="alert alert-danger">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+            @endif
         <!-- Multi Column with Form Separator -->
         <div class="card mb-4 px-3 py-5">
             <h5 class="card-header">Insert Data of Sale</h5>

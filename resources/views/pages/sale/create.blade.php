@@ -3661,20 +3661,16 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                 // alert(mop);
 
                 if (mop == "Credit Card") {
-                    // var input = ' <div class="form-floating form-floating-outline">\
-                    //                 <input\
-                    //                     type="text"\
-                    //                     id="billings-card-num"\
-                    //                     class="form-control billing-card-mask"\
-                    //                     placeholder="4541 2541 2547 2577"\
-                    //                     name="card_number"\
-                    //                     aria-describedby="paymentCard"  />\
-                    //                 <label for="billings-card-num">Card number</label>\
-                    //               </div>';
-                    var input = '<button data-bs-target="#addcarddetail" data-bs-toggle="modal" \
-                                    class="btn btn-primary mb-3 text-nowrap add-new-role">\
-                                    Add Card \
-                                </button>'
+                    var input = ' <div class="form-floating form-floating-outline">\
+                                    <input\
+                                        type="text"\
+                                        id="billings-card-num"\
+                                        class="form-control billing-card-mask"\
+                                        placeholder="4541 2541 2547 2577"\
+                                        name="card_number"\
+                                        aria-describedby="paymentCard"  />\
+                                    <label for="billings-card-num">Card number</label>\
+                                  </div>';
 
                     $('#embed_mop').html(input);
                     var script = document.createElement('script');
