@@ -13,6 +13,7 @@ use App\Models\Role;
 use App\Models\Sale;
 use App\Models\SubCategory;
 use App\Models\User;
+use App\Notifications\NewLeadNotification;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -56,7 +57,7 @@ class LeadController extends Controller
         $formattedCallBackTime = Carbon::parse($request->call_back_time)->format('Y-m-d H:i:s'); // e.g., 2024-10-15 14:30:00
         $request->validate([
             'business_name' => 'required',
-            'business_number' => 'required',
+            'business_number' => 'required | unique:leads,business_number_adv',
             'category' => 'required',
 
         ]);
@@ -102,6 +103,7 @@ class LeadController extends Controller
                 ]);
             }
          }
+        //  $rel_users = User::where('id', $lead->closer()->id)->get();
         // if(isset($request->service)){
         //     foreach ($request->service as $service) {
         //         CompanyServicesLead::create([
@@ -141,6 +143,25 @@ class LeadController extends Controller
         ->whereNotIn('id', $sub_categories_id)
         ->get();
         $comments = Comments::where('lead_id', $lead->id)->orderby('id', 'DESC')->get();
+
+        // $closers = $lead->closers; // Get all the closers related to the lead
+        // // dd($closers);
+        // $userIds = $closers->pluck('closer_id'); // Extract user IDs from the closers
+        // // dd($userIds);
+        // $rel_users = User::whereIn('id', $userIds) // Get users from closers
+        //                  ->orWhereHas('role', function ($query) {
+        //                      $query->where('name', 'Q/A'); // Get users with role 'Q/A'
+        //                  })
+        //                  ->get();
+
+        // // dd($rel_users);
+
+        // foreach ($rel_users as $user) {
+        //     $user->notify(new NewLeadNotification($lead));
+        // }
+
+
+
         // dd($lead->closers);
         return view('pages.lead.edit', compact('lead', 'sub_categories', 'categories','related_subcategories', 'closers', 'company_services', 'selected_company_services', 'comments' ));
     }
@@ -153,7 +174,7 @@ class LeadController extends Controller
         $formattedCallBackTime = Carbon::parse($request->call_back_time)->format('Y-m-d H:i:s'); // e.g., 2024-10-15 14:30:00
         $request->validate([
             'business_name' => 'required',
-            'business_number' => 'required',
+            'business_number' => 'required  | unique:leads,business_number_adv,' .$id,
             'category' => 'required',
         ]);
         $lead = Lead::find($id);
