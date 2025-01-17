@@ -234,6 +234,14 @@ id="layout-navbar">
         </li>
         <li class="dropdown-notifications-list scrollable-container">
           <ul class="list-group list-group-flush">
+            {{-- @foreach (auth()->user()->unreadNotifications as $notification)
+                <li class="list-group-item list-group-item-action dropdown-notifications-item">
+                    <div class="notification">
+                        <p>New Lead Added: {{ $notification->data['lead_name'] }}</p>
+                        <small>Added by: {{ $notification->data['added_by'] }}</small>
+                    </div>
+                </li>
+            @endforeach --}}
             <li class="list-group-item list-group-item-action dropdown-notifications-item">
               <div class="d-flex gap-2">
                 <div class="flex-shrink-0">
@@ -250,7 +258,7 @@ id="layout-navbar">
                 </div>
               </div>
             </li>
-            <li class="list-group-item list-group-item-action dropdown-notifications-item">
+            {{-- <li class="list-group-item list-group-item-action dropdown-notifications-item">
               <div class="d-flex gap-2">
                 <div class="flex-shrink-0">
                   <div class="avatar me-1">
@@ -387,7 +395,7 @@ id="layout-navbar">
                   <small class="text-muted">5 days ago</small>
                 </div>
               </div>
-            </li>
+            </li> --}}
           </ul>
         </li>
         <li class="dropdown-menu-footer border-top p-2">

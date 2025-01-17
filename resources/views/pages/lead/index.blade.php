@@ -49,7 +49,7 @@
                                 @endphp
                                 {{-- <p>{{ $sale }}</p> --}}
 
-                                @if ($user->role_id == 1 || $user->role->name == 'Executives' || $user->role->name == 'QA')
+                                @if ($user->role_id == 1 || $user->role->name == 'Executives' || $user->role->name == 'QA' || $user->role->name == 'Accounts')
                                     {{-- <p>fdgsdfg</p> --}}
                                     @foreach ($leads as $item)
                                         <tr>

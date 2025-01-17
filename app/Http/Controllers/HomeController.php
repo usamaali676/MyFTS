@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\GlobalHelper;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class HomeController extends Controller
 {
@@ -28,6 +29,7 @@ class HomeController extends Controller
         // dd($route);
         // $user = Auth::user();
         // $totalRevenue =
+        // $notifications = Auth::user()->notifications;
         return view('home');
     }
 }
