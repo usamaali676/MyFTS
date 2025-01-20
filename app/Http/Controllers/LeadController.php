@@ -42,8 +42,9 @@ class LeadController extends Controller
     public function create()
     {
         $categories = BusinessCategory::all();
-        $role = Role::where('name', "Closer")->first();
-        $closers = User::where('role_id', $role->id)->get();
+        $roles = Role::whereIn('name', ['Closer', 'Customer Support'])->get();
+        $closers = User::whereIn('role_id', $roles->pluck('id'))->get();
+        // dd($closers);
         $company_services = CompanyServices::all();
         return view('pages.lead.create', compact('categories', 'closers', 'company_services'));
     }
