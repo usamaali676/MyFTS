@@ -153,8 +153,8 @@ class LeadController extends Controller
         $sub_categories = $lead->sub_categories;
         $categories = BusinessCategory::all();
         $sub_categories_id = $lead->sub_categories->pluck('id')->toArray();
-        $role = Role::where('name', "Closer")->first();
-        $closers = User::where('role_id', $role->id)->get();
+        $roles = Role::whereIn('name', ['Closer', 'Customer Support'])->get();
+        $closers = User::whereIn('role_id', $roles->pluck('id'))->get();
         $selected_company_services = $lead->company_services;
         $company_services = CompanyServices::all();
         $related_subcategories = SubCategory::where('business_category_id',  $lead->category_id)
