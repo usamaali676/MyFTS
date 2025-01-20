@@ -437,7 +437,7 @@
         </div>
         </form>
 
-        <div class="col-xl-12 col-lg-5 col-md-5 pt-5">
+        <div class="col-xl-12 col-lg-12 col-md-12 pt-5">
             <div class="card mb-4">
                 <div class="card-header">
                     <div class="row">
