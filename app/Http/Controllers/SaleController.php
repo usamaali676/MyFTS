@@ -55,8 +55,8 @@ class SaleController extends Controller
         $social_links = DB::select("SHOW COLUMNS FROM social_links LIKE 'social_name'");
         $social_links = $social_links[0]->Type; // Get the type string
         $social_links = explode("','", substr($social_links, 6, -2));
-        $role = Role::where('name', "Closer")->first();
-        $closers = User::where('role_id', $role->id)->get();
+        $roles = Role::whereIn('name', ['Closer', 'Customer Support'])->get();
+        $closers = User::whereIn('role_id', $roles->pluck('id'))->get();
         $csrole = Role::where('name', "Customer Support")->first();
         $csr = User::where('role_id', $csrole->id)->get();
         $sale = Sale::where('lead_id', $lead->id)->first();
