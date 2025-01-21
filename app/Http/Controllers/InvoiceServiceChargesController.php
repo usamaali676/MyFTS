@@ -124,9 +124,8 @@ class InvoiceServiceChargesController extends Controller
                 'discount_amount' => $request->discount_amount,
                 'invoice_due_date' => $request->invoice_due_date,
                 'total_amount' => $request->invoice_amount,
-                'invoice_freq' =>   $request->invoice_freq,
+                'invoice_frequency' =>   $request->invoice_freq,
                 'month' => $request->month,
-
             ]);
         // }
         if(isset($request->service_id) && count($request->service_id) > 0){
