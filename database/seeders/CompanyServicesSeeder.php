@@ -14,7 +14,7 @@ class CompanyServicesSeeder extends Seeder
      */
     public function run(): void
     {
-        $services = ['Hosting'];
+        $services = ['Misc.'];
         // $services = ['Activation Date'];
         foreach ($services as $service) {
             CompanyServices::create([

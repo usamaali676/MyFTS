@@ -1279,6 +1279,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                                 <option value="Monthly">Monthly</option>
                                                                 <option value="Bi-annually">Bi-annually</option>
                                                                 <option value="Annually">Annually</option>
+                                                                <option value="One-Time-Payment">One-Time-Payment</option>
                                                             </select>
                                                             <label for="multicol-country">Invoice Frequency</label>
                                                         </div>
