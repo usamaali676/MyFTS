@@ -11,11 +11,11 @@ class Lead extends Model
     use HasFactory;
     use SoftDeletes;
     protected $dates = ['deleted_at'];
-    protected $fillable = [ 'category_id', 'saler_id', 'business_name_adv', 'business_number_adv',	'off_email', 'website_url' , 	'lead_status', 'call_status', 'call_back_time', 'created_by', 'updated_by', 'deleted_by' , 'client_name', 'client_address', 'client_designation',  'additional_number', 'additional_email', 'country', 'state', 'city', 'zip_code'
+    protected $fillable = [ 'saler_id', 'business_name_adv', 'business_number_adv',	'off_email', 'website_url' , 	'lead_status', 'call_status', 'call_back_time', 'created_by', 'updated_by', 'deleted_by' , 'client_name', 'client_address', 'client_designation',  'additional_number', 'additional_email', 'country', 'state', 'city', 'zip_code'
     ];
 
     public function category() {
-        return $this->belongsTo(BusinessCategory::class, 'category_id');
+        return $this->belongsToMany(BusinessCategory::class);
     }
     public function saler() {
         return $this->belongsTo(User::class, 'saler_id');

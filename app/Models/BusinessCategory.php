@@ -17,4 +17,7 @@ class BusinessCategory extends Model
     {
         return $this->hasMany(Subcategory::class);
     }
+    public function leads(){
+        return $this->belongsToMany(Lead::class);
+    }
 }

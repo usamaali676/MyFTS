@@ -45,7 +45,7 @@
                         <div class="row g-4">
                             <div class="col-md-6">
                                 <div class="form-floating form-floating-outline">
-                                    <select id="category" name="category" class="select2 form-select" data-allow-clear="true" required>
+                                    <select id="category" name="category[]" class="select2 form-select" data-allow-clear="true" multiple required>
                                         <option value="">Please Select</option>
                                         @foreach ($categories as $item)
                                         <option value="{{$item->id}}">{{$item->name}}</option>
@@ -363,9 +363,47 @@
         });
     });
 </script> --}}
-
 <script>
-    $('#category').change(function (e) {
+    $('#category').change(function () {
+        var selectedCategories = $(this).val(); // Get all selected categories as an array
+        var subcategories = $('#multicol-language');
+
+        // Clear existing subcategories
+        subcategories.empty();
+        subcategories.append('<option value="">Please Select</option>');
+
+        if (selectedCategories && selectedCategories.length > 0) {
+            subcategories.prop('disabled', false);
+
+            // Loop through all selected categories and fetch subcategories for each
+            $.each(selectedCategories, function (index, categoryId) {
+                $.ajax({
+                    type: "GET",
+                    url: "{{ route('front.get_subcategory') }}",
+                    data: {'selected': categoryId}, // Send one category at a time to get its subcategories
+                    success: function (response) {
+                        var sub_category = response.sub_category;
+
+                        // Loop through subcategories and add them to the dropdown
+                        $.each(sub_category, function (i, item) {
+                            // Avoid adding duplicate subcategory options
+                            if ($('#multicol-language option[value="' + item.id + '"]').length === 0) {
+                                subcategories.append('<option value="' + item.id + '">' + item.name + '</option>');
+                            }
+                        });
+                    }
+                });
+            });
+        } else {
+            subcategories.prop('disabled', true); // Disable subcategories if no categories are selected
+        }
+    });
+</script>
+
+
+{{-- <script>
+    $('#category').select(function (e) {
+        alert("sdfsdfasd");
     e.preventDefault();
     var selected = $(this).find('option:selected').val();
     var subcategories = $('#multicol-language');
@@ -378,7 +416,7 @@
             success: function (response) {
                sub_category = response.sub_category;
 
-               subcategories.empty();
+            //    subcategories.empty();
                subcategories.append('<option value="">Please Select</option>');
                $.each(sub_category, function (i, item) {
                    subcategories.append('<option value="' + item.id + '">' + item.name + '</option>');
@@ -392,7 +430,7 @@
         subcategories.prop('disabled', true);
     }
 });
-</script>
+</script> --}}
 <script>
 $('#call-status').change(function (e) {
     e.preventDefault();
