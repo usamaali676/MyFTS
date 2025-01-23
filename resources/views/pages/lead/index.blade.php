@@ -132,8 +132,10 @@
                                                 @else
                                                     <td>N/A</td>
                                                 @endif
-                                                <td><span
-                                                        class="badge rounded-pill bg-label-primary me-1">{{ $item->category->name }}</span>
+                                                <td>
+                                                    @foreach ($item->category as $cat)
+                                                    <span class="badge rounded-pill bg-label-primary me-1">{{$cat->name }}</span>
+                                                    @endforeach
                                                 </td>
                                                 <td>{{ explode(' -',   $item->saler->name )[0] }}</td>
                                                 <td>{{ $item->call_status }}</td>
@@ -276,8 +278,10 @@
                                                 @else
                                                     <td>N/A</td>
                                                 @endif
-                                                <td><span
-                                                        class="badge rounded-pill bg-label-primary me-1">{{ $item->category->name }}</span>
+                                                <td>
+                                                    @foreach ($item->category as $cat)
+                                                    <span class="badge rounded-pill bg-label-primary me-1">{{$cat->name }}</span>
+                                                    @endforeach
                                                 </td>
                                                 <td>{{ explode(' -',   $item->saler->name )[0] }}</td>
                                                 <td>{{ $item->call_status }}</td>
