@@ -45,10 +45,12 @@
                 <div class="row g-4">
                     <div class="col-md-6">
                         <div class="form-floating form-floating-outline">
-                            <select id="category" name="category" class="select2 form-select" data-allow-clear="true" required>
+                            <select id="category" name="category[]" class="select2 form-select"  multiple required>
                                 <option value="">Please Select</option>
-                                @if(isset($lead->category_id))
-                                <option value="{{$lead->category_id}}" selected>{{$lead->category->name}}</option>
+                                @if(isset($lead->category))
+                                @foreach ($lead->category as $cat)
+                                <option value="{{$cat->id}}" selected>{{$cat->name}}</option>
+                                @endforeach
                                 @else
                                 <option value="" selected>Please Select</option>
                                 @endif
