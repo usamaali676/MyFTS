@@ -59,7 +59,6 @@ class LeadController extends Controller
         $request->validate([
             'business_name' => 'required',
             'business_number' => 'required | unique:leads,business_number_adv',
-            'category' => 'required',
 
         ]);
       $lead = Lead::create([
@@ -74,7 +73,7 @@ class LeadController extends Controller
             'zip_code' => $request->zip_code,
             'website_url' => $request->website_url,
             'saler_id' => Auth::user()->id,
-            'category_id' => $request->category,
+            // 'category_id' => $request->category,
             'lead_status' =>  $request->lead_status,
             'call_status' => $request->call_status,
             'call_back_time' => $formattedCallBackTime,
@@ -83,6 +82,7 @@ class LeadController extends Controller
             'additional_email' => $request->add_email,
         ]);
         $lead->sub_categories()->attach($request->sub_category);
+        $lead->category()->attach($request->category);
         $lead->company_services()->attach($request->service);
         // $lead->closers()->attach($request->closers);
         if(isset($request->closers)){
@@ -207,7 +207,7 @@ class LeadController extends Controller
             'city' => $request->cities,
             'client_designation' => $request->client_designation,
             'zip_code' => $request->zip_code,
-            'category_id' => $request->category,
+            // 'category_id' => $request->category,
             'lead_status' =>  $request->lead_status,
             'call_status' => $request->call_status,
             'call_back_time' => $formattedCallBackTime,
@@ -217,6 +217,8 @@ class LeadController extends Controller
         ]);
         $lead->sub_categories()->sync($request->sub_category);
         $lead->company_services()->sync($request->service);
+        $lead->category()->sync($request->category);
+
         // if(isset($request->closers)){
             $remainingclosers = LeadCloser::where('lead_id', $lead->id)->get();
             if(isset($remainingclosers)){

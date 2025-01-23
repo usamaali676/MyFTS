@@ -45,7 +45,7 @@
                         <div class="row g-4">
                             <div class="col-md-6">
                                 <div class="form-floating form-floating-outline">
-                                    <select id="category" name="category" class="select2 form-select" data-allow-clear="true" required>
+                                    <select id="category" name="category[]" class="select2 form-select" data-allow-clear="true" multiple required>
                                         <option value="">Please Select</option>
                                         @foreach ($categories as $item)
                                         <option value="{{$item->id}}">{{$item->name}}</option>
