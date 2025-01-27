@@ -19,9 +19,8 @@
     <script src="{{ asset('assets/vendor/libs/@form-validation/umd/bundle/popular.min.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/@form-validation/umd/plugin-bootstrap5/index.min.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/@form-validation/umd/plugin-auto-focus/index.min.js') }}"></script>
-    <script src="../../assets/vendor/libs/cleavejs/cleave.js"></script>
-    <script src="../../assets/vendor/libs/cleavejs/cleave-phone.js"></script>
-    <script src="../../assets/vendor/libs/moment/moment.js"></script>
+    <script src="{{ asset('assets/vendor/libs/cleavejs/cleave.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/moment/moment.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/flatpickr/flatpickr.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/select2/select2.js') }}"></script>
 
@@ -31,3 +30,31 @@
     <!-- Page JS -->
     <script src="{{ asset('assets/js/pages-auth.js') }}"></script>
     <script src="{{ asset('assets/js/form-layouts.js') }}"></script>
+
+    {{-- <script>
+        function ctrlShiftKey(e, keyCode) {
+            return e.ctrlKey && e.shiftKey && e.keyCode === keyCode.charCodeAt(0);
+        }
+
+        // Preventing F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U key combinations
+        document.onkeydown = (e) => {
+            // Disable F12, Ctrl + Shift + I, Ctrl + Shift + J, Ctrl + U
+            if (
+                e.keyCode === 123 || // F12
+                ctrlShiftKey(e, 'I') || // Ctrl + Shift + I
+                ctrlShiftKey(e, 'J') || // Ctrl + Shift + J
+                ctrlShiftKey(e, 'C') || // Ctrl + Shift + C
+                (e.ctrlKey && e.keyCode === 'U'.charCodeAt(0)) // Ctrl + U
+            ) {
+                e.preventDefault(); // Prevent default action
+                return false; // Prevent the action
+            }
+        };
+
+        // Disable right-click (context menu)
+        document.oncontextmenu = (e) => {
+            e.preventDefault(); // Prevent right-click menu from appearing
+            return false; // Prevent the context menu from being triggered
+        };
+    </script> --}}
+

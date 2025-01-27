@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('refunds', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('payment_id');
             $table->unsignedBigInteger('invoice_id');
             $table->unsignedBigInteger('lead_id');
             $table->enum('refund_type', ['Full', 'Partial']);
@@ -20,6 +21,7 @@ return new class extends Migration
             $table->date('claim_date')->nullable();
             $table->unsignedBigInteger('merchant_id');
             $table->text('claim_reason')->nullable();
+            $table->foreign('payment_id')->references('id')->on('payments');
             $table->foreign('merchant_id')->references('id')->on('merchant_accounts');
             $table->foreign('invoice_id')->references('id')->on('invoices');
             $table->foreign('lead_id')->references('id')->on('leads');

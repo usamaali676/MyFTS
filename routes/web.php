@@ -45,6 +45,10 @@ Route::controller(FrontController::class)
     Route::get('/getcash', 'getcash')->name('getcash');
     Route::get('/getbank', 'getbank')->name('getbank');
     Route::get('/get-refund', 'getRefund')->name('getRefund');
+    Route::get('/get-chargeBack', 'getchargeBack')->name('getchargeBack');
+    Route::get('otp-verify',  'showVerifyForm')->name('otp.verify');
+    Route::post('otp-verify',  'verify')->name('otp.verify.post');
+
 });
 
 Route::controller(RoleController::class)

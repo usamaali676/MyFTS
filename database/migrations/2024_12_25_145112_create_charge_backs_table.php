@@ -13,12 +13,14 @@ return new class extends Migration
     {
         Schema::create('charge_backs', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('payment_id');
             $table->unsignedBigInteger('invoice_id');
             $table->unsignedBigInteger('lead_id');
             $table->date('claim_date')->nullable();
             $table->unsignedBigInteger('merchant_id');
             $table->text('claim_reason')->nullable();
             $table->foreign('merchant_id')->references('id')->on('merchant_accounts');
+            $table->foreign('payment_id')->references('id')->on('payments');
             $table->foreign('invoice_id')->references('id')->on('invoices');
             $table->foreign('lead_id')->references('id')->on('leads');
             $table->timestamps();

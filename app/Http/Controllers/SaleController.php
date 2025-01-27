@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\BusinessHours;
 use App\Models\ChargeBack;
 use App\Models\Client;
+use App\Models\ClientReporting;
 use App\Models\ClientServices;
 use App\Models\Comments;
 use App\Models\CompanyServices;
@@ -54,10 +55,13 @@ class SaleController extends Controller
         $social_links = DB::select("SHOW COLUMNS FROM social_links LIKE 'social_name'");
         $social_links = $social_links[0]->Type; // Get the type string
         $social_links = explode("','", substr($social_links, 6, -2));
-        $role = Role::where('name', "Closer")->first();
-        $closers = User::where('role_id', $role->id)->get();
-        $csrole = Role::where('name', "Customer Support")->first();
-        $csr = User::where('role_id', $csrole->id)->get();
+        $roles = Role::whereIn('name', ['Closer', 'Customer Support'])->get();
+        $closers = User::whereIn('role_id', $roles->pluck('id'))->get();
+        // $csrole = Role::where('name', "Customer Support")->first();
+        $csr = User::whereIn('role_id', $roles->pluck('id'))
+        ->whereNotIn('id', [12, 13])
+        ->get();
+
         $sale = Sale::where('lead_id', $lead->id)->first();
         $mehchant = MerchantAccount::all();
         $comments = Comments::where('lead_id', $lead->id)->orderby('id', 'DESC')->get();
@@ -72,18 +76,30 @@ class SaleController extends Controller
         $company_services = CompanyServices::all();
         if (isset($sale)) {
             $client = Client::where('sale_id', $sale->id)->first();
+            if(isset($client)) {
+            $reports = ClientReporting::where('client_id', $client->id)->get();
+            }
+            else{
+                $reports = NULL;
+            }
+
             // dd($client);
             // $lastMonthName = Carbon::now()->subMonth()->format('F');
             // dd($lastMonthName);
             $lastMonthName = Carbon::now()->format('M Y');
             $invoice = Invoice::where('sale_id', $sale->id)->where('month', $lastMonthName)->first();
-            $all_invoices = Invoice::where('sale_id', $sale->id)->get();
-            if(isset($invoice)){
-            $payments = Payment::where('invoice_id', $invoice->id)->get();
-            }
-            else{
-                $payments = NULL;
-            }
+            // $all_invoices = Invoice::where('sale_id', $sale->id)->get();
+            // if(isset($invoice)){
+            // $payments = Payment::where('invoice_id', $invoice->id)->get();
+            $all_invoices =  Invoice::where('sale_id', $sale->id)->get();
+            $invoiceIds = $all_invoices->pluck('id')->toArray();
+            $payments = Payment::whereIn('invoice_id', $invoiceIds)
+            ->with('invoice', 'merchant')// Fixed 'merchant' to 'merchant'
+            ->get();
+            // }
+            // else{
+            //     $payments = NULL;
+            // }
             // dd($invoice);
             // Get client services for the sale and eager load their company services specific to this sale
             $client_services = $sale->clientServices->map(function ($clientService) use ($sale) {
@@ -91,7 +107,7 @@ class SaleController extends Controller
                 $clientService->setRelation('companyServicesForSale', $clientService->companyServicesForSale($sale->id)->get());
                 return $clientService;
             });
-            return view('pages.sale.create', compact('lead', 'client_enum', 'call_enum', 'social_links', 'closers', 'sale', 'company_services', 'client_services', 'invoice', 'mehchant' , 'all_invoices', 'payments', 'csr', 'comments','refunds','chargeBack','client'));
+            return view('pages.sale.create', compact('lead', 'client_enum', 'call_enum', 'social_links', 'closers', 'sale', 'company_services', 'client_services', 'invoice', 'mehchant' , 'all_invoices', 'payments', 'csr', 'comments','refunds','chargeBack','client', 'reports'));
         } else {
             return view('pages.sale.create', compact('lead', 'client_enum', 'call_enum', 'social_links', 'closers', 'sale', 'company_services', 'mehchant', 'csr', 'comments','refunds', 'chargeBack'));
         }

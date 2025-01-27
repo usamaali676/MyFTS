@@ -45,7 +45,7 @@
                         <div class="row g-4">
                             <div class="col-md-6">
                                 <div class="form-floating form-floating-outline">
-                                    <select id="category" name="category" class="select2 form-select" data-allow-clear="true" required>
+                                    <select id="category" name="category[]" class="select2 form-select" data-allow-clear="true" multiple required>
                                         <option value="">Please Select</option>
                                         @foreach ($categories as $item)
                                         <option value="{{$item->id}}">{{$item->name}}</option>
@@ -74,15 +74,15 @@
                                     <input type="text" id="business_name" name="business_name" class="form-control" required
                                         placeholder="John"
                                         onkeydown="return /[a-zA-Z\s]/.test(event.key) || event.key === 'Backspace' || event.key === 'Tab';" />
-                                    <label for="multicol-first-name">Business Name</label>
+                                    <label for="multicol-first-name">Business Name <span style="color: #ff4d49">*</span></label>
                                 </div>
 
                             </div>
                             <div class="col-md-6">
                                 <div class="form-floating form-floating-outline">
                                     <input type="tel"  id="business_number" style="height: calc(2.940725rem + 2px);"
-                                        name="business_number" class="form-control"  required/>
-                                    {{-- <label for="multicol-last-name">Business Number</label> --}}
+                                        name="business_number" class="form-control" placeholder=" "  required />
+                                    <label for="multicol-last-name" id="business_number_label" style="padding-left: 45px ">Business Number <span style="color: #ff4d49">*</span></label>
                                 </div>
                             </div>
 
@@ -210,7 +210,10 @@
                                     <select id="multicol-closers" name="closers[]" class="select2 form-select" multiple>
                                         <option value="">Please Select</option>
                                         @foreach ($closers as $user)
-                                        <option value="{{ $user->id }}">{{ $user->name }}</option>
+                                        @php
+                                            $closerName = explode(' -', $user->name)[0];// Use the part after the hyphen, or the original text if no hyphen exists
+                                        @endphp
+                                        <option value="{{ $user->id }}">{{ $closerName }}</option>
                                         @endforeach
                                         {{-- <option value="en" selected>English</option>
                                         <option value="fr" selected>French</option>
@@ -241,30 +244,9 @@
                             <h6>Additional Contact Info</h6>
                         </div>
                         <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-floating form-floating-outline">
-                                        <input type="tel"  id="business_number2" style="height: calc(2.940725rem + 2px);"
-                                            name="add_business_number" class="form-control"  />
-                                        <label for="multicol-last-name">Additional Business Number</label>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-2">
-                                        <div class="input-group input-group-merge">
-                                            <div class="form-floating form-floating-outline">
-                                                <input type="email" id="basic-default-email2" name="add_email" class="form-control"
-                                                    placeholder="john.doe" aria-label="john.doe"
-                                                    aria-describedby="basic-default-email2">
-                                                <label for="basic-default-email">Optional Email</label>
-                                            </div>
-                                            <span class="input-group-text" id="basic-default-email2">@example.com</span>
-                                        </div>
-                                        <div class="form-text">You can use letters, numbers &amp; periods</div>
-                                    </div>
-                                </div>
-                            </div>
-                            {{-- <div id="repeater">
+
+                            <div id="repeater">
+
 
                                     <div class="items">
                                         <div class="item-content">
@@ -300,7 +282,7 @@
                                         <a class="btn btn-primary repeater-add-btn" style="color: #fff">Add</a>
                                     </div>
 
-                            </div> --}}
+                            </div>
 
                                 <!-- Hidden Template for New Repeater Item -->
                         </div>
@@ -348,7 +330,7 @@
 });
 </script>
 
-    {{-- <script src="{{ asset('assets/vendor/libs/jquery-repeater/jquery-repeater.js') }}"></script> --}}
+    <script src="{{ asset('assets/vendor/libs/jquery-repeater/jquery-repeater.js') }}"></script>
     {{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.repeater/1.2.1/jquery.repeater.js" integrity="sha512-bZAXvpVfp1+9AUHQzekEZaXclsgSlAeEnMJ6LfFAvjqYUVZfcuVXeQoN5LhD7Uw0Jy4NCY9q3kbdEXbwhZUmUQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script>
         $(document).ready(function() {
@@ -365,12 +347,12 @@
 
     </script> --}}
 
-{{-- <script src="{{ asset('assets/js/leadreapeter.js') }}"></script> --}}
-{{-- <script>
+<script src="{{ asset('assets/js/leadreapeter.js') }}"></script>
+<script>
     $(function(){
         $("#repeater").createRepeater_lead();
     });
-</script> --}}
+</script>
 {{-- <script>
     $(document).ready(function () {
         // Add a new repeater item on Add button click
@@ -381,9 +363,47 @@
         });
     });
 </script> --}}
-
 <script>
-    $('#category').change(function (e) {
+    $('#category').change(function () {
+        var selectedCategories = $(this).val(); // Get all selected categories as an array
+        var subcategories = $('#multicol-language');
+
+        // Clear existing subcategories
+        subcategories.empty();
+        subcategories.append('<option value="">Please Select</option>');
+
+        if (selectedCategories && selectedCategories.length > 0) {
+            subcategories.prop('disabled', false);
+
+            // Loop through all selected categories and fetch subcategories for each
+            $.each(selectedCategories, function (index, categoryId) {
+                $.ajax({
+                    type: "GET",
+                    url: "{{ route('front.get_subcategory') }}",
+                    data: {'selected': categoryId}, // Send one category at a time to get its subcategories
+                    success: function (response) {
+                        var sub_category = response.sub_category;
+
+                        // Loop through subcategories and add them to the dropdown
+                        $.each(sub_category, function (i, item) {
+                            // Avoid adding duplicate subcategory options
+                            if ($('#multicol-language option[value="' + item.id + '"]').length === 0) {
+                                subcategories.append('<option value="' + item.id + '">' + item.name + '</option>');
+                            }
+                        });
+                    }
+                });
+            });
+        } else {
+            subcategories.prop('disabled', true); // Disable subcategories if no categories are selected
+        }
+    });
+</script>
+
+
+{{-- <script>
+    $('#category').select(function (e) {
+        alert("sdfsdfasd");
     e.preventDefault();
     var selected = $(this).find('option:selected').val();
     var subcategories = $('#multicol-language');
@@ -396,7 +416,7 @@
             success: function (response) {
                sub_category = response.sub_category;
 
-               subcategories.empty();
+            //    subcategories.empty();
                subcategories.append('<option value="">Please Select</option>');
                $.each(sub_category, function (i, item) {
                    subcategories.append('<option value="' + item.id + '">' + item.name + '</option>');
@@ -410,7 +430,7 @@
         subcategories.prop('disabled', true);
     }
 });
-</script>
+</script> --}}
 <script>
 $('#call-status').change(function (e) {
     e.preventDefault();
@@ -540,6 +560,23 @@ $('#call-status').change(function (e) {
                 });
             }
         });
+    });
+</script>
+
+<script>
+    const inputField = document.querySelector("#business_number");
+    const label = document.querySelector("#business_number_label");
+
+    // Hide the label when the input is focused
+    inputField.addEventListener("focus", function() {
+        label.style.display = "none"; // Hide label
+    });
+
+    // Show the label again when the input loses focus, but only if the field is empty
+    inputField.addEventListener("blur", function() {
+        if (inputField.value === "") {
+            label.style.display = "block"; // Show label if the input is empty
+        }
     });
 </script>
 

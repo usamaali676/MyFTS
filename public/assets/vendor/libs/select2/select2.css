@@ -364,14 +364,14 @@ html:not([dir=rtl]) .form-floating.form-floating-select2 label {
 .light-style .select2-container--default .select2-selection {
   transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
   background-color: #fff;
-  border: 1px solid #d8d8dd;
+  border: 1px solid #7a7a7a;
   border-radius: 0.5rem;
 }
 .light-style .select2-container--default .select2-selection:hover {
   border-color: #bbbcc4;
 }
 .light-style .select2-container--default .select2-selection__placeholder {
-  color: #bbbcc4;
+  color: #7a7a7a;
 }
 .light-style .select2-container--default .select2-selection--single {
   height: 2.47rem;

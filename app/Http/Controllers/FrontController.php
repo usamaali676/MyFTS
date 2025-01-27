@@ -158,10 +158,45 @@ class FrontController extends Controller
             public function getRefund(Request $request)
             {
                 if($request->ajax()){
-                    $invoice = Invoice::where('id', $request->invoice_id)->first();
+                    // $invoice = Invoice::where('id', $request->invoice_id)->first();
+                    $payment = Payment::where('id', $request->payment_id)->with('invoice')->first();
                     // dd($invoice->id);
-                    return response()->json(['invoice' => $invoice]);
+                    return response()->json(['payment' => $payment]);
                 }
+            }
+            public function getchargeBack(Request $request)
+            {
+                if($request->ajax()){
+                    // $invoice = Invoice::where('id', $request->invoice_id)->first();
+                    $payment = Payment::where('id', $request->payment_id)->with('invoice')->first();
+                    // dd($invoice->id);
+                    return response()->json(['payment' => $payment]);
+                }
+            }
+
+            public function showVerifyForm()
+            {
+                return view('auth.otp');
+            }
+
+            public function verify(Request $request)
+            {
+                $request->validate([
+                    'otp' => 'required|digits:6',
+                ]);
+
+                $user = User::find(session('user_id'));
+
+                if ($user && $user->otp == $request->otp) {
+                    // Clear OTP and log in the user
+                    $user->otp = null;
+                    $user->save();
+
+                    auth()->login($user);
+                    return redirect('/');
+                }
+
+                return back()->withErrors(['otp' => 'Invalid OTP']);
             }
 
     }

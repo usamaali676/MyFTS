@@ -29,6 +29,15 @@
 
         <form class="card-body" method="POST" action="{{ route('lead.update', $lead->id) }}" id="leadForm" onsubmit="return validateForm()">
             @csrf
+            @if ($errors->any())
+            <div class="alert alert-danger">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+            @endif
         <!-- Multi Column with Form Separator -->
         <div class="card mb-4 px-3 py-5">
             <h5 class="card-header">Insert Data of Sale</h5>
@@ -36,10 +45,12 @@
                 <div class="row g-4">
                     <div class="col-md-6">
                         <div class="form-floating form-floating-outline">
-                            <select id="category" name="category" class="select2 form-select" data-allow-clear="true" required>
+                            <select id="category" name="category[]" class="select2 form-select"  multiple required>
                                 <option value="">Please Select</option>
-                                @if(isset($lead->category_id))
-                                <option value="{{$lead->category_id}}" selected>{{$lead->category->name}}</option>
+                                @if(isset($lead->category))
+                                @foreach ($lead->category as $cat)
+                                <option value="{{$cat->id}}" selected>{{$cat->name}}</option>
+                                @endforeach
                                 @else
                                 <option value="" selected>Please Select</option>
                                 @endif
@@ -77,7 +88,7 @@
                             <input type="text" id="business_name" name="business_name" class="form-control"
                                 placeholder="John" value="{{ $lead->business_name_adv }}"
                                 onkeydown="return /[a-zA-Z\s]/.test(event.key) || event.key === 'Backspace' || event.key === 'Tab';" />
-                            <label for="multicol-first-name">Business Name</label>
+                            <label for="multicol-first-name">Business Name <span style="color: #ff4d49">*</span></label>
                         </div>
                     </div>
                     <div class="col-md-6">
@@ -233,13 +244,19 @@
 
                                 @if(isset($lead->closers))
                                 @foreach ($lead->closers as $item)
-                                    <option value="{{ $item->closer_id }}" selected>{{ $item->user->name }}</option>
+                                    @php
+                                    $closerName = explode(' -', $item->user->name)[0];// Use the part after the hyphen, or the original text if no hyphen exists
+                                    @endphp
+                                    <option value="{{ $item->closer_id }}" selected>{{ $closerName }}</option>
                                 @endforeach
                                 @else
                                 <option value="">Please Select</option>
                                 @endif
                                 @foreach ($closers as $item)
-                                <option value="{{ $item->id }}">{{ $item->name }}</option>
+                                @php
+                                    $newcloserName = explode(' -',  $item->name)[0];// Use the part after the hyphen, or the original text if no hyphen exists
+                                    @endphp
+                                <option value="{{ $item->id }}">{{ $newcloserName }}</option>
                                 @endforeach
                                 {{-- <option value="en" selected>English</option>
                                 <option value="fr" selected>French</option>
@@ -277,7 +294,7 @@
                     <h6>Additional Contact Info</h6>
                 </div>
                 <div class="card-body">
-                    <div class="row">
+                    {{-- <div class="row">
                         <div class="col-md-6">
                             <div class="form-floating form-floating-outline">
                                 <input type="tel"  id="business_number2" style="height: calc(2.940725rem + 2px);"
@@ -299,7 +316,79 @@
                                 <div class="form-text">You can use letters, numbers &amp; periods</div>
                             </div>
                         </div>
-                    </div>
+                    </div> --}}
+                    <div id="repeater">
+
+                        @if(isset($lead->additional_info))
+                            @foreach ($lead->additional_info as $info)
+                                <div class="items">
+                                    <div class="item-content">
+                                        <div class="row py-2">
+                                            <div class="col-md-4">
+                                                <div class="form-floating form-floating-outline">
+                                                    <select name="platform_name[]" class="form-control">
+                                                        @if (isset($info->name))
+                                                            <option value="{{ $info->name }}" selected>{{ $info->name }}</option>
+                                                        @else
+                                                            <option value="">Please Select</option>
+                                                        @endif
+                                                        <option value="phone">Phone</option>
+                                                        <option value="email">Email</option>
+                                                        <option value="url">URL</option>
+                                                    </select>
+                                                    <label> Platform</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-floating form-floating-outline">
+                                                    <input type="text" class="form-control" value="{{ $info->value }}" name="platform_value[]" placeholder="Value" />
+                                                    <label>Value</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <a class="btn btn-outline-danger remove-btn" style="color: #ff4d49" onclick="$(this).closest('.items').remove()">Remove</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        @else
+                        <div class="items">
+                            <div class="item-content">
+                                <div class="row py-2">
+                                    <div class="col-md-4">
+                                        <div class="form-floating form-floating-outline">
+                                            <select name="platform_name[]" class="form-control">
+                                                <option value="">Please Select</option>
+                                                <option value="phone">Phone</option>
+                                                <option value="email">Email</option>
+                                                <option value="url">URL</option>
+                                            </select>
+                                            <label> Platform</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-floating form-floating-outline">
+                                            <input type="text" class="form-control" name="platform_value[]" placeholder="Value" />
+                                            <label>Value</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <a class="btn btn-outline-danger remove-btn" style="color: #ff4d49" onclick="$(this).closest('.items').remove()">Remove</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        @endif
+
+                        <div class="items" >
+                        </div>
+
+                        <div class="repeater-footer py-4" style="display: flex; justify-content: flex-end;">
+                            <a class="btn btn-primary repeater-add-btn" style="color: #fff">Add</a>
+                        </div>
+
+                </div>
                     {{-- <div id="repeater">
 
                             <div class="items">
@@ -350,7 +439,7 @@
         </div>
         </form>
 
-        <div class="col-xl-12 col-lg-5 col-md-5 pt-5">
+        <div class="col-xl-12 col-lg-12 col-md-12 pt-5">
             <div class="card mb-4">
                 <div class="card-header">
                     <div class="row">
@@ -484,6 +573,12 @@
   strictMode: true,
   utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/24.6.0/build/js/utils.min.js"
 });
+</script>
+<script src="{{ asset('assets/js/leadreapeter.js') }}"></script>
+<script>
+    $(function(){
+        $("#repeater").createRepeater_lead();
+    });
 </script>
 <script>
     $(document).ready(function () {

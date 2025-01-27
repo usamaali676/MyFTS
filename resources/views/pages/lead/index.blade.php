@@ -31,11 +31,11 @@
                         <thead>
                             <tr>
                                 <th></th>
-                                <th>Name</th>
+                                <th>Business Name</th>
                                 <th>Number</th>
                                 <th>Email</th>
                                 <th>Category</th>
-                                <th>Saler</th>
+                                <th>Seller</th>
                                 <th>Call Status</th>
                                 <th>Closers</th>
                                 <th>Sale Status</th>
@@ -49,7 +49,7 @@
                                 @endphp
                                 {{-- <p>{{ $sale }}</p> --}}
 
-                                @if ($user->role_id == 1 || $user->role->name == 'Executives' || $user->role->name == 'QA')
+                                @if ($user->role_id == 1 || $user->role->name == 'Executives' || $user->role->name == 'QA' || $user->role->name == 'Accounts')
                                     {{-- <p>fdgsdfg</p> --}}
                                     @foreach ($leads as $item)
                                         <tr>
@@ -61,18 +61,22 @@
                                             @else
                                                 <td>N/A</td>
                                             @endif
-                                            <td><span
-                                                    class="badge rounded-pill bg-label-primary me-1">{{ $item->category->name }}</span>
+                                            <td>
+                                                @foreach ($item->category as $cat)
+                                                <span class="badge rounded-pill bg-label-primary me-1">{{$cat->name }}</span>
+                                                @endforeach
                                             </td>
-                                            <td>{{ $item->saler->name }}</td>
+                                            <td>{{ explode(' -',   $item->saler->name )[0] }}</td>
                                             <td>{{ $item->call_status }}</td>
                                             <td>
                                                 {{-- <p>{{ $item->closers }}</p> --}}
                                                 @if (isset($item->closers) && count($item->closers) > 0)
-                                                    @foreach ($item->closers as $list)
+                                                    <div class="d-flex" style="gap: 10px; flex-direction: column;">
+                                                        @foreach ($item->closers as $list)
                                                         <span
-                                                            class="badge rounded-pill bg-label-primary me-1">{{ $list->user->name }}</span>
-                                                    @endforeach
+                                                            class="badge rounded-pill bg-label-primary me-1">{{ explode(' -',  $list->user->name)[0] }}</span>
+                                                        @endforeach
+                                                    </div>
                                                 @else
                                                     N/A
                                                 @endif
@@ -118,7 +122,7 @@
                                     @endforeach
                                 @elseif ($user->role->name == 'Customer Support')
                                     @foreach ($leads as $item)
-                                        @if (isset($item->sale) && $item->sale->status == 1)
+                                        @if (isset($item->sale) && $item->sale->Customer_support->contains('cs_id', $user->id) || $item->saler_id == $user->id)
                                             <tr>
                                                 <td>{{ $loop->index + 1 }}</td>
                                                 <td>{{ $item->business_name_adv }}</td>
@@ -128,18 +132,22 @@
                                                 @else
                                                     <td>N/A</td>
                                                 @endif
-                                                <td><span
-                                                        class="badge rounded-pill bg-label-primary me-1">{{ $item->category->name }}</span>
+                                                <td>
+                                                    @foreach ($item->category as $cat)
+                                                    <span class="badge rounded-pill bg-label-primary me-1">{{$cat->name }}</span>
+                                                    @endforeach
                                                 </td>
-                                                <td>{{ $item->saler->name }}</td>
+                                                <td>{{ explode(' -',   $item->saler->name )[0] }}</td>
                                                 <td>{{ $item->call_status }}</td>
                                                 <td>
                                                     {{-- <p>{{ $item->closers }}</p> --}}
                                                     @if (isset($item->closers) && count($item->closers) > 0)
-                                                        @foreach ($item->closers as $list)
+                                                        <div class="d-flex" style="gap: 10px; flex-direction: column;">
+                                                            @foreach ($item->closers as $list)
                                                             <span
-                                                                class="badge rounded-pill bg-label-primary me-1">{{ $list->user->name }}</span>
-                                                        @endforeach
+                                                                class="badge rounded-pill bg-label-primary me-1">{{ explode(' -',  $list->user->name)[0] }}</span>
+                                                            @endforeach
+                                                        </div>
                                                     @else
                                                         N/A
                                                     @endif
@@ -197,18 +205,22 @@
                                                 @else
                                                     <td>N/A</td>
                                                 @endif
-                                                <td><span
-                                                        class="badge rounded-pill bg-label-primary me-1">{{ $item->category->name }}</span>
+                                                <td>
+                                                    @foreach ($item->category as $cat)
+                                                    <span class="badge rounded-pill bg-label-primary me-1">{{$cat->name }}</span>
+                                                    @endforeach
                                                 </td>
-                                                <td>{{ $item->saler->name }}</td>
+                                                <td>{{ explode(' -',   $item->saler->name )[0] }}</td>
                                                 <td>{{ $item->call_status }}</td>
                                                 <td>
                                                     {{-- <p>{{ $item->closers }}</p> --}}
                                                     @if (isset($item->closers) && count($item->closers) > 0)
-                                                        @foreach ($item->closers as $list)
+                                                        <div class="d-flex" style="gap: 10px; flex-direction: column;">
+                                                            @foreach ($item->closers as $list)
                                                             <span
-                                                                class="badge rounded-pill bg-label-primary me-1">{{ $list->user->name }}</span>
-                                                        @endforeach
+                                                                class="badge rounded-pill bg-label-primary me-1">{{ explode(' -',  $list->user->name)[0] }}</span>
+                                                            @endforeach
+                                                        </div>
                                                     @else
                                                         N/A
                                                     @endif
@@ -256,7 +268,9 @@
                                     @endforeach
                                 @else
                                     @foreach ($leads as $item)
-                                        @if ($item->closers->contains('closer_id', $user->id) && $item->sale == null)
+
+                                        {{-- @if ($item->closers->contains('closer_id', $user->id) && $item->sale == null) --}}
+                                        @if ($item->closers->contains('closer_id', $user->id) || $item->saler_id == $user->id)
                                             <tr>
                                                 <td>{{ $loop->index + 1 }}</td>
                                                 <td>{{ $item->business_name_adv }}</td>
@@ -266,18 +280,22 @@
                                                 @else
                                                     <td>N/A</td>
                                                 @endif
-                                                <td><span
-                                                        class="badge rounded-pill bg-label-primary me-1">{{ $item->category->name }}</span>
+                                                <td>
+                                                    @foreach ($item->category as $cat)
+                                                    <span class="badge rounded-pill bg-label-primary me-1">{{$cat->name }}</span>
+                                                    @endforeach
                                                 </td>
-                                                <td>{{ $item->saler->name }}</td>
+                                                <td>{{ explode(' -',   $item->saler->name )[0] }}</td>
                                                 <td>{{ $item->call_status }}</td>
                                                 <td>
                                                     {{-- <p>{{ $item->closers }}</p> --}}
                                                     @if (isset($item->closers) && count($item->closers) > 0)
-                                                        @foreach ($item->closers as $list)
+                                                        <div class="d-flex" style="gap: 10px; flex-direction: column;">
+                                                            @foreach ($item->closers as $list)
                                                             <span
-                                                                class="badge rounded-pill bg-label-primary me-1">{{ $list->user->name }}</span>
-                                                        @endforeach
+                                                                class="badge rounded-pill bg-label-primary me-1">{{ explode(' -',  $list->user->name)[0] }}</span>
+                                                            @endforeach
+                                                        </div>
                                                     @else
                                                         N/A
                                                     @endif
@@ -332,7 +350,8 @@
                                 <th>Name</th>
                                 <th>Number</th>
                                 <th>Email</th>
-                                <th>Saler</th>
+                                <th>Category</th>
+                                <th>Seller</th>
                                 <th>Status</th>
                                 <th>Action</th>
                             </tr>

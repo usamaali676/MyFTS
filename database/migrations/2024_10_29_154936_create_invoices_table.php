@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('discount_type')->nullable();
             $table->decimal('discount_amount', 10, 2)->nullable();
             $table->date('invoice_due_date')->nullable();
-            $table->enum('invoice_frequency', ['Monthly', 'Bi-annually','Annually']);
+            $table->enum('invoice_frequency', ['Monthly', 'Bi-annually','Annually', 'One-Time-Payment']);
             $table->decimal('total_amount', 10, 2)->nullable();
             $table->boolean('invoice_active_status')->defaultFalse();
             $table->date('activation_date')->nullable();

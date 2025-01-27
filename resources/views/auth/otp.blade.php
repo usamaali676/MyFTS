@@ -1,3 +1,30 @@
+{{-- @extends('layouts.app')
+
+@section('content')
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">{{ __('Verify Your Email Address') }}</div>
+
+                <div class="card-body">
+
+                    <form class="d-inline"method="POST" action="{{ route('front.otp.verify.post') }}">
+                        @csrf
+                        <div class="form-group">
+                            <label for="otp">Enter OTP</label>
+                            <input type="text" name="otp" id="otp" class="form-control" required>
+                            @error('otp') <span class="text-danger">{{ $message }}</span> @enderror
+                        </div>
+                        <button type="submit" class="btn btn-primary d-grid w-100">Verify</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> --}}
+
+
 @extends('layouts.app')
 
 @section('content')
@@ -107,38 +134,19 @@
 
           <!-- Verify Email -->
           <div class="card-body mt-2">
-            <h4 class="mb-2">Verify your email ✉️</h4>
+            <h4 class="mb-2">Confirm Your Email ✉️</h4>
             <p class="text-start mb-2">
-              Write your Email. We will Send activation link sent to your email address: Please follow the link inside to
+              Write your OTP. We Send OTP  to your email address: Please follow the Instruction inside to
               continue.
             </p>
-            <form method="POST" action="{{ route('password.email') }}">
+            <form class="d-inline" method="POST" action="{{ route('front.otp.verify.post') }}">
                 @csrf
-                @if (session('status'))
-                <div class="alert alert-success" role="alert">
-                    {{ session('status') }}
-                </div>
-                @endif
                 <div class="form-floating form-floating-outline mb-3">
-                    <input
-                      type="text"
-                      class="form-control"
-                      id="email"
-                      name="email"
-                      placeholder="Enter your email or username"
-                      autofocus />
-                      @error('email')
-                      <span class="invalid-feedback" role="alert">
-                          <strong>{{ $message }}</strong>
-                      </span>
-                      @enderror
-                    <label for="email">Email or Username</label>
-                  </div>
-
-
-                  <div class="mb-3">
-                    <button class="btn btn-primary d-grid w-100" type="submit">  {{ __('Send Password Reset Link') }}</button>
-                  </div>
+                    <input type="text" name="otp" id="otp" class="form-control" required>
+                    <label for="otp">Enter OTP</label>
+                    @error('otp') <span class="text-danger">{{ $message }}</span> @enderror
+                </div>
+                <button type="submit" class="btn btn-primary d-grid w-100">Verify</button>
             </form>
           </div>
         </div>
@@ -153,3 +161,5 @@
     </div>
   </div>
 @endsection
+
+{{-- @endsection --}}

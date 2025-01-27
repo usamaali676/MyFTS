@@ -13,6 +13,7 @@ use App\Models\Role;
 use App\Models\Sale;
 use App\Models\SubCategory;
 use App\Models\User;
+use App\Notifications\NewLeadNotification;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -41,8 +42,9 @@ class LeadController extends Controller
     public function create()
     {
         $categories = BusinessCategory::all();
-        $role = Role::where('name', "Closer")->first();
-        $closers = User::where('role_id', $role->id)->get();
+        $roles = Role::whereIn('name', ['Closer', 'Customer Support'])->get();
+        $closers = User::whereIn('role_id', $roles->pluck('id'))->get();
+        // dd($closers);
         $company_services = CompanyServices::all();
         return view('pages.lead.create', compact('categories', 'closers', 'company_services'));
     }
@@ -52,12 +54,11 @@ class LeadController extends Controller
      */
     public function store(Request $request)
     {
-        // dd($request->all());
+
         $formattedCallBackTime = Carbon::parse($request->call_back_time)->format('Y-m-d H:i:s'); // e.g., 2024-10-15 14:30:00
         $request->validate([
             'business_name' => 'required',
-            'business_number' => 'required',
-            'category' => 'required',
+            'business_number' => 'required | unique:leads,business_number_adv',
 
         ]);
       $lead = Lead::create([
@@ -72,7 +73,7 @@ class LeadController extends Controller
             'zip_code' => $request->zip_code,
             'website_url' => $request->website_url,
             'saler_id' => Auth::user()->id,
-            'category_id' => $request->category,
+            // 'category_id' => $request->category,
             'lead_status' =>  $request->lead_status,
             'call_status' => $request->call_status,
             'call_back_time' => $formattedCallBackTime,
@@ -81,6 +82,7 @@ class LeadController extends Controller
             'additional_email' => $request->add_email,
         ]);
         $lead->sub_categories()->attach($request->sub_category);
+        $lead->category()->attach($request->category);
         $lead->company_services()->attach($request->service);
         // $lead->closers()->attach($request->closers);
         if(isset($request->closers)){
@@ -92,6 +94,34 @@ class LeadController extends Controller
                 ]);
             }
         }
+        if (isset($request->platform_name) && count($request->platform_name) > 0 && !is_null($request->platform_name[0]) &&
+        isset($request->platform_value) && count($request->platform_value) > 0 && !is_null($request->platform_value[0])) {
+            foreach ($request->platform_name as $key => $name) {
+                LeadAdditionalInfo::create([
+                    'lead_id' => $lead->id,
+                    'name' => $name,
+                    'value' => $request->platform_value[$key],
+                ]);
+            }
+         }
+
+            //     $closers = $lead->closers; // Get all the closers related to the lead
+            // // dd($closers);
+            // $userIds = $closers->pluck('closer_id'); // Extract user IDs from the closers
+            // // dd($userIds);
+            // $rel_users = User::whereIn('id', $userIds) // Get users from closers
+            //                 ->orWhereHas('role', function ($query) {
+            //                     $query->whereIn('name', ['QA', 'Executives', 'Creator']);
+            //                 })
+            //                 ->get();
+
+            // // dd($rel_users);
+
+            // foreach ($rel_users as $user) {
+            //     $user->notify(new NewLeadNotification($lead));
+            // }
+
+        //  $rel_users = User::where('id', $lead->closer()->id)->get();
         // if(isset($request->service)){
         //     foreach ($request->service as $service) {
         //         CompanyServicesLead::create([
@@ -123,14 +153,33 @@ class LeadController extends Controller
         $sub_categories = $lead->sub_categories;
         $categories = BusinessCategory::all();
         $sub_categories_id = $lead->sub_categories->pluck('id')->toArray();
-        $role = Role::where('name', "Closer")->first();
-        $closers = User::where('role_id', $role->id)->get();
+        $roles = Role::whereIn('name', ['Closer', 'Customer Support'])->get();
+        $closers = User::whereIn('role_id', $roles->pluck('id'))->get();
         $selected_company_services = $lead->company_services;
         $company_services = CompanyServices::all();
         $related_subcategories = SubCategory::where('business_category_id',  $lead->category_id)
         ->whereNotIn('id', $sub_categories_id)
         ->get();
         $comments = Comments::where('lead_id', $lead->id)->orderby('id', 'DESC')->get();
+
+        // $closers = $lead->closers; // Get all the closers related to the lead
+        // // dd($closers);
+        // $userIds = $closers->pluck('closer_id'); // Extract user IDs from the closers
+        // // dd($userIds);
+        // $rel_users = User::whereIn('id', $userIds) // Get users from closers
+        //                  ->orWhereHas('role', function ($query) {
+        //                      $query->where('name', 'Q/A'); // Get users with role 'Q/A'
+        //                  })
+        //                  ->get();
+
+        // // dd($rel_users);
+
+        // foreach ($rel_users as $user) {
+        //     $user->notify(new NewLeadNotification($lead));
+        // }
+
+
+
         // dd($lead->closers);
         return view('pages.lead.edit', compact('lead', 'sub_categories', 'categories','related_subcategories', 'closers', 'company_services', 'selected_company_services', 'comments' ));
     }
@@ -143,7 +192,7 @@ class LeadController extends Controller
         $formattedCallBackTime = Carbon::parse($request->call_back_time)->format('Y-m-d H:i:s'); // e.g., 2024-10-15 14:30:00
         $request->validate([
             'business_name' => 'required',
-            'business_number' => 'required',
+            'business_number' => 'required  | unique:leads,business_number_adv,' .$id,
             'category' => 'required',
         ]);
         $lead = Lead::find($id);
@@ -158,7 +207,7 @@ class LeadController extends Controller
             'city' => $request->cities,
             'client_designation' => $request->client_designation,
             'zip_code' => $request->zip_code,
-            'category_id' => $request->category,
+            // 'category_id' => $request->category,
             'lead_status' =>  $request->lead_status,
             'call_status' => $request->call_status,
             'call_back_time' => $formattedCallBackTime,
@@ -168,6 +217,8 @@ class LeadController extends Controller
         ]);
         $lead->sub_categories()->sync($request->sub_category);
         $lead->company_services()->sync($request->service);
+        $lead->category()->sync($request->category);
+
         // if(isset($request->closers)){
             $remainingclosers = LeadCloser::where('lead_id', $lead->id)->get();
             if(isset($remainingclosers)){
@@ -183,6 +234,29 @@ class LeadController extends Controller
                 ]);
             }
         }
+        if (isset($request->platform_name) && count($request->platform_name) > 0 && !is_null($request->platform_name[0]) &&
+        isset($request->platform_value) && count($request->platform_value) > 0 && !is_null($request->platform_value[0])) {
+            foreach ($request->platform_name as $key => $name) {
+                // Find the existing record by lead_id and name
+                $platform = LeadAdditionalInfo::where('lead_id', $lead->id)
+                                              ->where('name', $name)
+                                              ->first();
+
+                // If the record exists, update it, otherwise, create a new record
+                if ($platform) {
+                    $platform->update([
+                        'value' => $request->platform_value[$key],
+                    ]);
+                } else {
+                    // If no existing record, create a new one
+                    LeadAdditionalInfo::create([
+                        'lead_id' => $lead->id,
+                        'name' => $name,
+                        'value' => $request->platform_value[$key],
+                    ]);
+                }
+            }
+        }
         Alert::Success('Success', "Lead Updated Successfully");
         return redirect()->route('lead.index');
 
@@ -194,7 +268,7 @@ class LeadController extends Controller
     public function destroy($id)
     {
         $lead = Lead::find($id);
-        $lead->delete_by = Auth::user()->id;
+        $lead->deleted_by = Auth::user()->id;
         $lead->save();
         $lead->delete();
         Alert::Success('Success', "Lead Deleted Successfully");

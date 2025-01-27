@@ -16,77 +16,27 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $categoriesWithSubcategories = [
-            'Cleaning' => [
-                'Residential Cleaning',
-                'Commercial Cleaning',
-                'Window Cleaning',
-                'Carpet Cleaning',
-                'Deep Cleaning',
+            'Insurance' => [
+                'Property insurance',
+                'Life insurance',
+                'Credit insurance',
+                'Renters insurance',
+                'Health insurance',
+                'Auto insurance',
+                'Home insurance',
+                'Business insurance',
             ],
-            'Plumbing' => [
-                'Leak Repair',
-                'Drain Cleaning',
-                'Pipe Installation',
-                'Water Heater Services',
-                'Sewer Line Repair',
+            'Financial consulting' => [
+                'Wealth manager',
+                'Investment advisor',
+                'Financial planner or advisor',
+                'Broker',
+                'Chartered Financial Consultant',
+                'Independent Financial Adviser',
+                'Asset management',
+                'Registered investment advisor (RIA)',
+                'Tax planning',
             ],
-            'Electrical' => [
-                'Wiring Installation',
-                'Lighting Installation',
-                'Circuit Breaker Replacement',
-                'Electrical Inspections',
-                'Emergency Repairs',
-            ],
-            'Landscaping' => [
-                'Lawn Care',
-                'Garden Design',
-                'Tree Removal',
-                'Irrigation Systems',
-                'Hardscaping',
-            ],
-            'Carpentry' => [
-                'Furniture Making',
-                'Cabinet Installation',
-                'Custom Shelving',
-                'Deck Construction',
-                'Trim and Molding',
-            ],
-            'Pest Control' => [
-                'Termite Control',
-                'Rodent Removal',
-                'Insect Extermination',
-                'Preventive Treatments',
-                'Wildlife Control',
-            ],
-            'Painting' => [
-                'Interior Painting',
-                'Exterior Painting',
-                'Commercial Painting',
-                'Specialty Finishes',
-                'Wallpaper Installation',
-            ],
-            'Roofing' => [
-                'Roof Installation',
-                'Roof Repair',
-                'Gutter Installation',
-                'Roof Inspections',
-                'Emergency Roof Repair',
-            ],
-            'HVAC' => [
-                'AC Installation',
-                'Heating Repair',
-                'Duct Cleaning',
-                'Furnace Installation',
-                'Thermostat Installation',
-            ],
-            'Moving Services' => [
-                'Residential Moving',
-                'Commercial Moving',
-                'Packing Services',
-                'Storage Solutions',
-                'Loading and Unloading',
-            ],
-            // Add more categories and subcategories as needed...
         ];
 
         // Create categories and their subcategories

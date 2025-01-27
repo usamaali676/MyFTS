@@ -17,4 +17,7 @@ class Invoice extends Model
     public function servicecharges(){
         return $this->hasMany(InvoiceServiceCharges::class, 'invoice_id');
     }
+    public function payments(){
+        return $this->hasMany(Payment::class, 'invoice_id');
+    }
 }
