@@ -72,8 +72,8 @@
                             <div class="col-md-6">
                                 <div class="form-floating form-floating-outline">
                                     <input type="text" id="business_name" name="business_name" class="form-control" required
-                                        placeholder="John"
-                                        onkeydown="return /[a-zA-Z\s]/.test(event.key) || event.key === 'Backspace' || event.key === 'Tab';" />
+                                        placeholder="Towing Company"
+                                        onkeydown="return /[a-zA-Z0-9\s\-\_&.,]/.test(event.key) || event.key === 'Backspace' || event.key === 'Tab';" />
                                     <label for="multicol-first-name">Business Name <span style="color: #ff4d49">*</span></label>
                                 </div>
 
