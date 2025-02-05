@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\ChargeBack;
+use App\Models\Invoice;
+use App\Models\User;
+use App\Notifications\NewChargeBackNotification;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -51,6 +54,15 @@ class ChargeBackController extends Controller
                 'merchant_id' => $request->input('merchant_id'),
                 'claim_reason' => $request->input('chargeBack_reason'),
             ]);
+            $invoice = Invoice::where('id', $request->invoice_id)->first();
+            $title = 'A ChargeBack is Charged Against Invoice: '. $invoice->invoice_number;
+            $relatedUsers = User::WhereHas('role', function ($query) {
+                    $query->whereIn('name', ['QA', 'Executives', 'Creator', 'Accounts']);
+                })
+                ->get();
+                foreach ($relatedUsers as $user) {
+                    $user->notify(new NewChargeBackNotification($charge, $title, $invoice));
+                }
             $chargeBack = ChargeBack::where('lead_id', '=', $charge->lead_id)->with('invoice', 'merchant')->get();
             return response()->json([
                 'message' => 'ChargeBack Added Successfully!',

@@ -6517,11 +6517,11 @@ textarea.form-control-lg {
   content: "";
 }
 
-.text-truncate {
+/* .text-truncate {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
+} */
 
 .vr {
   display: inline-block;

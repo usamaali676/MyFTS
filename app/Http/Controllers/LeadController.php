@@ -104,22 +104,23 @@ class LeadController extends Controller
                 ]);
             }
          }
+         $title = 'New Lead Generated: '. $lead->business_name_adv;
 
-            //     $closers = $lead->closers; // Get all the closers related to the lead
-            // // dd($closers);
-            // $userIds = $closers->pluck('closer_id'); // Extract user IDs from the closers
-            // // dd($userIds);
-            // $rel_users = User::whereIn('id', $userIds) // Get users from closers
-            //                 ->orWhereHas('role', function ($query) {
-            //                     $query->whereIn('name', ['QA', 'Executives', 'Creator']);
-            //                 })
-            //                 ->get();
+            $closers = $lead->closers; // Get all the closers related to the lead
+            // dd($closers);
+            $userIds = $closers->pluck('closer_id'); // Extract user IDs from the closers
+            // dd($userIds);
+            $rel_users = User::whereIn('id', $userIds) // Get users from closers
+                            ->orWhereHas('role', function ($query) {
+                                $query->whereIn('name', ['QA', 'Executives', 'Creator', 'Accounts']);
+                            })
+                            ->get();
 
             // // dd($rel_users);
 
-            // foreach ($rel_users as $user) {
-            //     $user->notify(new NewLeadNotification($lead));
-            // }
+            foreach ($rel_users as $user) {
+                $user->notify(new NewLeadNotification($lead, $title));
+            }
 
         //  $rel_users = User::where('id', $lead->closer()->id)->get();
         // if(isset($request->service)){

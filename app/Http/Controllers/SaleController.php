@@ -20,6 +20,7 @@ use App\Models\Sale;
 use App\Models\SaleCS;
 use App\Models\SocialLink;
 use App\Models\User;
+use App\Notifications\NewSaleNotification;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -213,6 +214,21 @@ class SaleController extends Controller
             $sale->time_zone = $request->timezone;
             $sale->updated_by = Auth::user()->id;
             $sale->save();
+
+            $lead = Lead::findOrFail($request->lead_id);
+            $title = 'Lead is Updated in Sale: '. $lead->business_name_adv;
+            $closers = $lead->closers; // Get all the closers related to the lead
+            // dd($closers);
+            $userIds = $closers->pluck('closer_id'); // Extract user IDs from the closers
+            // dd($userIds);
+            $relatedUsers = User::whereIn('id', $userIds) // Get users from closers
+                ->orWhereHas('role', function ($query) {
+                    $query->whereIn('name', ['QA', 'Executives', 'Creator', 'Accounts']);
+                })
+                ->get();
+            foreach ($relatedUsers as $user) {
+                $user->notify(new NewSaleNotification($sale, $lead, $title));
+            }
         }
 
         $old_social = SocialLink::where('sale_id', $sale->id)->get();
@@ -315,6 +331,8 @@ class SaleController extends Controller
                 );
             }
         }
+
+
 
 
         return response()->json([

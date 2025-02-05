@@ -131,6 +131,23 @@ class GlobalHelper
     }
 
 
+    public static  function timeAgoShort(Carbon $time)
+{
+    $now = Carbon::now();
+
+    $now = Carbon::now();
+
+    if ($time->diffInSeconds($now) < 60) {
+        return round($time->diffInSeconds($now)) . 'S ago';
+    } elseif ($time->diffInMinutes($now) < 60) {
+        return round($time->diffInMinutes($now)) . 'M ago';
+    } elseif ($time->diffInHours($now) < 24) {
+        return round($time->diffInHours($now)) . 'H ago';
+    } else {
+        return round($time->diffInDays($now)) . 'D ago';
+    }
+}
+
 
 
 

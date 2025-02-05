@@ -50,9 +50,13 @@ $user = Auth::user();
                         </div>
                     </div>
                     <div class="card-info mt-4 pt-1 mt-lg-1 mt-xl-4">
-                        <h5 class="mb-2">155k</h5>
-                        <p class="mb-lg-2 mb-xl-3">Total Orders</p>
-                        <div class="badge bg-label-secondary rounded-pill">Last 4 Month</div>
+                        @if(isset($sale_count))
+                        <h5 class="mb-2">{{ $sale_count }}</h5>
+                        @else
+                        <h5 class="mb-2">0</h5>
+                        @endif
+                        <p class="mb-lg-2 mb-xl-3">Total Sales</p>
+                        <div class="badge bg-label-secondary rounded-pill">Current Month</div>
                     </div>
                 </div>
             </div>
@@ -64,10 +68,10 @@ $user = Auth::user();
             <div class="card h-100">
                 <div class="card-header pb-0">
                     <div class="d-flex align-items-end mb-1 flex-wrap gap-2">
-                        <h4 class="mb-0 me-2">$38.5k</h4>
+                        <h4 class="mb-0 me-2">${{ $total }}</h4>
                         <p class="mb-0 text-success">+62%</p>
                     </div>
-                    <span class="d-block mb-2 text-body">Sessions</span>
+                    <span class="d-block mb-2 text-body">Revenue </span>
                 </div>
                 <div class="card-body pt-0">
                     <div id="sessions"></div>
