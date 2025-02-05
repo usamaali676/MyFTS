@@ -58,7 +58,7 @@ class LeadController extends Controller
         $formattedCallBackTime = Carbon::parse($request->call_back_time)->format('Y-m-d H:i:s'); // e.g., 2024-10-15 14:30:00
         $request->validate([
             'business_name' => 'required',
-            'business_number' => 'required | unique:leads,business_number_adv',
+            'business_number' => 'required|unique:leads,business_number_adv,NULL,id,deleted_at,NULL',
 
         ]);
       $lead = Lead::create([
@@ -193,7 +193,7 @@ class LeadController extends Controller
         $formattedCallBackTime = Carbon::parse($request->call_back_time)->format('Y-m-d H:i:s'); // e.g., 2024-10-15 14:30:00
         $request->validate([
             'business_name' => 'required',
-            'business_number' => 'required  | unique:leads,business_number_adv,' .$id,
+            'business_number' => 'required|unique:leads,business_number_adv,' . $id . ',id,deleted_at,NULL',
             'category' => 'required',
         ]);
         $lead = Lead::find($id);
