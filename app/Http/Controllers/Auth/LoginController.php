@@ -45,7 +45,7 @@ class LoginController extends Controller
     protected function authenticated(Request $request, $user)
     {
         // Check if the user's email is admin@admin.com
-        if ($user->email === 'admin@admin.com') {
+        if ($user->email === 'admin@admin.com' || $user->role->name == "Executives") {
             // Skip 2FA and redirect to the intended page
             return redirect()->intended($this->redirectPath());
         }

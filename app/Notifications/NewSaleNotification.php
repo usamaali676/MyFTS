@@ -7,21 +7,23 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class NewLeadNotification extends Notification
+class NewSaleNotification extends Notification
 {
     use Queueable;
+    protected $sale;
+    protected $lead;
+    protected $title;
 
-    private $lead;
-    private $title;
-    private $link;
 
     /**
      * Create a new notification instance.
      */
-    public function __construct($lead, $title )
+    public function __construct($sale,  $lead, $title,)
     {
+        $this->sale = $sale;
         $this->lead = $lead;
         $this->title = $title;
+
     }
 
     /**
@@ -37,25 +39,7 @@ class NewLeadNotification extends Notification
     /**
      * Get the mail representation of the notification.
      */
-    // public function toMail(object $notifiable): MailMessage
-    // {
-    //     return (new MailMessage)
-    //                 ->line('The introduction to the notification.')
-    //                 ->action('Notification Action', url('/'))
-    //                 ->line('Thank you for using our application!');
-    // }
 
-
-    public function toDatabase($notifiable)
-    {
-        return [
-
-            'title' => $this->title,
-            'lead_id' => $this->lead->id,
-            'lead_name' => $this->lead->business_name_adv,
-            'added_by' => $this->lead->created_by,
-        ];
-    }
 
     /**
      * Get the array representation of the notification.
@@ -64,8 +48,12 @@ class NewLeadNotification extends Notification
      */
     public function toArray(object $notifiable): array
     {
+        // dd($this->lead);
         return [
-            //
+            'title' => $this->title,
+            'sale_id' => $this->sale->id,
+            'lead_name' => $this->lead->business_name_adv,
+            'added_by' => $this->sale->created_by,
         ];
     }
 }
