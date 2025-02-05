@@ -456,15 +456,15 @@ $('#call-status').change(function (e) {
 
         // Check if all required fields are set
         if (businessName && businessName.trim() !== "") {
-            // Validate business name (only letters and spaces)
-            if (!/^[a-zA-Z\s]*$/.test(businessName)) {
-                alert('Invalid Business Name. Only letters and spaces are allowed.');
-                return false;
-            }
-        } else {
-            alert('Business Name is required.');
-            return false;
-        }
+    // Validate business name (allow letters, numbers, spaces, and special characters like -, _, &)
+    if (!/^[a-zA-Z0-9\s\-\_&.,]*$/.test(businessName)) {
+        alert('Invalid Business Name. Only letters, numbers, spaces, and certain special characters are allowed.');
+        return false;
+    }
+    } else {
+        alert('Business Name is required.');
+        return false;
+    }
 
 
 
