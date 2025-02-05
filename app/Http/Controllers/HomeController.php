@@ -31,54 +31,54 @@ class HomeController extends Controller
     {
         // $route = GlobalHelper::Permissions();
         // dd($route);
-        $user = Auth::user();
+        // $user = Auth::user();
         // $totalRevenue =
         // $notifications = Auth::user()->notifications;
         // $notifications->each(function ($notification) {
         //     $notification->user = User::find($notification->data['added_by']);
         // });
-        $lead = Lead::where('saler_id', $user->id)
-        ->whereMonth('created_at', now()->month)
-        ->whereYear('created_at', now()->year)
-        ->get();
+        // $lead = Lead::where('saler_id', $user->id)
+        // ->whereMonth('created_at', now()->month)
+        // ->whereYear('created_at', now()->year)
+        // ->get();
 
-        $last_lead = Lead::where('saler_id', $user->id)
-        ->whereMonth('created_at',now()->subMonth()->month)
-        ->whereYear('created_at', now()->subMonth()->year)
-        ->get();
+        // $last_lead = Lead::where('saler_id', $user->id)
+        // ->whereMonth('created_at',now()->subMonth()->month)
+        // ->whereYear('created_at', now()->subMonth()->year)
+        // ->get();
 
-        // Get sales for this month that are associated with those leads
-        $sale = Sale::whereIn('lead_id', $lead->pluck('id'))
-                ->whereMonth('created_at', now()->month)
-                ->whereYear('created_at', now()->year)
-                ->get();
+        // // Get sales for this month that are associated with those leads
+        // $sale = Sale::whereIn('lead_id', $lead->pluck('id'))
+        //         ->whereMonth('created_at', now()->month)
+        //         ->whereYear('created_at', now()->year)
+        //         ->get();
 
-        $sale_count = Sale::whereIn('lead_id', $lead->pluck('id'))
-                ->whereMonth('created_at', now()->month)
-                ->whereYear('created_at', now()->year)
-                ->count();
-        // dd($sale_count);
-        $last_sale_count = Sale::whereIn('lead_id', $last_lead->pluck('id'))
-        ->whereMonth('created_at', now()->subMonth()->month)  // Subtract 1 month
-        ->whereYear('created_at', now()->subMonth()->year)   // Use the previous month year
-        ->count();
+        // $sale_count = Sale::whereIn('lead_id', $lead->pluck('id'))
+        //         ->whereMonth('created_at', now()->month)
+        //         ->whereYear('created_at', now()->year)
+        //         ->count();
+        // // dd($sale_count);
+        // $last_sale_count = Sale::whereIn('lead_id', $last_lead->pluck('id'))
+        // ->whereMonth('created_at', now()->subMonth()->month)  // Subtract 1 month
+        // ->whereYear('created_at', now()->subMonth()->year)   // Use the previous month year
+        // ->count();
 
-        // if ($last_sale_count > 0) {
-        //     $percentage_diff = (($sale_count - $last_sale_count) / $last_sale_count) * 100;
-        // } else {
-        //     $percentage_diff = 0;  // Handle case where there were no sales last month
+        // // if ($last_sale_count > 0) {
+        // //     $percentage_diff = (($sale_count - $last_sale_count) / $last_sale_count) * 100;
+        // // } else {
+        // //     $percentage_diff = 0;  // Handle case where there were no sales last month
+        // // }
+        // // dd($percentage_diff);
+
+        // // Sum the invoice amounts for this month
+        // $total = 0;
+        // foreach ($sale as $s) {
+        // $total += Invoice::where('sale_id', $s->id)
+        //                 ->whereMonth('created_at', now()->month)
+        //                 ->whereYear('created_at', now()->year)
+        //                 ->sum('total_amout');
         // }
-        // dd($percentage_diff);
-
-        // Sum the invoice amounts for this month
-        $total = 0;
-        foreach ($sale as $s) {
-        $total += Invoice::where('sale_id', $s->id)
-                        ->whereMonth('created_at', now()->month)
-                        ->whereYear('created_at', now()->year)
-                        ->sum('total_amout');
-        }
         // dd($total);
-        return view('home', compact('total', 'sale_count'));
+        return view('home');
     }
 }
