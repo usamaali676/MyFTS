@@ -194,4 +194,7 @@ Route::controller(RoleController::class)
     ->middleware(PermissionMiddelware::class)
     ->group(function () {
         Route::post('store', 'store')->name('store');
+        Route::post('edit/{id}', 'edit')->name('edit');
+        Route::post('update/{id}', 'update')->name('update');
+        Route::get('delete', 'destroy')->name('delete');
     });
