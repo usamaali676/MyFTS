@@ -42,11 +42,26 @@ class RefundController extends Controller
                 'refund_amount' =>'required',
                 'merchant_id' =>'required',
             ]);
-            $invoice = Invoice::where('id', $request->invoice_id)->first();
 
+            $invoice = Invoice::where('id', $request->invoice_id)->first();
+            if(isset($invoice)){
+                $old_refund = Refund::where('invoice_id', $invoice->id)->first();
+                if(isset($old_refund)){
+                if ($old_refund->refund_amount >= $invoice->total_amount) {
+                    return response()->json([
+                        'error' => 'Refund with the same Invoice ID already exists',
+                    ], 422);
+                }
+                elseif($request->refund_amount > ($invoice->total_amount - $old_refund->refund_amount)){
+                    return response()->json([
+                        'error' => 'Refund Amount Exceeded',
+                    ], 422);
+                }
+                }
+            }
             if ( $request->refund_amount > $invoice->total_amount ) {
                 return response()->json([
-                    'error' => 'Charge Back Amount Exceeded',
+                    'error' => 'Refund Amount Exceeded',
                 ], 422);
             }
            $refund = Refund::create([

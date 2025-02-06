@@ -1849,133 +1849,175 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                     <small>Reports</small>
                                 </div>
                                 <div class="row g-4">
-                                    <form id="report_create" method="POST" action="{{ route('clientReport.store') }}">
-                                        @csrf
-                                        @if ($errors->any())
-                                        <div class="alert alert-danger">
-                                            <ul>
-                                                @foreach ($errors->all() as $error)
-                                                <li>{{ $error }}</li>
-                                                @endforeach
-                                            </ul>
-                                        </div>
-                                        @endif
-                                        <div class="row g-4">
-                                            @if(isset($client))
-                                                <input type="hidden" name="client_id" value="{{ $client->id }}">
+                                    @if(isset($clientreport_perm) && $clientreport_perm->create == 1)
+                                        <form id="report_create" method="POST" action="{{ route('clientReport.store') }}">
+                                            @csrf
+                                            @if ($errors->any())
+                                            <div class="alert alert-danger">
+                                                <ul>
+                                                    @foreach ($errors->all() as $error)
+                                                    <li>{{ $error }}</li>
+                                                    @endforeach
+                                                </ul>
+                                            </div>
                                             @endif
-                                            <div class="col-md-6 select2-primary">
-                                                <div class="form-floating form-floating-outline">
-                                                    <select id="select-report-type" name="report_type" class="select2 form-select">
-                                                        <option value="">Select Report Type</option>
-                                                        <option value="Landing Pages">Landing Pages</option>
-                                                        <option value="SMM">SMM</option>
-                                                        <option value="GMB">GMB</option>
-                                                        <option value="Website Development">Website Development</option>
-                                                        <option value="Other">Other</option>
-                                                    </select>
-                                                    <label for="select-invoice">Select Report Type</label>
+                                            <div class="row g-4">
+                                                @if(isset($client))
+                                                    <input type="hidden" name="client_id" value="{{ $client->id }}">
+                                                @endif
+                                                <div class="col-md-6 select2-primary">
+                                                    <div class="form-floating form-floating-outline">
+                                                        <select id="select-report-type" name="report_type" class="select2 form-select">
+                                                            <option value="">Select Report Type</option>
+                                                            <option value="Landing Pages">Landing Pages</option>
+                                                            <option value="SMM">SMM</option>
+                                                            <option value="GMB">GMB</option>
+                                                            <option value="Website Development">Website Development</option>
+                                                            <option value="Other">Other</option>
+                                                        </select>
+                                                        <label for="select-invoice">Select Report Type</label>
+                                                    </div>
                                                 </div>
-                                            </div>
 
-                                            <div class="col-md-6 select2-primary">
-                                                <div class="form-floating form-floating-outline">
-                                                    <select id="select-created_by" name="created_by" class="select2 form-select">
-                                                        @auth
-                                                        <option value="{{ Auth::user()->id }}" selected @readonly(true)>{{ Auth::user()->name }}</option>
-                                                        @endauth
+                                                <div class="col-md-6 select2-primary">
+                                                    <div class="form-floating form-floating-outline">
+                                                        <select id="select-created_by" name="created_by" class="select2 form-select">
+                                                            @auth
+                                                            <option value="{{ Auth::user()->id }}" selected @readonly(true)>{{ Auth::user()->name }}</option>
+                                                            @endauth
 
 
-                                                    </select>
-                                                    <label for="select-invoice">Select Created By</label>
+                                                        </select>
+                                                        <label for="select-invoice">Select Created By</label>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div class="col-md-6 select2-primary">
-                                                <div class="form-floating form-floating-outline">
-                                                    <select id="select-verified_by" name="verified_by" class="select2 form-select">
-                                                        @auth
-                                                        <option value="{{ Auth::user()->id }}" selected @readonly(true)>{{ Auth::user()->name }}</option>
-                                                        @endauth
-                                                    </select>
-                                                    <label for="select-invoice">Select Verified By</label>
+                                                <div class="col-md-6 select2-primary">
+                                                    <div class="form-floating form-floating-outline">
+                                                        <select id="select-verified_by" name="verified_by" class="select2 form-select">
+                                                            @auth
+                                                            <option value="{{ Auth::user()->id }}" selected @readonly(true)>{{ Auth::user()->name }}</option>
+                                                            @endauth
+                                                        </select>
+                                                        <label for="select-invoice">Select Verified By</label>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div class="col-md-6 select2-primary">
-                                                <div class="form-floating form-floating-outline">
-                                                    <select id="select-dispatched_by" name="despatched_by" class="select2 form-select">
-                                                        <option value="">Select Dispatched By</option>
-                                                        @foreach ($csr as $item)
-                                                            <option value="{{ $item->id }}">{{ $item->name }}</option>
-                                                        @endforeach
-                                                    </select>
-                                                    <label for="select-invoice">Select Dispatched By</label>
-                                                </div>
-                                            </div>
-                                            <div class="col-12">
-                                                <button class="btn btn-primary">
-                                                    <input type="file" name="report_file" id="" placeholder="Upload File" accept="application/pdf,application/doc,.doc, .docx,">
-                                                </button>
-                                            </div>
-                                            <div class="col-12">
-                                                <button class="btn btn-primary">
-                                                    <i class="fas fa-plus-circle me-2"></i>
-                                                    Add Report
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </form>
-
-                                    <div class="row py-4">
-                                        <h4>Reports</h4>
-                                        <div class="col-md-12">
-                                            <div class="table-responsive">
-                                                <table id="reporting_table" class="table table-striped">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>Sr</th>
-                                                            <th>Client Name</th>
-                                                            <th>Report Type</th>
-                                                            <th>Schedule Date</th>
-                                                            <th>Reporting Date</th>
-                                                            <th>Created By</th>
-                                                            <th>Verified By</th>
-                                                            <th>Varification Date</th>
-                                                            <th>Dispatch</th>
-                                                            <th>Dispatch Date</th>
-                                                            <th>Status</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        @if (isset($reports) && count($reports) > 0)
-                                                            @foreach ($reports as $key=>$item)
-                                                            <tr>
-                                                                <td>{{ $key + 1 }}</td>
-                                                                <td>{{ $item->client->sale->lead->business_name_adv }}</td>
-                                                                <td>{{ $item->reporting_type }}</td>
-                                                                <td>{{ $item->client->reporting_date }}</td>
-                                                                <td>{{ \Carbon\Carbon::parse($item->created_at)->format('Y-m-d') }}</td>
-                                                                <td>{{ $item->createdBy->name }}</td>
-                                                                @if(isset($item->verified_by))
-                                                                <td>{{ $item->verifiedBy->name }}</td>
-                                                                @else
-                                                                <td>Not Verified</td>
-                                                                @endif
-                                                                <td>{{ $item->report_verified_at }}</td>
-                                                                @if(isset($item->dispatched_by))
-                                                                <td>{{ $item->dispatchedBy->name }}</td>
-                                                                @else
-                                                                <td>Not Dispatched</td>
-                                                                @endif
-                                                                <td>{{ $item->dispatch_at }}</td>
-                                                                <td>{{ $item->report_status }}</td>
-                                                            </tr>
+                                                <div class="col-md-6 select2-primary">
+                                                    <div class="form-floating form-floating-outline">
+                                                        <select id="select-dispatched_by" name="despatched_by" class="select2 form-select">
+                                                            <option value="">Select Dispatched By</option>
+                                                            @foreach ($csr as $item)
+                                                                <option value="{{ $item->id }}">{{ $item->name }}</option>
                                                             @endforeach
-                                                        @endif
-                                                    </tbody>
-                                                </table>
+                                                        </select>
+                                                        <label for="select-invoice">Select Dispatched By</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-12">
+                                                    <button class="btn btn-primary">
+                                                        <input type="file" name="report_file" id="" placeholder="Upload File" accept="application/pdf,application/doc,.doc, .docx,">
+                                                    </button>
+                                                </div>
+                                                <div class="col-12">
+                                                    <button class="btn btn-primary">
+                                                        <i class="fas fa-plus-circle me-2"></i>
+                                                        Add Report
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    @endif
+                                    @if(isset($clientreport_perm) && $clientreport_perm->view == 1)
+                                        <div class="row py-4">
+                                            <h4>Reports</h4>
+                                            <div class="col-md-12">
+                                                <div class="table-responsive">
+                                                    <table id="reporting_table" class="table table-striped">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Sr</th>
+                                                                <th>Client Name</th>
+                                                                <th>Report Type</th>
+                                                                <th>Schedule Date</th>
+                                                                <th>Reporting Date</th>
+                                                                <th>Created By</th>
+                                                                <th>Verified By</th>
+                                                                <th>Varification Date</th>
+                                                                <th>Dispatch</th>
+                                                                <th>Dispatch Date</th>
+                                                                <th>Status</th>
+                                                                <th>Action</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            @if (isset($reports) && count($reports) > 0)
+                                                                @foreach ($reports as $key=>$item)
+                                                                <tr>
+                                                                    <td>{{ $key + 1 }}</td>
+                                                                    <td>{{ $item->client->sale->lead->business_name_adv }}</td>
+                                                                    <td>{{ $item->reporting_type }}</td>
+                                                                    <td>{{ $item->client->reporting_date }}</td>
+                                                                    <td>{{ \Carbon\Carbon::parse($item->created_at)->format('Y-m-d') }}</td>
+                                                                    <td>{{ $item->createdBy->name }}</td>
+                                                                    @if(isset($item->verified_by))
+                                                                    <td>{{ $item->verifiedBy->name }}</td>
+                                                                    @else
+                                                                    <td>Not Verified</td>
+                                                                    @endif
+                                                                    <td>{{ \Carbon\Carbon::parse( $item->report_verified_at)->format('Y-m-d') }}</td>
+                                                                    @if(isset($item->dispatched_by))
+                                                                    <td>{{ $item->dispatchedBy->name }}</td>
+                                                                    @else
+                                                                    <td>Not Dispatched</td>
+                                                                    @endif
+                                                                    <td>{{ $item->dispatch_at }}</td>
+                                                                    <td>@if($item->report_status == "created")
+                                                                        <span class="badge rounded-pill bg-danger">{{ $item->report_status }}</span>
+                                                                        @elseif($item->report_status == "verified")
+                                                                        <span class="badge rounded-pill bg-info">{{ $item->report_status }}</span>
+                                                                        @else
+                                                                         <span class="badge rounded-pill bg-success">{{ $item->report_status }}</span>
+                                                                         @endif
+                                                                        </td>
+                                                                    <td>
+                                                                        <div class="d-inline-flex text-nowrap">
+                                                                            <form id="dispatch_report" action="{{ route('clientReport.update', $item->id) }}" method="POST">
+                                                                                @csrf
+                                                                            <button type="submit"
+                                                                                class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect"
+                                                                                data-bs-toggle="tooltip" title="Dispatch"><i
+                                                                                    class="ri-send-plane-2-line ri-20px"></i></button>
+                                                                            </form>
+                                                                            <button
+                                                                                class="btn btn-sm btn-icon btn-text-secondary rounded-pill dropdown-toggle hide-arrow"
+                                                                                data-bs-toggle="dropdown" aria-expanded="false"><i
+                                                                                    class="mdi mdi-dots-vertical mdi-20px"></i></button>
+                                                                            <div class="dropdown-menu dropdown-menu-end m-0" style="">
+                                                                                <a type="button" href="{{ asset('reports/report/'. $item->report_file) }}" target="_blank"
+
+                                                                                    class="dropdown-item delete-record"><i
+                                                                                    class="mdi mdi-eye me-2"></i><span>Preview</span></a>
+                                                                                <form id="verify_report" action="{{ route('clientReport.edit', $item->id) }}" method="POST">
+                                                                                    @csrf
+                                                                                    <button type="submit"
+                                                                                        class="dropdown-item"><i
+                                                                                            class="mdi mdi-check-decagram me-2"></i><span>Verify</span></button>
+                                                                                </form>
+                                                                                {{-- <button type="button" class="btn btn-primary" id="confirm-color">Alert</button> --}}
+                                                                                <a type="button" id="{{ $item->id }}" data-confirm="Are you sure to delete this item?"
+                                                                                    class="dropdown-item delete-record delete_report"><i
+                                                                                        class="mdi mdi-delete-outline me-2"></i><span>Delete</span></a>
+                                                                            </div>
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+                                                                @endforeach
+                                                            @endif
+                                                        </tbody>
+                                                    </table>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    @endif
 
 
                                     <div class="col-12 d-flex justify-content-between">
@@ -2224,7 +2266,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
             return false;
         });
     </script>
-    <script>
+    {{-- <script>
         const threeDaysAgo = new Date();
             threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
 
@@ -2232,7 +2274,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
             flatpickr("#flatpickr-date", {
                 minDate: threeDaysAgo // Set minimum date to 3 days ago
             });
-    </script>
+    </script> --}}
     <script>
         const input = document.querySelector("#business_number");
         const iti =  intlTelInput(input, {
@@ -4390,6 +4432,15 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                         var report_verified_at = report.report_verified_at ? formatDate(report.report_verified_at) : 'N/A';
                         var dispatch_at = report.dispatch_at ? formatDate(report.dispatch_at) : 'N/A';
 
+                        var statusBadge = '';
+                        if (report.report_status === "created") {
+                            statusBadge = '<span class="badge rounded-pill bg-danger">' + report.report_status + '</span>';
+                        } else if (report.report_status === "verified") {
+                            statusBadge = '<span class="badge rounded-pill bg-info">' + report.report_status + '</span>';
+                        } else {
+                            statusBadge = '<span class="badge rounded-pill bg-success">' + report.report_status + '</span>';
+                        }
+
                         table_content += '<tr>\
                                             <td>' + (index + 1) + '</td>\
                                             <td>' + report.client.sale.lead.business_name_adv + '</td>\
@@ -4401,16 +4452,39 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                             <td>' + report_verified_at + '</td>\
                                             <td>' + dispatchedBy + '</td>\
                                             <td>' + dispatch_at + '</td>\
-                                            <td>' + report.report_status + '</td>\
+                                            <td>' + statusBadge + '</td>\
+                                            <td>\
+                                            <div class="d-inline-flex text-nowrap">\
+                                                <form id="dispatch_report" action="{{ route('clientReport.update', ' + report.id + ') }}" method="POST">\
+                                                    @csrf\
+                                                    <button class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect" data-bs-toggle="tooltip" title="Dispatch">\
+                                                        <i class="ri-send-plane-2-line ri-20px"></i>\
+                                                    </button>\
+                                                </form>\
+                                                <button class="btn btn-sm btn-icon btn-text-secondary rounded-pill dropdown-toggle hide-arrow" data-bs-toggle="dropdown" aria-expanded="false">\
+                                                    <i class="mdi mdi-dots-vertical mdi-20px"></i>\
+                                                </button>\
+                                                <div class="dropdown-menu dropdown-menu-end m-0">\
+                                                    <a type="button" href="'+'/reports/report/' + report.report_file +'" target="_blank" class="dropdown-item delete-record">\
+                                                        <i class="mdi mdi-eye me-2"></i><span>Preview</span>\
+                                                    </a>\
+                                                    <form id="verify_report" action="{{ route('clientReport.edit', ' + report.id + ') }}" method="POST">\
+                                                        @csrf\
+                                                        <button type="submit" class="dropdown-item">\
+                                                            <i class="mdi mdi-check-decagram me-2"></i><span>Verify</span>\
+                                                        </button>\
+                                                    </form>\
+                                                    <a type="button" id="'+ report.id +'" data-confirm="Are you sure to delete this item?" class="dropdown-item delete-record delete_report">\
+                                                        <i class="mdi mdi-delete-outline me-2"></i><span>Delete</span>\
+                                                    </a>\
+                                                </div>\
+                                            </div>\
+                                        </td>\
                                         </tr>';
                     });
 
                     // Clear the table first and then append the new rows
                     $('#reporting_table tbody').empty().append(table_content);
-
-
-
-
 
 
                     // Handle success response (display success message using SweetAlert2)
@@ -4471,8 +4545,387 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
         });
     });
 </script>
+<script>
+    $(document).ready(function () {
+        $('#verify_report').on('submit', function (e) {
+            e.preventDefault(); // Prevent the default form submission
+
+            // Store current form values before submission, particularly time and select elements
 
 
+            // Create a FormData object to handle form data
+            let formData = new FormData(this);
+
+            // Clear previous error messages
+
+            $.ajax({
+                url: $(this).attr('action'), // Form action URL
+                type: $(this).attr('method'), // POST method
+                data: formData,
+                processData: false, // Important: do not process the data
+                contentType: false, // Important: content type is false
+                success: function (response) {
+
+                    console.log(response);
+
+                    var reports = response.reports;
+                    var table_content = '';
+
+                    // Function to format date in Day-Month-Year (DD-MM-YYYY)
+                    function formatDate(dateString) {
+                        var date = new Date(dateString);
+                        var day = String(date.getDate()).padStart(2, '0'); // Add leading zero if single digit
+                        var month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based, so add 1
+                        var year = date.getFullYear();
+                        return day + '-' + month + '-' + year;
+                    }
+
+                    reports.forEach(function(report, index) {
+                        var verifiedBy = report.verified_by ? report.verified_by.name : 'Not Verified';
+                        var dispatchedBy = report.dispatched_by ? report.dispatched_by.name : 'Not Dispatched';
+
+                        // Format the dates
+                        var created_at = formatDate(report.created_at);
+                        var reporting_date = formatDate(report.client.reporting_date);
+                        var report_verified_at = report.report_verified_at ? formatDate(report.report_verified_at) : 'N/A';
+                        var dispatch_at = report.dispatch_at ? formatDate(report.dispatch_at) : 'N/A';
+
+                        var statusBadge = '';
+                        if (report.report_status === "created") {
+                            statusBadge = '<span class="badge rounded-pill bg-danger">' + report.report_status + '</span>';
+                        } else if (report.report_status === "verified") {
+                            statusBadge = '<span class="badge rounded-pill bg-info">' + report.report_status + '</span>';
+                        } else {
+                            statusBadge = '<span class="badge rounded-pill bg-success">' + report.report_status + '</span>';
+                        }
+
+                        table_content += '<tr>\
+                                            <td>' + (index + 1) + '</td>\
+                                            <td>' + report.client.sale.lead.business_name_adv + '</td>\
+                                            <td>' + report.reporting_type + '</td>\
+                                            <td>' + reporting_date + '</td>\
+                                            <td>' + created_at + '</td>\
+                                            <td>' + report.created_by.name + '</td>\
+                                            <td>' + verifiedBy + '</td>\
+                                            <td>' + report_verified_at + '</td>\
+                                            <td>' + dispatchedBy + '</td>\
+                                            <td>' + dispatch_at + '</td>\
+                                            <td>' + statusBadge + '</td>\
+                                            <td>\
+                                            <div class="d-inline-flex text-nowrap">\
+                                                <form id="dispatch_report" action="{{ route('clientReport.update', ' + report.id + ') }}" method="POST">\
+                                                    @csrf\
+                                                    <button class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect" data-bs-toggle="tooltip" title="Dispatch">\
+                                                        <i class="ri-send-plane-2-line ri-20px"></i>\
+                                                    </button>\
+                                                </form>\
+                                                <button class="btn btn-sm btn-icon btn-text-secondary rounded-pill dropdown-toggle hide-arrow" data-bs-toggle="dropdown" aria-expanded="false">\
+                                                    <i class="mdi mdi-dots-vertical mdi-20px"></i>\
+                                                </button>\
+                                                <div class="dropdown-menu dropdown-menu-end m-0">\
+                                                    <a type="button" href="'+'/reports/report/' + report.report_file +'" target="_blank" class="dropdown-item delete-record">\
+                                                        <i class="mdi mdi-eye me-2"></i><span>Preview</span>\
+                                                    </a>\
+                                                    <form id="verify_report" action="{{ route('clientReport.edit', ' + report.id + ') }}" method="POST">\
+                                                        @csrf\
+                                                        <button type="submit" class="dropdown-item">\
+                                                            <i class="mdi mdi-check-decagram me-2"></i><span>Verify</span>\
+                                                        </button>\
+                                                    </form>\
+                                                    <a type="button" id="'+ report.id +'" data-confirm="Are you sure to delete this item?" class="dropdown-item delete-record delete_report">\
+                                                        <i class="mdi mdi-delete-outline me-2"></i><span>Delete</span>\
+                                                    </a>\
+                                                </div>\
+                                            </div>\
+                                        </td>\
+                                        </tr>';
+                    });
+
+                    // Clear the table first and then append the new rows
+                    $('#reporting_table tbody').empty().append(table_content);
+
+                    // Handle success response (display success message using SweetAlert2)
+                    Swal.fire({
+                        position: 'top-end',
+                        icon: 'success',
+                        title: 'Success',
+                        text: response.message,
+                        showConfirmButton: false, // Remove the confirm button
+                        timer: 1500, // Duration in milliseconds before the toast disappears
+                        toast: true,
+                        showConfirmButton: false
+                    });
+
+
+                    // Optionally reset the form only on success
+                    $('#refund_form')[0].reset();
+                    // This will reset the form fields
+                },
+                error: function (xhr) {
+                    // Handle validation errors
+                    let errors = xhr.responseJSON.errors;
+                    if (errors) {
+                        let errorHtml = '<div class="alert alert-danger"><ul>';
+                        $.each(errors, function (key, value) {
+                            errorHtml += '<li>' + value + '</li>';
+                        });
+                        errorHtml += '</ul></div>';
+                        $('#service_area').prepend(errorHtml); // Add errors to the form
+
+                        // Display SweetAlert2 for validation errors
+                        Swal.fire({
+                            position: 'top-end',
+                            icon: 'error',
+                            title: 'Validation Error',
+                            html: errorHtml, // Use the generated error HTML
+                            showConfirmButton: false, // Remove the confirm button
+                            timer: 1500, // Duration in milliseconds before the toast disappears
+                            toast: true,
+                        });
+                    }
+                    else if (xhr.responseJSON.error) {
+                        // Show custom error message with SweetAlert2
+                        Swal.fire({
+                            position: 'top-end',
+                            icon: 'error',
+                            title: 'Error',
+                            text: xhr.responseJSON.error, // Show the custom error message
+                            showConfirmButton: false, // Remove the confirm button
+                            timer: 1500, // Duration in milliseconds before the toast disappears
+                            toast: true,
+                        });
+                    }
+
+                    // Restore time input and select values after error
+                }
+            });
+        });
+    });
+</script>
+<script>
+    $(document).ready(function () {
+        $('#dispatch_report').on('submit', function (e) {
+            e.preventDefault(); // Prevent the default form submission
+
+            // Store current form values before submission, particularly time and select elements
+
+
+            // Create a FormData object to handle form data
+            let formData = new FormData(this);
+            // alert(formData);
+            // Clear previous error messages
+
+            $.ajax({
+                url: $(this).attr('action'), // Form action URL
+                type: $(this).attr('method'), // POST method
+                data: formData,
+                processData: false, // Important: do not process the data
+                contentType: false, // Important: content type is false
+                success: function (response) {
+
+                    console.log(response);
+
+                    var reports = response.reports;
+                    var table_content = '';
+
+                    // Function to format date in Day-Month-Year (DD-MM-YYYY)
+                    function formatDate(dateString) {
+                        var date = new Date(dateString);
+                        var day = String(date.getDate()).padStart(2, '0'); // Add leading zero if single digit
+                        var month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based, so add 1
+                        var year = date.getFullYear();
+                        return day + '-' + month + '-' + year;
+                    }
+
+                    reports.forEach(function(report, index) {
+                        var verifiedBy = report.verified_by ? report.verified_by.name : 'Not Verified';
+                        var dispatchedBy = report.dispatched_by ? report.dispatched_by.name : 'Not Dispatched';
+
+                        // Format the dates
+                        var created_at = formatDate(report.created_at);
+                        var reporting_date = formatDate(report.client.reporting_date);
+                        var report_verified_at = report.report_verified_at ? formatDate(report.report_verified_at) : 'N/A';
+                        var dispatch_at = report.dispatch_at ? formatDate(report.dispatch_at) : 'N/A';
+
+                        var statusBadge = '';
+                        if (report.report_status === "created") {
+                            statusBadge = '<span class="badge rounded-pill bg-danger">' + report.report_status + '</span>';
+                        } else if (report.report_status === "verified") {
+                            statusBadge = '<span class="badge rounded-pill bg-info">' + report.report_status + '</span>';
+                        } else {
+                            statusBadge = '<span class="badge rounded-pill bg-success">' + report.report_status + '</span>';
+                        }
+
+                        table_content += '<tr>\
+                                            <td>' + (index + 1) + '</td>\
+                                            <td>' + report.client.sale.lead.business_name_adv + '</td>\
+                                            <td>' + report.reporting_type + '</td>\
+                                            <td>' + reporting_date + '</td>\
+                                            <td>' + created_at + '</td>\
+                                            <td>' + report.created_by.name + '</td>\
+                                            <td>' + verifiedBy + '</td>\
+                                            <td>' + report_verified_at + '</td>\
+                                            <td>' + dispatchedBy + '</td>\
+                                            <td>' + dispatch_at + '</td>\
+                                            <td>' + statusBadge + '</td>\
+                                            <td>\
+                                            <div class="d-inline-flex text-nowrap">\
+                                                <form id="dispatch_report" action="{{ route('clientReport.update', ' + report.id + ') }}" method="POST">\
+                                                    @csrf\
+                                                    <button class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect" data-bs-toggle="tooltip" title="Dispatch">\
+                                                        <i class="ri-send-plane-2-line ri-20px"></i>\
+                                                    </button>\
+                                                </form>\
+                                                <button class="btn btn-sm btn-icon btn-text-secondary rounded-pill dropdown-toggle hide-arrow" data-bs-toggle="dropdown" aria-expanded="false">\
+                                                    <i class="mdi mdi-dots-vertical mdi-20px"></i>\
+                                                </button>\
+                                                <div class="dropdown-menu dropdown-menu-end m-0">\
+                                                    <a type="button" href="'+'/reports/report/' + report.report_file +'" target="_blank" class="dropdown-item delete-record">\
+                                                        <i class="mdi mdi-eye me-2"></i><span>Preview</span>\
+                                                    </a>\
+                                                    <form id="verify_report" action="{{ route('clientReport.edit', ' + report.id + ') }}" method="POST">\
+                                                        @csrf\
+                                                        <button type="submit" class="dropdown-item">\
+                                                            <i class="mdi mdi-check-decagram me-2"></i><span>Verify</span>\
+                                                        </button>\
+                                                    </form>\
+                                                    <a type="button" id="'+ report.id +'" data-confirm="Are you sure to delete this item?" class="dropdown-item delete-record delete_report">\
+                                                        <i class="mdi mdi-delete-outline me-2"></i><span>Delete</span>\
+                                                    </a>\
+                                                </div>\
+                                            </div>\
+                                        </td>\
+                                        </tr>';
+                    });
+
+                    // Clear the table first and then append the new rows
+                    $('#reporting_table tbody').empty().append(table_content);
+
+
+                    // Handle success response (display success message using SweetAlert2)
+                    Swal.fire({
+                        position: 'top-end',
+                        icon: 'success',
+                        title: 'Success',
+                        text: response.message,
+                        showConfirmButton: false, // Remove the confirm button
+                        timer: 1500, // Duration in milliseconds before the toast disappears
+                        toast: true,
+                        showConfirmButton: false
+                    });
+
+
+                    // Optionally reset the form only on success
+                    $('#refund_form')[0].reset();
+                    // This will reset the form fields
+                },
+                error: function (xhr) {
+                    // Handle validation errors
+                    let errors = xhr.responseJSON.errors;
+                    if (errors) {
+                        let errorHtml = '<div class="alert alert-danger"><ul>';
+                        $.each(errors, function (key, value) {
+                            errorHtml += '<li>' + value + '</li>';
+                        });
+                        errorHtml += '</ul></div>';
+                         // Add errors to the form
+
+                        // Display SweetAlert2 for validation errors
+                        Swal.fire({
+                            position: 'top-end',
+                            icon: 'error',
+                            title: 'Validation Error',
+                            html: errorHtml, // Use the generated error HTML
+                            showConfirmButton: false, // Remove the confirm button
+                            timer: 1500, // Duration in milliseconds before the toast disappears
+                            toast: true,
+                        });
+                    }
+                    else if (xhr.responseJSON.error) {
+                        // Show custom error message with SweetAlert2
+                        Swal.fire({
+                            position: 'top-end',
+                            icon: 'error',
+                            title: 'Error',
+                            text: xhr.responseJSON.error, // Show the custom error message
+                            showConfirmButton: false, // Remove the confirm button
+                            timer: 1500, // Duration in milliseconds before the toast disappears
+                            toast: true,
+                        });
+                    }
+
+                    // Restore time input and select values after error
+                }
+            });
+        });
+    });
+</script>
+
+<script>
+    $(document).ready(function () {
+        // Use event delegation to attach the click event to the table or a parent element
+        $('#reporting_table').on('click', '.delete_report', function() {
+            var id = $(this).attr('id'); // Get the ID of the keyword to be deleted
+            var row = $(this).closest('tr'); // Get the parent row of the clicked delete button
+
+            $.ajax({
+                url: "{{ route('clientReport.delete')}}",  // Ensure this route is correct
+                type: "GET",
+                data: {id: id},
+                success: function (response) {
+                    // Show success message using SweetAlert
+                    Swal.fire({
+                        position: 'top-end',
+                        icon: 'success',
+                        title: 'Success Keyword Deleted',
+                        text: response.message,
+                        showConfirmButton: false,
+                        timer: 1500,
+                        toast: true,
+                    });
+
+                    // Remove the deleted row from the table
+                    row.remove(); // Remove the <tr> containing the deleted keyword
+                },
+                error: function (xhr) {
+                    // Handle validation errors or other issues
+                    let errors = xhr.responseJSON.errors;
+                    if (errors) {
+                        let errorHtml = '<div class="alert alert-danger"><ul>';
+                        $.each(errors, function (key, value) {
+                            errorHtml += '<li>' + value + '</li>';
+                        });
+                        errorHtml += '</ul></div>';
+                        $('#service_area').prepend(errorHtml);
+
+                        // Display SweetAlert2 for validation errors
+                        Swal.fire({
+                            position: 'top-end',
+                            icon: 'error',
+                            title: 'Validation Error',
+                            html: errorHtml, // Use the generated error HTML
+                            showConfirmButton: false,
+                            timer: 1500,
+                            toast: true,
+                        });
+                    } else if (xhr.responseJSON.error) {
+                        // Custom error message for server-side issues
+                        Swal.fire({
+                            position: 'top-end',
+                            icon: 'error',
+                            title: 'Error',
+                            text: xhr.responseJSON.error,
+                            showConfirmButton: false,
+                            timer: 1500,
+                            toast: true,
+                        });
+                    }
+                }
+            });
+        });
+    });
+
+</script>
 
 {{-- End Report --}}
 @endsection

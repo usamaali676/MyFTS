@@ -185,7 +185,7 @@ class LeadController extends Controller
         return view('pages.lead.edit', compact('lead', 'sub_categories', 'categories','related_subcategories', 'closers', 'company_services', 'selected_company_services', 'comments' ));
     }
 
-    /**
+    /**      
      * Update the specified resource in storage.
      */
     public function update(Request $request, $id)
