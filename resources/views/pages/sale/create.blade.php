@@ -2266,7 +2266,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
             return false;
         });
     </script>
-    <script>
+    {{-- <script>
         const threeDaysAgo = new Date();
             threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
 
@@ -2274,7 +2274,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
             flatpickr("#flatpickr-date", {
                 minDate: threeDaysAgo // Set minimum date to 3 days ago
             });
-    </script>
+    </script> --}}
     <script>
         const input = document.querySelector("#business_number");
         const iti =  intlTelInput(input, {
@@ -4624,7 +4624,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                     <i class="mdi mdi-dots-vertical mdi-20px"></i>\
                                                 </button>\
                                                 <div class="dropdown-menu dropdown-menu-end m-0">\
-                                                    <a type="button" href="'+'reports/report/' + report.report_file +'" target="_blank" class="dropdown-item delete-record">\
+                                                    <a type="button" href="'+'/reports/report/' + report.report_file +'" target="_blank" class="dropdown-item delete-record">\
                                                         <i class="mdi mdi-eye me-2"></i><span>Preview</span>\
                                                     </a>\
                                                     <form id="verify_report" action="{{ route('clientReport.edit', ' + report.id + ') }}" method="POST">\
@@ -4713,7 +4713,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
 
             // Create a FormData object to handle form data
             let formData = new FormData(this);
-
+            // alert(formData);
             // Clear previous error messages
 
             $.ajax({
@@ -4781,7 +4781,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                     <i class="mdi mdi-dots-vertical mdi-20px"></i>\
                                                 </button>\
                                                 <div class="dropdown-menu dropdown-menu-end m-0">\
-                                                    <a type="button" href="'+'reports/report/' + report.report_file +'" target="_blank" class="dropdown-item delete-record">\
+                                                    <a type="button" href="'+'/reports/report/' + report.report_file +'" target="_blank" class="dropdown-item delete-record">\
                                                         <i class="mdi mdi-eye me-2"></i><span>Preview</span>\
                                                     </a>\
                                                     <form id="verify_report" action="{{ route('clientReport.edit', ' + report.id + ') }}" method="POST">\
@@ -4790,7 +4790,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                             <i class="mdi mdi-check-decagram me-2"></i><span>Verify</span>\
                                                         </button>\
                                                     </form>\
-                                                    <a type="button" id="' + report.id + '" data-confirm="Are you sure to delete this item?" class="dropdown-item delete-record delete_report">\
+                                                    <a type="button" id="'+ report.id +'" data-confirm="Are you sure to delete this item?" class="dropdown-item delete-record delete_report">\
                                                         <i class="mdi mdi-delete-outline me-2"></i><span>Delete</span>\
                                                     </a>\
                                                 </div>\
