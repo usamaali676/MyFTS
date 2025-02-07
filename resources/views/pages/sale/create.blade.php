@@ -661,9 +661,9 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                 <div class="col-md-6 col-12 mb-6">
                                                     <div class="form-floating form-floating-outline">
                                                     @if(isset($sale) && isset($sale->signup_date))
-                                                    <input type="text" class="form-control flatpickr-input active" name="signup_date" placeholder="YYYY-MM-DD" id="flatpickr-date" value="{{ $sale->signup_date }}" readonly="readonly">
+                                                    <input type="text" class="form-control flatpickr-input active" name="signup_date" placeholder="YYYY-MM-DD" id="flatpickr-date-signup" value="{{ $sale->signup_date }}" readonly="readonly">
                                                     @else
-                                                    <input type="text" class="form-control flatpickr-input active" name="signup_date" placeholder="YYYY-MM-DD" id="flatpickr-date"  readonly="readonly">
+                                                    <input type="text" class="form-control flatpickr-input active" name="signup_date" placeholder="YYYY-MM-DD" id="flatpickr-date-signup"  readonly="readonly">
                                                     @endif
                                                     <label for="flatpickr-date">Signup Date</label>
                                                     </div>
@@ -760,7 +760,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                 {{-- Service --}}
                                 @if(isset($Clientservices_perm) && $Clientservices_perm->view == 1 || (isset($Servicearea_perm) && $Servicearea_perm->view == 1))
                                     <div id="address" class="content">
-                                        @if(isset($Clientservices_perm) && $Clientservices_perm->view == 1)
+                                        @if(isset($Clientservices_perm) && $Clientservices_perm->create == 1)
                                             <div class="content-header mb-3">
                                                 <h6 class="mb-0">Services</h6>
                                             </div>
@@ -907,7 +907,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                 </form>
                                             </div>
                                         @endif
-                                        @if(isset($Servicearea_perm) && $Servicearea_perm->view == 1)
+                                        @if(isset($Servicearea_perm) && $Servicearea_perm->create == 1)
                                             <div class="row g-4">
                                                     <h4>Client Service Area</h4>
                                                     <form id="service_area" action="{{ route('serviceArea.store') }}" method="POST" >
@@ -948,6 +948,8 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                     </div>
                                                     </form>
                                             </div>
+                                        @endif
+                                        @if(isset($Servicearea_perm) && $Servicearea_perm->view == 1)
                                             <div class="row g-4">
 
                                                 <div class="col-md-12">
@@ -1001,44 +1003,46 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
 
                                     <div id="social-links" class="content">
 
-                                            <div class="content-header mb-3">
-                                                <h6 class="mb-0">Services/Sub-services/Keywords</h6>
-                                                <small>Add Services/Sub-services/Keywords against Areas</small>
-                                            </div>
-                                            <form id="keywordadd" action="{{ route('keyword.store') }}" method="POST">
-                                                @csrf
-                                                <div class="row g-4">
-                                                    @if(isset($sale))
-                                                    <input type="hidden" name="sale_id5" id="sale_id5" value="{{ $sale->id }}">
-                                                    @else
-                                                    <input type="hidden" name="sale_id5" id="sale_id5" >
-                                                    @endif
-                                                    <div class="col-md-12">
-                                                        <div class="form-floating form-floating-outline">
-                                                            <input type="text" id="keyword" name="keyword" class="form-control" placeholder="Keyword" />
-                                                            <label for="Keyword">Keyword</label>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <div class="form-floating form-floating-outline">
-                                                            <select id="areas_dropdown" name="area_id" class="select2 form-select" data-allow-clear="true">
-                                                                <option value="">Please Select</option>
-                                                                @if(isset($sale) && count($sale->service_area) > 0)
-                                                                @foreach ($sale->service_area as $area)
-                                                                <option value="{{$area->id }}">{{ $area->country }}, {{ $area->state }}, {{ $area->city }}</option>
-                                                                @endforeach
-                                                                @endif
-                                                            </select>
-                                                            <label for="multicol-country">Service Area</label>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <div class="form-floating form-floating-outline">
-                                                            <button type="submit" class="btn btn-primary">Add</button>
-                                                        </div>
-                                                    </div>
+                                            @if(isset($Keyword_perm) && $Keyword_perm->create == 1)
+                                                <div class="content-header mb-3">
+                                                    <h6 class="mb-0">Services/Sub-services/Keywords</h6>
+                                                    <small>Add Services/Sub-services/Keywords against Areas</small>
                                                 </div>
-                                            </form>
+                                                <form id="keywordadd" action="{{ route('keyword.store') }}" method="POST">
+                                                    @csrf
+                                                    <div class="row g-4">
+                                                        @if(isset($sale))
+                                                        <input type="hidden" name="sale_id5" id="sale_id5" value="{{ $sale->id }}">
+                                                        @else
+                                                        <input type="hidden" name="sale_id5" id="sale_id5" >
+                                                        @endif
+                                                        <div class="col-md-12">
+                                                            <div class="form-floating form-floating-outline">
+                                                                <input type="text" id="keyword" name="keyword" class="form-control" placeholder="Keyword" />
+                                                                <label for="Keyword">Keyword</label>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <div class="form-floating form-floating-outline">
+                                                                <select id="areas_dropdown" name="area_id" class="select2 form-select" data-allow-clear="true">
+                                                                    <option value="">Please Select</option>
+                                                                    @if(isset($sale) && count($sale->service_area) > 0)
+                                                                    @foreach ($sale->service_area as $area)
+                                                                    <option value="{{$area->id }}">{{ $area->country }}, {{ $area->state }}, {{ $area->city }}</option>
+                                                                    @endforeach
+                                                                    @endif
+                                                                </select>
+                                                                <label for="multicol-country">Service Area</label>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <div class="form-floating form-floating-outline">
+                                                                <button type="submit" class="btn btn-primary">Add</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            @endif
                                             <div class="row g-4 py-5">
                                                 <div class="col-md-12">
                                                     <div class="table-responsive">
@@ -1062,7 +1066,6 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                                         @endif
                                                                         <td> <a  type="button" id="{{ $keyword->id }}"
                                                                             class="dropdown-item delete-record keyword_delete" data-confirm="Are you sure to delete this item?"><i class="mdi mdi-delete-outline me-2"></i><span>Delete</span></a></td>
-
                                                                     </tr>
                                                                     @endforeach
                                                                 @endif
@@ -1885,8 +1888,6 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                             @auth
                                                             <option value="{{ Auth::user()->id }}" selected @readonly(true)>{{ Auth::user()->name }}</option>
                                                             @endauth
-
-
                                                         </select>
                                                         <label for="select-invoice">Select Created By</label>
                                                     </div>
@@ -1969,7 +1970,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                                     @else
                                                                     <td>Not Dispatched</td>
                                                                     @endif
-                                                                    <td>{{ $item->dispatch_at }}</td>
+                                                                    <td>{{ \Carbon\Carbon::parse( $item->dispatch_at)->format('Y-m-d') }}</td>
                                                                     <td>@if($item->report_status == "created")
                                                                         <span class="badge rounded-pill bg-danger">{{ $item->report_status }}</span>
                                                                         @elseif($item->report_status == "verified")
@@ -2018,8 +2019,6 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                             </div>
                                         </div>
                                     @endif
-
-
                                     <div class="col-12 d-flex justify-content-between">
                                         <a class="btn btn-outline-secondary btn-prev" style="color: #6d788d" disabled>
                                             <i class="mdi mdi-arrow-left me-sm-1"></i>
@@ -2134,7 +2133,6 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                   </div>
                             </div>
 
-
                             <div class="col-6 text-center">
                                 <button type="submit" class="btn btn-primary me-sm-3 me-1">Submit</button>
                                 <button type="reset" class="btn btn-outline-secondary" data-bs-dismiss="modal"
@@ -2195,8 +2193,6 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                     <label for="exampleFormControlTextarea1">Write Comment</label>
                                   </div>
                             </div>
-
-
                             <div class="col-6 text-center">
                                 <button type="submit" class="btn btn-primary me-sm-3 me-1">Submit</button>
                                 <button type="reset" class="btn btn-outline-secondary" data-bs-dismiss="modal"
@@ -2266,15 +2262,24 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
             return false;
         });
     </script>
-    {{-- <script>
+    <script>
         const threeDaysAgo = new Date();
             threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
-
             // Initialize Flatpickr
             flatpickr("#flatpickr-date", {
                 minDate: threeDaysAgo // Set minimum date to 3 days ago
             });
-    </script> --}}
+    </script>
+      <script>
+        const threeYearsAgo = new Date();
+        // Subtract 3 years from the current date
+        threeYearsAgo.setFullYear(threeYearsAgo.getFullYear() - 3);
+
+        // Initialize Flatpickr
+        flatpickr("#flatpickr-date-signup", {
+            minDate: threeYearsAgo, // Set minimum date to 3 years ago
+        });
+    </script>
     <script>
         const input = document.querySelector("#business_number");
         const iti =  intlTelInput(input, {
@@ -2294,7 +2299,6 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
             theme: "dark" // defaults to "light"
             })
         ]
-
         });
     </script>
 
@@ -3366,7 +3370,6 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                 toast: true,
                             });
                         }
-
                         // Restore time input and select values after error
                     }
                 });
@@ -4501,7 +4504,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
 
 
                     // Optionally reset the form only on success
-                    $('#refund_form')[0].reset();
+                    $('#report_create')[0].reset();
                     // This will reset the form fields
                 },
                 error: function (xhr) {
@@ -4643,6 +4646,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
 
                     // Clear the table first and then append the new rows
                     $('#reporting_table tbody').empty().append(table_content);
+                    reinitializeFunction('#reporting_table tbody');
 
                     // Handle success response (display success message using SweetAlert2)
                     Swal.fire({
@@ -4708,7 +4712,6 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
             e.preventDefault(); // Prevent the default form submission
 
             // Store current form values before submission, particularly time and select elements
-
 
             // Create a FormData object to handle form data
             let formData = new FormData(this);
