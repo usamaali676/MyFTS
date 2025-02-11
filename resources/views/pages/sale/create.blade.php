@@ -2278,17 +2278,11 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
             flatpickr("#flatpickr-date", {
                 minDate: threeYearsAgo // Set minimum date to 3 days ago
             });
-    </script>
-      <script>
-        const threeYearsAgo = new Date();
-        // Subtract 3 years from the current date
-        threeYearsAgo.setFullYear(threeYearsAgo.getFullYear() - 3);
-
-        // Initialize Flatpickr
-        flatpickr("#flatpickr-date-signup", {
+            flatpickr("#flatpickr-date-signup", {
             minDate: threeYearsAgo, // Set minimum date to 3 years ago
         });
     </script>
+
     <script>
         const input = document.querySelector("#business_number");
         const iti =  intlTelInput(input, {
