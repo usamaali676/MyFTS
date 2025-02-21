@@ -255,7 +255,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                         <input type="text" id="business_name" name="business_name"
                                                             class="form-control" placeholder="John"
                                                             value="{{ $lead->business_name_adv }}"
-                                                            onkeydown="return /[a-zA-Z\s]/.test(event.key) || event.key === 'Backspace' || event.key === 'Tab';" />
+                                                            />
                                                         <label for="multicol-first-name">Business Name Adv</label>
                                                     </div>
                                                     @error('business_name')
@@ -2458,10 +2458,10 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
             // }
 
             // Validate business name (only letters and spaces)
-            if (!/^[a-zA-Z\s]*$/.test(businessName)) {
-                alert('Invalid Business Name. Only letters and spaces are allowed.');
-                return false;
-            }
+            // if (!/^[a-zA-Z\s]*$/.test(businessName)) {
+            //     alert('Invalid Business Name. Only letters and spaces are allowed.');
+            //     return false;
+            // }
 
             // Validate business number (only digits)
             if (!iti.isValidNumber()) {
@@ -2474,10 +2474,14 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
             // }
 
             // const urlPattern = /^(https?:\/\/)?([a-zA-Z0-9\-]+\.)+[a-zA-Z]{2,}(\/[^\s]*)?$/;
+            if (websiteUrl && websiteUrl.trim() !== "") {
+            // Validate website URL (must be a valid URL with domain)
+            const urlPattern = /^(https?:\/\/)?([a-zA-Z0-9\-]+\.)+[a-zA-Z]{2,}(\/[^\s]*)?$/;
             if (!urlPattern.test(websiteUrl)) {
                 alert('Invalid Website URL. Please enter a valid URL (e.g., http://example.com).');
                 return false;
             }
+        }
 
             // if (!urlPattern.test(socialLink)) {
             //     alert('Invalid Social  URL. Please enter a valid URL (e.g., http://example.com).');
