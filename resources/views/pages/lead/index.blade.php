@@ -122,7 +122,7 @@
                                     @endforeach
                                 @elseif ($user->role->name == 'Customer Support')
                                     @foreach ($leads as $item)
-                                        @if (isset($item->sale) && $item->sale->Customer_support->contains('cs_id', $user->id) || $item->saler_id == $user->id)
+                                        @if (isset($item->sale) && $item->sale->Customer_support->contains('cs_id', $user->id) || $item->saler_id == $user->id || $item->closers->contains('closer_id', $user->id) )
                                             <tr>
                                                 <td>{{ $loop->index + 1 }}</td>
                                                 <td>{{ $item->business_name_adv }}</td>
