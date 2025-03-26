@@ -44,10 +44,6 @@ $user = Auth::user();
                                 <i class="mdi mdi-cart-plus mdi-24px"></i>
                             </div>
                         </div>
-                        <div class="d-flex align-items-center">
-                            <p class="mb-0 text-success me-1">+22%</p>
-                            <i class="mdi mdi-chevron-up text-success"></i>
-                        </div>
                     </div>
                     <div class="card-info mt-4 pt-1 mt-lg-1 mt-xl-4">
                         @if(isset($sale_count))
@@ -179,7 +175,7 @@ $user = Auth::user();
         <!--/ Performance Chart -->
 
         <!-- Project Statistics -->
-        {{-- <div class="col-md-6 col-xl-4">
+        <div class="col-md-6 col-xl-4">
             <div class="card h-100">
                 <div class="card-header d-flex align-items-center justify-content-between">
                     <h5 class="card-title m-0 me-2">Project Statistics</h5>
@@ -288,19 +284,19 @@ $user = Auth::user();
                     </ul>
                 </div>
             </div>
-        </div> --}}
+        </div>
         <!--/ Project Statistics -->
 
         <!-- Multiple widgets -->
-        {{-- <div class="col-md-6 col-xl-4">
+        <div class="col-md-6 col-xl-4">
             <div class="row g-4">
                 <!-- Total Revenue chart -->
                 <div class="col-md-6 col-sm-6">
                     <div class="card h-100">
                         <div class="card-header pb-0">
                             <div class="d-flex align-items-end mb-1 flex-wrap gap-2">
-                                <h4 class="mb-0 me-2">$42.5k</h4>
-                                <p class="mb-0 text-danger">-22%</p>
+                                <h4 class="mb-0 me-2">${{ $total }}</h4>
+                                {{-- <p class="mb-0 text-danger">-22%</p> --}}
                             </div>
                             <span class="d-block mb-2 text-body">Total Revenue</span>
                         </div>
@@ -320,15 +316,15 @@ $user = Auth::user();
                                         <i class="mdi mdi-currency-usd mdi-24px"></i>
                                     </div>
                                 </div>
-                                <div class="d-flex align-items-center">
+                                {{-- <div class="d-flex align-items-center">
                                     <p class="mb-0 text-success me-1">+38%</p>
                                     <i class="mdi mdi-chevron-up text-success"></i>
-                                </div>
+                                </div> --}}
                             </div>
                             <div class="card-info mt-4 pt-3">
-                                <h5 class="mb-2">$13.4k</h5>
+                                <h5 class="mb-2">{{ $sale_count }}</h5>
                                 <p class="text-body">Total Sales</p>
-                                <div class="badge bg-label-secondary rounded-pill mt-1">Last Six Month</div>
+                                <div class="badge bg-label-secondary rounded-pill mt-1">Current Month</div>
                             </div>
                         </div>
                     </div>
@@ -373,26 +369,16 @@ $user = Auth::user();
                 </div>
                 <!--/ overview Radial chart -->
             </div>
-        </div> --}}
+        </div>
         <!--/ Multiple widgets -->
 
         <!-- Sales Country Chart -->
-        {{-- <div class="col-12 col-xl-4 col-md-6">
+        <div class="col-12 col-xl-4 col-md-6">
             <div class="card h-100">
                 <div class="card-header">
                     <div class="d-flex justify-content-between">
-                        <h5 class="mb-1">Sales Country</h5>
-                        <div class="dropdown">
-                            <button class="btn p-0" type="button" id="salesCountryDropdown" data-bs-toggle="dropdown"
-                                aria-haspopup="true" aria-expanded="false">
-                                <i class="mdi mdi-dots-vertical mdi-24px"></i>
-                            </button>
-                            <div class="dropdown-menu dropdown-menu-end" aria-labelledby="salesCountryDropdown">
-                                <a class="dropdown-item" href="javascript:void(0);">Last 28 Days</a>
-                                <a class="dropdown-item" href="javascript:void(0);">Last Month</a>
-                                <a class="dropdown-item" href="javascript:void(0);">Last Year</a>
-                            </div>
-                        </div>
+                        <h5 class="mb-1">Sales States</h5>
+
                     </div>
                     <p class="mb-0 text-body">Total $42,580 Sales</p>
                 </div>
@@ -400,7 +386,7 @@ $user = Auth::user();
                     <div id="salesCountryChart"></div>
                 </div>
             </div>
-        </div> --}}
+        </div>
         <!--/ Sales Country Chart -->
 
 
@@ -410,4 +396,168 @@ $user = Auth::user();
 
     </div>
 </div>
+@endsection
+@section('js')
+<script>
+
+let cardColor, labelColor, headingColor, borderColor, grayColor, currentTheme, bodyColorLabel;
+
+if (isDarkStyle) {
+  cardColor = config.colors_dark.cardColor;
+  labelColor = config.colors_dark.textMuted;
+  headingColor = config.colors_dark.headingColor;
+  borderColor = config.colors_dark.borderColor;
+  grayColor = '#3b3e59';
+  currentTheme = 'dark';
+  bodyColorLabel = config.colors_dark.bodyColor;
+} else {
+  cardColor = config.colors.cardColor;
+  labelColor = config.colors.textMuted;
+  headingColor = config.colors.headingColor;
+  borderColor = config.colors.borderColor;
+  grayColor = '#f4f4f6';
+  currentTheme = 'light';
+  bodyColorLabel = config.colors.bodyColor;
+}
+
+const chartColors = {
+  donut: {
+    series1: config.colors.warning,
+    series2: '#fdb528cc',
+    series3: '#fdb52899',
+    series4: '#fdb52866',
+    series5: config.colors_label.warning
+  },
+  donut2: {
+    series1: config.colors.success,
+    series2: '#43ff64e6',
+    series3: '#43ff6473',
+    series4: '#43ff6433'
+  },
+  line: {
+    series1: config.colors.warning,
+    series2: config.colors.primary,
+    series3: '#7367f029'
+  }
+};
+    // Pass the data from Laravel to JavaScript
+    const responseData = @json($topStates);
+
+    // Extract the state names and lead counts from the response
+    const categories = responseData.map(item => item.state);
+    const data = responseData.map(item => item.lead_count);
+
+    const salesCountryChartEl = document.querySelector('#salesCountryChart');
+    const salesCountryChartConfig = {
+        chart: {
+            type: 'bar',
+            height: 295,
+            parentHeightOffset: 0,
+            toolbar: {
+                show: false
+            }
+        },
+        series: [
+            {
+                name: 'Leads',
+                data: data
+            }
+        ],
+        plotOptions: {
+            bar: {
+                borderRadius: 8,
+                barHeight: '60%',
+                horizontal: true,
+                distributed: true,
+                startingShape: 'rounded',
+                dataLabels: {
+                    position: 'bottom'
+                }
+            }
+        },
+        dataLabels: {
+            enabled: true,
+            textAnchor: 'start',
+            offsetY: 8,
+            offsetX: 11,
+            style: {
+                fontWeight: 500,
+                fontSize: '0.9375rem',
+                fontFamily: 'Inter'
+            }
+        },
+        tooltip: {
+            enabled: false
+        },
+        legend: {
+            show: false
+        },
+        colors: [
+            config.colors.primary,
+            config.colors.success,
+            config.colors.warning,
+            config.colors.info,
+            config.colors.danger
+        ],
+        grid: {
+            strokeDashArray: 8,
+            borderColor,
+            xaxis: { lines: { show: true } },
+            yaxis: { lines: { show: false } },
+            padding: {
+                top: -18,
+                left: 21,
+                right: 33,
+                bottom: 10
+            }
+        },
+        xaxis: {
+            categories: categories, // Dynamically set the categories based on response data
+            labels: {
+                formatter: function (val) {
+                    return Number(val / 1000) + 'K';
+                },
+                style: {
+                    fontSize: '0.9375rem',
+                    colors: labelColor,
+                    fontFamily: 'Inter'
+                }
+            },
+            axisBorder: {
+                show: false
+            },
+            axisTicks: {
+                show: false
+            }
+        },
+        yaxis: {
+            labels: {
+                style: {
+                    fontWeight: 500,
+                    fontSize: '0.9375rem',
+                    colors: headingColor,
+                    fontFamily: 'Inter'
+                }
+            }
+        },
+        states: {
+            hover: {
+                filter: {
+                    type: 'none'
+                }
+            },
+            active: {
+                filter: {
+                    type: 'none'
+                }
+            }
+        }
+    };
+
+    // Render the chart if the element exists
+    if (typeof salesCountryChartEl !== undefined && salesCountryChartEl !== null) {
+        const salesCountryChart = new ApexCharts(salesCountryChartEl, salesCountryChartConfig);
+        salesCountryChart.render();
+    }
+</script>
 @endsection

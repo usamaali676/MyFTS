@@ -130,6 +130,8 @@ class InvoiceServiceChargesController extends Controller
                 'total_amount' => $request->invoice_amount,
                 'invoice_frequency' =>   $request->invoice_freq,
                 'month' => $request->month,
+                'invoice_type' => $request->invoice_type,
+                'agent_id' => $request->agent_id,
                 'created_by' => Auth::user()->id,
             ]);
         // }

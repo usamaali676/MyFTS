@@ -147,6 +147,11 @@ class FrontController extends Controller
                 $zelle = ZelleAccount::all();
                 return response()->json(['zelle' => $zelle]);
             }
+            public function getususer(){
+                $roles = Role::whereIn('name', ['Closer', 'Customer Support'])->get();
+                $ususer = User::whereIn('role_id', $roles->pluck('id'))->get();
+                return response()->json(['ususer' => $ususer]);
+            }
             public function getcash(){
                 $cash = Cashapp::all();
                 return response()->json(['cash' => $cash]);

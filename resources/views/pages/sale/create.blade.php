@@ -333,10 +333,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                             <option value="Alaska Time (AKT)">Alaska Time (AKT)</option>
                                                             <option value="Hawaii-Aleutian Time (HAST)">Hawaii-Aleutian Time (HAST)</option>
                                                         </optgroup>
-
-
                                                         </select>
-
                                                         <label for="time_zone">Time Zone</label>
                                                     </div>
                                                 </div>
@@ -437,7 +434,6 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                                         </span>
                                                                     </label>
                                                                 </div>
-
                                                             </div>
                                                         </div>
                                                         <!-- Day / End -->
@@ -1316,6 +1312,26 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                             </div>
                                                         </div>
                                                     </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-floating form-floating-outline">
+                                                            <select id="invoice_type" name="invoice_type" class="select2 form-select" data-allow-clear="true">
+                                                                <option value="">Please Select</option>
+                                                                {{-- @if(isset($invoice) && isset($invoice->discount_type))
+                                                                <option value="{{$invoice->discount_type}}" selected>{{ $invoice->discount_type }}</option>
+                                                                @endif --}}
+                                                                <option value="Sale">Sale</option>
+                                                                <option value="UpSale">UpSale</option>
+
+                                                            </select>
+                                                            <label for="multicol-country">Invoice Type</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div  id="embed_invoice_type" class="input-group input-group-merge">
+
+                                                            {{-- <span class="input-group-text cursor-pointer p-1" id="paymentCard"><span class="card-type w-px-50"></span></span> --}}
+                                                        </div>
+                                                    </div>
 
                                                     <div class="col-md-12 text-right">
                                                         <div class="invoice-button d-flex " style="gap: 0px 20px;">
@@ -1981,12 +1997,12 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                                         </td>
                                                                     <td>
                                                                         <div class="d-inline-flex text-nowrap">
-                                                                            <form id="dispatch_report" action="{{ route('clientReport.update', $item->id) }}" method="POST">
+                                                                            <form id="dispatch_report" method="POST" action="{{ route('clientReport.update', $item->id) }}" >
                                                                                 @csrf
-                                                                            <button type="submit"
-                                                                                class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect"
-                                                                                data-bs-toggle="tooltip" title="Dispatch"><i
-                                                                                    class="ri-send-plane-2-line ri-20px"></i></button>
+                                                                                <button type="submit"
+                                                                                    class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect"
+                                                                                    data-bs-toggle="tooltip" title="Dispatch"><i
+                                                                                        class="ri-send-plane-2-line ri-20px"></i></button>
                                                                             </form>
                                                                             <button
                                                                                 class="btn btn-sm btn-icon btn-text-secondary rounded-pill dropdown-toggle hide-arrow"
@@ -1997,7 +2013,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
 
                                                                                     class="dropdown-item delete-record"><i
                                                                                     class="mdi mdi-eye me-2"></i><span>Preview</span></a>
-                                                                                <form id="verify_report" action="{{ route('clientReport.edit', $item->id) }}" method="POST">
+                                                                                <form id="verify_report" method="POST" action="{{ route('clientReport.edit', $item->id) }}" >
                                                                                     @csrf
                                                                                     <button type="submit"
                                                                                         class="dropdown-item"><i
@@ -3708,6 +3724,56 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
             })
         });
     </script>
+
+
+<script>
+    $(document).ready(function () {
+        $('#invoice_type').change(function () {
+            var type = this.value;
+            // alert(mop);
+
+            if (type == "UpSale") {
+                $.ajax({
+                    type: "GET",
+                    url: "{{ route('front.getususer') }}",
+                    success: function (response) {
+                        // Validate response structure
+                        if (response && response.ususer && Array.isArray(response.ususer)) {
+                            console.log(response);
+
+                            // Map the response data to options
+                            var options = $.map(response.ususer, function (ususer) {
+                                return '<option value="' + ususer.id + '">' + ususer.name + '</option>';
+                            });
+
+                            // Build the select input with the dynamic options
+                            var input = '<div class="form-floating form-floating-outline pb-3">' +
+                                            '<select id="invoice_agent" name="agent_id" class="select2 form-select" data-allow-clear="true">' +
+                                                '<option value="">Please Select</option>' + options + '</select>' +
+                                            '<label for="mop">Select Agent</label>' +
+                                        '</div>';
+
+                            // Clear previous content and inject new content
+                            $('#embed_invoice_type').html(input);
+
+                            // Initialize or reinitialize Select2 (if needed)
+                            $('#invoice_agent').select2();
+                        } else {
+                            console.error('Invalid response structure:', response);
+                            // Handle invalid response structure
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('AJAX request failed:', status, error);
+                        // Handle the error appropriately
+                    }
+                });
+            }
+
+        });
+    });
+</script>
+
     <script>
         $(document).ready(function () {
             $('#mop').change(function () {
@@ -4432,17 +4498,14 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                         var year = date.getFullYear();
                         return day + '-' + month + '-' + year;
                     }
-
                     reports.forEach(function(report, index) {
                         var verifiedBy = report.verified_by ? report.verified_by.name : 'Not Verified';
                         var dispatchedBy = report.dispatched_by ? report.dispatched_by.name : 'Not Dispatched';
-
                         // Format the dates
                         var created_at = formatDate(report.created_at);
                         var reporting_date = formatDate(report.client.reporting_date);
                         var report_verified_at = report.report_verified_at ? formatDate(report.report_verified_at) : 'N/A';
                         var dispatch_at = report.dispatch_at ? formatDate(report.dispatch_at) : 'N/A';
-
                         var statusBadge = '';
                         if (report.report_status === "created") {
                             statusBadge = '<span class="badge rounded-pill bg-danger">' + report.report_status + '</span>';
@@ -4451,6 +4514,8 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                         } else {
                             statusBadge = '<span class="badge rounded-pill bg-success">' + report.report_status + '</span>';
                         }
+                        var updateUrl = "{{ route('clientReport.update', ':id') }}".replace(':id', report.id);
+                        var editUrl = "{{ route('clientReport.edit', ':id') }}".replace(':id', report.id);
 
                         table_content += '<tr>\
                                             <td>' + (index + 1) + '</td>\
@@ -4466,7 +4531,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                             <td>' + statusBadge + '</td>\
                                             <td>\
                                             <div class="d-inline-flex text-nowrap">\
-                                                <form id="dispatch_report" action="{{ route('clientReport.update', ' + report.id + ') }}" method="POST">\
+                                                <form id="dispatch_report" action="' + updateUrl + '" method="POST">\
                                                     @csrf\
                                                     <button class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect" data-bs-toggle="tooltip" title="Dispatch">\
                                                         <i class="ri-send-plane-2-line ri-20px"></i>\
@@ -4479,7 +4544,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                     <a type="button" href="'+'/reports/report/' + report.report_file +'" target="_blank" class="dropdown-item delete-record">\
                                                         <i class="mdi mdi-eye me-2"></i><span>Preview</span>\
                                                     </a>\
-                                                    <form id="verify_report" action="{{ route('clientReport.edit', ' + report.id + ') }}" method="POST">\
+                                                    <form id="verify_report" action="' + editUrl + '" method="POST">\
                                                         @csrf\
                                                         <button type="submit" class="dropdown-item">\
                                                             <i class="mdi mdi-check-decagram me-2"></i><span>Verify</span>\
@@ -4493,10 +4558,8 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                         </td>\
                                         </tr>';
                     });
-
                     // Clear the table first and then append the new rows
                     $('#reporting_table tbody').empty().append(table_content);
-
 
                     // Handle success response (display success message using SweetAlert2)
                     Swal.fire({
@@ -4549,7 +4612,6 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                             toast: true,
                         });
                     }
-
                     // Restore time input and select values after error
                 }
             });
@@ -4558,7 +4620,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
 </script>
 <script>
     $(document).ready(function () {
-        $('#verify_report').on('submit', function (e) {
+        $(document).on('submit', '#verify_report', function (e) {
             e.preventDefault(); // Prevent the default form submission
 
             // Store current form values before submission, particularly time and select elements
@@ -4610,6 +4672,9 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                             statusBadge = '<span class="badge rounded-pill bg-success">' + report.report_status + '</span>';
                         }
 
+                        var updateUrl = "{{ route('clientReport.update', ':id') }}".replace(':id', report.id);
+                        var editUrl = "{{ route('clientReport.edit', ':id') }}".replace(':id', report.id);
+
                         table_content += '<tr>\
                                             <td>' + (index + 1) + '</td>\
                                             <td>' + report.client.sale.lead.business_name_adv + '</td>\
@@ -4623,8 +4688,8 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                             <td>' + dispatch_at + '</td>\
                                             <td>' + statusBadge + '</td>\
                                             <td>\
-                                            <div class="d-inline-flex text-nowrap">\
-                                                <form id="dispatch_report" action="{{ route('clientReport.update', ' + report.id + ') }}" method="POST">\
+                                              <div class="d-inline-flex text-nowrap">\
+                                                <form id="dispatch_report" action="' + updateUrl + '" method="POST">\
                                                     @csrf\
                                                     <button class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect" data-bs-toggle="tooltip" title="Dispatch">\
                                                         <i class="ri-send-plane-2-line ri-20px"></i>\
@@ -4637,7 +4702,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                     <a type="button" href="'+'/reports/report/' + report.report_file +'" target="_blank" class="dropdown-item delete-record">\
                                                         <i class="mdi mdi-eye me-2"></i><span>Preview</span>\
                                                     </a>\
-                                                    <form id="verify_report" action="{{ route('clientReport.edit', ' + report.id + ') }}" method="POST">\
+                                                    <form id="verify_report" action="' + editUrl + '" method="POST">\
                                                         @csrf\
                                                         <button type="submit" class="dropdown-item">\
                                                             <i class="mdi mdi-check-decagram me-2"></i><span>Verify</span>\
@@ -4667,7 +4732,6 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                         toast: true,
                         showConfirmButton: false
                     });
-
 
                     // Optionally reset the form only on success
                     $('#refund_form')[0].reset();
@@ -4716,15 +4780,13 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
 </script>
 <script>
     $(document).ready(function () {
-        $('#dispatch_report').on('submit', function (e) {
+        $(document).on('submit', '#dispatch_report', function (e) {
             e.preventDefault(); // Prevent the default form submission
-
             // Store current form values before submission, particularly time and select elements
 
             // Create a FormData object to handle form data
             let formData = new FormData(this);
             // alert(formData);
-            // Clear previous error messages
 
             $.ajax({
                 url: $(this).attr('action'), // Form action URL
@@ -4766,6 +4828,8 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                         } else {
                             statusBadge = '<span class="badge rounded-pill bg-success">' + report.report_status + '</span>';
                         }
+                        var updateUrl = "{{ route('clientReport.update', ':id') }}".replace(':id', report.id);
+                        var editUrl = "{{ route('clientReport.edit', ':id') }}".replace(':id', report.id);
 
                         table_content += '<tr>\
                                             <td>' + (index + 1) + '</td>\
@@ -4781,7 +4845,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                             <td>' + statusBadge + '</td>\
                                             <td>\
                                             <div class="d-inline-flex text-nowrap">\
-                                                <form id="dispatch_report" action="{{ route('clientReport.update', ' + report.id + ') }}" method="POST">\
+                                                <form id="dispatch_report" action="' + updateUrl + '" method="POST">\
                                                     @csrf\
                                                     <button class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect" data-bs-toggle="tooltip" title="Dispatch">\
                                                         <i class="ri-send-plane-2-line ri-20px"></i>\
@@ -4794,7 +4858,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                     <a type="button" href="'+'/reports/report/' + report.report_file +'" target="_blank" class="dropdown-item delete-record">\
                                                         <i class="mdi mdi-eye me-2"></i><span>Preview</span>\
                                                     </a>\
-                                                    <form id="verify_report" action="{{ route('clientReport.edit', ' + report.id + ') }}" method="POST">\
+                                                    <form id="verify_report" action="' + editUrl + '" method="POST">\
                                                         @csrf\
                                                         <button type="submit" class="dropdown-item">\
                                                             <i class="mdi mdi-check-decagram me-2"></i><span>Verify</span>\

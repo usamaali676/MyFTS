@@ -507,116 +507,116 @@
 
   // Sales Country Bar Chart
   // --------------------------------------------------------------------
-  const salesCountryChartEl = document.querySelector('#salesCountryChart'),
-    salesCountryChartConfig = {
-      chart: {
-        type: 'bar',
-        height: 368,
-        parentHeightOffset: 0,
-        toolbar: {
-          show: false
-        }
-      },
-      series: [
-        {
-          name: 'Sales',
-          data: [17165, 13850, 12375, 9567, 7880]
-        }
-      ],
-      plotOptions: {
-        bar: {
-          borderRadius: 10,
-          barHeight: '60%',
-          horizontal: true,
-          distributed: true,
-          startingShape: 'rounded',
-          dataLabels: {
-            position: 'bottom'
-          }
-        }
-      },
-      dataLabels: {
-        enabled: true,
-        textAnchor: 'start',
-        offsetY: 8,
-        offsetX: 11,
-        style: {
-          fontWeight: 500,
-          fontSize: '0.9375rem',
-          fontFamily: 'Inter'
-        }
-      },
-      tooltip: {
-        enabled: false
-      },
-      legend: {
-        show: false
-      },
-      colors: [
-        config.colors.primary,
-        config.colors.success,
-        config.colors.warning,
-        config.colors.info,
-        config.colors.danger
-      ],
-      grid: {
-        strokeDashArray: 8,
-        borderColor,
-        xaxis: { lines: { show: true } },
-        yaxis: { lines: { show: false } },
-        padding: {
-          top: -18,
-          left: 21,
-          right: 33,
-          bottom: 10
-        }
-      },
-      xaxis: {
-        categories: ['US', 'IN', 'JA', 'CA', 'AU'],
-        labels: {
-          formatter: function (val) {
-            return Number(val / 1000) + 'K';
-          },
-          style: {
-            fontSize: '0.9375rem',
-            colors: labelColor,
-            fontFamily: 'Inter'
-          }
-        },
-        axisBorder: {
-          show: false
-        },
-        axisTicks: {
-          show: false
-        }
-      },
-      yaxis: {
-        labels: {
-          style: {
-            fontWeight: 500,
-            fontSize: '0.9375rem',
-            colors: headingColor,
-            fontFamily: 'Inter'
-          }
-        }
-      },
-      states: {
-        hover: {
-          filter: {
-            type: 'none'
-          }
-        },
-        active: {
-          filter: {
-            type: 'none'
-          }
-        }
-      }
-    };
-  if (typeof salesCountryChartEl !== undefined && salesCountryChartEl !== null) {
-    const salesCountryChart = new ApexCharts(salesCountryChartEl, salesCountryChartConfig);
-    salesCountryChart.render();
-  }
+//   const salesCountryChartEl = document.querySelector('#salesCountryChart'),
+//     salesCountryChartConfig = {
+//       chart: {
+//         type: 'bar',
+//         height: 368,
+//         parentHeightOffset: 0,
+//         toolbar: {
+//           show: false
+//         }
+//       },
+//       series: [
+//         {
+//           name: 'Sales',
+//           data: [17165, 13850, 12375, 9567, 7880]
+//         }
+//       ],
+//       plotOptions: {
+//         bar: {
+//           borderRadius: 10,
+//           barHeight: '60%',
+//           horizontal: true,
+//           distributed: true,
+//           startingShape: 'rounded',
+//           dataLabels: {
+//             position: 'bottom'
+//           }
+//         }
+//       },
+//       dataLabels: {
+//         enabled: true,
+//         textAnchor: 'start',
+//         offsetY: 8,
+//         offsetX: 11,
+//         style: {
+//           fontWeight: 500,
+//           fontSize: '0.9375rem',
+//           fontFamily: 'Inter'
+//         }
+//       },
+//       tooltip: {
+//         enabled: false
+//       },
+//       legend: {
+//         show: false
+//       },
+//       colors: [
+//         config.colors.primary,
+//         config.colors.success,
+//         config.colors.warning,
+//         config.colors.info,
+//         config.colors.danger
+//       ],
+//       grid: {
+//         strokeDashArray: 8,
+//         borderColor,
+//         xaxis: { lines: { show: true } },
+//         yaxis: { lines: { show: false } },
+//         padding: {
+//           top: -18,
+//           left: 21,
+//           right: 33,
+//           bottom: 10
+//         }
+//       },
+//       xaxis: {
+//         categories: ['US', 'IN', 'JA', 'CA', 'AU'],
+//         labels: {
+//           formatter: function (val) {
+//             return Number(val / 1000) + 'K';
+//           },
+//           style: {
+//             fontSize: '0.9375rem',
+//             colors: labelColor,
+//             fontFamily: 'Inter'
+//           }
+//         },
+//         axisBorder: {
+//           show: false
+//         },
+//         axisTicks: {
+//           show: false
+//         }
+//       },
+//       yaxis: {
+//         labels: {
+//           style: {
+//             fontWeight: 500,
+//             fontSize: '0.9375rem',
+//             colors: headingColor,
+//             fontFamily: 'Inter'
+//           }
+//         }
+//       },
+//       states: {
+//         hover: {
+//           filter: {
+//             type: 'none'
+//           }
+//         },
+//         active: {
+//           filter: {
+//             type: 'none'
+//           }
+//         }
+//       }
+//     };
+//   if (typeof salesCountryChartEl !== undefined && salesCountryChartEl !== null) {
+//     const salesCountryChart = new ApexCharts(salesCountryChartEl, salesCountryChartConfig);
+//     salesCountryChart.render();
+//   }
 
   // Weekly Sales Line Chart
   // --------------------------------------------------------------------
