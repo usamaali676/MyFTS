@@ -42,7 +42,7 @@ class LeadController extends Controller
     public function create()
     {
         $categories = BusinessCategory::all();
-        $roles = Role::whereIn('name', ['Closer', 'Customer Support'])->get();
+        $roles = Role::whereIn('name', ['Closer', 'Customer Support','Executives'])->get();
         $closers = User::whereIn('role_id', $roles->pluck('id'))->get();
         // dd($closers);
         $company_services = CompanyServices::all();
@@ -154,7 +154,7 @@ class LeadController extends Controller
         $sub_categories = $lead->sub_categories;
         $categories = BusinessCategory::all();
         $sub_categories_id = $lead->sub_categories->pluck('id')->toArray();
-        $roles = Role::whereIn('name', ['Closer', 'Customer Support'])->get();
+        $roles = Role::whereIn('name', ['Closer', 'Customer Support', 'Executives'])->get();
         $closers = User::whereIn('role_id', $roles->pluck('id'))->get();
         $selected_company_services = $lead->company_services;
         $company_services = CompanyServices::all();
@@ -185,7 +185,7 @@ class LeadController extends Controller
         return view('pages.lead.edit', compact('lead', 'sub_categories', 'categories','related_subcategories', 'closers', 'company_services', 'selected_company_services', 'comments' ));
     }
 
-    /**      
+    /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, $id)
