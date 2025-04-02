@@ -3104,7 +3104,6 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                     $('#countries').append(`<option value="${country.name}">${country.name} (${country.iso2})</option>`);
                 });
             });
-
             // Load states on country select
             $('#countries').on('change', function() {
                 const countryId = $(this).val();
@@ -3113,7 +3112,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
 
 
                 if (countryId) {
-                    $.get(`https://myfts.firmtech.biz/front/states/${countryId}`, function(data) {
+                    $.get(`https://crm.firmtechllc.com/front/states/${countryId}`, function(data) {
                         $.each(data, function(index, state) {
                             $('#states').append(`<option value="${state.name}">${state.name} (${state.state_code})</option>`);
                         });
@@ -3128,7 +3127,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                 $('#cities').empty().append('<option value="">Select City</option>').prop('disabled', false);
 
                 if (stateId) {
-                    $.get(`https://myfts.firmtech.biz/front/cities/${stateId}/${conrtyId}`, function(data) {
+                    $.get(`https://crm.firmtechllc.com/front/cities/${stateId}/${conrtyId}`, function(data) {
                         $.each(data, function(index, city) {
                             $('#cities').append(`<option value="${city.name}">${city.name}</option>`);
                         });
