@@ -81,6 +81,7 @@ class InvoiceServiceChargesController extends Controller
             'month' => 'required',
             'activation_date' => 'required',
             'invoice_due_date' => 'required',
+            'invoice_amount' => 'required',
         ]);
         $sale = Sale::find($request->sale_id6);
         $unique_id =  Str::random(5) . '_' . time();
