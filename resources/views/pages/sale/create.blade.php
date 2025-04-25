@@ -1368,7 +1368,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                         @endif
                                         <!-- /Invoice Form -->
                                         @if(isset($Payment_perm) && $Payment_perm->view == 1)
-                                            <form id="make_payment" action="{{ route('payment.store') }}" method="POST">
+                                            <form id="make_payment" action="{{ route('payment.store') }}" method="POST" >
                                                 @csrf
                                                 <div class="row g-4 py-3">
                                                     <h4>Payment Detail</h4>
@@ -3577,7 +3577,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                 <td>' + invoice.activation_date + '</td>\
                                 <td>' + invoice.invoice_due_date + '</td>\
                                 <td>' + invoice.total_amount + '</td>\
-                                <td>' + <a href="' + route('front.invoiceView', payment.invoice_number) + '" target="_blank">View Invoice</a>+'</td>
+                                <td><a href="/front/invoice/ ' + invoice.invoice_number + '" target="_blank">View Invoice</a> </td>\
                             </tr>';
                         });
 
@@ -3925,7 +3925,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                 <td>' + payment.balance  + '</td>\
                                 <td>'+ payment.mop+'</td>\
                                 <td>' + payment.merchant.name + '</td>\
-                                <td>' + <a href="' + asset('business/recipts/' + payment.trans_ss) + '">View Receipt</a> +'</td>
+                                <td> <a href="/business/recipts/' + payment.trans_ss + '">View Receipt</a> </td>\
                             </tr>';
                         });
 
