@@ -36,7 +36,6 @@ class PaymentController extends Controller
      */
     public function store(Request $request)
     {
-        dd($request->all());
         $request->validate([
             'invoice_id' => 'required',
             'merchant' => 'required',

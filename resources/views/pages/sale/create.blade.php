@@ -3577,7 +3577,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                 <td>' + invoice.activation_date + '</td>\
                                 <td>' + invoice.invoice_due_date + '</td>\
                                 <td>' + invoice.total_amount + '</td>\
-                                <td><a href="/front/invoice/ ' + invoice.invoice_number + '" target="_blank">View Invoice</a> </td>\
+                                <td><a href="/front/invoice/'+invoice.invoice_number+'" target="_blank">View Invoice</a> </td>\
                             </tr>';
                         });
 
@@ -3925,7 +3925,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                 <td>' + payment.balance  + '</td>\
                                 <td>'+ payment.mop+'</td>\
                                 <td>' + payment.merchant.name + '</td>\
-                                <td> <a href="/business/recipts/' + payment.trans_ss + '">View Receipt</a> </td>\
+                                <td> <a href="/business/recipts/'+ payment.trans_ss +'">View Receipt</a> </td>\
                             </tr>';
                         });
 
