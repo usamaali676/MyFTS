@@ -1357,6 +1357,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                                     <th>Invoice Date</th>
                                                                     <th>Due Date</th>
                                                                     <th>Invoice Amount</th>
+                                                                    <th>View Invoice</th>
 
                                                                 </tr>
                                                             </thead>
@@ -1370,6 +1371,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                                     <td>{{ $item->activation_date }}</td>
                                                                     <td>{{ $item->invoice_due_date }}</td>
                                                                     <td>{{ $item->total_amount }}</td>
+                                                                    <td><a href="{{ route('front.invoiceView',  $item->invoice_number) }}" target="_blank">View</a></td>
                                                                 </tr>
                                                                 @endforeach
                                                                 @endif
@@ -1382,7 +1384,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                         @endif
                                         <!-- /Invoice Form -->
                                         @if(isset($Payment_perm) && $Payment_perm->view == 1)
-                                            <form id="make_payment" action="{{ route('payment.store') }}" method="POST">
+                                            <form id="make_payment" action="{{ route('payment.store') }}" method="POST" >
                                                 @csrf
                                                 <div class="row g-4 py-3">
                                                     <h4>Payment Detail</h4>
@@ -1487,7 +1489,9 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                                     <th>Invoice Amount</th>
                                                                     <th>Paid Amount</th>
                                                                     <th>Balance Amount</th>
+                                                                    <th>Payment Methods</th>
                                                                     <th>Merchant Amount</th>
+                                                                    <th>Receipts</th>
                                                                 </tr>
                                                             </thead>
                                                             <tbody>
@@ -1504,7 +1508,9 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                                     <td>{{ $item->invoice->total_amount }}</td>
                                                                     <td>{{ $item->amount }}</td>
                                                                     <td>{{ $item->balance }}</td>
+                                                                    <td>{{ $item->mop }}</td>
                                                                     <td>{{ $item->merchant->name }}</td>
+                                                                    <td><a href="{{ asset('business/recipts/'. $item->trans_ss) }}" target="_blank">View</a></td>
                                                                 </tr>
                                                                 @endforeach
                                                                 @endif
@@ -3587,6 +3593,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                 <td>' + invoice.activation_date + '</td>\
                                 <td>' + invoice.invoice_due_date + '</td>\
                                 <td>' + invoice.total_amount + '</td>\
+                                <td><a href="/front/invoice/'+invoice.invoice_number+'" target="_blank">View Invoice</a> </td>\
                             </tr>';
                         });
 
@@ -3982,7 +3989,9 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                 <td>' + payment.invoice.total_amount + '</td>\
                                 <td>' + payment.amount + '</td>\
                                 <td>' + payment.balance  + '</td>\
+                                <td>'+ payment.mop+'</td>\
                                 <td>' + payment.merchant.name + '</td>\
+                                <td> <a href="/business/recipts/'+ payment.trans_ss +'">View Receipt</a> </td>\
                             </tr>';
                         });
 
