@@ -51,7 +51,7 @@ class HomeController extends Controller
 
         // Get sales for this month that are associated with those leads
         $sale = Sale::whereIn('lead_id', $lead->pluck('id'))
-                
+
                 ->whereMonth('created_at', now()->month)
                 ->whereYear('created_at', now()->year)
                 ->get();
@@ -89,7 +89,9 @@ class HomeController extends Controller
             ->limit(5)
             ->get();
         $total_leads = Lead::all()->count();
+        $totalStates = Lead::select('state')->distinct()->count();
+
         // dd($topStates);
-        return view('home', compact('sale', 'total', 'sale_count', 'topStates', 'total_leads'));
+        return view('home', compact('sale', 'total', 'sale_count', 'topStates', 'total_leads', 'lead', 'totalStates'));
     }
 }

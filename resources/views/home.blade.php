@@ -378,9 +378,8 @@ $user = Auth::user();
                 <div class="card-header">
                     <div class="d-flex justify-content-between">
                         <h5 class="mb-1">Sales States</h5>
-
                     </div>
-                    <p class="mb-0 text-body">Total $42,580 Sales</p>
+                    <p class="mb-0 text-body">Total {{ $totalStates }} States</p>
                 </div>
                 <div class="card-body pb-1 px-0">
                     <div id="salesCountryChart"></div>
@@ -388,12 +387,6 @@ $user = Auth::user();
             </div>
         </div>
         <!--/ Sales Country Chart -->
-
-
-
-
-
-
     </div>
 </div>
 @endsection
