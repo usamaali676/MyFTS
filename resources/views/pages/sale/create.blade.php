@@ -1304,6 +1304,21 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                     </div>
                                                     <div class="col-md-6">
                                                         <div class="form-floating form-floating-outline">
+                                                            <select id="invoice_type" name="invoice_type" class="select2 form-select" data-allow-clear="true">
+                                                                <option value="">Please Select</option>
+                                                                {{-- @if(isset($invoice) && isset($invoice->discount_type))
+                                                                <option value="{{$invoice->discount_type}}" selected>{{ $invoice->discount_type }}</option>
+                                                                @endif --}}
+                                                                <option value="New">New</option>
+                                                                <option value="UpSell">UpSell</option>
+                                                                <option value="Monthly">Monthly</option>
+
+                                                            </select>
+                                                            <label for="multicol-country">Invoice Type</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-floating form-floating-outline">
                                                             <div class="input-group input-group-merge">
                                                                 <span class="input-group-text">$</span>
                                                                 <div class="form-floating form-floating-outline">
@@ -1342,6 +1357,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                                     <th>Due Date</th>
                                                                     <th>Invoice Amount</th>
                                                                     <th>View Invoice</th>
+                                                                    <th>Delete Invoice</th>
 
                                                                 </tr>
                                                             </thead>
@@ -1356,6 +1372,8 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                                     <td>{{ $item->invoice_due_date }}</td>
                                                                     <td>{{ $item->total_amount }}</td>
                                                                     <td><a href="{{ route('front.invoiceView',  $item->invoice_number) }}" target="_blank">View</a></td>
+                                                                    <td> <a  type="button" id="{{ $item->id }}"
+                                                                        class="dropdown-item delete-record invoice_delete" data-confirm="Are you sure to delete this item?"><i class="mdi mdi-delete-outline me-2"></i><span>Delete</span></a></td>
                                                                 </tr>
                                                                 @endforeach
                                                                 @endif
@@ -3578,6 +3596,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                 <td>' + invoice.invoice_due_date + '</td>\
                                 <td>' + invoice.total_amount + '</td>\
                                 <td><a href="/front/invoice/'+invoice.invoice_number+'" target="_blank">View Invoice</a> </td>\
+                                <td><a type="button" id="' + invoice.id + '" class="dropdown-item delete-record invoice_delete" data-confirm="Are you sure to delete this item?"><i class="mdi mdi-delete-outline me-2"></i><span>Delete</span></a></td>\
                             </tr>';
                         });
 
@@ -3688,6 +3707,74 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
             });
         });
     </script>
+        <script>
+            $(document).ready(function () {
+                // Use event delegation to attach the click event to the table or a parent element
+                $('#invoice_table_gen').on('click', '.invoice_delete', function() {
+                    if (!confirm('Are you sure you want to delete this invoice?')) {
+                        return; // Cancel if the user clicks "Cancel"
+                    }
+                    var id = $(this).attr('id'); // Get the ID of the keyword to be deleted
+                    var row = $(this).closest('tr'); // Get the parent row of the clicked delete button
+
+                    $.ajax({
+                        url: "{{ route('invoiceCharges.delete')}}",  // Ensure this route is correct
+                        type: "GET",
+                        data: {id: id},
+                        success: function (response) {
+                            // Show success message using SweetAlert
+                            Swal.fire({
+                                position: 'top-end',
+                                icon: 'success',
+                                title: 'Success Invoice Deleted',
+                                text: response.message,
+                                showConfirmButton: false,
+                                timer: 1500,
+                                toast: true,
+                            });
+
+                            // Remove the deleted row from the table
+                            row.remove(); // Remove the <tr> containing the deleted keyword
+                        },
+                        error: function (xhr) {
+                            // Handle validation errors or other issues
+                            let errors = xhr.responseJSON.errors;
+                            if (errors) {
+                                let errorHtml = '<div class="alert alert-danger"><ul>';
+                                $.each(errors, function (key, value) {
+                                    errorHtml += '<li>' + value + '</li>';
+                                });
+                                errorHtml += '</ul></div>';
+                                $('#service_area').prepend(errorHtml);
+
+                                // Display SweetAlert2 for validation errors
+                                Swal.fire({
+                                    position: 'top-end',
+                                    icon: 'error',
+                                    title: 'Validation Error',
+                                    html: errorHtml, // Use the generated error HTML
+                                    showConfirmButton: false,
+                                    timer: 1500,
+                                    toast: true,
+                                });
+                            } else if (xhr.responseJSON.error) {
+                                // Custom error message for server-side issues
+                                Swal.fire({
+                                    position: 'top-end',
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: xhr.responseJSON.error,
+                                    showConfirmButton: false,
+                                    timer: 1500,
+                                    toast: true,
+                                });
+                            }
+                        }
+                    });
+                });
+            });
+
+        </script>
     <script>
         $(document).ready(function () {
             $('#invoice_number_id').change(function () {

@@ -130,6 +130,7 @@ class InvoiceServiceChargesController extends Controller
                 'invoice_due_date' => $request->invoice_due_date,
                 'total_amount' => $request->invoice_amount,
                 'invoice_frequency' =>   $request->invoice_freq,
+                'invoice_type' =>  $request->invoice_type,
                 'month' => $request->month,
                 'created_by' => Auth::user()->id,
             ]);
@@ -230,8 +231,14 @@ class InvoiceServiceChargesController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(InvoiceServiceCharges $invoiceServiceCharges)
+    public function destroy(Request $request)
     {
-        //
+        $invoice = Invoice::find($request->id);
+        $invoice->delete();
+
+        // $rem_keyword = K
+        return response()->json([
+           'message' => 'Invoice deleted successfully!'
+        ], 200);
     }
 }

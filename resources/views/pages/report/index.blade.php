@@ -154,8 +154,11 @@
             </div>
           </div>
         </div>
+
         <div class="card-datatable table-responsive">
-          <table id="report-table" class="datatables-products table ">
+            {{-- <div class="dt-buttons btn-group flex-wrap"> <div class="btn-group"><button class="btn buttons-collection btn-label-primary dropdown-toggle me-4 waves-effect border-none" tabindex="0" aria-controls="report-table" type="button" aria-haspopup="dialog" aria-expanded="false"><span><span class="d-flex align-items-center gap-2"><i class="icon-base ri ri-external-link-line icon-18px"></i> <span class="d-none d-sm-inline-block">Export</span></span></span></button></div> <button class="btn create-new btn-primary" tabindex="0" aria-controls="DataTables_Table_0" type="button"><span><span class="d-flex align-items-center"><i class="icon-base ri ri-add-line icon-18px me-sm-1"></i><span class="d-none d-sm-inline-block">Add New Record</span></span></span></button> </div> --}}
+
+          <table id="report-table" class="datatables-products table datatables-basic ">
 
             <thead class="table-light">
               <tr>
@@ -194,6 +197,8 @@
     <script src="{{ asset('assets/vendor/libs/jquery-timepicker/jquery-timepicker.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/pickr/pickr.js') }}"></script>
     <script src="{{ asset('assets/js/forms-pickers.js') }}"></script>
+    {{-- <script src="{{ asset('assets/js/tables-datatables-basic.js') }}"></script> --}}
+
 
 
     <script>
@@ -268,7 +273,158 @@
                 info: 'Showing _START_ to _END_ of _TOTAL_ entries'
             }
             });
+            order: [[2, 'desc']],
+      dom: '<"card-header flex-column flex-md-row"<"head-label text-center"><"dt-action-buttons text-end pt-3 pt-md-0"B>><"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6 d-flex justify-content-center justify-content-md-end"f>>t<"row"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>',
+      displayLength: 7,
+      lengthMenu: [7, 10, 25, 50, 75, 100],
+      buttons: [
+        {
+          extend: 'collection',
+          className: 'btn btn-label-primary dropdown-toggle me-2 waves-effect waves-light',
+          text: '<i class="mdi mdi-export-variant me-sm-1"></i> <span class="d-none d-sm-inline-block">Export</span>',
+          buttons: [
+            {
+              extend: 'print',
+              text: '<i class="mdi mdi-printer-outline me-1" ></i>Print',
+              className: 'dropdown-item',
+              exportOptions: {
+                columns: [3, 4, 5, 6, 7],
+                // prevent avatar to be display
+                format: {
+                  body: function (inner, coldex, rowdex) {
+                    if (inner.length <= 0) return inner;
+                    var el = $.parseHTML(inner);
+                    var result = '';
+                    $.each(el, function (index, item) {
+                      if (item.classList !== undefined && item.classList.contains('user-name')) {
+                        result = result + item.lastChild.firstChild.textContent;
+                      } else if (item.innerText === undefined) {
+                        result = result + item.textContent;
+                      } else result = result + item.innerText;
+                    });
+                    return result;
+                  }
+                }
+              },
+              customize: function (win) {
+                //customize print view for dark
+                $(win.document.body)
+                  .css('color', config.colors.headingColor)
+                  .css('border-color', config.colors.borderColor)
+                  .css('background-color', config.colors.bodyBg);
+                $(win.document.body)
+                  .find('table')
+                  .addClass('compact')
+                  .css('color', 'inherit')
+                  .css('border-color', 'inherit')
+                  .css('background-color', 'inherit');
+              }
+            },
+            {
+              extend: 'csv',
+              text: '<i class="mdi mdi-file-document-outline me-1" ></i>Csv',
+              className: 'dropdown-item',
+              exportOptions: {
+                columns: [3, 4, 5, 6, 7],
+                // prevent avatar to be display
+                format: {
+                  body: function (inner, coldex, rowdex) {
+                    if (inner.length <= 0) return inner;
+                    var el = $.parseHTML(inner);
+                    var result = '';
+                    $.each(el, function (index, item) {
+                      if (item.classList !== undefined && item.classList.contains('user-name')) {
+                        result = result + item.lastChild.firstChild.textContent;
+                      } else if (item.innerText === undefined) {
+                        result = result + item.textContent;
+                      } else result = result + item.innerText;
+                    });
+                    return result;
+                  }
+                }
+              }
+            },
+            {
+              extend: 'excel',
+              text: '<i class="mdi mdi-file-excel-outline me-1"></i>Excel',
+              className: 'dropdown-item',
+              exportOptions: {
+                columns: [3, 4, 5, 6, 7],
+                // prevent avatar to be display
+                format: {
+                  body: function (inner, coldex, rowdex) {
+                    if (inner.length <= 0) return inner;
+                    var el = $.parseHTML(inner);
+                    var result = '';
+                    $.each(el, function (index, item) {
+                      if (item.classList !== undefined && item.classList.contains('user-name')) {
+                        result = result + item.lastChild.firstChild.textContent;
+                      } else if (item.innerText === undefined) {
+                        result = result + item.textContent;
+                      } else result = result + item.innerText;
+                    });
+                    return result;
+                  }
+                }
+              }
+            },
+            {
+              extend: 'pdf',
+              text: '<i class="mdi mdi-file-pdf-box me-1"></i>Pdf',
+              className: 'dropdown-item',
+              exportOptions: {
+                columns: [3, 4, 5, 6, 7],
+                // prevent avatar to be display
+                format: {
+                  body: function (inner, coldex, rowdex) {
+                    if (inner.length <= 0) return inner;
+                    var el = $.parseHTML(inner);
+                    var result = '';
+                    $.each(el, function (index, item) {
+                      if (item.classList !== undefined && item.classList.contains('user-name')) {
+                        result = result + item.lastChild.firstChild.textContent;
+                      } else if (item.innerText === undefined) {
+                        result = result + item.textContent;
+                      } else result = result + item.innerText;
+                    });
+                    return result;
+                  }
+                }
+              }
+            },
+            {
+              extend: 'copy',
+              text: '<i class="mdi mdi-content-copy me-1" ></i>Copy',
+              className: 'dropdown-item',
+              exportOptions: {
+                columns: [3, 4, 5, 6, 7],
+                // prevent avatar to be display
+                format: {
+                  body: function (inner, coldex, rowdex) {
+                    if (inner.length <= 0) return inner;
+                    var el = $.parseHTML(inner);
+                    var result = '';
+                    $.each(el, function (index, item) {
+                      if (item.classList !== undefined && item.classList.contains('user-name')) {
+                        result = result + item.lastChild.firstChild.textContent;
+                      } else if (item.innerText === undefined) {
+                        result = result + item.textContent;
+                      } else result = result + item.innerText;
+                    });
+                    return result;
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          text: '<i class="mdi mdi-plus me-sm-1"></i> <span class="d-none d-sm-inline-block">Add New Record</span>',
+          className: 'create-new btn btn-primary waves-effect waves-light'
         }
+      ],
+        }
+
         });
 
     </script>
@@ -343,10 +499,10 @@
                 tableBody.empty(); // Clear previous rows
 
                 if (response.data.length === 0) {
-                    $('#dev_rev').html(response.summary.development);
-                    $('#mark_rev').html(response.summary.marketing);
-                    $('#charge_back').html(response.summary.chargeback);
-                    $('#total_rev').html(response.summary.total);
+                    $('#dev_rev').html("$"+ response.summary.development);
+                    $('#mark_rev').html("$"+ response.summary.marketing);
+                    $('#charge_back').html("$"+ response.summary.chargeback);
+                    $('#total_rev').html("$"+ response.summary.total);
                     // alert("No Data Found");
                     // tableBody.append('<tr><td colspan="7" class="text-center">No data found</td></tr>');
                 } else {
@@ -369,10 +525,10 @@
                         `);
                     });
 
-                    $('#dev_rev').html(response.summary.development);
-                    $('#mark_rev').html(response.summary.marketing);
-                    $('#charge_back').html(response.summary.chargeback);
-                    $('#total_rev').html(response.summary.total);
+                    $('#dev_rev').html("$"+ response.summary.development);
+                    $('#mark_rev').html("$"+ response.summary.marketing);
+                    $('#charge_back').html("$"+ response.summary.chargeback);
+                    $('#total_rev').html("$"+ response.summary.total);
                 }
 
                 // ✅ Reinitialize DataTable
