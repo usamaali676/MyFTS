@@ -129,6 +129,12 @@
                 </li>
             </ul>
         </li>
+        <li class="menu-item">
+            <a href="{{ route('salereport.index') }}" class="menu-link">
+                <i class="menu-icon icon-base ri ri-bar-chart-2-line"></i>
+                <div data-i18n="Reports">Reports</div>
+            </a>
+        </li>
 
 
 

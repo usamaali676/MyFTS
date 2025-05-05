@@ -20,4 +20,8 @@ class Invoice extends Model
     public function payments(){
         return $this->hasMany(Payment::class, 'invoice_id');
     }
+    public function chargeback(){
+        return $this->hasOne(ChargeBack::class,'invoice_id');
+    }
+
 }

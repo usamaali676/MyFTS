@@ -12,6 +12,7 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\RefundController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SaleController;
+use App\Http\Controllers\SaleReportController;
 use App\Http\Controllers\ServiceAreaController;
 use App\Http\Controllers\UserController;
 use App\Http\Middleware\PermissionMiddelware;
@@ -48,6 +49,7 @@ Route::controller(FrontController::class)
     Route::get('/get-chargeBack', 'getchargeBack')->name('getchargeBack');
     Route::get('otp-verify',  'showVerifyForm')->name('otp.verify');
     Route::post('otp-verify',  'verify')->name('otp.verify.post');
+
 
 });
 
@@ -197,4 +199,15 @@ Route::controller(RoleController::class)
         Route::post('edit/{id}', 'edit')->name('edit');
         Route::post('update/{id}', 'update')->name('update');
         Route::get('delete', 'destroy')->name('delete');
+    });
+
+    Route::controller(SaleReportController::class)
+    ->prefix('salereport')
+    ->as('salereport.')
+    ->middleware(PermissionMiddelware::class)
+    ->group(function () {
+        Route::get('/index', 'index')->name('index');
+        Route::get('/getdata', 'show')->name('show');
+        Route::get('/reportfilter', 'filterData')->name('reportfilter');
+
     });
