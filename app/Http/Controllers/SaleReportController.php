@@ -13,8 +13,10 @@ use Illuminate\Http\Request;
 class SaleReportController extends Controller
 {
    public function index() {
-       $role_id = Role::where('name', "TSR")->first();
-       $agent = User::where('role_id' , $role_id->id)->get();
+        $role_id = Role::whereIn('name', ['Closer', 'TSR'])->get();
+        $agent = User::whereIn('role_id', $role_id->pluck('id'))->get();
+    //    $role_id = Role::where('name', "TSR","Closer")->first();
+    //    $agent = User::where('role_id' , $role_id->id)->get();
        $closer_id = Role::where('name', "Closer")->first();
        $closer = User::where('role_id', $closer_id->id)->get();
      return view('pages.report.index', compact('agent', 'closer'));
