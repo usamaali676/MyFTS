@@ -150,10 +150,10 @@ public function filterData(Request $request)
             }) ?? 'N/A',
             'comment' => $sale->comment ?? '',
             'price' => $item->total_amount,
-            'invoice' => $item->invoice_number,
+            // 'invoice' => $item->invoice_number,
         ];
     });
-    dd($data);
+    // dd($data);
 
     // Revenue calculations
     $devRevenue = 0;
