@@ -197,8 +197,6 @@
     <script src="{{ asset('assets/vendor/libs/jquery-timepicker/jquery-timepicker.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/pickr/pickr.js') }}"></script>
     <script src="{{ asset('assets/js/forms-pickers.js') }}"></script>
-    {{-- <script src="{{ asset('assets/js/tables-datatables-basic.js') }}"></script> --}}
-
 
 
     <script>
@@ -217,7 +215,7 @@
 
         const dt_product_table = $('.datatables-products');
 
-        if (dt_product_table.length) {
+        if (dt_product_table.length > 0) {
             dt_product_table.DataTable({
             ajax: '{{ route('salereport.show') }}', // <-- Replace this with your controller JSON URL
             columns: [
@@ -273,158 +271,7 @@
                 info: 'Showing _START_ to _END_ of _TOTAL_ entries'
             }
             });
-            order: [[2, 'desc']],
-      dom: '<"card-header flex-column flex-md-row"<"head-label text-center"><"dt-action-buttons text-end pt-3 pt-md-0"B>><"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6 d-flex justify-content-center justify-content-md-end"f>>t<"row"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>',
-      displayLength: 7,
-      lengthMenu: [7, 10, 25, 50, 75, 100],
-      buttons: [
-        {
-          extend: 'collection',
-          className: 'btn btn-label-primary dropdown-toggle me-2 waves-effect waves-light',
-          text: '<i class="mdi mdi-export-variant me-sm-1"></i> <span class="d-none d-sm-inline-block">Export</span>',
-          buttons: [
-            {
-              extend: 'print',
-              text: '<i class="mdi mdi-printer-outline me-1" ></i>Print',
-              className: 'dropdown-item',
-              exportOptions: {
-                columns: [3, 4, 5, 6, 7],
-                // prevent avatar to be display
-                format: {
-                  body: function (inner, coldex, rowdex) {
-                    if (inner.length <= 0) return inner;
-                    var el = $.parseHTML(inner);
-                    var result = '';
-                    $.each(el, function (index, item) {
-                      if (item.classList !== undefined && item.classList.contains('user-name')) {
-                        result = result + item.lastChild.firstChild.textContent;
-                      } else if (item.innerText === undefined) {
-                        result = result + item.textContent;
-                      } else result = result + item.innerText;
-                    });
-                    return result;
-                  }
-                }
-              },
-              customize: function (win) {
-                //customize print view for dark
-                $(win.document.body)
-                  .css('color', config.colors.headingColor)
-                  .css('border-color', config.colors.borderColor)
-                  .css('background-color', config.colors.bodyBg);
-                $(win.document.body)
-                  .find('table')
-                  .addClass('compact')
-                  .css('color', 'inherit')
-                  .css('border-color', 'inherit')
-                  .css('background-color', 'inherit');
-              }
-            },
-            {
-              extend: 'csv',
-              text: '<i class="mdi mdi-file-document-outline me-1" ></i>Csv',
-              className: 'dropdown-item',
-              exportOptions: {
-                columns: [3, 4, 5, 6, 7],
-                // prevent avatar to be display
-                format: {
-                  body: function (inner, coldex, rowdex) {
-                    if (inner.length <= 0) return inner;
-                    var el = $.parseHTML(inner);
-                    var result = '';
-                    $.each(el, function (index, item) {
-                      if (item.classList !== undefined && item.classList.contains('user-name')) {
-                        result = result + item.lastChild.firstChild.textContent;
-                      } else if (item.innerText === undefined) {
-                        result = result + item.textContent;
-                      } else result = result + item.innerText;
-                    });
-                    return result;
-                  }
-                }
-              }
-            },
-            {
-              extend: 'excel',
-              text: '<i class="mdi mdi-file-excel-outline me-1"></i>Excel',
-              className: 'dropdown-item',
-              exportOptions: {
-                columns: [3, 4, 5, 6, 7],
-                // prevent avatar to be display
-                format: {
-                  body: function (inner, coldex, rowdex) {
-                    if (inner.length <= 0) return inner;
-                    var el = $.parseHTML(inner);
-                    var result = '';
-                    $.each(el, function (index, item) {
-                      if (item.classList !== undefined && item.classList.contains('user-name')) {
-                        result = result + item.lastChild.firstChild.textContent;
-                      } else if (item.innerText === undefined) {
-                        result = result + item.textContent;
-                      } else result = result + item.innerText;
-                    });
-                    return result;
-                  }
-                }
-              }
-            },
-            {
-              extend: 'pdf',
-              text: '<i class="mdi mdi-file-pdf-box me-1"></i>Pdf',
-              className: 'dropdown-item',
-              exportOptions: {
-                columns: [3, 4, 5, 6, 7],
-                // prevent avatar to be display
-                format: {
-                  body: function (inner, coldex, rowdex) {
-                    if (inner.length <= 0) return inner;
-                    var el = $.parseHTML(inner);
-                    var result = '';
-                    $.each(el, function (index, item) {
-                      if (item.classList !== undefined && item.classList.contains('user-name')) {
-                        result = result + item.lastChild.firstChild.textContent;
-                      } else if (item.innerText === undefined) {
-                        result = result + item.textContent;
-                      } else result = result + item.innerText;
-                    });
-                    return result;
-                  }
-                }
-              }
-            },
-            {
-              extend: 'copy',
-              text: '<i class="mdi mdi-content-copy me-1" ></i>Copy',
-              className: 'dropdown-item',
-              exportOptions: {
-                columns: [3, 4, 5, 6, 7],
-                // prevent avatar to be display
-                format: {
-                  body: function (inner, coldex, rowdex) {
-                    if (inner.length <= 0) return inner;
-                    var el = $.parseHTML(inner);
-                    var result = '';
-                    $.each(el, function (index, item) {
-                      if (item.classList !== undefined && item.classList.contains('user-name')) {
-                        result = result + item.lastChild.firstChild.textContent;
-                      } else if (item.innerText === undefined) {
-                        result = result + item.textContent;
-                      } else result = result + item.innerText;
-                    });
-                    return result;
-                  }
-                }
-              }
-            }
-          ]
-        },
-        {
-          text: '<i class="mdi mdi-plus me-sm-1"></i> <span class="d-none d-sm-inline-block">Add New Record</span>',
-          className: 'create-new btn btn-primary waves-effect waves-light'
         }
-      ],
-        }
-
         });
 
     </script>

@@ -3,6 +3,7 @@
 /public/build
 /public/hot
 /public/storage
+/database/seeders
 /storage/*.key
 /vendor
 /public

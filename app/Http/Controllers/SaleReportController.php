@@ -23,10 +23,11 @@ class SaleReportController extends Controller
 
    }
    public function show() {
-    $invoices = Invoice::whereHas('payments')->get();
+    $invoices = Invoice::whereHas('payments')->whereNotIn('invoice_type', ['Upsell', 'Monthly'])->get();
+    // dd($invoices->sale_id);
     $sr = 1;
 
-    // dd($invoices);
+    // dd($invoices->sale_id);
     $data = $invoices->map(function ($item, $index) {
 
         $sale = Sale::where('id', $item->sale_id )->first();
@@ -61,14 +62,14 @@ public function filterData(Request $request)
 {
 
     // dd($request->all());
-    $query = Invoice::whereHas('payments');
+    $query = Invoice::whereHas('payments')->whereNotIn('invoice_type', ['Upsell', 'Monthly']);
 
 
     // Filter by date range
     if ($request->has('date') && !empty($request->date)) {
         [$start, $end] = explode(' to ', $request->date);
         $query->whereHas('payments', function ($q) use ($start, $end) {
-            $q->whereBetween('created_at', [
+            $q->whereBetween('activation_date', [
                 Carbon::parse($start)->startOfDay(),
                 Carbon::parse($end)->endOfDay()
             ]);
@@ -126,6 +127,7 @@ public function filterData(Request $request)
 
         return true;
     });
+    // dd($data);
 
     $data = $filtered->values()->map(function ($item, $index) {
         $sale = $item->sale;
@@ -135,9 +137,10 @@ public function filterData(Request $request)
         return [
             'id' => $sale->id,
             'sr_no' => $index + 1,
-            'date' => $payments->map(function ($date) {
-                return Carbon::parse($date->created_at)->format('Y-m-d');
-            }),
+            // 'date' => $payments->map(function ($date) {
+            //     return Carbon::parse($date->created_at)->format('Y-m-d');
+            // }),
+            'date' =>   Carbon::parse($item->activation_date)->format('Y-m-d'),
             'agent' => explode(' -', $sale->lead->saler->name )[0] ?? 'N/A',
             'closer' => $sale->lead->closers->map(function ($closer) {
                 return explode(' -', $closer->user->name )[0] ?? 'N/A';
@@ -146,9 +149,11 @@ public function filterData(Request $request)
                 return $items->service_name->name ?? 'N/A';
             }) ?? 'N/A',
             'comment' => $sale->comment ?? '',
-            'price' => $item->total_amount
+            'price' => $item->total_amount,
+            'invoice' => $item->invoice_number,
         ];
     });
+    dd($data);
 
     // Revenue calculations
     $devRevenue = 0;
@@ -263,4 +268,223 @@ public function filterData(Request $request)
     // return response()->json(['data' => $data]);
 }
 
+public function getstats() {
+    $role_id = Role::whereIn('name', ['Closer', 'TSR', 'Customer Support'])->get();
+    $agent = User::whereIn('role_id', $role_id->pluck('id'))->get();
+//    $role_id = Role::where('name', "TSR","Closer")->first();
+//    $agent = User::where('role_id' , $role_id->id)->get();
+   $closer_id = Role::where('name', "Closer")->first();
+   $closer = User::where('role_id', $closer_id->id)->get();
+ return view('pages.report.view', compact('agent', 'closer'));
+
 }
+
+public function stats(Request $request) {
+
+        // dd($request->agent);
+        $request->validate([
+            'agent' => 'required'
+        ]);
+        $query = Invoice::whereHas('payments')->whereNotIn('invoice_type', ['Upsell', 'Monthly']);
+
+        // dd($query);
+    // Filter by date range
+    if ($request->has('date') && !empty($request->date)) {
+        [$start, $end] = explode(' to ', $request->date);
+        $query->whereHas('payments', function ($q) use ($start, $end) {
+            $q->whereBetween('activation_date', [
+                Carbon::parse($start)->startOfDay(),
+                Carbon::parse($end)->endOfDay()
+            ]);
+        });
+    }
+
+    $invoices = $query->get();
+    // dd($invoices);
+    $typeCategories = [
+        'Development' => ['Website Development'],
+        'Marketing' => ['LandingPage', 'GMB', 'SMM', 'Google Reviews', 'Google Ads Campaign', 'SEO']
+    ];
+
+    $filtered = $invoices->filter(function ($invoice) use ($request) {
+        $sale = $invoice->sale;
+
+        // dd($sale);
+        // Filter by agent
+        if ($request->agent && $sale->lead->saler->id != $request->agent) {
+            return false;
+        }
+
+        // dd($sale);
+        // Filter by closer
+        // if ($request->closer) {
+        //     $closerIds = $sale->lead->closers->pluck('closer_id')->toArray();
+        //     if (!in_array($request->closer, $closerIds)) {
+        //         return false;
+        //     }
+        // }
+
+        $typeCategories = [
+            'Development' => ['Website Development'],
+            'Marketing' => ['LandingPage', 'GMB', 'SMM', 'Google Reviews', 'Google Ads Campaign', 'SEO']
+        ];
+
+        if ($request->type) {
+            $types = $invoice->servicecharges->pluck('service_name.name')->toArray();
+
+            // Match current types against defined category
+            $categoryServices = $typeCategories[$request->type] ?? [];
+
+            // If none of the invoice's types match the selected category, skip it
+            $hasMatch = false;
+            foreach ($types as $typeName) {
+                if (in_array($typeName, $categoryServices)) {
+                    $hasMatch = true;
+                    break;
+                }
+            }
+
+            if (!$hasMatch) {
+                return false; // Exclude this invoice from the results
+            }
+        }
+
+
+
+
+        return true;
+    });
+    // dd($filtered);
+
+    $data = $filtered->values()->map(function ($item, $index) {
+        $sale = $item->sale;
+        $types = $item->servicecharges;
+        $payments = $item->payments;
+
+        return [
+            'id' => $sale->id,
+            'sr_no' => $index + 1,
+            'date' => $payments->map(function ($date) {
+                return Carbon::parse($date->created_at)->format('Y-m-d');
+            }),
+            'agent' => explode(' -', $sale->lead->saler->name )[0] ?? 'N/A',
+            // 'closer' => $sale->lead->closers->map(function ($closer) {
+            //     return explode(' -', $closer->user->name )[0] ?? 'N/A';
+            // }) ?? 'N/A',
+            'type' => $types->map(function ($items) {
+                return $items->service_name->name ?? 'N/A';
+            }) ?? 'N/A',
+            'comment' => $sale->comment ?? '',
+            'price' => $item->total_amount
+        ];
+    });
+
+
+    // dd($data);
+
+    // return view('pages.report.report', response()->json([
+    //     'labels' => $data->pluck('date')->flatten()->unique()->sort()->values(),
+    //     'datasets' => [
+    //         'Development' => $data->filter(fn($d) => in_array('Development', $d['type']))
+    //                           ->pluck('price'),
+    //         'Marketing' => $data->filter(fn($d) => in_array('Marketing', $d['type']))
+    //                           ->pluck('price'),
+    //     ]
+    //     ]));
+
+    // dd($data);
+
+    $developmentServices = ['Website Development'];
+    $marketingServices = ['LandingPage', 'GMB', 'SMM', 'Google Reviews', 'Google Ads Campaign', 'SEO'];
+
+    $labels = $data->pluck('date')->flatten()->unique()->sort()->values();
+
+    $developmentItems = $data->filter(function ($d) use ($developmentServices) {
+        return collect($d['type'])->intersect($developmentServices)->isNotEmpty();
+    });
+
+    $marketingItems = $data->filter(function ($d) use ($marketingServices) {
+        return collect($d['type'])->intersect($marketingServices)->isNotEmpty();
+    });
+
+    // Get individual price lists
+    $development = $developmentItems->pluck('price')->values();
+    $marketing = $marketingItems->pluck('price')->values();
+
+    // Calculate combined total
+    $total = $development->sum() + $marketing->sum();
+
+
+    // Group prices by month (e.g., "2025-05")
+$monthlyGroups = $data->flatMap(function ($d) use ($developmentServices, $marketingServices) {
+    return collect($d['date'])->map(function ($date) use ($d, $developmentServices, $marketingServices) {
+        $month = Carbon::parse($date)->format('Y-m');
+        $type = collect($d['type']);
+
+        return [
+            'month' => $month,
+            'development' => $type->intersect($developmentServices)->isNotEmpty() ? $d['price'] : 0,
+            'marketing' => $type->intersect($marketingServices)->isNotEmpty() ? $d['price'] : 0,
+        ];
+    });
+});
+
+// Aggregate sums per month
+$monthlySummary = $monthlyGroups->groupBy('month')->map(function ($items) {
+    return [
+        'development' => $items->sum('development'),
+        'marketing' => $items->sum('marketing')
+    ];
+})->sortKeys();
+
+// Extract labels and data arrays
+$monthlyLabels = $monthlySummary->keys()->map(function ($month) {
+    return Carbon::parse($month . '-01')->format('M Y'); // e.g., "May 2025"
+})->values();
+
+$monthlyDevelopment = $monthlySummary->pluck('development')->values();
+$monthlyMarketing = $monthlySummary->pluck('marketing')->values();
+
+    return view('pages.report.report', [
+        'labels' => $labels,
+        'datasets' => [
+            'Development' => $development,
+            'Marketing' => $marketing
+        ],
+        'total' => $total,
+        'monthlyLabels' => $monthlyLabels,
+        'monthlyDev' => $monthlyDevelopment,
+        'monthlyMarketing' => $monthlyMarketing
+    ]);
+
+    // $development = $data->filter(function ($d) use ($developmentServices) {
+    //     return collect($d['type'])->intersect($developmentServices)->isNotEmpty();
+    // })->pluck('price')->values();
+
+    // $marketing = $data->filter(function ($d) use ($marketingServices) {
+    //     return collect($d['type'])->intersect($marketingServices)->isNotEmpty();
+    // })->pluck('price')->values();
+
+    // return view('pages.report.report', [
+    //     'labels' => $labels,
+    //     'datasets' => [
+    //         'Development' => $development,
+    //         'Marketing' => $marketing
+    //     ]
+    // ]);
+    // return view('pages.report.report', [
+    //     'labels' => $data->pluck('date')->flatten()->unique()->sort()->values(),
+    //     'datasets' => [
+    //         'Development' => $data->filter(fn($d) => in_array('Development', $d['type']->toArray()))
+    //                             ->pluck('price')->values(),
+    //         'Marketing' => $data->filter(fn($d) => in_array('Marketing', $d['type']->toArray()))
+    //                             ->pluck('price')->values(),
+    //     ]
+
+    // ]);
+
+}
+
+}
+
+

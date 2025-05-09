@@ -210,5 +210,7 @@ Route::controller(RoleController::class)
         Route::get('/index', 'index')->name('index');
         Route::get('/getdata', 'show')->name('show');
         Route::get('/reportfilter', 'filterData')->name('reportfilter');
+        Route::get('/get-stats', 'getstats')->name('edit');
+        Route::post('/stats', 'stats')->name('store');
 
     });

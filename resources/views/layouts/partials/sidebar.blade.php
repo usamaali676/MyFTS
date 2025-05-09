@@ -130,11 +130,25 @@
             </ul>
         </li>
         <li class="menu-item">
-            <a href="{{ route('salereport.index') }}" class="menu-link">
+            <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon icon-base ri ri-bar-chart-2-line"></i>
                 <div data-i18n="Reports">Reports</div>
             </a>
+            <ul class="menu-sub">
+                <li class="menu-item">
+                    <a href="{{ route('salereport.index') }}" class="menu-link">
+                        <div data-i18n="View">View</div>
+                    </a>
+                </li>
+
+                <li class="menu-item">
+                    <a href="{{ route('salereport.edit') }}" class="menu-link">
+                        <div data-i18n="Singular Report">Singular Report</div>
+                    </a>
+                </li>
+            </ul>
         </li>
+
 
 
 
