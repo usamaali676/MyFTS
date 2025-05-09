@@ -13,7 +13,7 @@ use Illuminate\Http\Request;
 class SaleReportController extends Controller
 {
    public function index() {
-        $role_id = Role::whereIn('name', ['Closer', 'TSR'])->get();
+        $role_id = Role::whereIn('name', ['Closer', 'TSR', 'Customer Support'])->get();
         $agent = User::whereIn('role_id', $role_id->pluck('id'))->get();
     //    $role_id = Role::where('name', "TSR","Closer")->first();
     //    $agent = User::where('role_id' , $role_id->id)->get();
@@ -39,9 +39,10 @@ class SaleReportController extends Controller
 
             'id' => $sale->id,
             'sr_no' => $index + 1,
-            'date' =>  $payments->map(function ($date) {
-                return Carbon::parse($date->created_at)->format('Y-m-d');
-            }),
+            // 'date' =>  $payments->map(function ($date) {
+            //     return Carbon::parse($date->created_at)->format('Y-m-d');
+            // }),
+            'date' =>   Carbon::parse($item->activation_date)->format('Y-m-d'),
             'agent' => explode(' -',  $sale->lead->saler->name  )[0] ?? 'N/A',
             // 'closer' => $sale->lead->closers ?? 'N/A',
             'closer' => $sale->lead->closers->map(function ($closer) {
@@ -311,18 +312,21 @@ public function stats(Request $request) {
 
         // dd($sale);
         // Filter by agent
-        if ($request->agent && $sale->lead->saler->id != $request->agent) {
-            return false;
-        }
+
 
         // dd($sale);
         // Filter by closer
-        // if ($request->closer) {
+        // if ($request->agent) {
         //     $closerIds = $sale->lead->closers->pluck('closer_id')->toArray();
-        //     if (!in_array($request->closer, $closerIds)) {
+        //     if (!in_array($request->agent, $closerIds)) {
         //         return false;
         //     }
         // }
+        $closerIds = $sale->lead->closers->pluck('closer_id')->toArray();
+
+         if ($request->agent && $sale->lead->saler->id != $request->agent && !in_array($request->agent, $closerIds)) {
+            return false;
+        }
 
         $typeCategories = [
             'Development' => ['Website Development'],
@@ -364,9 +368,10 @@ public function stats(Request $request) {
         return [
             'id' => $sale->id,
             'sr_no' => $index + 1,
-            'date' => $payments->map(function ($date) {
-                return Carbon::parse($date->created_at)->format('Y-m-d');
-            }),
+            // 'date' => $payments->map(function ($date) {
+            //     return Carbon::parse($date->created_at)->format('Y-m-d');
+            // }),
+            'date' =>   Carbon::parse($item->activation_date)->format('Y-m-d'),
             'agent' => explode(' -', $sale->lead->saler->name )[0] ?? 'N/A',
             // 'closer' => $sale->lead->closers->map(function ($closer) {
             //     return explode(' -', $closer->user->name )[0] ?? 'N/A';
@@ -413,6 +418,8 @@ public function stats(Request $request) {
 
     // Calculate combined total
     $total = $development->sum() + $marketing->sum();
+    $developmentTotal = $development->sum();
+    $marketingTotal = $marketing->sum();
 
 
     // Group prices by month (e.g., "2025-05")
@@ -425,6 +432,7 @@ $monthlyGroups = $data->flatMap(function ($d) use ($developmentServices, $market
             'month' => $month,
             'development' => $type->intersect($developmentServices)->isNotEmpty() ? $d['price'] : 0,
             'marketing' => $type->intersect($marketingServices)->isNotEmpty() ? $d['price'] : 0,
+
         ];
     });
 });
@@ -454,7 +462,9 @@ $monthlyMarketing = $monthlySummary->pluck('marketing')->values();
         'total' => $total,
         'monthlyLabels' => $monthlyLabels,
         'monthlyDev' => $monthlyDevelopment,
-        'monthlyMarketing' => $monthlyMarketing
+        'monthlyMarketing' => $monthlyMarketing,
+        'developmentTotal' => $developmentTotal,
+        'marketingTotal' => $marketingTotal
     ]);
 
     // $development = $data->filter(function ($d) use ($developmentServices) {

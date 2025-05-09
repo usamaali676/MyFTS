@@ -11,6 +11,23 @@
 
             <div class="row">
               <!-- Line Charts -->
+
+              <div class="col-12 mb-4">
+                <div class="card">
+                  <div class="card-header header-elements">
+                    <div>
+                      <h5 class="card-title mb-0">Statistics</h5>
+                      <small class="text-muted">Commercial networks and enterprises</small>
+                    </div>
+                    <div class="card-header-elements ms-auto py-0">
+                      <h5 class="mb-0 me-3">Total: ${{ number_format($total, 2) }}</h5>
+                    </div>
+                  </div>
+                  <div class="card-body pt-2">
+                    <canvas id="lineChart" class="chartjs" data-height="500"></canvas>
+                  </div>
+                </div>
+              </div>
               <div class="col-xl-12 col-12 mb-4">
                 <div class="card">
                   <div class="card-header header-elements">
@@ -20,22 +37,6 @@
                   </div>
                   <div class="card-body">
                     <canvas id="barChart" class="chartjs" data-height="400"></canvas>
-                  </div>
-                </div>
-              </div>
-              <div class="col-12 mb-4">
-                <div class="card">
-                  <div class="card-header header-elements">
-                    <div>
-                      <h5 class="card-title mb-0">Statistics</h5>
-                      <small class="text-muted">Commercial networks and enterprises</small>
-                    </div>
-                    <div class="card-header-elements ms-auto py-0">
-                      <h5 class="mb-0 me-3">${{ number_format($total, 2) }}</h5>
-                    </div>
-                  </div>
-                  <div class="card-body pt-2">
-                    <canvas id="lineChart" class="chartjs" data-height="500"></canvas>
                   </div>
                 </div>
               </div>
@@ -759,7 +760,7 @@ const labels = {!! json_encode($labels) !!};
         labels: labels,
         datasets: [
           {
-            label: 'Development',
+            label: 'Development ${{ $developmentTotal }}',
             data: developmentData,
             borderColor: config.colors.primary,
             backgroundColor: config.colors.primary,
@@ -767,7 +768,7 @@ const labels = {!! json_encode($labels) !!};
             fill: false
           },
           {
-            label: 'Marketing',
+            label: 'Marketing ${{ $marketingTotal }}',
             data: marketingData,
             borderColor: config.colors.warning,
             backgroundColor: config.colors.warning,
