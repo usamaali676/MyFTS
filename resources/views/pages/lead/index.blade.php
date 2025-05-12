@@ -88,8 +88,10 @@
                                                 @if (isset($item->sale) && isset($item->sale->Customer_support) && count($item->sale->Customer_support) > 0)
                                                     <div class="d-flex" style="gap: 10px; flex-direction: column;">
                                                         @foreach ($item->sale->Customer_support as $list)
-                                                        <span
+                                                        @if(isset($list->user->name))
+                                                            <span
                                                             class="badge rounded-pill bg-label-primary me-1">{{ explode(' -',  $list->user->name)[0] }}</span>
+                                                        @endif
                                                         @endforeach
                                                     </div>
                                                 @else

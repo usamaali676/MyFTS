@@ -672,17 +672,17 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                     <div class="form-floating form-floating-outline">
                                                         <select id="multicol-cs" name="customer_support[]" class="select2 form-select" multiple>
                                                             @if(isset($sale) && isset($sale->Customer_support))
-                                                            @foreach ($sale->Customer_support as $item)
-                                                            <option value="{{ $item->id }}" selected>{{ $item->user->name }}</option>
-                                                            @endforeach
-                                                            @foreach ($csr as $item)
-                                                            <option value="{{ $item->id }}">{{ $item->name }}</option>
-                                                            @endforeach
+                                                                @foreach ($sale->Customer_support as $item)
+                                                                <option value="{{ $item->user->id }}" selected>{{ $item->user->name }}</option>
+                                                                @endforeach
+                                                                @foreach ($csr as $item)
+                                                                <option value="{{ $item->id }}">{{ $item->name }}</option>
+                                                                @endforeach
                                                             @else
-                                                            <option value="">Please Select</option>
-                                                            @foreach ($csr as $item)
-                                                            <option value="{{ $item->id }}">{{ $item->name }}</option>
-                                                            @endforeach
+                                                                <option value="">Please Select</option>
+                                                                @foreach ($csr as $item)
+                                                                <option value="{{ $item->id }}">{{ $item->name }}</option>
+                                                                @endforeach
                                                             @endif
 
 

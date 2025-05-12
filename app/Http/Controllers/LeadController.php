@@ -32,6 +32,7 @@ class LeadController extends Controller
         $leads = Lead::with('closers') // Eager load the closers relationship directly in the query
         ->orderBy('id', 'DESC')
         ->get();
+        // dd($leads);
         // $sale = Sale::where('lead_id', $leads->id)->first();
         return view('pages.lead.index', compact('leads'));
     }

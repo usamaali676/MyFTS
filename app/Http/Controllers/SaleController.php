@@ -61,13 +61,16 @@ class SaleController extends Controller
         // $csrole = Role::where('name', "Customer Support")->first();
         $csr = User::whereIn('role_id', $roles->pluck('id'))
         ->whereNotIn('id', [12, 13])
+        // ->pluck('name');
         ->get();
+        // dd($csr);
 
         $sale = Sale::where('lead_id', $lead->id)->first();
         $mehchant = MerchantAccount::all();
         $comments = Comments::where('lead_id', $lead->id)->orderby('id', 'DESC')->get();
         $refunds = Refund::where('lead_id', '=', $lead->id)->get();
         $chargeBack = ChargeBack::where('lead_id', '=', $lead->id)->get();
+        // dd($sale->Customer_support);
 
 
 
@@ -152,15 +155,16 @@ class SaleController extends Controller
             }
             // dd("work");
             if (isset($request->customer_support)) {
+                // dd($request->customer_support);
                 $oldcs = SaleCS::where('sale_id', $sale->id)->get();
                 foreach ($oldcs as $cs) {
                     $cs->delete();
                 }
-                foreach ($request->customer_support as $cs) {
+                // dd($oldcs);
+                foreach ($request->customer_support as $item) {
                     SaleCS::create([
                         'sale_id' => $sale->id,
-                        'cs_id' => $cs,
-                        'created_by' => Auth::user()->id,
+                        'cs_id' => $item,
                     ]);
                 }
             }
