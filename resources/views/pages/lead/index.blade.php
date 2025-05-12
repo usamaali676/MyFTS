@@ -67,7 +67,9 @@
                                                 <span class="badge rounded-pill bg-label-primary me-1">{{$cat->name }}</span>
                                                 @endforeach
                                             </td>
+                                            @if(isset($item->saler->name))
                                             <td>{{ explode(' -',   $item->saler->name )[0] }}</td>
+                                            @endif
                                             {{-- <td>{{ $item->call_status }}</td> --}}
                                             <td>
                                                 {{-- <p>{{ $item->closers }}</p> --}}
@@ -150,8 +152,9 @@
                                                     <span class="badge rounded-pill bg-label-primary me-1">{{$cat->name }}</span>
                                                     @endforeach
                                                 </td>
+                                                @if(isset($item->saler->name))
                                                 <td>{{ explode(' -',   $item->saler->name )[0] }}</td>
-                                                {{-- <td>{{ $item->call_status }}</td> --}}
+                                                @endif                                                {{-- <td>{{ $item->call_status }}</td> --}}
                                                 <td>
                                                     {{-- <p>{{ $item->closers }}</p> --}}
                                                     @if (isset($item->closers) && count($item->closers) > 0)
@@ -242,8 +245,9 @@
                                                     <span class="badge rounded-pill bg-label-primary me-1">{{$cat->name }}</span>
                                                     @endforeach
                                                 </td>
+                                                @if(isset($item->saler->name))
                                                 <td>{{ explode(' -',   $item->saler->name )[0] }}</td>
-                                                {{-- <td>{{ $item->call_status }}</td> --}}
+                                                @endif                                                {{-- <td>{{ $item->call_status }}</td> --}}
                                                 <td>
                                                     {{-- <p>{{ $item->closers }}</p> --}}
                                                     @if (isset($item->closers) && count($item->closers) > 0)
@@ -318,8 +322,9 @@
                                                     <span class="badge rounded-pill bg-label-primary me-1">{{$cat->name }}</span>
                                                     @endforeach
                                                 </td>
+                                                @if(isset($item->saler->name))
                                                 <td>{{ explode(' -',   $item->saler->name )[0] }}</td>
-                                                {{-- <td>{{ $item->call_status }}</td> --}}
+                                                @endif                                                {{-- <td>{{ $item->call_status }}</td> --}}
                                                 <td>
                                                     {{-- <p>{{ $item->closers }}</p> --}}
                                                     @if (isset($item->closers) && count($item->closers) > 0)
