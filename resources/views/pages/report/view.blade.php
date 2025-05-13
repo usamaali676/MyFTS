@@ -14,6 +14,15 @@
           <h5 class="card-title">Filter</h5>
           <form action="{{ route('salereport.store') }}" method="POST" >
             @csrf
+            @if ($errors->any())
+            <div class="alert alert-danger">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+            @endif
             <div class="d-flex justify-content-between align-items-center row py-3 gap-3 gap-md-0">
                 <div class="col-md-3 product_status">
                     <div class="form-floating form-floating-outline">

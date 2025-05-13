@@ -160,7 +160,6 @@ class SaleController extends Controller
                 foreach ($oldcs as $cs) {
                     $cs->delete();
                 }
-                // dd($oldcs);
                 foreach ($request->customer_support as $item) {
                     SaleCS::create([
                         'sale_id' => $sale->id,

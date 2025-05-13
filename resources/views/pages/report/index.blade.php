@@ -9,6 +9,16 @@
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/bootstrap-daterangepicker/bootstrap-daterangepicker.css') }}" />
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/pickr/pickr-themes.css') }}" />
 
+    <style>
+        @media print {
+            .layout-navbar{
+                display: none !important;
+            }
+            .no-print{
+                display: none !important;
+            }
+        }
+    </style>
 
 @endsection
 @section('content')
@@ -99,9 +109,12 @@
 
       <!-- Product List Table -->
       <div class="card">
-        <div class="card-header">
-          <h5 class="card-title">Filter</h5>
-          <div class="d-flex justify-content-between align-items-center row py-3 gap-3 gap-md-0">
+        <div class="card-header no-print">
+            <div class="d-flex" style="justify-content: space-between;">
+                <h5 class="card-title" style="margin: auto 0px;">Filter</h5>
+                <button id="print" type="btn" onclick="(function() { window.print(); })()" class="btn btn-primary waves-effect waves-light ">Print</button>
+            </div>
+          <div class="d-flex justify-content-between align-items-center row py-3 gap-3 gap-md-0 no-print">
             <div class="col-md-3 product_status">
                           <div class="form-floating form-floating-outline">
                             <input type="text" id="flatpickr-range" class="form-control" />
