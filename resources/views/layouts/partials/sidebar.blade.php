@@ -137,13 +137,18 @@
             <ul class="menu-sub">
                 <li class="menu-item">
                     <a href="{{ route('salereport.index') }}" class="menu-link">
-                        <div data-i18n="View">View</div>
+                        <div data-i18n="Sale Report">Sale Report</div>
                     </a>
                 </li>
 
                 <li class="menu-item">
                     <a href="{{ route('salereport.edit') }}" class="menu-link">
-                        <div data-i18n="Singular Report">Singular Report</div>
+                        <div data-i18n="Yearly Report">Yearly Report</div>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="{{ route('salereport.update') }}" class="menu-link">
+                        <div data-i18n="Support Report">Support Report</div>
                     </a>
                 </li>
             </ul>
