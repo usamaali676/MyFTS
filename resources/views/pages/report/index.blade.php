@@ -17,6 +17,12 @@
             .no-print{
                 display: none !important;
             }
+            #layout-menu{
+                display: none !important;
+            }
+            .layout-menu-fixed:not(.layout-menu-collapsed) .layout-page, .layout-menu-fixed-offcanvas:not(.layout-menu-collapsed) .layout-page{
+                padding-left: 0px !important;
+            }
         }
     </style>
 
