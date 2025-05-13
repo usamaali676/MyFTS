@@ -495,6 +495,97 @@ $monthlyMarketing = $monthlySummary->pluck('marketing')->values();
 
 }
 
+public function update(){
+
+
+    $roleIds = Role::where('name', "Customer Support")->pluck('id');
+
+    $users = User::whereIn('role_id', $roleIds)->get();
+    
+    $data = [];
+    
+    $currentMonth = Carbon::now()->format('M Y'); // e.g., "May 2025"
+    
+    foreach ($users as $user) {
+        $salesQuery = Sale::whereHas('Customer_support', function ($query) use ($user) {
+            $query->where('cs_id', $user->id);
+        });
+    
+        $allSale = (clone $salesQuery)->count();
+        $activeSalesCount = (clone $salesQuery)->where('status', 1)->count();
+        $inactiveSalesCount = (clone $salesQuery)->where('status', 0)->count();
+    
+        $ChargedPayment = (clone $salesQuery)->whereHas('invoice', function ($query) use ($currentMonth) {
+            $query->where('month', $currentMonth)
+                  ->whereHas('payments');
+        })->count();
+        $Chargedamount = 0;
+
+        $salesWithPayments = (clone $salesQuery)->whereHas('invoice', function ($query) use ($currentMonth) {
+            $query->where('month', $currentMonth)
+                  ->whereHas('payments');
+        })->with(['invoice.payments'])->get();
+        
+        foreach ($salesWithPayments as $sale) {
+            foreach ($sale->invoice as $invoice) {
+                foreach ($invoice->payments as $payment) {
+                    $Chargedamount += $payment->amount;
+                }
+            }
+        }
+        
+        
+
+    
+        $data[] = [
+            'user_id' => $user->id,
+            'user_name' => $user->name,
+            'total_sale' => $allSale,
+            'active_sales' => $activeSalesCount,
+            'inactive_sales' => $inactiveSalesCount,
+            'charged_payment_sales' => $ChargedPayment,
+            'pending_payment_sales' => $activeSalesCount - $ChargedPayment,
+            'total_revenue' => $Chargedamount,
+        ];
+    }
+
+//     $roleIds = Role::where('name', "Customer Support")->pluck('id');
+
+// $users = User::whereIn('role_id', $roleIds)->get();
+
+// $data = [];
+
+// foreach ($users as $user) {
+//     $sales = Sale::whereHas('Customer_support', function ($query) use ($user) {
+//         $query->where('cs_id', $user->id);
+//     });
+
+//     $allSale = (clone $sales)->count();
+//     $activeSalesCount = (clone $sales)->where('status', 1)->count();
+//     $inactiveSalesCount = (clone $sales)->where('status', 0)->count();
+//     $currentMonth = Carbon::now()->format('M Y');
+//     $pendingPayment = (clone $sales)->whereHas('invoice', function ($query) use ($user){
+//         $query->whereIn('month', $currentMonth)
+//         ->whereNotHas('payments');
+//     })->count();
+
+
+//     $data[] = [
+//         'user_id' => $user->id,
+//         'user_name' => $user->name,
+//         'total_sale' => $allSale,
+//         'active_sales' => $activeSalesCount,
+//         'inactive_sales' => $inactiveSalesCount,
+//     ];
+// }
+
+// Optionally return or dump $data
+// dd($data);
+
+
+    return view('pages.report.support', compact('data'));
+}
+
 }
 
 

@@ -212,5 +212,5 @@ Route::controller(RoleController::class)
         Route::get('/reportfilter', 'filterData')->name('reportfilter');
         Route::get('/get-stats', 'getstats')->name('edit');
         Route::post('/stats', 'stats')->name('store');
-
+        Route::get('/support', 'update')->name('update');
     });

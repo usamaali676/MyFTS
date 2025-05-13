@@ -32,6 +32,10 @@
                     <span>Date Due:</span>
                     <span>{{ $invoice->invoice_due_date }}</span>
                   </div>
+                  <div>
+                    <span>Invoice Type:</span>
+                    <span>{{ $invoice->invoice_type }}</span>
+                  </div>
                 </div>
               </div>
             </div>
