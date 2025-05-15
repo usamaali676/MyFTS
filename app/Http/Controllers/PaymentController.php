@@ -42,6 +42,7 @@ class PaymentController extends Controller
             'mop' => 'required',
             'payment_amount' => 'required',
             'trans_id' => 'required',
+            'trans_ss' => 'required',
         ]);
         $payment_amount = Payment::where('invoice_id', $request->invoice_id)->where('payment_type', "Partials Payment")->first();
         // dd($payment_amount);

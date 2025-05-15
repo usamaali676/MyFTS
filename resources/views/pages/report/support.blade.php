@@ -4,6 +4,23 @@
 <link rel="stylesheet" href="{{ asset('assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css') }}" />
 <link href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css" rel="stylesheet" />
 
+<style>
+    @media print {
+        .layout-navbar{
+            display: none !important;
+        }
+        .no-print{
+            display: none !important;
+        }
+        #layout-menu{
+            display: none !important;
+        }
+        .layout-menu-fixed:not(.layout-menu-collapsed) .layout-page, .layout-menu-fixed-offcanvas:not(.layout-menu-collapsed) .layout-page{
+            padding-left: 0px !important;
+        }
+    }
+</style>
+
 @endsection
 @section('content')
 <div class="content-wrapper">
@@ -92,14 +109,14 @@
                 <h5 class="card-title" style="margin: auto 0px;">Filter</h5>
                 <button id="print" type="btn" onclick="(function() { window.print(); })()" class="btn btn-primary waves-effect waves-light ">Print</button>
             </div>
-          {{-- <div class="d-flex justify-content-between align-items-center row py-3 gap-3 gap-md-0 no-print">
+          <div class="d-flex justify-content-between align-items-center row py-3 gap-3 gap-md-0 no-print">
             <div class="col-md-3 product_status">
                           <div class="form-floating form-floating-outline">
-                            <input type="text" id="flatpickr-range" class="form-control" />
-                            <label for="flatpickr-range">Date</label>
+                            <input type="text" id="flatpickr-input" class="form-control" />
+                            <label for="flatpickr-input">Date</label>
                           </div>
             </div>
-            <div class="col-md-3 product_category">
+            {{-- <div class="col-md-3 product_category">
                 <div class="form-floating form-floating-outline">
                     <select id="agnet_select" name="agent" class="select2 form-select"
                         data-allow-clear="true">
@@ -141,8 +158,8 @@
                     <label for="multicol-country">Type</label>
                 </div>
 
-            </div>
-          </div> --}}
+            </div> --}}
+          </div>
         </div>
         <div class="card-datatable table-responsive">
 
