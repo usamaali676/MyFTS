@@ -213,4 +213,5 @@ Route::controller(RoleController::class)
         Route::get('/get-stats', 'getstats')->name('edit');
         Route::post('/stats', 'stats')->name('store');
         Route::get('/support', 'update')->name('update');
+        Route::get('/reportSupport', 'reportsupport')->name('reportsupport');
     });

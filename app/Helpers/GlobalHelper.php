@@ -106,7 +106,7 @@ class GlobalHelper
         $permissions = []; // Initialize an empty array for permissions
 
         // Define routes to ignore
-        $ignoreRoutesStartingWith = 'sanctum|livewire|ignition|verification|dashboard|password|logout|register|login|front|contact|listing|search|singcat|cities|test|filter|home|area.destroy|filament|storage';
+        $ignoreRoutesStartingWith = 'sanctum|livewire|ignition|verification|dashboard|password|logout|register|login|front|contact|listing|search|singcat|cities|test|filter|home|area.destroy|filament|storage|salereport.reportfilter|salereport.reportsupport';
 
         foreach ($routeCollection as $item) {
             $name = $item->action;

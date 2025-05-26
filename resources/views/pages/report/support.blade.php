@@ -3,6 +3,10 @@
 <link rel="stylesheet" href="{{ asset('assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css') }}" />
 <link rel="stylesheet" href="{{ asset('assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css') }}" />
 <link href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css" rel="stylesheet" />
+<link rel="stylesheet" href="{{ asset('assets/vendor/libs/flatpickr/flatpickr.css') }}" />
+<link rel="stylesheet" href="{{ asset('assets/vendor/libs/pickr/pickr-themes.css') }}" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/plugins/monthSelect/style.min.css"  />
+
 
 <style>
     @media print {
@@ -19,6 +23,13 @@
             padding-left: 0px !important;
         }
     }
+    .flatpickr-monthSelect-theme-dark .flatpickr-current-month input.cur-year{
+    color: #000 !important;
+}
+.flatpickr-monthSelect-theme-dark .flatpickr-monthSelect-month{
+    color: #000 !important;
+}
+
 </style>
 
 @endsection
@@ -112,8 +123,8 @@
           <div class="d-flex justify-content-between align-items-center row py-3 gap-3 gap-md-0 no-print">
             <div class="col-md-3 product_status">
                           <div class="form-floating form-floating-outline">
-                            <input type="text" id="flatpickr-input" class="form-control" />
-                            <label for="flatpickr-input">Date</label>
+                            <input type="text" id="month" class="form-control flatpickr-input active" format="YYYY" name="month">
+                            <label for="month">Month</label>
                           </div>
             </div>
             {{-- <div class="col-md-3 product_category">
@@ -172,7 +183,10 @@
                         <th>No. of Charged</th>
                         <th>Pending Payments</th>
                         <th>Stopped Working</th>
-                        <th>Total Revenue</th>
+                        <th>Total Revenue (Support)</th>
+                        <th>UpSell</th>
+                        <th>Upsell Revenue</th>
+                        <th>Grand Total</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -185,6 +199,9 @@
                       <td>{{$person['pending_payment_sales']}}</td>
                       <td>{{$person['inactive_sales']}}</td>
                       <td>{{$person['total_revenue']}}</td>
+                      <td>{{ $person['upsellcount'] }}</td>
+                      <td>{{ $person['upsellamount'] }}</td>
+                      <td>{{ $person['grandtotal'] }}</td>
                     </tr>
                   @endforeach
                 </tbody>
@@ -200,9 +217,55 @@
 @section('js')
 <script src="{{ asset('assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js') }}"></script>
 <script src="{{ asset('assets/js/tables-datatables-advanced.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/index.js"></script>
+
 <script>
     $('#recodetable').DataTable();
 </script>
+<script>
+    flatpickr("#month", {
+        plugins: [
+        new monthSelectPlugin({
+        shorthand: true, //defaults to false
+        dateFormat: "M Y", //defaults to "F Y"
+        altFormat: "F Y", //defaults to "F Y"
+        theme: "dark" // defaults to "light"
+        })
+    ]
+    });
+</script>
+<script>
+    $("#month").change(function (e) {
+        // e.preventDefault();
+        month = $(this).val();
+        // alert(month);
+        $.ajax({
+            type: 'GET',
+            url: '{{ route('salereport.reportsupport') }}',
+            data: {month: month},
+            success: function (response) {
+                console.log(response);
+                // $("#recodetable").empty();
+                var data = response.data;
+                var newdata = $.map(data, function (support, index) {
+                    return  '<tr>\
+                      <td></td>\
+                      <td>'+ support.user_name +'</td>\
+                      <td>'+ support.total_sale +'</td>\
+                      <td>'+ support.charged_payment_sales +'</td>\
+                      <td>'+ support.pending_payment_sales +'</td>\
+                      <td>' + support.inactive_sales +'</td>\
+                      <td>' + support.total_revenue +'</td>\
+                    </tr>'
+                }).join('');
+
+                $('#recodetable tbody').empty().append(newdata);
+
+            }
+        });
+    });
+</script>
+
 
 
     {{-- <script>
@@ -281,12 +344,6 @@
         });
 
     </script> --}}
-
-
-
-
-
-
 
 {{-- <script>
     $(document).ready(function () {

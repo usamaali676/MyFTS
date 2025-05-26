@@ -4546,6 +4546,8 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                         } else {
                             statusBadge = '<span class="badge rounded-pill bg-success">' + report.report_status + '</span>';
                         }
+                        let url = "{{ route('clientReport.update', ':id') }}".replace(':id', report.id);
+
 
                         table_content += '<tr>\
                                             <td>' + (index + 1) + '</td>\
@@ -4561,7 +4563,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                             <td>' + statusBadge + '</td>\
                                             <td>\
                                             <div class="d-inline-flex text-nowrap">\
-                                                <form id="dispatch_report" action="{{ route('clientReport.update', ' + report.id + ') }}" method="POST">\
+                                                <form id="dispatch_report" action="'+ url +'" method="POST">\
                                                     @csrf\
                                                     <button class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect" data-bs-toggle="tooltip" title="Dispatch">\
                                                         <i class="ri-send-plane-2-line ri-20px"></i>\
