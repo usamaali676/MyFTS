@@ -504,8 +504,8 @@ public function update(){
 
     $data = [];
 
-    // $currentMonth = Carbon::now()->format('M Y'); // e.g., "May 2025"
-    $currentMonth = Carbon::now()->subMonth()->format('M Y');
+    $currentMonth = Carbon::now()->format('M Y'); // e.g., "May 2025"
+    // $currentMonth = Carbon::now()->subMonth()->format('M Y');
 
     // dd($previousMonth);
 
