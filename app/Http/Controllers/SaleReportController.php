@@ -680,11 +680,43 @@ public function reportsupport(Request $request){
 
         foreach ($salesWithPayments as $sale) {
             foreach ($sale->invoice as $invoice) {
-                foreach ($invoice->payments as $payment) {
-                    $Chargedamount += $payment->amount;
+                if($invoice->invoice_type == "Monthly" && $invoice->month == $currentMonth){
+                    foreach ($invoice->payments as $payment) {
+                        $Chargedamount += $payment->amount;
+                    }
                 }
             }
         }
+
+        $upsellcount = (clone $salesQuery)->whereHas('invoice', function ($query) use ($currentMonth) {
+            $query->where('month', $currentMonth)
+                ->where('invoice_type', "UpSell")
+                  ->whereHas('payments');
+        })->count();
+
+        // echo $upsellcount;
+
+        $upsellamount = 0;
+
+        // dd($salesQuery);
+
+        $upsellWithPayments = (clone $salesQuery)->whereHas('invoice', function ($query) use ($currentMonth) {
+            $query->where('month', $currentMonth)
+            ->where('invoice_type', "UpSell")
+                  ->whereHas('payments');
+        })->with(['invoice.payments'])->get();
+
+        foreach ($upsellWithPayments as $sale) {
+            foreach ($sale->invoice as $invoice) {
+                if($invoice->invoice_type == "UpSell" && $invoice->month == $currentMonth){
+                    foreach ($invoice->payments as $payment) {
+                        $upsellamount += $payment->amount;
+                    }
+                }
+            }
+        }
+
+        $grandtotal = $upsellamount +  $Chargedamount;
 
 
 
@@ -697,6 +729,9 @@ public function reportsupport(Request $request){
             'charged_payment_sales' => $ChargedPayment,
             'pending_payment_sales' => $activeSalesCount - $ChargedPayment,
             'total_revenue' => $Chargedamount,
+            'upsellcount' => $upsellcount,
+            'upsellamount' => $upsellamount,
+            'grandtotal' => $grandtotal,
         ];
     }
     return response()->json([

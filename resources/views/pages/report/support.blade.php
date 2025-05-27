@@ -256,6 +256,9 @@
                       <td>'+ support.pending_payment_sales +'</td>\
                       <td>' + support.inactive_sales +'</td>\
                       <td>' + support.total_revenue +'</td>\
+                      <td>' + support.upsellcount +'</td>\
+                      <td>' + support.upsellamount +'</td>\
+                      <td>' + support.grandtotal +'</td>\
                     </tr>'
                 }).join('');
 
