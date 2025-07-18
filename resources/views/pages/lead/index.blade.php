@@ -53,7 +53,9 @@
                                 @if ($user->role_id == 1 || $user->role->name == 'Executives' || $user->role->name == 'QA' || $user->role->name == 'Accounts')
                                     {{-- <p>fdgsdfg</p> --}}
                                     @foreach ($leads as $item)
-                                        <tr>
+
+
+                                        <tr @if(isset($item->chargeback))style="background-color: rgb(255, 222, 222)"  @endif>
                                             <td>{{ $loop->index + 1 }}</td>
                                             <td>{{ $item->business_name_adv }}</td>
                                             <td>{{ $item->business_number_adv }}</td>
@@ -99,8 +101,10 @@
                                                 @endif</td>
                                             <td>
                                                 {{-- <p>{{ $item->sale }}</p> --}}
-                                                @if (isset($item->sale) && $item->sale->status == 1)
+                                                @if (isset($item->sale) && $item->sale->status == 1 && !isset($item->chargeback))
                                                     <span class="badge rounded-pill bg-success">Active</span>
+                                                @elseif (isset($item->chargeback))
+                                                    <span class="badge rounded-pill bg-danger">Chargeback</span>
                                                 @else
                                                     <span class="badge rounded-pill bg-danger">Inactive</span>
                                                 @endif
@@ -136,6 +140,7 @@
                                                 </div>
                                             </td>
                                         </tr>
+
                                     @endforeach
                                 @elseif ($user->role->name == 'Customer Support')
                                     @foreach ($leads as $item)

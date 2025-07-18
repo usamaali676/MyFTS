@@ -41,4 +41,7 @@ class Lead extends Model
     {
         return $this->hasMany(LeadAdditionalInfo::class, 'lead_id');
     }
+    public function chargeback(){
+        return $this->hasOne(ChargeBack::class, 'lead_id');
+    }
 }
