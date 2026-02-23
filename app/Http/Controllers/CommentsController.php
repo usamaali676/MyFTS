@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Comments;
+use App\Models\Lead;
+use App\Models\User;
+use App\Notifications\NewCommentNotification;
 use Illuminate\Http\Request;
 use Exception;
 use Illuminate\Support\Facades\Auth;
@@ -44,6 +47,21 @@ class CommentsController extends Controller
                 'lead_id' => $request->lead_id,
                 'user_id' => Auth::user()->id,
             ]);
+
+            $lead = Lead::findOrFail($request->lead_id);
+            $title = 'New Comment on Lead: '. $lead->business_name_adv;
+            $closers = $lead->closers; // Get all the closers related to the lead
+            // dd($closers);
+            $userIds = $closers->pluck('closer_id'); // Extract user IDs from the closers
+            // dd($userIds);
+            $relatedUsers = User::whereIn('id', $userIds) // Get users from closers
+                ->orWhereHas('role', function ($query) {
+                    $query->whereIn('name', ['QA', 'Executives', 'Creator', 'Accounts']);
+                })
+                ->get();
+            foreach ($relatedUsers as $user) {
+                $user->notify(new NewCommentNotification($comment, $lead, $title));
+            }
             $comments = Comments::where('lead_id', $comment->lead_id)->orderby('id', 'DESC')->with('user')->get();
             return response()->json([
                 'message' => 'Comment Added Successfully!',

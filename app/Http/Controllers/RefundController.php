@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Invoice;
 use App\Models\Refund;
+use App\Models\User;
+use App\Notifications\NewRefundNotification;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -31,7 +33,7 @@ class RefundController extends Controller
      */
     public function store(Request $request)
     {
-        // dd($request->all());
+        // dd($request->invoice_id);
         try {
             $request->validate([
                 'refund_type' => 'required',
@@ -40,11 +42,26 @@ class RefundController extends Controller
                 'refund_amount' =>'required',
                 'merchant_id' =>'required',
             ]);
-            $invoice = Invoice::where('id', $request->invoice_id)->first();
 
+            $invoice = Invoice::where('id', $request->invoice_id)->first();
+            if(isset($invoice)){
+                $old_refund = Refund::where('invoice_id', $invoice->id)->first();
+                if(isset($old_refund)){
+                if ($old_refund->refund_amount >= $invoice->total_amount) {
+                    return response()->json([
+                        'error' => 'Refund with the same Invoice ID already exists',
+                    ], 422);
+                }
+                elseif($request->refund_amount > ($invoice->total_amount - $old_refund->refund_amount)){
+                    return response()->json([
+                        'error' => 'Refund Amount Exceeded',
+                    ], 422);
+                }
+                }
+            }
             if ( $request->refund_amount > $invoice->total_amount ) {
                 return response()->json([
-                    'error' => 'Charge Back Amount Exceeded',
+                    'error' => 'Refund Amount Exceeded',
                 ], 422);
             }
            $refund = Refund::create([
@@ -57,6 +74,17 @@ class RefundController extends Controller
                'refund_reason' => $request->claim_reason,
                'lead_id' => $request->lead_id,
             ]);
+
+            $invoice = Invoice::where('id', $invoice->id)->first();
+            $title = 'A '. $refund->refund_type .'-Refund Charged Against Invoice: '. $invoice->invoice_number;
+            $relatedUsers = User::WhereHas('role', function ($query) {
+                    $query->whereIn('name', ['QA', 'Executives', 'Creator', 'Accounts']);
+                })
+                ->get();
+                foreach ($relatedUsers as $user) {
+                    $user->notify(new NewRefundNotification($refund, $title, $invoice));
+                }
+
             $refunds = Refund::where('lead_id', '=', $refund->lead_id)->with('invoice', 'merchant')->get();
             return response()->json([
                 'message' => 'Refund Added Successfully!',

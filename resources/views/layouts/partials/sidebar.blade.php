@@ -129,6 +129,38 @@
                 </li>
             </ul>
         </li>
+        <li class="menu-item">
+            <a href="javascript:void(0);" class="menu-link menu-toggle">
+                <i class="menu-icon icon-base ri ri-bar-chart-2-line"></i>
+                <div data-i18n="Reports">Reports</div>
+            </a>
+            <ul class="menu-sub">
+                <li class="menu-item">
+                    <a href="{{ route('salereport.index') }}" class="menu-link">
+                        <div data-i18n="Sale Report">Sale Report</div>
+                    </a>
+                </li>
+
+                <li class="menu-item">
+                    <a href="{{ route('salereport.edit') }}" class="menu-link">
+                        <div data-i18n="Yearly Report">Yearly Report</div>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="{{ route('salereport.update') }}" class="menu-link">
+                        <div data-i18n="Support Report">Support Report</div>
+                    </a>
+                </li>
+            </ul>
+        </li>
+        <li class="menu-item">
+            <a href="{{ route('attendance.index') }}" class="menu-link ">
+                <i class="menu-icon tf-icons mdi mdi-calendar"></i>
+                <div data-i18n="Attendance">Attendance</div>
+            </a>
+
+        </li>
+
 
 
 

@@ -11,6 +11,17 @@ use Illuminate\Support\Facades\Route;
 
 class GlobalHelper
 {
+        public static function getShiftDate()
+    {
+        $now = now('UTC')->setTimezone(config('app.shift_timezone'));
+
+        // If between 12:00 AM and 4:00 AM → belongs to previous day
+        if ($now->hour < 4) {
+            return $now->subDay()->toDateString();
+        }
+
+        return $now->toDateString();
+    }
 
     public static function daterange($var)
     {
@@ -106,7 +117,7 @@ class GlobalHelper
         $permissions = []; // Initialize an empty array for permissions
 
         // Define routes to ignore
-        $ignoreRoutesStartingWith = 'sanctum|livewire|ignition|verification|dashboard|password|logout|register|login|front|contact|listing|search|singcat|cities|test|filter|home|area.destroy|filament|storage';
+        $ignoreRoutesStartingWith = 'sanctum|livewire|ignition|verification|dashboard|password|logout|register|login|front|contact|listing|search|singcat|cities|test|filter|home|area.destroy|filament|storage|salereport.reportfilter|salereport.reportsupport';
 
         foreach ($routeCollection as $item) {
             $name = $item->action;
@@ -130,6 +141,23 @@ class GlobalHelper
         return array_values(array_unique(array_keys($permissions))); // Return only unique permissions
     }
 
+
+    public static  function timeAgoShort(Carbon $time)
+{
+    $now = Carbon::now();
+
+    $now = Carbon::now();
+
+    if ($time->diffInSeconds($now) < 60) {
+        return round($time->diffInSeconds($now)) . 'S ago';
+    } elseif ($time->diffInMinutes($now) < 60) {
+        return round($time->diffInMinutes($now)) . 'M ago';
+    } elseif ($time->diffInHours($now) < 24) {
+        return round($time->diffInHours($now)) . 'H ago';
+    } else {
+        return round($time->diffInDays($now)) . 'D ago';
+    }
+}
 
 
 

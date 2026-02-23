@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Invoice extends Model
 {
-    protected $fillable = ['sale_id' ,'invoice_number' ,'discount_type' ,'discount_amount' ,'invoice_due_date' ,'invoice_frequency' ,'total_amount' ,'marchent_id' ,'invoice_active_status' ,'activation_date' ,'mop', 'month', ];
+    protected $fillable = ['sale_id' ,'invoice_number' ,'discount_type' ,'discount_amount' ,'invoice_due_date' ,'invoice_frequency' ,'total_amount' ,'marchent_id' ,'invoice_active_status' ,'activation_date' ,'mop', 'month', 'created_by', 'invoice_type' ];
 
     public function marchent() {
         return $this->belongsTo(MerchantAccount::class, 'marchent_id');
@@ -20,4 +20,8 @@ class Invoice extends Model
     public function payments(){
         return $this->hasMany(Payment::class, 'invoice_id');
     }
+    public function chargeback(){
+        return $this->hasOne(ChargeBack::class,'invoice_id');
+    }
+
 }

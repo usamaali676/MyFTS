@@ -425,7 +425,7 @@
     {{-- <div class="modal fade" id="basicModal" tabindex="-1" aria-hidden="true"> --}}
 
     <!-- Edit Role Modal -->
-   {{-- <div class="modal fade" id="editRoleModal" tabindex="-1" aria-hidden="true">
+   {{-- <div class="modal fade" id="editRoleModal" tabindex="-1" aria-hidden="true">3.
         <div class="modal-dialog modal-lg modal-dialog-centered modal-add-new-role">
             <div class="modal-content p-3 p-md-5">
                 <button type="button" class="btn-close btn-pinned" data-bs-dismiss="modal" aria-label="Close"></button>

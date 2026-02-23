@@ -5,9 +5,13 @@ namespace App\Http\Controllers;
 use App\Models\CompanyServices;
 use App\Models\Invoice;
 use App\Models\InvoiceServiceCharges;
+use App\Models\Lead;
 use App\Models\Sale;
+use App\Models\User;
+use App\Notifications\NewInvoiceNotification;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
 class InvoiceServiceChargesController extends Controller
@@ -77,6 +81,7 @@ class InvoiceServiceChargesController extends Controller
             'month' => 'required',
             'activation_date' => 'required',
             'invoice_due_date' => 'required',
+            'invoice_amount' => 'required',
         ]);
         $sale = Sale::find($request->sale_id6);
         $unique_id =  Str::random(5) . '_' . time();
@@ -125,7 +130,9 @@ class InvoiceServiceChargesController extends Controller
                 'invoice_due_date' => $request->invoice_due_date,
                 'total_amount' => $request->invoice_amount,
                 'invoice_frequency' =>   $request->invoice_freq,
+                'invoice_type' =>  $request->invoice_type,
                 'month' => $request->month,
+                'created_by' => Auth::user()->id,
             ]);
         // }
         if(isset($request->service_id) && count($request->service_id) > 0){
@@ -151,6 +158,19 @@ class InvoiceServiceChargesController extends Controller
                 ]);
                 }
         }
+        $sale = Sale::find($request->sale_id6);
+        $lead = Lead::findOrFail($sale->lead_id);
+        $title = 'New Invoice Genrated For: '. $lead->business_name_adv;
+
+
+        $relatedUsers = User::WhereHas('role', function ($query) {
+                $query->whereIn('name', ['QA', 'Executives', 'Creator', 'Accounts']);
+            })
+            ->get();
+            foreach ($relatedUsers as $user) {
+                $user->notify(new NewInvoiceNotification($invoice, $sale, $title));
+            }
+
         $all_invoices = $sale->invoice;
         return response()->json([
             'message' => 'Invoice Genrated Succesfully!',
@@ -211,8 +231,14 @@ class InvoiceServiceChargesController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(InvoiceServiceCharges $invoiceServiceCharges)
+    public function destroy(Request $request)
     {
-        //
+        $invoice = Invoice::find($request->id);
+        $invoice->delete();
+
+        // $rem_keyword = K
+        return response()->json([
+           'message' => 'Invoice deleted successfully!'
+        ], 200);
     }
 }

@@ -521,7 +521,7 @@
                         <div class="form-floating form-floating-outline">
                             <input type="text" class="form-control flatpickr-input active" name="due_date"
                             placeholder="YYYY-MM-DD" id="flatpickr-date">
-                            <label for="flatpickr-date">Due Date</label>
+                            <label for="flatpickr-date">Date</label>
                         </div>
                     </div>
                     <div class="col-12">

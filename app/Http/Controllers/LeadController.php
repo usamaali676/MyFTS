@@ -32,6 +32,7 @@ class LeadController extends Controller
         $leads = Lead::with('closers') // Eager load the closers relationship directly in the query
         ->orderBy('id', 'DESC')
         ->get();
+        // dd($leads);
         // $sale = Sale::where('lead_id', $leads->id)->first();
         return view('pages.lead.index', compact('leads'));
     }
@@ -42,7 +43,7 @@ class LeadController extends Controller
     public function create()
     {
         $categories = BusinessCategory::all();
-        $roles = Role::whereIn('name', ['Closer', 'Customer Support'])->get();
+        $roles = Role::whereIn('name', ['Closer', 'Customer Support','Executives'])->get();
         $closers = User::whereIn('role_id', $roles->pluck('id'))->get();
         // dd($closers);
         $company_services = CompanyServices::all();
@@ -58,7 +59,7 @@ class LeadController extends Controller
         $formattedCallBackTime = Carbon::parse($request->call_back_time)->format('Y-m-d H:i:s'); // e.g., 2024-10-15 14:30:00
         $request->validate([
             'business_name' => 'required',
-            'business_number' => 'required | unique:leads,business_number_adv',
+            'business_number' => 'required|unique:leads,business_number_adv,NULL,id,deleted_at,NULL',
 
         ]);
       $lead = Lead::create([
@@ -104,22 +105,23 @@ class LeadController extends Controller
                 ]);
             }
          }
+         $title = 'New Lead Generated: '. $lead->business_name_adv;
 
-            //     $closers = $lead->closers; // Get all the closers related to the lead
-            // // dd($closers);
-            // $userIds = $closers->pluck('closer_id'); // Extract user IDs from the closers
-            // // dd($userIds);
-            // $rel_users = User::whereIn('id', $userIds) // Get users from closers
-            //                 ->orWhereHas('role', function ($query) {
-            //                     $query->whereIn('name', ['QA', 'Executives', 'Creator']);
-            //                 })
-            //                 ->get();
+            $closers = $lead->closers; // Get all the closers related to the lead
+            // dd($closers);
+            $userIds = $closers->pluck('closer_id'); // Extract user IDs from the closers
+            // dd($userIds);
+            $rel_users = User::whereIn('id', $userIds) // Get users from closers
+                            ->orWhereHas('role', function ($query) {
+                                $query->whereIn('name', ['QA', 'Executives', 'Creator', 'Accounts']);
+                            })
+                            ->get();
 
             // // dd($rel_users);
 
-            // foreach ($rel_users as $user) {
-            //     $user->notify(new NewLeadNotification($lead));
-            // }
+            foreach ($rel_users as $user) {
+                $user->notify(new NewLeadNotification($lead, $title));
+            }
 
         //  $rel_users = User::where('id', $lead->closer()->id)->get();
         // if(isset($request->service)){
@@ -153,7 +155,7 @@ class LeadController extends Controller
         $sub_categories = $lead->sub_categories;
         $categories = BusinessCategory::all();
         $sub_categories_id = $lead->sub_categories->pluck('id')->toArray();
-        $roles = Role::whereIn('name', ['Closer', 'Customer Support'])->get();
+        $roles = Role::whereIn('name', ['Closer', 'Customer Support', 'Executives'])->get();
         $closers = User::whereIn('role_id', $roles->pluck('id'))->get();
         $selected_company_services = $lead->company_services;
         $company_services = CompanyServices::all();
@@ -192,7 +194,7 @@ class LeadController extends Controller
         $formattedCallBackTime = Carbon::parse($request->call_back_time)->format('Y-m-d H:i:s'); // e.g., 2024-10-15 14:30:00
         $request->validate([
             'business_name' => 'required',
-            'business_number' => 'required  | unique:leads,business_number_adv,' .$id,
+            'business_number' => 'required|unique:leads,business_number_adv,' . $id . ',id,deleted_at,NULL',
             'category' => 'required',
         ]);
         $lead = Lead::find($id);

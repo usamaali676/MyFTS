@@ -169,7 +169,7 @@
                             @foreach($sale->social_links as $link)
                                 <li class="d-flex align-items-center mb-3">
                                     <div class="d-flex flex-wrap">
-                                    <span class="fw-medium me-2">{{ $link->social_name }}:</span> <span>{{ $link->social_link }}</span>
+                                    <span class="fw-medium me-2">{{ $link->social_name }}:</span> <span style="width: 86%;">{{ $link->social_link }}</span>
                                     </div>
                                 </li>
                             @endforeach

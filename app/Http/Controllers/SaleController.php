@@ -20,6 +20,7 @@ use App\Models\Sale;
 use App\Models\SaleCS;
 use App\Models\SocialLink;
 use App\Models\User;
+use App\Notifications\NewSaleNotification;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -55,18 +56,21 @@ class SaleController extends Controller
         $social_links = DB::select("SHOW COLUMNS FROM social_links LIKE 'social_name'");
         $social_links = $social_links[0]->Type; // Get the type string
         $social_links = explode("','", substr($social_links, 6, -2));
-        $roles = Role::whereIn('name', ['Closer', 'Customer Support'])->get();
+        $roles = Role::whereIn('name', ['Closer', 'Customer Support', 'Executives'])->get();
         $closers = User::whereIn('role_id', $roles->pluck('id'))->get();
         // $csrole = Role::where('name', "Customer Support")->first();
         $csr = User::whereIn('role_id', $roles->pluck('id'))
         ->whereNotIn('id', [12, 13])
+        // ->pluck('name');
         ->get();
+        // dd($csr);
 
         $sale = Sale::where('lead_id', $lead->id)->first();
         $mehchant = MerchantAccount::all();
         $comments = Comments::where('lead_id', $lead->id)->orderby('id', 'DESC')->get();
         $refunds = Refund::where('lead_id', '=', $lead->id)->get();
         $chargeBack = ChargeBack::where('lead_id', '=', $lead->id)->get();
+        // dd($sale->Customer_support);
 
 
 
@@ -151,15 +155,15 @@ class SaleController extends Controller
             }
             // dd("work");
             if (isset($request->customer_support)) {
+                // dd($request->customer_support);
                 $oldcs = SaleCS::where('sale_id', $sale->id)->get();
                 foreach ($oldcs as $cs) {
                     $cs->delete();
                 }
-                foreach ($request->customer_support as $cs) {
+                foreach ($request->customer_support as $item) {
                     SaleCS::create([
                         'sale_id' => $sale->id,
-                        'cs_id' => $cs,
-                        'created_by' => Auth::user()->id,
+                        'cs_id' => $item,
                     ]);
                 }
             }
@@ -213,6 +217,21 @@ class SaleController extends Controller
             $sale->time_zone = $request->timezone;
             $sale->updated_by = Auth::user()->id;
             $sale->save();
+
+            $lead = Lead::findOrFail($request->lead_id);
+            $title = 'Lead is Updated in Sale: '. $lead->business_name_adv;
+            $closers = $lead->closers; // Get all the closers related to the lead
+            // dd($closers);
+            $userIds = $closers->pluck('closer_id'); // Extract user IDs from the closers
+            // dd($userIds);
+            $relatedUsers = User::whereIn('id', $userIds) // Get users from closers
+                ->orWhereHas('role', function ($query) {
+                    $query->whereIn('name', ['QA', 'Executives', 'Creator', 'Accounts']);
+                })
+                ->get();
+            foreach ($relatedUsers as $user) {
+                $user->notify(new NewSaleNotification($sale, $lead, $title));
+            }
         }
 
         $old_social = SocialLink::where('sale_id', $sale->id)->get();
@@ -315,6 +334,8 @@ class SaleController extends Controller
                 );
             }
         }
+
+
 
 
         return response()->json([

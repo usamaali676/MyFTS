@@ -7,6 +7,7 @@ use App\Models\ClientReporting;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ClientReportingController extends Controller
 {
@@ -71,24 +72,74 @@ class ClientReportingController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(ClientReporting $clientReporting)
+    public function edit($id)
     {
-        //
+        $client_report = ClientReporting::find($id);
+        $user = Auth::user();
+        if(isset($client_report) && $client_report->verified_by != NULL){
+            return response()->json([
+                'error' => 'Report is Aready Verified!',
+            ], 409);
+        }
+        else{
+            $client_report->update([
+                'verified_by' => $user->id,
+                'report_verified_at' => Carbon::now(),
+                'report_status' => 'verified',
+            ]);
+            $all_reports = ClientReporting::where('client_id', $client_report->client_id)->with('client', 'client.sale.lead', 'createdBy', 'verifiedBy', 'dispatchedBy')->get();
+            return response()->json([
+                'message' => 'Report Verified Successfully!',
+                'reports' => $all_reports,
+            ], 200);
+        }
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, ClientReporting $clientReporting)
+    public function update( $id)
     {
-        //
+        $client_report = ClientReporting::find($id);
+        // dd($client_report);
+        if($client_report->report_status == "created"){
+            return response()->json([
+                'error' => 'Can not Dispatch Without Varifications',
+            ], 409);
+        }
+        else{
+            $user = Auth::user();
+            if(isset($client_report) && $client_report->dispatch_at != NULL){
+                return response()->json([
+                    'error' => 'Report is Already Dispatched!',
+                ], 409);
+            }
+            else{
+                $client_report->update([
+                    'dispatched_by' => $user->id,
+                    'dispatch_at' => Carbon::now(),
+                    'report_status' => 'dispatched',
+                ]);
+                $all_reports = ClientReporting::where('client_id', $client_report->client_id)->with('client', 'client.sale.lead', 'createdBy', 'verifiedBy', 'dispatchedBy')->get();
+                return response()->json([
+                    'message' => 'Report Verified Successfully!',
+                    'reports' => $all_reports,
+                ], 200);
+            }
+        }
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(ClientReporting $clientReporting)
+    public function destroy(Request $request)
     {
-        //
+        $clientReport = ClientReporting::find($request->id);
+        $clientReport->delete();
+
+        // $rem_keyword = K
+        return response()->json([
+           'message' => 'Report deleted successfully!'
+        ], 200);
     }
 }

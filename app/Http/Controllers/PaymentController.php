@@ -8,6 +8,8 @@ use App\Models\Holidays;
 use App\Models\Invoice;
 use App\Models\Payment;
 use App\Models\Sale;
+use App\Models\User;
+use App\Notifications\NewPaymentNotification;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -34,13 +36,13 @@ class PaymentController extends Controller
      */
     public function store(Request $request)
     {
-        // dd($request->all());
         $request->validate([
             'invoice_id' => 'required',
             'merchant' => 'required',
             'mop' => 'required',
             'payment_amount' => 'required',
             'trans_id' => 'required',
+            'trans_ss' => 'required',
         ]);
         $payment_amount = Payment::where('invoice_id', $request->invoice_id)->where('payment_type', "Partials Payment")->first();
         // dd($payment_amount);
@@ -158,6 +160,16 @@ class PaymentController extends Controller
                     'reporting_date' => $finalReportingDate,
                 ]);
             }
+            $invoice = Invoice::find($request->invoice_id);
+            $title = 'A Payment Charged Against Invoice: '. $invoice->invoice_number;
+
+            $relatedUsers = User::WhereHas('role', function ($query) {
+                    $query->whereIn('name', ['QA', 'Executives', 'Creator', 'Accounts']);
+                })
+                ->get();
+                foreach ($relatedUsers as $user) {
+                    $user->notify(new NewPaymentNotification($invoice, $payment, $title));
+                }
             $all_invoices =  Invoice::where('sale_id', $sale->id)->get();
             $invoiceIds = $all_invoices->pluck('id')->toArray();
             $payments = Payment::whereIn('invoice_id', $invoiceIds)

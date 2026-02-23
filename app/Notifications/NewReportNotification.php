@@ -7,20 +7,20 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class NewLeadNotification extends Notification
+class NewReportNotification extends Notification
 {
     use Queueable;
-
-    private $lead;
+    private $report;
+    private $client;
     private $title;
-    private $link;
 
     /**
      * Create a new notification instance.
      */
-    public function __construct($lead, $title )
+    public function __construct($report, $client, $title)
     {
-        $this->lead = $lead;
+        $this->report = $report;
+        $this->client = $client;
         $this->title = $title;
     }
 
@@ -37,24 +37,12 @@ class NewLeadNotification extends Notification
     /**
      * Get the mail representation of the notification.
      */
-    // public function toMail(object $notifiable): MailMessage
-    // {
-    //     return (new MailMessage)
-    //                 ->line('The introduction to the notification.')
-    //                 ->action('Notification Action', url('/'))
-    //                 ->line('Thank you for using our application!');
-    // }
-
-
-    public function toDatabase($notifiable)
+    public function toMail(object $notifiable): MailMessage
     {
-        return [
-
-            'title' => $this->title,
-            'lead_id' => $this->lead->id,
-            'lead_name' => $this->lead->business_name_adv,
-            'added_by' => $this->lead->created_by,
-        ];
+        return (new MailMessage)
+                    ->line('The introduction to the notification.')
+                    ->action('Notification Action', url('/'))
+                    ->line('Thank you for using our application!');
     }
 
     /**
@@ -65,7 +53,10 @@ class NewLeadNotification extends Notification
     public function toArray(object $notifiable): array
     {
         return [
-            //
+            'title' => $this->title,
+            'sale_id' => $this->client->id,
+            'lead_name' => $this->report->report_file,
+            'added_by' => $this->report->created_by,
         ];
     }
 }
