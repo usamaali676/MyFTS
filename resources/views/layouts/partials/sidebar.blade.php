@@ -1,3 +1,8 @@
+@php
+    $user = auth()->user();
+    $clientreport_perm = App\Models\Permission::where('role_id', $user->role_id)->where('name', "clientreport")->first();
+    $attendance_perm = App\Models\Permission::where('role_id', $user->role_id)->where('name', "attendance")->first();
+@endphp
 <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
     <div class="app-brand demo">
         <a href="{{ route('home') }}" class="app-brand-link">
@@ -129,6 +134,7 @@
                 </li>
             </ul>
         </li>
+         @if(isset($clientreport_perm) && $clientreport_perm->view == 1)
         <li class="menu-item">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon icon-base ri ri-bar-chart-2-line"></i>
@@ -153,6 +159,8 @@
                 </li>
             </ul>
         </li>
+        @endif
+         @if(isset($attendance_perm) && $attendance_perm->view == 1)
         <li class="menu-item">
             <a href="{{ route('attendance.index') }}" class="menu-link ">
                 <i class="menu-icon tf-icons mdi mdi-calendar"></i>
@@ -160,6 +168,7 @@
             </a>
 
         </li>
+        @endif
 
 
 
