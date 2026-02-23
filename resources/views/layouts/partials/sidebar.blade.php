@@ -153,6 +153,13 @@
                 </li>
             </ul>
         </li>
+        <li class="menu-item">
+            <a href="{{ route('attendance.index') }}" class="menu-link ">
+                <i class="menu-icon tf-icons mdi mdi-calendar"></i>
+                <div data-i18n="Attendance">Attendance</div>
+            </a>
+
+        </li>
 
 
 

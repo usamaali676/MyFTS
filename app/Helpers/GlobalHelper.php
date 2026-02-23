@@ -11,6 +11,17 @@ use Illuminate\Support\Facades\Route;
 
 class GlobalHelper
 {
+        public static function getShiftDate()
+    {
+        $now = now('UTC')->setTimezone(config('app.shift_timezone'));
+
+        // If between 12:00 AM and 4:00 AM → belongs to previous day
+        if ($now->hour < 4) {
+            return $now->subDay()->toDateString();
+        }
+
+        return $now->toDateString();
+    }
 
     public static function daterange($var)
     {

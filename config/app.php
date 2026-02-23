@@ -66,6 +66,9 @@ return [
     */
 
     'timezone' => env('APP_TIMEZONE', 'UTC'),
+    'shift_start' => '19:00:00',
+    'shift_end'   => '04:00:00',
+    'shift_timezone' => 'Asia/Karachi',
 
     /*
     |--------------------------------------------------------------------------

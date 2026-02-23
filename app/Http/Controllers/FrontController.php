@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Attendance;
 use App\Models\BankAccount;
 use App\Models\Cashapp;
 use App\Models\Invoice;
@@ -11,6 +12,7 @@ use App\Models\Role;
 use App\Models\SubCategory;
 use App\Models\User;
 use App\Models\ZelleAccount;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class FrontController extends Controller
@@ -179,25 +181,95 @@ class FrontController extends Controller
                 return view('auth.otp');
             }
 
-            public function verify(Request $request)
+            public function attendancefilter(Request $request)
             {
-                $request->validate([
-                    'otp' => 'required|digits:6',
-                ]);
 
-                $user = User::find(session('user_id'));
+                    // Get request parameters
+                    $dateRange = $request->input('date'); // expected format: "2026-02-01 to 2026-02-21"
+                    $agentId = $request->input('agent');
+                    $type = $request->input('type');
 
-                if ($user && $user->otp == $request->otp) {
-                    // Clear OTP and log in the user
-                    $user->otp = null;
-                    $user->save();
+                    // Base query
+                    $query = Attendance::query();
 
-                    auth()->login($user);
-                    return redirect('/');
-                }
+                    // Filter by agent if provided
+                    if (!empty($agentId)) {
+                        $query->where('user_id', $agentId);
+                    }
+                    // dd($query->get());
 
-                return back()->withErrors(['otp' => 'Invalid OTP']);
+                    // Filter by type if provided
+                    //  if (!empty($type)) {
+                    //     if ($type === 'late') {
+                    //         $query->where('is_late', 1);
+                    //     } elseif ($type === 'half') {
+                    //         $query->where('half_day', 1);
+                    //     }
+                    // }
+                    // if (!empty($type)) {
+                    //  if ($type === 'late') {
+                    //         $query->where('is_late', 1);
+                    //     }
+                    // }
+                    // // dd(vars: $query->get());
+
+                    // if (!empty($type)) {
+                    //     if ($type === 'half') {
+                    //         $query->where('half_day', 1);
+                    //     }
+                    // }
+                    // dd($type);
+
+                    $query->when($type === 'Late', function ($q) {
+                        $q->where('is_late', 1);
+                    })->when($type === 'Half-Day', function ($q) {
+                        $q->where('half_day', 1);
+                    });
+
+
+                    // dd(vars: $query->get());
+
+                    // Filter by date range if provided
+                    if (!empty($dateRange)) {
+                        // Split range
+                        $dates = explode(' to ', $dateRange);
+
+                        if (count($dates) === 2) {
+                            $startDate = Carbon::parse($dates[0])->startOfDay();
+                            $endDate = Carbon::parse($dates[1])->endOfDay();
+                            $query->whereBetween('shift_date', [$startDate, $endDate]);
+                        }
+                    }
+
+
+                    // Fetch data
+                    $attendances = $query->orderBy('shift_date', 'desc')->get();
+                                        // dd(vars: $query->get());
+
+                    // Prepare response data
+                    $data = $attendances->map(function ($attendance, $index) {
+                        return [
+                            'sr_no' => $index + 1,
+                            'agent' => $attendance->user->name ?? 'N/A', // Assuming Attendance belongsTo Agent
+                            'date' => $attendance->shift_date,
+                            'login_time' => $attendance->login_time,
+                            'logout_time' => $attendance->logout_time,
+                            'working_minutes' => $attendance->working_minutes,
+                            'late' => $attendance->is_late ? 'Yes' : 'No',
+                            'half_day' => $attendance->half_day ? 'Yes' : 'No',
+                        ];
+                    });
+                    // dd($data);
+
+                    return response()->json([
+                        'data' => $data,
+                        // 'summary' => [/* optional summary data */],
+                    ]);
+
             }
+
+
+
 
     }
 

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\ChargeBackController;
 use App\Http\Controllers\ClientReportingController;
 use App\Http\Controllers\ClientServicesController;
@@ -28,6 +29,7 @@ use Illuminate\Support\Facades\Route;
 Auth::routes();
 
 Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::post('otp-verify',  [App\Http\Controllers\Auth\LoginController::class, 'verify'])->name('front.otp.verify.post');
 
 Route::controller(FrontController::class)
 ->prefix('front')
@@ -48,7 +50,9 @@ Route::controller(FrontController::class)
     Route::get('/get-refund', 'getRefund')->name('getRefund');
     Route::get('/get-chargeBack', 'getchargeBack')->name('getchargeBack');
     Route::get('otp-verify',  'showVerifyForm')->name('otp.verify');
-    Route::post('otp-verify',  'verify')->name('otp.verify.post');
+    // Route::get('/attendances',  'attendances')->name('attendances');
+    Route::get('/attendances-filter',  'attendancefilter')->name('attendances.filter');
+
 
 
 });
@@ -214,4 +218,12 @@ Route::controller(RoleController::class)
         Route::post('/stats', 'stats')->name('store');
         Route::get('/support', 'update')->name('update');
         Route::get('/reportSupport', 'reportsupport')->name('reportsupport');
+    });
+
+    Route::controller(AttendanceController::class)
+    ->prefix('attendance')
+    ->as('attendance.')
+    ->middleware(PermissionMiddelware::class)
+    ->group(function () {
+        Route::get('/index', 'index')->name('index');
     });
