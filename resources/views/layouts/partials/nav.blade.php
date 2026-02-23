@@ -289,7 +289,7 @@ id="layout-navbar">
               </div>
               <div class="flex-grow-1">
                 @auth
-                <span class="fw-medium d-block">{{ Auth::user()->name; }}</span>
+                <span class="fw-medium d-block">{{ Auth::user()->name }}</span>
                 @endauth
 
                 <small class="text-muted">Admin</small>
