@@ -134,7 +134,7 @@
                 </li>
             </ul>
         </li>
-         @if(isset($clientreport_perm) && $clientreport_perm->view == 1)
+         @if(isset($salereport_perm) && $salereport_perm->view == 1)
         <li class="menu-item">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon icon-base ri ri-bar-chart-2-line"></i>
