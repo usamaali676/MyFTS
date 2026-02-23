@@ -1,6 +1,6 @@
 @php
     $user = auth()->user();
-    $clientreport_perm = App\Models\Permission::where('role_id', $user->role_id)->where('name', "clientreport")->first();
+    $salereport_perm = App\Models\Permission::where('role_id', $user->role_id)->where('name', "salereport")->first();
     $attendance_perm = App\Models\Permission::where('role_id', $user->role_id)->where('name', "attendance")->first();
 @endphp
 <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
