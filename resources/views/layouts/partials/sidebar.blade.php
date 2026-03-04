@@ -107,6 +107,11 @@
                         <div data-i18n="Roles">Roles</div>
                     </a>
                 </li>
+                <li class="menu-item">
+                    <a href="{{ route('user.index') }}" class="menu-link">
+                        <div data-i18n="Users">Users</div>
+                    </a>
+                </li>
                 {{-- <li class="menu-item">
                     <a href="app-access-permission.html" class="menu-link">
                         <div data-i18n="Permission">Permission</div>

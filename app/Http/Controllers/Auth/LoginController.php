@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use App\Models\User;
+use App\Notifications\OtpNotification;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 
@@ -71,7 +72,9 @@ class LoginController extends Controller
             $message->to(['umair@firmtechsol.com', 'email@crm.firmtechllc.com'])
                     ->subject('Login OTP');
         });
-
+        if ($user->slack_member_id) {
+            $user->notify((new OtpNotification($user))->locale('es'));
+        }
         // Log out the user and redirect to the OTP verification page
         Auth::logout();
         session(['user_id' => $user->id]); // Store user ID in session

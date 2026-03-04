@@ -34,6 +34,7 @@ class UserController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => bcrypt($request->password),
+            'slack_member_id' => $request->slack_member_id,
             'created_by' => Auth::user()->id,
         ]);
         Alert::success('Succes', "User Added Successfully");
@@ -56,6 +57,7 @@ class UserController extends Controller
         $user->role_id = $request->role_id;
         $user->name = $request->name;
         $user->email = $request->email;
+        $user->slack_member_id = $request->slack_member_id;
         $user->updated_by = Auth::user()->id;
         if($request->password!=null){
             $user->password = bcrypt($request->password);

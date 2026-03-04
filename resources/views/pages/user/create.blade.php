@@ -97,18 +97,18 @@
                   <hr class="my-4 mx-n4" />
                   <h6>2. Personal Info</h6>
                   <div class="row g-4">
-                    <div class="col-md-12">
+                    <div class="col-md-6">
                       <div class="form-floating form-floating-outline">
                         <input type="text" name="name" id="multicol-first-name" class="form-control" placeholder="John" />
                         <label for="multicol-first-name">Full Name</label>
                       </div>
                     </div>
-                    {{-- <div class="col-md-6">
+                    <div class="col-md-6">
                       <div class="form-floating form-floating-outline">
-                        <input type="text" name="l_name" id="multicol-last-name" class="form-control" placeholder="Doe" />
-                        <label for="multicol-last-name">Last Name</label>
+                        <input type="text" name="slack_member_id" id="multicol-last-name" class="form-control" placeholder="UABCDEF123" />
+                        <label for="multicol-last-name">Slack Member ID</label>
                       </div>
-                    </div> --}}
+                    </div>
                   </div>
                   <div class="pt-4">
                     <button type="submit" class="btn btn-primary me-sm-3 me-1">Submit</button>

@@ -6,6 +6,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "laravel/slack-notification-channel": "^3.7",
         "laravel/tinker": "^2.9",
         "laravel/ui": "^4.5",
         "realrashid/sweet-alert": "^7.2"
