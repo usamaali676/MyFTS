@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\LeadCloser;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -71,6 +72,10 @@ class UserController extends Controller
         $user = User::find($id);
         $user->deleted_by = Auth::user()->id;
         $user->save();
+        $lead_Closers = LeadCloser::where('closer_id', $user->id)->get();
+        foreach($lead_Closers as $lead_Closer){
+            $lead_Closer->delete();
+        }
         $user->delete();
         Alert::success('Success', "User Deleted Successfully");
         return redirect()->route('user.index');
