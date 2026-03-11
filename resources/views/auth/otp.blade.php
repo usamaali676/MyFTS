@@ -136,7 +136,7 @@
           <div class="card-body mt-2">
             <h4 class="mb-2">Confirm Your Email ✉️</h4>
             <p class="text-start mb-2">
-              Write your OTP. We Send OTP  to your email address: Please follow the Instruction inside to
+              Write your OTP. We Send OTP  to your Slack: Please follow the Instruction inside to
               continue.
             </p>
             <form class="d-inline" method="POST" action="{{ route('front.otp.verify.post') }}">
