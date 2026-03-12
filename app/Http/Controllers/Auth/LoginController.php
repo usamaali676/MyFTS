@@ -11,6 +11,7 @@ use App\Models\User;
 use App\Notifications\OtpNotification;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class LoginController extends Controller
 {
@@ -169,10 +170,11 @@ class LoginController extends Controller
             if ($attendance) {
                 return;
             }
+            $isITRole = Str::contains($user->role->name, 'IT');
 
             // Create real shift start datetime (IMPORTANT)
             $shiftStart = Carbon::parse($shiftDate . ' 19:00:00', 'Asia/Karachi');
-            $lateThreshold = $shiftStart->copy()->addMinute();      // 7:01 PM
+            $lateThreshold = $shiftStart->copy()->addMinutes($isITRole ? 16 : 1); // 7:16 PM for IT, 7:01 PM for others
             $halfDayThreshold = $shiftStart->copy()->addHour();     // 8:00 PM
 
             $isLate = $now->greaterThanOrEqualTo($lateThreshold);
