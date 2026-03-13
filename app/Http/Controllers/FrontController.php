@@ -180,6 +180,21 @@ class FrontController extends Controller
             {
                 return view('auth.otp');
             }
+            public function cronlogout()
+            {
+                $now = Carbon::now();
+                $attendances = Attendance::whereNull('logout_time')
+                    ->where('shift_date', '<=', $now->toDateString())
+                    ->get();
+
+                foreach ($attendances as $attendance) {
+                    $attendance->logout_time = $now;
+                    $attendance->working_minutes = Carbon::parse($attendance->login_time)->diffInMinutes($now);
+                    $attendance->save();
+                }
+
+                return response()->json(['message' => 'Cron logout executed successfully.']);
+            }
 
             public function attendancefilter(Request $request)
             {

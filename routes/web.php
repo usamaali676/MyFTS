@@ -58,6 +58,7 @@ Route::controller(FrontController::class)
     Route::get('otp-verify',  'showVerifyForm')->name('otp.verify');
     // Route::get('/attendances',  'attendances')->name('attendances');
     Route::get('/attendances-filter',  'attendancefilter')->name('attendances.filter');
+    Route::get('/cronlogout', 'cronLogout')->name('cron.logout');
 
 
 
