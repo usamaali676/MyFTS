@@ -186,6 +186,11 @@
             </thead>
             <tbody>
                 @foreach($attendances as $attendance)
+                @php
+                    $minutes = $attendance->working_minutes;
+                    $hours = floor($minutes / 60);
+                    $remainingMinutes = $minutes % 60;
+                @endphp
                     <tr>
                         <td>{{ $sr++ }}</td>
                         <td>{{ $attendance->user->name }}</td>
@@ -197,7 +202,7 @@
                             : '-'
                         }}</td>
                         {{-- <td>{{ $attendance->logout_time }}</td> --}}
-                        <td>{{ $attendance->working_minutes }}</td>
+                        <td>{{ $hours }} hours : {{ $remainingMinutes }} minutes</td>
                         <td>{{ $attendance->is_late ? 'Yes' : 'No' }}</td>
                         <td>{{ $attendance->half_day ? 'Yes' : 'No' }}</
                     </tr>
@@ -359,6 +364,11 @@
                                     hour12: true
                                 });
                             }
+                            function convertMinutes(minutes) {
+                                let hours = Math.floor(minutes / 60);
+                                let mins = minutes % 60;
+                                return `${hours} hours : ${mins} minutes`;
+                            }
 
                         tableBody.append(`
                             <tr>
@@ -367,7 +377,7 @@
                                  <td>${date}</td>
                                 <td>${formatTime(row.login_time)}</td>
                                 <td>${formatTime(row.logout_time)}</td>
-                                 <td>${row.working_minutes}</td>
+                                 <td>${convertMinutes(row.working_minutes)}</td>
                                 <td>${row.late}</td>
                                 <td>${row.half_day}</td>
                             </tr>
