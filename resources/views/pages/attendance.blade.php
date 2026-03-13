@@ -179,7 +179,7 @@
                 <th>Date</th>
                 <th>CheckIn</th>
                 <th>CheckOut</th>
-                <th>Working Hours</th>
+                <th>Working Minutes</th>
                 <th>Late</th>
                 <th>Half Day</th>
               </tr>
