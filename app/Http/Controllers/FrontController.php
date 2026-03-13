@@ -182,9 +182,10 @@ class FrontController extends Controller
             }
             public function cronlogout()
             {
-                $now = Carbon::now();
+                $now = now('Asia/Karachi');
+                $shiftDate = $this->getShiftDate();
                 $attendances = Attendance::whereNull('logout_time')
-                    ->where('shift_date', '<=', $now->toDateString())
+                    ->where('shift_date', '<=', $shiftDate)
                     ->get();
 
                 foreach ($attendances as $attendance) {
@@ -195,6 +196,18 @@ class FrontController extends Controller
 
                 return response()->json(['message' => 'Cron logout executed successfully.']);
             }
+
+                private function getShiftDate()
+                {
+                    $now = now('Asia/Karachi');
+
+                    // Shift: 7 PM → 4 AM
+                    if ($now->hour < 5) {
+                        return $now->subDay()->toDateString();
+                    }
+
+                    return $now->toDateString();
+                }
 
             public function attendancefilter(Request $request)
             {
