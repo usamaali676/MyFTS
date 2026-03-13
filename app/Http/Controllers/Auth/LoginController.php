@@ -236,14 +236,10 @@ class LoginController extends Controller
 
                     $minutes = $loginTime->diffInMinutes($logoutTime, false);
 
-                    if ($minutes < 0) {
-                        $minutes += 1440;
-                    }
 
-                    $hours = floor($minutes / 60);
 
                     $attendance->logout_time = $logoutTime;
-                    $attendance->working_minutes = $hours;
+                    $attendance->working_minutes = $minutes;
                     $attendance->save();
                 }
             }
