@@ -234,7 +234,11 @@ class LoginController extends Controller
                     $loginTime = Carbon::parse($attendance->login_time, 'Asia/Karachi');
                     $logoutTime = now('Asia/Karachi');
 
-                    $minutes = $loginTime->diffInMinutes($logoutTime, false);
+                    if ($logoutTime->lessThan($loginTime)) {
+                            $logoutTime->addDay();
+                    }
+
+                    $minutes = $loginTime->diffInMinutes($logoutTime);
 
 
 
