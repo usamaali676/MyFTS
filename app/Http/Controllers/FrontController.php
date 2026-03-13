@@ -185,8 +185,9 @@ class FrontController extends Controller
                 $now = now('Asia/Karachi');
                 $shiftDate = $this->getShiftDate();
                 $attendances = Attendance::whereNull('logout_time')
-                    ->where('shift_date', '<=', $shiftDate)
+                    ->where('shift_date', '=', $shiftDate)
                     ->get();
+
 
                 foreach ($attendances as $attendance) {
                     $attendance->logout_time = $now;
