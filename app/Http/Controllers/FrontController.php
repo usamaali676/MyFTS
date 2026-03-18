@@ -183,6 +183,10 @@ class FrontController extends Controller
             public function cronlogout()
             {
                 $now = now('Asia/Karachi');
+                    // Only run at 04:15
+                    if ($now->format('H:i') !== '04:15') {
+                        return response()->json(['message' => 'Skipped']);
+                    }
                 $shiftDate = $this->getShiftDate();
                 $attendances = Attendance::whereNull('logout_time')
                     ->where('shift_date', '=', $shiftDate)
