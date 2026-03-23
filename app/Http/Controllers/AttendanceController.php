@@ -15,7 +15,7 @@ class AttendanceController extends Controller
     {
         $sr = 1;
         $user = User::all();
-        $attendances = Attendance::all();
+        $attendances = Attendance::orderBy('id', 'desc')->get();
         return view('pages.attendance', compact('attendances', 'sr', 'user'));
     }
 
