@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Attendance;
 use App\Models\BankAccount;
+use App\Models\Breaks;
 use App\Models\Cashapp;
 use App\Models\Invoice;
 use App\Models\Lead;
@@ -14,6 +15,8 @@ use App\Models\User;
 use App\Models\ZelleAccount;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use RealRashid\SweetAlert\Facades\Alert;
 
 class FrontController extends Controller
 {
@@ -180,27 +183,6 @@ class FrontController extends Controller
             {
                 return view('auth.otp');
             }
-            public function cronlogout()
-            {
-                $now = now('Asia/Karachi');
-                    // Only run at 04:15
-                    if ($now->format('H:i') !== '04:15') {
-                        return response()->json(['message' => 'Skipped']);
-                    }
-                $shiftDate = $this->getShiftDate();
-                $attendances = Attendance::whereNull('logout_time')
-                    ->where('shift_date', '=', $shiftDate)
-                    ->get();
-
-
-                foreach ($attendances as $attendance) {
-                    $attendance->logout_time = $now;
-                    $attendance->working_minutes = Carbon::parse($attendance->login_time)->diffInMinutes($now);
-                    $attendance->save();
-                }
-
-                return response()->json(['message' => 'Cron logout executed successfully.']);
-            }
 
                 private function getShiftDate()
                 {
@@ -213,6 +195,33 @@ class FrontController extends Controller
 
                     return $now->toDateString();
                 }
+            public function cronlogout()
+            {
+                $now = now('Asia/Karachi');
+                    // Only run at 04:15
+                    if ($now->format('H:i') !== '04:15') {
+                        return response()->json(['message' => 'Skipped']);
+                    }
+                $shiftDate = $this->getShiftDate();
+                $attendances = Attendance::whereNull('logout_time')
+                    ->where('shift_date', '=', $shiftDate)
+                    ->get();
+                    $logoutTime = now('Asia/Karachi');
+
+                   
+                foreach ($attendances as $attendance) {
+                     if ($logoutTime->lessThan($attendance->login_time)) {
+                            $logoutTime->addDay();
+                    }
+                    $attendance->logout_time = $logoutTime;
+                    $attendance->working_minutes = Carbon::parse($attendance->login_time)->diffInMinutes($now);
+                    $attendance->save();
+                }
+
+                return response()->json(['message' => 'Cron logout executed successfully.']);
+            }
+
+
 
             public function attendancefilter(Request $request)
             {
@@ -299,6 +308,52 @@ class FrontController extends Controller
                         // 'summary' => [/* optional summary data */],
                     ]);
 
+            }
+                
+            public function startBreak()
+            {
+                 $shiftDate = $this->getShiftDate();
+                $user = Auth::user();
+
+                $attendance = Attendance::where('user_id', $user->id)
+                    ->where('shift_date', $shiftDate)
+                    ->first();
+                    // dd($attendance);
+
+                // Check if already on break
+                $activeBreak = Breaks::where('user_id', $user->id)
+                    ->whereNull('break_end')
+                    ->first();
+
+                if ($activeBreak) {
+                    Alert::error('Error', 'Already on break');
+                    return redirect()->back();
+                }
+
+                Breaks::create([
+                    'user_id' => $user->id,
+                    'attendance_id' => $attendance->id,
+                    'break_start' => Carbon::parse($shiftDate)
+                    ->setTimeFrom(now('Asia/Karachi')),
+                ]);
+            }
+            public function endBreak()
+            {
+                $shiftDate = $this->getShiftDate();
+                $user = Auth::user();
+
+                $break = Breaks::where('user_id', $user->id)
+                    ->whereNull('break_end')
+                    ->latest()
+                    ->first();
+                    $breakStart = Carbon::parse($break->break_start, 'Asia/Karachi');
+
+                if ($break) {
+                    $break->break_end = Carbon::parse($shiftDate)
+                    ->setTimeFrom(now('Asia/Karachi'));
+                    $break->duration = $breakStart->diffInSeconds(now());
+                    $break->save();
+                }
             }
 
 

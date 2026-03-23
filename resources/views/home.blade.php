@@ -19,7 +19,7 @@ $user = Auth::user();
                             {{-- <p class="mb-0">You have done <span class="h6 mb-0">68%</span>😎 more sales today.</p>
                             --}}
                             <p>Check your new badge in your profile.</p>
-                            <a href="javascript:;" class="btn btn-primary">View Profile</a>
+                            <a id="startBreakBtn" href="javascript:;" class="btn btn-primary">Start Break</a>
                         </div>
                     </div>
                     <div class="col-md-6 text-center text-md-end order-1 order-md-2">
@@ -428,4 +428,153 @@ $user = Auth::user();
 
     </div>
 </div>
+
+
+<div class="modal fade" id="breakModal" tabindex="-1">
+    <div class="modal-dialog modal-fullscreen">
+        <div class="modal-content bg-white text-white d-flex align-items-center justify-content-center">
+
+            <div class="text-center">
+                <img src="{{asset('assets/img/coffee-break-pana.svg')}}" style="width: 100%; height: 400px;">
+                <h1 style="padding-top: 20px; color: #636578" class="mb-4">{{$user->name}} is On Break</h1>
+
+                <h2 id="breakTimer" style="font-size: 60px; color: #666cff">
+                    00:00:00
+                </h2>
+
+                <button class="btn  btn-danger mt-5 px-5 py-3" id="endBreakBtn">
+                    End Break
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+@endsection
+@section('custom-js')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    let timerInterval;
+    let seconds = 0;
+    let isOnBreak = false;
+    
+
+
+    // Init Bootstrap Modal
+    const breakModalEl = document.getElementById('breakModal');
+    const breakModal = new bootstrap.Modal(breakModalEl, {
+        backdrop: 'static',
+        keyboard: false
+    });
+
+    // Format Timer
+    function formatTime(sec) {
+        let h = String(Math.floor(sec / 3600)).padStart(2, '0');
+        let m = String(Math.floor((sec % 3600) / 60)).padStart(2, '0');
+        let s = String(sec % 60).padStart(2, '0');
+        return `${h}:${m}:${s}`;
+    }
+
+    // Start Timer
+    function startTimer() {
+        timerInterval = setInterval(() => {
+            seconds++;
+            document.getElementById('breakTimer').innerText = formatTime(seconds);
+        }, 1000);
+    }
+
+    // Stop Timer
+    function stopTimer() {
+        clearInterval(timerInterval);
+        seconds = 0;
+    }
+
+    // Fullscreen Mode
+    function openFullscreen() {
+        let elem = document.documentElement;
+        if (elem.requestFullscreen) {
+            elem.requestFullscreen().catch(() => {});
+        }
+    }
+
+    function exitFullscreen() {
+        if (document.fullscreenElement) {
+            document.exitFullscreen();
+        }
+    }
+
+    // START BREAK
+    document.getElementById('startBreakBtn').addEventListener('click', function () {
+
+        if (isOnBreak) return;
+
+        fetch('{{ route('front.stratBreak') }}', {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            }
+        });
+
+        isOnBreak = true;
+        seconds = 0;
+
+        breakModal.show();
+        openFullscreen();
+        startTimer();
+    });
+
+    // END BREAK
+    document.getElementById('endBreakBtn').addEventListener('click', function () {
+
+        if (!isOnBreak) return;
+
+        fetch('{{ route('front.endBreak') }}', {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            }
+        });
+
+        isOnBreak = false;
+
+        stopTimer();
+        breakModal.hide();
+        exitFullscreen();
+    });
+
+    // Prevent leaving tab (basic)
+    document.addEventListener('visibilitychange', function () {
+        if (isOnBreak && document.hidden) {
+            alert('⚠️ You are on break. Please stay on this screen.');
+            {{-- location.reload(); --}}
+             // strict handling
+        }
+    });
+
+    // Prevent ESC key manually (extra safety)
+    document.addEventListener('keydown', function (e) {
+        if (isOnBreak && e.key === "Escape") {
+            e.preventDefault();
+        }
+    });
+
+    // Prevent right click (optional strict)
+    document.addEventListener('contextmenu', function (e) {
+        if (isOnBreak) {
+            e.preventDefault();
+        }
+    });
+
+    // Force focus back (optional strict)
+    window.onblur = function () {
+        if (isOnBreak) {
+            setTimeout(() => {
+                window.focus();
+            }, 100);
+        }
+    };
+
+});
+</script>
 @endsection

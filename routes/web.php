@@ -59,6 +59,8 @@ Route::controller(FrontController::class)
     // Route::get('/attendances',  'attendances')->name('attendances');
     Route::get('/attendances-filter',  'attendancefilter')->name('attendances.filter');
     Route::get('/cronlogout', 'cronLogout')->name('cron.logout');
+    Route::post('/startBreak', 'startBreak')->name('stratBreak');
+    Route::post('/endBreak', 'endBreak')->name('endBreak');
 
 
 
