@@ -208,7 +208,7 @@ class FrontController extends Controller
                     ->get();
                     $logoutTime = now('Asia/Karachi');
 
-                   
+
                 foreach ($attendances as $attendance) {
                      if ($logoutTime->lessThan($attendance->login_time)) {
                             $logoutTime->addDay();
@@ -309,7 +309,7 @@ class FrontController extends Controller
                     ]);
 
             }
-                
+
             public function startBreak()
             {
                  $shiftDate = $this->getShiftDate();
@@ -347,11 +347,12 @@ class FrontController extends Controller
                     ->latest()
                     ->first();
                     $breakStart = Carbon::parse($break->break_start, 'Asia/Karachi');
+                    $breakEnd = Carbon::parse($shiftDate)
+                    ->setTimeFrom(now('Asia/Karachi'));
 
                 if ($break) {
-                    $break->break_end = Carbon::parse($shiftDate)
-                    ->setTimeFrom(now('Asia/Karachi'));
-                    $break->duration = $breakStart->diffInSeconds(now());
+                    $break->break_end = $breakEnd;
+                    $break->duration = $breakStart->diffInSeconds($breakEnd);
                     $break->save();
                 }
             }
