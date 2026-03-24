@@ -214,7 +214,7 @@ class FrontController extends Controller
                             $logoutTime->addDay();
                     }
                     $attendance->logout_time = $logoutTime;
-                    $attendance->working_minutes = Carbon::parse($attendance->login_time)->diffInMinutes($now);
+                    $attendance->working_minutes = Carbon::parse($attendance->login_time)->diffInMinutes($logoutTime);
                     $attendance->save();
                 }
 
