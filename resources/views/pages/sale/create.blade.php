@@ -4878,30 +4878,34 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                             <td>' + statusBadge + '</td>\
                                             <td>\
                                             <div class="d-inline-flex text-nowrap">\
-                                                <form id="dispatch_report" action="{{ route('clientReport.update', ' + report.id + ') }}" method="POST">\
+                                                <form id="dispatch_report" action="/clientReport/update/' + report.id + '" method="POST">\
                                                     @csrf\
-                                                    <button class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect" data-bs-toggle="tooltip" title="Dispatch">\
+                                                    <button class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect" title="Dispatch">\
                                                         <i class="ri-send-plane-2-line ri-20px"></i>\
                                                     </button>\
                                                 </form>\
-                                                <button class="btn btn-sm btn-icon btn-text-secondary rounded-pill dropdown-toggle hide-arrow" data-bs-toggle="dropdown" aria-expanded="false">\
+                                            \
+                                                <button class="btn btn-sm btn-icon btn-text-secondary rounded-pill dropdown-toggle hide-arrow" data-bs-toggle="dropdown">\
                                                     <i class="mdi mdi-dots-vertical mdi-20px"></i>\
                                                 </button>\
+                                            \
                                                 <div class="dropdown-menu dropdown-menu-end m-0">\
-                                                    <a type="button" href="'+'/reports/report/' + report.report_file +'" target="_blank" class="dropdown-item delete-record">\
+                                                    <a href="/reports/report/' + report.report_file + '" target="_blank" class="dropdown-item">\
                                                         <i class="mdi mdi-eye me-2"></i><span>Preview</span>\
                                                     </a>\
-                                                    <form id="verify_report" action="{{ route('clientReport.edit', ' + report.id + ') }}" method="POST">\
+                                            \
+                                                    <form id="verify_report" action="/clientReport/edit/' + report.id + '" method="POST">\
                                                         @csrf\
                                                         <button type="submit" class="dropdown-item">\
                                                             <i class="mdi mdi-check-decagram me-2"></i><span>Verify</span>\
                                                         </button>\
                                                     </form>\
-                                                    <a type="button" id="'+ report.id +'" data-confirm="Are you sure to delete this item?" class="dropdown-item delete-record delete_report">\
+                                            \
+                                                    <a id="' + report.id + '" class="dropdown-item delete-record delete_report">\
                                                         <i class="mdi mdi-delete-outline me-2"></i><span>Delete</span>\
                                                     </a>\
                                                 </div>\
-                                            </div>\
+                                            </div>
                                         </td>\
                                         </tr>';
                     });
