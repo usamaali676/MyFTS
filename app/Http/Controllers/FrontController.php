@@ -16,6 +16,7 @@ use App\Models\ZelleAccount;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use RealRashid\SweetAlert\Facades\Alert;
 
 class FrontController extends Controller
@@ -217,6 +218,7 @@ class FrontController extends Controller
                     $attendance->working_minutes = Carbon::parse($attendance->login_time)->diffInMinutes($logoutTime);
                     $attendance->save();
                 }
+                  DB::table('sessions')->truncate();
 
                 return response()->json(['message' => 'Cron logout executed successfully.']);
             }
