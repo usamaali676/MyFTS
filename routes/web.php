@@ -61,6 +61,7 @@ Route::controller(FrontController::class)
     Route::get('/cronlogout', 'cronLogout')->name('cron.logout');
     Route::post('/startBreak', 'startBreak')->name('stratBreak');
     Route::post('/endBreak', 'endBreak')->name('endBreak');
+    Route::get('/zkteco', 'ZktecoIntegnew')->name('zkteco');
 
 
 

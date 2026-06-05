@@ -18,6 +18,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use RealRashid\SweetAlert\Facades\Alert;
+use MehediJaman\LaravelZkteco\LaravelZkteco;
+use Rats\Zkteco\Lib\ZKTeco;
+use App\Services\ZKTecoTCP;
 
 class FrontController extends Controller
 {
@@ -358,6 +361,193 @@ class FrontController extends Controller
                     $break->save();
                 }
             }
+
+            public function ZktecoInteg() {
+                $zk = new LaravelZkteco('192.168.99.18', 4370);  // Remove 'TCP' — not supported in this lib
+                $connected = $zk->connect();
+
+                if ($connected) {
+                    sleep(1);
+
+                    // ✅ These actually exist in MehediJaman\LaravelZkteco
+                    $serial  = $zk->serialNumber();
+                    $name    = $zk->deviceName();
+                    $version = $zk->fmVersion();
+
+                    dd([
+                        'serial'   => $serial,
+                        'name'     => $name,
+                        'version'  => $version,
+                    ]);
+                }
+                else {
+                    echo "Failed to connect.";
+                }
+            }
+
+            public function ZktecoRawTest() {
+                $ip   = '192.168.99.18';
+                $port = 4370;
+
+                // ZKTeco "connect" command (UDP)
+                $socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
+                socket_set_option($socket, SOL_SOCKET, SO_RCVTIMEO, ['sec' => 3, 'usec' => 0]);
+
+                $command = pack('SSII', 1000, 0, 0, 0); // CMD_CONNECT
+
+                socket_sendto($socket, $command, strlen($command), 0, $ip, $port);
+
+                $response = '';
+                $from     = '';
+                $fromPort = 0;
+
+                $received = socket_recvfrom($socket, $response, 1024, 0, $from, $fromPort);
+                socket_close($socket);
+
+                dd([
+                    'bytes_received' => $received,
+                    'raw_hex'        => $received ? bin2hex($response) : 'NO RESPONSE',
+                ]);
+            }
+
+            public function ZktecoTCPTest() {
+    $ip   = '192.168.99.18';
+    $port = 4370;
+
+    $socket = @fsockopen($ip, $port, $errno, $errstr, 5);
+
+    if ($socket) {
+        fclose($socket);
+        dd('✅ TCP Connection successful — device speaks TCP');
+    } else {
+        dd("❌ TCP also failed: [$errno] $errstr");
+    }
+}
+    public function ZktecoIntegs() {
+        $zk = new ZKTeco('192.168.99.18', 4370);
+
+        // Force TCP mode
+        $zk->connect();
+
+        sleep(1);
+
+        $zk->disableDevice();
+
+        $users      = $zk->getUser();
+        $attendance = $zk->getAttendance();
+
+        $zk->enableDevice();
+        $zk->disconnect();
+
+        dd([
+            'users_count'      => count($users),
+            'attendance_count' => count($attendance),
+            'users'            => $users,
+            'attendance'       => $attendance,
+        ]);
+    }
+
+    public function ZktecoIntegnew()
+{
+   // commKey = 0 is factory default — change if you set a password on the device
+    $zk   = new ZKTecoTCP('192.168.99.18', 4370, 0);
+     $zk->debugAuth();
+    //  dd('Debug complete — check output above');
+    $connected = $zk->connect();
+
+    dd([
+        'connected'        => $connected,
+        'users_count'      => $connected ? count($zk->getUsers())      : 'N/A',
+        'attendance_count' => $connected ? count($zk->getAttendance()) : 'N/A',
+        'users'            => $connected ? $zk->getUsers()             : [],
+        'attendance'       => $connected ? $zk->getAttendance()        : [],
+    ]);
+}
+public function ZktecoDebug()
+{
+    $ip   = '192.168.99.18';
+    $port = 4370;
+
+    // ── Step 1: Raw TCP open ──────────────────────────────────
+    $socket = @fsockopen($ip, $port, $errno, $errstr, 10);
+
+    if (!$socket) {
+        dd("❌ Step 1 FAILED — fsockopen: [$errno] $errstr");
+    }
+
+    stream_set_timeout($socket, 5);
+    echo "✅ Step 1 PASSED — TCP socket opened<br>";
+
+    // ── Step 2: Build CMD_CONNECT packet ─────────────────────
+    $command   = 1000; // CMD_CONNECT
+    $sessionId = 0;
+    $replyId   = 0;
+
+    // Build payload without checksum first
+    $buf      = pack('vvvv', $command, 0, $sessionId, $replyId);
+
+    // Calculate checksum
+    $sum = 0;
+    $padded = str_pad($buf, ceil(strlen($buf) / 2) * 2, "\x00");
+    for ($i = 0; $i < strlen($padded); $i += 2) {
+        $sum += unpack('v', $padded[$i] . $padded[$i+1])[1];
+    }
+    while ($sum >> 16) $sum = ($sum & 0xFFFF) + ($sum >> 16);
+    $checksum = ~$sum & 0xFFFF;
+
+    // Rebuild with real checksum
+    $buf       = pack('vvvv', $command, $checksum, $sessionId, $replyId);
+    $tcpHeader = "\x50\x50\x82\x7d" . pack('V', strlen($buf));
+    $packet    = $tcpHeader . $buf;
+
+    echo "✅ Step 2 PASSED — Packet built: " . bin2hex($packet) . "<br>";
+
+    // ── Step 3: Send packet ───────────────────────────────────
+    $written = @fwrite($socket, $packet);
+
+    if ($written === false || $written === 0) {
+        dd("❌ Step 3 FAILED — Could not write to socket");
+    }
+
+    echo "✅ Step 3 PASSED — Sent $written bytes<br>";
+
+    // ── Step 4: Read raw response (no parsing) ────────────────
+    usleep(500000); // wait 500ms
+
+    $raw = @fread($socket, 1024);
+
+    if ($raw === false || $raw === '') {
+        // Try reading in chunks
+        $raw = '';
+        for ($i = 0; $i < 5; $i++) {
+            $chunk = @fread($socket, 256);
+            if ($chunk) { $raw .= $chunk; break; }
+            usleep(200000);
+        }
+    }
+
+    echo "✅ Step 4 — Raw response hex: <b>" . ($raw ? bin2hex($raw) : 'EMPTY — NO RESPONSE') . "</b><br>";
+    echo "✅ Step 4 — Raw length: " . strlen($raw) . " bytes<br>";
+
+    // ── Step 5: Parse whatever came back ─────────────────────
+    if (strlen($raw) >= 8) {
+        $magic = substr($raw, 0, 4);
+        echo "Magic bytes: " . bin2hex($magic) . " (expected: 50508277 or 50508270)<br>";
+
+        if (strlen($raw) >= 12) {
+            $inner   = substr($raw, 8);
+            $decoded = unpack('vcommand/vchecksum/vsession/vreply', substr($inner, 0, 8));
+            echo "Command: "    . $decoded['command']  . " (2000 = ACK_OK)<br>";
+            echo "Session ID: " . $decoded['session']  . "<br>";
+        }
+    }
+
+    fclose($socket);
+    dd('🔍 Debug complete — check output above');
+}
+
+
+
 
 
 

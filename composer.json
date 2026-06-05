@@ -9,6 +9,8 @@
         "laravel/slack-notification-channel": "^3.7",
         "laravel/tinker": "^2.9",
         "laravel/ui": "^4.5",
+        "mehedijaman/laravel-zkteco": "^1.0",
+        "rats/zkteco": "^002.0",
         "realrashid/sweet-alert": "^7.2"
     },
     "require-dev": {
