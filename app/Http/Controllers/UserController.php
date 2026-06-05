@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\LeadCloser;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -34,6 +35,7 @@ class UserController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => bcrypt($request->password),
+            'slack_member_id' => $request->slack_member_id,
             'created_by' => Auth::user()->id,
         ]);
         Alert::success('Succes', "User Added Successfully");
@@ -56,6 +58,7 @@ class UserController extends Controller
         $user->role_id = $request->role_id;
         $user->name = $request->name;
         $user->email = $request->email;
+        $user->slack_member_id = $request->slack_member_id;
         $user->updated_by = Auth::user()->id;
         if($request->password!=null){
             $user->password = bcrypt($request->password);
@@ -69,6 +72,10 @@ class UserController extends Controller
         $user = User::find($id);
         $user->deleted_by = Auth::user()->id;
         $user->save();
+        $lead_Closers = LeadCloser::where('closer_id', $user->id)->get();
+        foreach($lead_Closers as $lead_Closer){
+            $lead_Closer->delete();
+        }
         $user->delete();
         Alert::success('Success', "User Deleted Successfully");
         return redirect()->route('user.index');

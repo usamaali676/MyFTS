@@ -58,3 +58,4 @@
         };
     </script> --}}
 
+@yield('custom-js')

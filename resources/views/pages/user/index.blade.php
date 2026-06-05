@@ -9,7 +9,10 @@
             <!-- Content -->
 
             <div class="container-xxl flex-grow-1 container-p-y">
-              <h4 class="py-3 mb-4"> Users</h4>
+              <div class="d-flex justify-content-between align-items-center">
+                <h4 class="py-3 mb-4"><span class="text-muted fw-light">User/</span> List</h4>
+                <a href="{{ route('user.create') }}" class="btn btn-primary">Create User</a>
+                </div>
 
 
               <!-- Responsive Datatable -->

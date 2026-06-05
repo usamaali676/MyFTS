@@ -19,12 +19,18 @@ use App\Http\Controllers\UserController;
 use App\Http\Middleware\PermissionMiddelware;
 use App\Models\InvoiceServiceCharges;
 use App\Models\ServiceArea;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 // Route::get('/', function () {
 //     return view('welcome');
 // });
+Route::get('/config-cache', function() {
+     $exitCode = Artisan::call('config:cache');
+    // $exitCodes = Artisan::call('route:cache');
+     return 'Config cache cleared';
+ });
 
 Auth::routes();
 
@@ -52,6 +58,10 @@ Route::controller(FrontController::class)
     Route::get('otp-verify',  'showVerifyForm')->name('otp.verify');
     // Route::get('/attendances',  'attendances')->name('attendances');
     Route::get('/attendances-filter',  'attendancefilter')->name('attendances.filter');
+    Route::get('/cronlogout', 'cronLogout')->name('cron.logout');
+    Route::post('/startBreak', 'startBreak')->name('stratBreak');
+    Route::post('/endBreak', 'endBreak')->name('endBreak');
+    Route::get('/zkteco', 'ZktecoIntegnew')->name('zkteco');
 
 
 

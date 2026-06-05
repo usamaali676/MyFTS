@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use App\Traits\Searchable;
-
+use Illuminate\Notifications\Notification;
 
 class User extends Authenticatable
 {
@@ -32,6 +32,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role_id',
+        'slack_member_id'
     ];
 
     /**
@@ -58,5 +59,14 @@ class User extends Authenticatable
     }
     public function role() {
         return $this->belongsTo(Role::class, 'role_id');
+    }
+    //     public function routeNotificationForSlack(Notification $notification): mixed
+    // {
+    //     return 'U09CFSU190Q';
+    //     // return '#it-dept';
+    // }
+        public function routeNotificationForSlack(Notification $notification): mixed
+    {
+        return $this->slack_member_id;
     }
 }

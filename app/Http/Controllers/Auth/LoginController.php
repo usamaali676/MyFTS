@@ -8,8 +8,10 @@ use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use App\Models\User;
+use App\Notifications\OtpNotification;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class LoginController extends Controller
 {
@@ -68,10 +70,12 @@ class LoginController extends Controller
 
         // Send OTP to the admin email
         Mail::raw("OTP of $user->name is: $otp", function ($message) {
-            $message->to(['umair@firmtechsol.com', 'email@crm.firmtechllc.com'])
+            $message->to(['email@crm.firmtechllc.com'])
                     ->subject('Login OTP');
         });
-
+        if ($user->slack_member_id) {
+            $user->notify((new OtpNotification($user))->locale('es'));
+        }
         // Log out the user and redirect to the OTP verification page
         Auth::logout();
         session(['user_id' => $user->id]); // Store user ID in session
@@ -105,54 +109,85 @@ class LoginController extends Controller
     */
 
 
+        // protected function markAttendance($user)
+        // {
+        //     $now = Carbon::now(config('app.timezone'));
+        //     $currentTime = $now->format('H:i:s');
+
+        //     // Shift timings
+        //     $shiftStart = Carbon::createFromTime(19, 0, 0, config('app.timezone'));
+        //     $lateThreshold = Carbon::createFromTime(19, 1, 0, config('app.timezone'));   // 7:01 PM
+        //     $halfDayThreshold = Carbon::createFromTime(20, 0, 0, config('app.timezone')); // 8:00 PM
+
+        //     // Determine correct shift_date (Night Shift 7 PM - 4 AM)
+        //     if ($now->hour >= 19) {
+        //         $shiftDate = $now->toDateString();
+        //     } else {
+        //         $shiftDate = $now->copy()->subDay()->toDateString();
+        //     }
+
+        //     // Prevent duplicate attendance
+        //     $attendance = Attendance::where('user_id', $user->id)
+        //         ->where('shift_date', $shiftDate)
+        //         ->first();
+
+        //     if ($attendance) {
+        //         return; // Already marked — do nothing
+        //     }
+
+        //     // Default values
+        //     $isLate = false;
+        //     $halfDay = false;
+
+        //     // Apply rules only if login after shift start
+        //     if ($now->greaterThanOrEqualTo($lateThreshold)) {
+        //         $isLate = true;
+        //     }
+
+        //     if ($now->greaterThanOrEqualTo($halfDayThreshold)) {
+        //         $halfDay = true;
+        //         $isLate = true; // half day automatically late
+        //     }
+
+        //     Attendance::create([
+        //         'user_id'    => $user->id,
+        //         'shift_date' => $shiftDate,
+        //         'login_time' => $currentTime,
+        //         'is_late'    => $isLate,
+        //         'half_day'   => $halfDay,
+        //     ]);
+        // }
+
         protected function markAttendance($user)
-{
-    $now = Carbon::now(config('app.timezone'));
-    $currentTime = $now->format('H:i:s');
+        {
+            $now = now('Asia/Karachi');
+            $shiftDate = $this->getShiftDate();
 
-    // Shift timings
-    $shiftStart = Carbon::createFromTime(19, 0, 0, config('app.timezone'));
-    $lateThreshold = Carbon::createFromTime(19, 1, 0, config('app.timezone'));   // 7:01 PM
-    $halfDayThreshold = Carbon::createFromTime(20, 0, 0, config('app.timezone')); // 8:00 PM
+            $attendance = Attendance::where('user_id', $user->id)
+                ->where('shift_date', $shiftDate)
+                ->first();
 
-    // Determine correct shift_date (Night Shift 7 PM - 4 AM)
-    if ($now->hour >= 19) {
-        $shiftDate = $now->toDateString();
-    } else {
-        $shiftDate = $now->copy()->subDay()->toDateString();
-    }
+            if ($attendance) {
+                return;
+            }
+            $isITRole = Str::contains($user->role->name, 'IT');
 
-    // Prevent duplicate attendance
-    $attendance = Attendance::where('user_id', $user->id)
-        ->where('shift_date', $shiftDate)
-        ->first();
+            // Create real shift start datetime (IMPORTANT)
+            $shiftStart = Carbon::parse($shiftDate . ' 19:00:00', 'Asia/Karachi');
+            $lateThreshold = $shiftStart->copy()->addMinutes($isITRole ? 16 : 1); // 7:16 PM for IT, 7:01 PM for others
+            $halfDayThreshold = $shiftStart->copy()->addHour();     // 8:00 PM
 
-    if ($attendance) {
-        return; // Already marked — do nothing
-    }
+            $isLate = $now->greaterThanOrEqualTo($lateThreshold);
+            $halfDay = $now->greaterThanOrEqualTo($halfDayThreshold);
 
-    // Default values
-    $isLate = false;
-    $halfDay = false;
-
-    // Apply rules only if login after shift start
-    if ($now->greaterThanOrEqualTo($lateThreshold)) {
-        $isLate = true;
-    }
-
-    if ($now->greaterThanOrEqualTo($halfDayThreshold)) {
-        $halfDay = true;
-        $isLate = true; // half day automatically late
-    }
-
-    Attendance::create([
-        'user_id'    => $user->id,
-        'shift_date' => $shiftDate,
-        'login_time' => $currentTime,
-        'is_late'    => $isLate,
-        'half_day'   => $halfDay,
-    ]);
-}
+            Attendance::create([
+                'user_id'    => $user->id,
+                'shift_date' => $shiftDate,
+                'login_time' => $now, // store full datetime
+                'is_late'    => $isLate,
+                'half_day'   => $halfDay,
+            ]);
+        }
 
     /*
     |--------------------------------------------------------------------------
@@ -162,15 +197,17 @@ class LoginController extends Controller
 
     private function getShiftDate()
     {
-        $now = now('UTC')->setTimezone('Asia/Karachi');
+        $now = now('Asia/Karachi');
 
-        // Shift ends at 4 AM Pakistan
-        if ($now->hour < 4) {
+        // Shift: 7 PM → 4 AM
+        if ($now->hour < 5) {
             return $now->subDay()->toDateString();
         }
 
         return $now->toDateString();
     }
+
+
 
     /*
     |--------------------------------------------------------------------------
@@ -179,33 +216,39 @@ class LoginController extends Controller
     */
 
     public function logout(Request $request)
-    {
-        $user = Auth::user();
+        {
+            $user = Auth::user();
 
-        if ($user) {
+            if ($user) {
 
-            $shiftDate = $this->getShiftDate();
+                $shiftDate = $this->getShiftDate();
 
-            $attendance = Attendance::where('user_id', $user->id)
-                ->where('shift_date', $shiftDate)
-                ->first();
+                $attendance = Attendance::where('user_id', $user->id)
+                    ->where('shift_date', $shiftDate)
+                    ->first();
 
-            if ($attendance && !$attendance->logout_time) {
 
-                $logoutTimeUtc = now('UTC');
+                if ($attendance && !$attendance->logout_time) {
 
-                $attendance->logout_time = $logoutTimeUtc->format('H:i:s');
 
-                $attendance->working_minutes =
-                    Carbon::parse($attendance->login_time, 'UTC')
-                        ->diffInMinutes($logoutTimeUtc);
+                    $loginTime = Carbon::parse($attendance->login_time, 'Asia/Karachi');
+                    $logoutTime = now('Asia/Karachi');
 
-                $attendance->save();
+                    if ($logoutTime->lessThan($loginTime)) {
+                            $logoutTime->addDay();
+                    }
+
+                    $minutes = $loginTime->diffInMinutes($logoutTime);
+
+
+
+                    $attendance->logout_time = $logoutTime;
+                    $attendance->working_minutes = $minutes;
+                    $attendance->save();
+                }
             }
+
+            Auth::logout();
+            return redirect('/login');
         }
-
-        Auth::logout();
-
-        return redirect('/login');
-    }
 }
