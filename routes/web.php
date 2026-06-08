@@ -62,6 +62,7 @@ Route::controller(FrontController::class)
     Route::post('/startBreak', 'startBreak')->name('stratBreak');
     Route::post('/endBreak', 'endBreak')->name('endBreak');
     Route::get('/zkteco', 'ZktecoIntegnew')->name('zkteco');
+    Route::get('/callbacknotification', 'callbacknotification')->name('callbacknotification');
 
 
 

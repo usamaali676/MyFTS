@@ -428,8 +428,6 @@ $user = Auth::user();
 
     </div>
 </div>
-
-
 <div class="modal fade" id="breakModal" tabindex="-1">
     <div class="modal-dialog modal-fullscreen">
         <div class="modal-content bg-white text-white d-flex align-items-center justify-content-center">
@@ -450,20 +448,48 @@ $user = Auth::user();
         </div>
     </div>
 </div>
+<div class="modal fade" id="breakModaltype" tabindex="-1">
+    <div class="modal-dialog modal-fullscreen">
+        <div class="modal-content bg-white text-white d-flex align-items-center justify-content-center">
+
+            <div class="text-center">
+                <img src="{{asset('assets/img/coffee-break-pana.svg')}}" style="width: 100%; height: 400px;">
+                <h1 style="padding-top: 20px; color: #636578" class="mb-4">Select Break Type</h1>
+                <div class="d-flex justify-content-center gap-4">
+                    <input type="radio" class="btn-check" name="breakType" id="mealBreak" autocomplete="off" checked>
+                    <label class="btn  btn-primary mt-5 px-5 py-3" for="mealBreak">
+                        Meal Break
+                    </label>
+                    <input type="radio" class="btn-check" name="breakType" id="2ndBreak" autocomplete="off">
+                    <label class="btn  btn-primary mt-5 px-5 py-3" for="2ndBreak">
+                        2nd Break
+                    </label>
+                    <input type="radio" class="btn-check" name="breakType" id="smokeBreak" autocomplete="off">
+                    <label class="btn  btn-primary mt-5 px-5 py-3" for="smokeBreak">
+                        Smoke Break
+                    </label>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
 @endsection
 @section('custom-js')
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-
     let timerInterval;
     let seconds = 0;
     let isOnBreak = false;
-    
-
 
     // Init Bootstrap Modal
     const breakModalEl = document.getElementById('breakModal');
+    const breakModalE2 = document.getElementById('breakModaltype');
     const breakModal = new bootstrap.Modal(breakModalEl, {
+        backdrop: 'static',
+        keyboard: false
+    });
+    const breakModaltype = new bootstrap.Modal(breakModalE2, {
         backdrop: 'static',
         keyboard: false
     });
@@ -504,76 +530,96 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // START BREAK
-    document.getElementById('startBreakBtn').addEventListener('click', function () {
+        // START BREAK
+        document.getElementById('startBreakBtn').addEventListener('click', function () {
+            // 1. Show the break type selection modal first
+            breakModaltype.show();
+            openFullscreen();
 
-        if (isOnBreak) return;
+            // 2. Listen for break type selection
+            document.querySelectorAll('input[name="breakType"]').forEach((elem) => {
+                elem.addEventListener('click', function () {
+                    const val = document.querySelector('input[name="breakType"]:checked').id;
+                    console.log('Selected break type:', val);
+                    // 3. Hide the type selection modal
+                    breakModaltype.hide();
+                    // 4. NOW send the fetch with the selected break type
+                    fetch('{{ route('front.stratBreak') }}', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                            'Content-Type': 'application/json'   // changed
+                        },
+                            body: JSON.stringify({ break_type: val })
+                    })
+                    .then(response => response.text())
+                    .then(data => {
+                        console.log(data);
+                        // 5. Only start the break UI after successful response
+                        isOnBreak = true;
+                        seconds = 0;
+                        breakModal.show();
+                        openFullscreen();
+                        startTimer();
+                    })
+                    .catch(error => {
+                        alert('Error starting break. Please try again.');
+                        console.error(error);
+                    });
+                });
+            });
+        });
 
-        fetch('{{ route('front.stratBreak') }}', {
-            method: 'POST',
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        // END BREAK
+        document.getElementById('endBreakBtn').addEventListener('click', function () {
+
+            if (!isOnBreak) return;
+
+            fetch('{{ route('front.endBreak') }}', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                }
+            });
+
+            isOnBreak = false;
+
+            stopTimer();
+            breakModal.hide();
+            exitFullscreen();
+        });
+
+        // Prevent leaving tab (basic)
+        document.addEventListener('visibilitychange', function () {
+            if (isOnBreak && document.hidden) {
+                alert('⚠️ You are on break. Please stay on this screen.');
+                {{-- location.reload(); --}}
+                // strict handling
             }
         });
 
-        isOnBreak = true;
-        seconds = 0;
-
-        breakModal.show();
-        openFullscreen();
-        startTimer();
-    });
-
-    // END BREAK
-    document.getElementById('endBreakBtn').addEventListener('click', function () {
-
-        if (!isOnBreak) return;
-
-        fetch('{{ route('front.endBreak') }}', {
-            method: 'POST',
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        // Prevent ESC key manually (extra safety)
+        document.addEventListener('keydown', function (e) {
+            if (isOnBreak && e.key === "Escape") {
+                e.preventDefault();
             }
         });
 
-        isOnBreak = false;
+        // Prevent right click (optional strict)
+        document.addEventListener('contextmenu', function (e) {
+            if (isOnBreak) {
+                e.preventDefault();
+            }
+        });
 
-        stopTimer();
-        breakModal.hide();
-        exitFullscreen();
-    });
-
-    // Prevent leaving tab (basic)
-    document.addEventListener('visibilitychange', function () {
-        if (isOnBreak && document.hidden) {
-            alert('⚠️ You are on break. Please stay on this screen.');
-            {{-- location.reload(); --}}
-             // strict handling
-        }
-    });
-
-    // Prevent ESC key manually (extra safety)
-    document.addEventListener('keydown', function (e) {
-        if (isOnBreak && e.key === "Escape") {
-            e.preventDefault();
-        }
-    });
-
-    // Prevent right click (optional strict)
-    document.addEventListener('contextmenu', function (e) {
-        if (isOnBreak) {
-            e.preventDefault();
-        }
-    });
-
-    // Force focus back (optional strict)
-    window.onblur = function () {
-        if (isOnBreak) {
-            setTimeout(() => {
-                window.focus();
-            }, 100);
-        }
-    };
+        // Force focus back (optional strict)
+        window.onblur = function () {
+            if (isOnBreak) {
+                setTimeout(() => {
+                    window.focus();
+                }, 100);
+            }
+        };
 
 });
 </script>

@@ -13,6 +13,8 @@ use App\Models\Role;
 use App\Models\SubCategory;
 use App\Models\User;
 use App\Models\ZelleAccount;
+use Illuminate\Support\Facades\Notification;
+use App\Notifications\CallBackNotification;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -21,6 +23,7 @@ use RealRashid\SweetAlert\Facades\Alert;
 use MehediJaman\LaravelZkteco\LaravelZkteco;
 use Rats\Zkteco\Lib\ZKTeco;
 use App\Services\ZKTecoTCP;
+
 
 class FrontController extends Controller
 {
@@ -315,33 +318,81 @@ class FrontController extends Controller
 
             }
 
-            public function startBreak()
-            {
-                 $shiftDate = $this->getShiftDate();
-                $user = Auth::user();
+            // public function startBreak(Request $request)
+            // {
+            //      dd($request->input('break_type'));
+            //      $shiftDate = $this->getShiftDate();
+            //     $user = Auth::user();
 
-                $attendance = Attendance::where('user_id', $user->id)
-                    ->where('shift_date', $shiftDate)
-                    ->first();
-                    // dd($attendance);
+            //     $attendance = Attendance::where('user_id', $user->id)
+            //         ->where('shift_date', $shiftDate)
+            //         ->first();
+            //         // dd($attendance);
 
-                // Check if already on break
-                $activeBreak = Breaks::where('user_id', $user->id)
-                    ->whereNull('break_end')
-                    ->first();
+            //     // Check if already on break
+            //     $activeBreak = Breaks::where('user_id', $user->id)
+            //         ->whereNull('break_end')
+            //         ->first();
 
-                if ($activeBreak) {
-                    Alert::error('Error', 'Already on break');
-                    return redirect()->back();
-                }
+            //     if ($activeBreak) {
+            //         Alert::error('Error', 'Already on break');
+            //         return redirect()->back();
+            //     }
 
-                Breaks::create([
-                    'user_id' => $user->id,
-                    'attendance_id' => $attendance->id,
-                    'break_start' => Carbon::parse($shiftDate)
-                    ->setTimeFrom(now('Asia/Karachi')),
-                ]);
-            }
+            //     Breaks::create([
+            //         'user_id' => $user->id,
+            //         'attendance_id' => $attendance->id,
+            //         'break_start' => Carbon::parse($shiftDate)
+            //         ->setTimeFrom(now('Asia/Karachi')),
+            //     ]);
+            // }
+
+
+            public function startBreak(Request $request)
+{
+    try {
+        $breakType = $request->input('break_type');
+        $shiftDate = $this->getShiftDate();
+        $user = Auth::user();
+
+        $attendance = Attendance::where('user_id', $user->id)
+            ->where('shift_date', $shiftDate)
+            ->first();
+
+        // Catch the most common causes of 500
+        if (!$attendance) {
+            return response()->json(['error' => 'No attendance record found for today'], 404);
+        }
+
+        if (!$breakType) {
+            return response()->json(['error' => 'Break type is missing'], 422);
+        }
+
+        $activeBreak = Breaks::where('user_id', $user->id)
+            ->whereNull('break_end')
+            ->first();
+
+        if ($activeBreak) {
+            return response()->json(['error' => 'Already on break'], 400);
+        }
+
+        Breaks::create([
+            'user_id'       => $user->id,
+            'attendance_id' => $attendance->id,
+            'break_type'    => $breakType,
+            'break_start'   => Carbon::parse($shiftDate)->setTimeFrom(now('Asia/Karachi')),
+        ]);
+
+        return response()->json(['success' => true, 'break_type' => $breakType]);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'error'   => $e->getMessage(),
+            'line'    => $e->getLine(),
+            'file'    => $e->getFile(),
+        ], 500);
+    }
+}
             public function endBreak()
             {
                 $shiftDate = $this->getShiftDate();
@@ -551,6 +602,23 @@ public function ZktecoDebug()
 
 
 
+    public function callbacknotification()
+    {
+        $today = Carbon::today()->toDateString();
+        // $date = Carbon::parse($datetime)->toDateString();
+        $lead = Lead::whereDate('call_back_time', $today)->get();
+
+            foreach ($lead as $leads ) {
+                // dd($leads->closers());
+                $closers = $leads->closers()->get(); // Get all the closers related to the lead
+                $userIds = $closers->pluck('closer_id'); // Extract user IDs from the closers
+                $users = User::whereIn('id', $userIds)->get(); // Get users from closers
+                // dd($users);
+                Notification::send($users, new CallBackNotification($users, $lead));
+            }
+
+
+    }
 
     }
 
