@@ -30,9 +30,18 @@ class Lead extends Model
     public function sale(){
         return $this->hasOne(Sale::class, 'lead_id');
     }
-    public function company_services()
+    // public function company_services()
+    // {
+    //     return $this->belongsToMany(CompanyServices::class, );
+    // }
+     public function companyServices()
     {
-        return $this->belongsToMany(CompanyServices::class, );
+        return $this->belongsToMany(
+            CompanyServices::class,
+            'company_services_lead',
+            'lead_id',
+            'company_services_id'
+        );
     }
     public function comment()
     {

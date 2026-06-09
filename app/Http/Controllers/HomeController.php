@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Helpers\GlobalHelper;
 use App\Models\Attendance;
+use App\Models\CompanyServices;
 use App\Models\Invoice;
 use App\Models\Lead;
+use App\Models\Role;
 use App\Models\Sale;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -28,6 +30,17 @@ class HomeController extends Controller
      *
      * @return \Illuminate\Contracts\Support\Renderable
      */
+                    private function getShiftDate()
+                {
+                    $now = now('Asia/Karachi');
+
+                    // Shift: 7 PM → 4 AM
+                    if ($now->hour < 5) {
+                        return $now->subDay()->toDateString();
+                    }
+
+                    return $now->toDateString();
+                }
     public function index()
     {
         $route = GlobalHelper::Permissions();
@@ -37,7 +50,7 @@ class HomeController extends Controller
         $lates = Attendance::where('user_id', $user->id)
         ->whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()])
         ->where('is_late', true)
-        ->count();        
+        ->count();
         // dd($lates);
         $totalRevenue =
         $notifications = Auth::user()->notifications;
@@ -84,8 +97,39 @@ class HomeController extends Controller
                         ->whereMonth('created_at', now()->month)
                         ->whereYear('created_at', now()->year)
                         ->sum('total_amout');
+
+
+
         }
+        // $user = User::all();
+        $role = Role::where('name', 'TSR')->first();
+        $users = User::where('role_id', $role->id)->where('status', 1)->with([
+            'attendances' => function ($query) {
+                $query->whereBetween('created_at', [
+                    now()->startOfMonth(),
+                    now()->endOfMonth()
+                ])->with('breaks');
+            }
+        ])->get();
+        $shiftDate = $this->getShiftDate();
+
+        $services = CompanyServices::withCount('leads')->get();
+        // dd($services);
+        // dd($users[1]->attendances->pluck('breaks')->flatten());
         // dd($total);
-        return view('home', compact('route', 'notifications', 'totalRevenue', 'sale_count', 'last_sale_count', 'total', 'lates'));
+        return view('home', compact('route', 'notifications', 'totalRevenue', 'sale_count', 'last_sale_count', 'total', 'lates', 'users', 'shiftDate', 'services'));
     }
+    // public function breaksduration()
+    // {
+    //     $user = Auth::user();
+    //     $breaks = Attendance::where('user_id', $user->id)
+    //     ->whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()])
+    //     ->with('breaks')
+    //     ->get()
+    //     ->pluck('breaks')
+    //     ->flatten();
+    //     dd($breaks);
+
+    //     return view('breaks_duration', compact('breaks'));
+    // }
 }

@@ -55,4 +55,4 @@
             z-index: 9999;
         }
     </style>
-
+@yield('styles')

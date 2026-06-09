@@ -32,7 +32,9 @@ class User extends Authenticatable
         'email',
         'password',
         'role_id',
-        'slack_member_id'
+        'slack_member_id',
+        'status',
+        'user_type'
     ];
 
     /**
@@ -68,5 +70,9 @@ class User extends Authenticatable
         public function routeNotificationForSlack(Notification $notification): mixed
     {
         return $this->slack_member_id;
+    }
+    public function attendances()
+    {
+        return $this->hasMany(Attendance::class);
     }
 }
