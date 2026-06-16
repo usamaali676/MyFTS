@@ -325,6 +325,24 @@
 </script> --}}
 
 <script>
+      const dt_product_table = $('.datatables-products');
+                      dt_product_table.DataTable({
+                responsive: true,
+                language: {
+                    search: '',
+                    searchPlaceholder: 'Search...',
+                    info: 'Showing _START_ to _END_ of _TOTAL_ entries'
+                },
+                // dom: 'Bfrtip',
+                // buttons: ['excel', 'pdf', 'print'],
+                // Add bootstrap styling class if required
+                drawCallback: function () {
+                    $('.dataTables_paginate > .pagination').addClass('pagination-rounded');
+                }
+                });
+</script>
+
+<script>
     $(document).ready(function () {
         function fetchFilteredData() {
             $.ajax({
