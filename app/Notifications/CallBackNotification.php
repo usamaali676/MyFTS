@@ -40,8 +40,6 @@ class CallBackNotification extends Notification
     {
 
        foreach ($this->users as $user) {
-        dd($this->users);
-        // dd($this->lead->first()->id);
             return (new SlackMessage)
                 ->text('Lead: ' . $this->lead->first()->business_name_adv . ' is scheduled for a callback today. Assigned to: ' . $user->name);
         }
