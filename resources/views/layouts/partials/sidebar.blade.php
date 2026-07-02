@@ -200,6 +200,13 @@
         </li>
         @endif
 
+        {{-- <li class="menu-item">
+            <a href="{{ route('ai.index') }}" class="menu-link">
+                <i class="menu-icon tf-icons mdi mdi-robot-outline"></i>
+                <div data-i18n="AI Assistant">AI Assistant</div>
+            </a>
+        </li> --}}
+
 
 
 

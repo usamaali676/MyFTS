@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AIController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\ChargeBackController;
 use App\Http\Controllers\ClientReportingController;
@@ -31,10 +32,12 @@ Route::get('/config-cache', function() {
     // $exitCodes = Artisan::call('route:cache');
      return 'Config cache cleared';
  });
+ Route::get('/report/view/{uuid}' , [ClientReportingController::class, 'show'])->name('reportShow');
 
 Auth::routes();
 
 Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::get('/generate', [App\Http\Controllers\FrontController::class, 'generate'])->name('generate');
 Route::post('otp-verify',  [App\Http\Controllers\Auth\LoginController::class, 'verify'])->name('front.otp.verify.post');
 
 Route::controller(FrontController::class)
@@ -238,3 +241,16 @@ Route::controller(RoleController::class)
     ->group(function () {
         Route::get('/index', 'index')->name('index');
     });
+
+    Route::controller(AIController::class)
+    ->prefix('ai')
+    ->as('ai.')
+    ->middleware(PermissionMiddelware::class)
+    ->group(function () {
+        Route::get('/',           'index')->name('index');
+        Route::post('/send',      'sendMessage')->name('send');
+        Route::get('/history',    'history')->name('history');
+        Route::get('/show/{id}',  'show')->name('show');
+        Route::delete('/destroy/{id}', 'destroy')->name('destroy');
+    });
+

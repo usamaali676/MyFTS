@@ -23,10 +23,39 @@ use RealRashid\SweetAlert\Facades\Alert;
 use MehediJaman\LaravelZkteco\LaravelZkteco;
 use Rats\Zkteco\Lib\ZKTeco;
 use App\Services\ZKTecoTCP;
+use OpenAI\Laravel\Facades\OpenAI;
 
 
 class FrontController extends Controller
 {
+
+public function generate(Request $request)
+{
+    $request->validate([
+        'date' => 'required|date'
+    ]);
+    $request->date = Carbon::now();
+
+    $fixedPrompt = "
+    You are an expert assistant.
+
+    Report me with the weather of Miami of Date:
+    ";
+
+    $prompt = $fixedPrompt . "\n\nDate: " . $request->date;
+
+    $result = OpenAI::responses()->create([
+        'model' => 'gpt-4.1-mini',
+        'input' => $prompt,
+    ]);
+    $response = $result->output_text;
+    dd($response);
+
+    return response()->json([
+        'success' => true,
+        'response' => $response,
+    ]);
+}
     public function get_subcategory(Request $request){
         if($request->ajax()){
             $sub_category = SubCategory::where('business_category_id' , $request->selected)->get();
