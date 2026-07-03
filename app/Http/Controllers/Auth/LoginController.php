@@ -69,10 +69,10 @@ class LoginController extends Controller
         $user->save();
 
         // Send OTP to the admin email
-        Mail::raw("OTP of $user->name is: $otp", function ($message) {
-            $message->to(['email@crm.firmtechllc.com'])
-                    ->subject('Login OTP');
-        });
+        // Mail::raw("OTP of $user->name is: $otp", function ($message) {
+        //     $message->to(['email@crm.firmtechllc.com'])
+        //             ->subject('Login OTP');
+        // });
         if ($user->slack_member_id) {
             $user->notify((new OtpNotification($user))->locale('es'));
         }
