@@ -18,8 +18,6 @@ $user = Auth::user();
                     <div class="col-md-6 order-2 order-md-1">
                         <div class="card-body">
                             <h4 class="card-title pb-xl-2">Welcome {{$user->name}}!🎉</h4>
-                            {{-- <p class="mb-0">You have done <span class="h6 mb-0">68%</span>😎 more sales today.</p>
-                            --}}
                             <p>Check your new badge in your profile.</p>
                             <a id="startBreakBtn" href="javascript:;" class="btn btn-primary">Start Break</a>
                         </div>
