@@ -109,6 +109,46 @@
                         <label for="multicol-last-name">Slack Member ID</label>
                       </div>
                     </div>
+
+                    <div class="col-md-6">
+                        <div class="form-floating form-floating-outline">
+                          <select id="user_type" name="user_type"  class="select2 form-select" data-allow-clear="true">
+                            <option value="">Select</option>
+                            <option value="Agent">Agent</option>
+                            <option value="Closer">Closer</option>
+                            <option value="Customer_Support">Customer_Support</option>
+                            <option value="IT">IT</option>
+
+                          </select>
+                          <label for="user_type">User Type</label>
+                        </div>
+                      </div>
+                        <div class="col-xl-6">
+                            <div class="row">
+                                <div class="col-md mb-md-0 mb-5">
+                                <div class="form-check custom-option custom-option-basic checked">
+                                    <label class="form-check-label custom-option-content" for="customRadioTemp1">
+                                    <input  class="form-check-input" name="status" type="radio" value="1" id="customRadioTemp1" checked="">
+                                    <span class="custom-option-header">
+                                        <span class="h6 mb-0">Active User</span>
+                                    </span>
+                                    </label>
+                                </div>
+                                </div>
+                                <div class="col-md">
+                                <div class="form-check custom-option custom-option-basic">
+                                    <label class="form-check-label custom-option-content" for="customRadioTemp2">
+                                    <input class="form-check-input" name="status" type="radio" value="0" id="customRadioTemp2">
+                                    <span class="custom-option-header">
+                                        <span class="h6 mb-0">Deactive User</span>
+                                    </span>
+
+                                    </label>
+                                </div>
+                                </div>
+                            </div>
+
+                        </div>
                   </div>
                   <div class="pt-4">
                     <button type="submit" class="btn btn-primary me-sm-3 me-1">Submit</button>

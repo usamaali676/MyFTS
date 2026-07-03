@@ -17,6 +17,7 @@ return new class extends Migration
              $table->foreignId('attendance_id')->constrained()->onDelete('cascade');
             $table->timestamp('break_start')->nullable();
             $table->timestamp('break_end')->nullable();
+            $table->enum('break_type', ['mealBreak', '2ndBreak', 'smokeBreak'])->nullable();
             $table->integer('duration')->nullable(); // in seconds
             $table->timestamps();
         });

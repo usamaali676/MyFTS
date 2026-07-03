@@ -4,7 +4,9 @@ $user = Auth::user();
 @endphp
 @endauth
 @extends('layouts.dashboard')
+@section('styles')
 
+@endsection
 @section('content')
 
 <div class="container-xxl flex-grow-1 container-p-y">
@@ -16,8 +18,6 @@ $user = Auth::user();
                     <div class="col-md-6 order-2 order-md-1">
                         <div class="card-body">
                             <h4 class="card-title pb-xl-2">Welcome {{$user->name}}!🎉</h4>
-                            {{-- <p class="mb-0">You have done <span class="h6 mb-0">68%</span>😎 more sales today.</p>
-                            --}}
                             <p>Check your new badge in your profile.</p>
                             <a id="startBreakBtn" href="javascript:;" class="btn btn-primary">Start Break</a>
                         </div>
@@ -69,7 +69,6 @@ $user = Auth::user();
                 <div class="card-header pb-0">
                     <div class="d-flex align-items-end mb-1 flex-wrap gap-2">
                         <h4 class="mb-0 me-2">${{ $total }}</h4>
-                        {{-- <p class="mb-0 text-success">+62%</p> --}}
                     </div>
                     <span class="d-block mb-2 text-body">Revenue </span>
                 </div>
@@ -178,118 +177,7 @@ $user = Auth::user();
         </div> --}}
         <!--/ Performance Chart -->
 
-        <!-- Project Statistics -->
-        {{-- <div class="col-md-6 col-xl-4">
-            <div class="card h-100">
-                <div class="card-header d-flex align-items-center justify-content-between">
-                    <h5 class="card-title m-0 me-2">Project Statistics</h5>
-                    <div class="dropdown">
-                        <button class="btn p-0" type="button" id="projectStatus" data-bs-toggle="dropdown"
-                            aria-haspopup="true" aria-expanded="false">
-                            <i class="mdi mdi-dots-vertical mdi-24px"></i>
-                        </button>
-                        <div class="dropdown-menu dropdown-menu-end" aria-labelledby="projectStatus">
-                            <a class="dropdown-item" href="javascript:void(0);">Last 28 Days</a>
-                            <a class="dropdown-item" href="javascript:void(0);">Last Month</a>
-                            <a class="dropdown-item" href="javascript:void(0);">Last Year</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="d-flex justify-content-between py-2 px-4 border-bottom">
-                    <h6 class="mb-0 small">NAME</h6>
-                    <h6 class="mb-0 small">BUDGET</h6>
-                </div>
-                <div class="card-body">
-                    <ul class="p-0 m-0">
-                        <li class="d-flex mb-4">
-                            <div class="avatar avatar-md flex-shrink-0 me-3">
-                                <div class="avatar-initial bg-lighter rounded">
-                                    <div>
-                                        <img src="../../assets/img/icons/misc/3d-illustration.png" alt="User"
-                                            class="h-25" />
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
-                                <div class="me-2">
-                                    <h6 class="mb-0">3D Illustration</h6>
-                                    <small>Blender Illustration</small>
-                                </div>
-                                <div class="badge bg-label-primary rounded-pill">$6,500</div>
-                            </div>
-                        </li>
-                        <li class="d-flex mb-4">
-                            <div class="avatar avatar-md flex-shrink-0 me-3">
-                                <div class="avatar-initial bg-lighter rounded">
-                                    <div>
-                                        <img src="../../assets/img/icons/misc/finance-app-design.png" alt="User"
-                                            class="h-25" />
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
-                                <div class="me-2">
-                                    <h6 class="mb-0">Finance App Design</h6>
-                                    <small>Figma UI Kit</small>
-                                </div>
-                                <div class="badge bg-label-primary rounded-pill">$4,290</div>
-                            </div>
-                        </li>
-                        <li class="d-flex mb-4">
-                            <div class="avatar avatar-md flex-shrink-0 me-3">
-                                <div class="avatar-initial bg-lighter rounded">
-                                    <div>
-                                        <img src="../../assets/img/icons/misc/4-square.png" alt="User" class="h-25" />
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
-                                <div class="me-2">
-                                    <h6 class="mb-0">4 Square</h6>
-                                    <small>Android Application</small>
-                                </div>
-                                <div class="badge bg-label-primary rounded-pill">$44,500</div>
-                            </div>
-                        </li>
-                        <li class="d-flex mb-4">
-                            <div class="avatar avatar-md flex-shrink-0 me-3">
-                                <div class="avatar-initial bg-lighter rounded">
-                                    <div>
-                                        <img src="../../assets/img/icons/misc/delta-web-app.png" alt="User"
-                                            class="h-25" />
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
-                                <div class="me-2">
-                                    <h6 class="mb-0">Delta Web App</h6>
-                                    <small>React Dashboard</small>
-                                </div>
-                                <div class="badge bg-label-primary rounded-pill">$12,690</div>
-                            </div>
-                        </li>
-                        <li class="d-flex">
-                            <div class="avatar avatar-md flex-shrink-0 me-3">
-                                <div class="avatar-initial bg-lighter rounded">
-                                    <div>
-                                        <img src="../../assets/img/icons/misc/ecommerce-website.png" alt="User"
-                                            class="h-25" />
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
-                                <div class="me-2">
-                                    <h6 class="mb-0">eCommerce Website</h6>
-                                    <small>Vue + Laravel</small>
-                                </div>
-                                <div class="badge bg-label-primary rounded-pill">$10,850</div>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div> --}}
-        <!--/ Project Statistics -->
+
 
         <!-- Multiple widgets -->
         <div class="col-md-6 col-xl-4">
@@ -393,34 +281,70 @@ $user = Auth::user();
             </div>
         </div>
         <!--/ Multiple widgets -->
+        @if ($user->role->name == 'Creator' || $user->role->name == 'Executives' || $user->role->name == 'Closer' || $user->role->name == 'QA')
+            <!-- Project Statistics -->
+                    <div class="col-md-6 col-xl-4">
+                        <div class="card h-100">
+                            <div class="card-header d-flex align-items-center justify-content-between">
+                                <h5 class="card-title m-0 me-2">Today's Break Duration</h5>
+                            </div>
+                            <div class="d-flex justify-content-between py-2 px-4 border-bottom">
+                                <h6 class="mb-0 small">NAME</h6>
+                                <h6 class="mb-0 small">Duration</h6>
+                            </div>
+                            <div class="card-body">
+                                <ul class="p-0 m-0">
+                                    @foreach ($users as $b_user)
+                                        <li class="d-flex mb-4">
+                                            <div class="avatar avatar-md flex-shrink-0 me-3">
+                                                <div class="avatar-initial bg-lighter rounded">
+                                                    <div>
+                                                        <img src="{{ asset('assets/img/avatars/5.png') }}" alt="User"
+                                                            class="h-25" style="border-radius: 10%" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+                                                <div class="me-2">
+                                                    <h6 class="mb-0">{{ $b_user->name }}</h6>
+                                                    <small>{{ $b_user->role->name }}</small>
+                                                </div>
+                                                <div class="badge bg-label-primary rounded-pill">
+                                                    @php
+                                                        $todayBreaks = $b_user->attendances
+                                                            ->where('shift_date', $shiftDate)
+                                                            ->flatMap->breaks;
+                                                    @endphp
+                                                    {{ gmdate('H:i:s', $todayBreaks->sum('duration')) }}
+                                                </div>
+                                            </div>
+                                        </li>
+                                    @endforeach
 
-        <!-- Sales Country Chart -->
-        {{-- <div class="col-12 col-xl-4 col-md-6">
-            <div class="card h-100">
-                <div class="card-header">
-                    <div class="d-flex justify-content-between">
-                        <h5 class="mb-1">Sales Country</h5>
-                        <div class="dropdown">
-                            <button class="btn p-0" type="button" id="salesCountryDropdown" data-bs-toggle="dropdown"
-                                aria-haspopup="true" aria-expanded="false">
-                                <i class="mdi mdi-dots-vertical mdi-24px"></i>
-                            </button>
-                            <div class="dropdown-menu dropdown-menu-end" aria-labelledby="salesCountryDropdown">
-                                <a class="dropdown-item" href="javascript:void(0);">Last 28 Days</a>
-                                <a class="dropdown-item" href="javascript:void(0);">Last Month</a>
-                                <a class="dropdown-item" href="javascript:void(0);">Last Year</a>
+                                </ul>
                             </div>
                         </div>
                     </div>
-                    <p class="mb-0 text-body">Total $42,580 Sales</p>
-                </div>
-                <div class="card-body pb-1 px-0">
-                    <div id="salesCountryChart"></div>
+            <!--/ Project Statistics -->
+        @endif
+
+        @if ($user->role->name == 'Creator' || $user->role->name == 'Executives' || $user->role->name == 'Closer' || $user->role->name == 'QA')
+            <!-- Sales Country Chart -->
+            <div class="col-12 col-xl-4 col-md-6">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <div class="d-flex justify-content-between">
+                            <h5 class="mb-1">Service Leads</h5>
+                        </div>
+                        <p class="mb-0 text-body">Total {{ $services->sum('leads_count') }} Leads</p>
+                    </div>
+                    <div class="card-body pb-1 px-0">
+                        <div id="salescategoryChart"></div>
+                    </div>
                 </div>
             </div>
-        </div> --}}
-        <!--/ Sales Country Chart -->
-
+            <!--/ Sales Country Chart -->
+        @endif
 
 
 
@@ -428,8 +352,6 @@ $user = Auth::user();
 
     </div>
 </div>
-
-
 <div class="modal fade" id="breakModal" tabindex="-1">
     <div class="modal-dialog modal-fullscreen">
         <div class="modal-content bg-white text-white d-flex align-items-center justify-content-center">
@@ -450,20 +372,48 @@ $user = Auth::user();
         </div>
     </div>
 </div>
+<div class="modal fade" id="breakModaltype" tabindex="-1">
+    <div class="modal-dialog modal-fullscreen">
+        <div class="modal-content bg-white text-white d-flex align-items-center justify-content-center">
+
+            <div class="text-center">
+                <img src="{{asset('assets/img/coffee-break-pana.svg')}}" style="width: 100%; height: 400px;">
+                <h1 style="padding-top: 20px; color: #636578" class="mb-4">Select Break Type</h1>
+                <div class="d-flex justify-content-center gap-4">
+                    <input type="radio" class="btn-check" name="breakType" id="mealBreak" autocomplete="off" checked>
+                    <label class="btn  btn-primary mt-5 px-5 py-3" for="mealBreak">
+                        Meal Break
+                    </label>
+                    <input type="radio" class="btn-check" name="breakType" id="2ndBreak" autocomplete="off">
+                    <label class="btn  btn-primary mt-5 px-5 py-3" for="2ndBreak">
+                        2nd Break
+                    </label>
+                    <input type="radio" class="btn-check" name="breakType" id="smokeBreak" autocomplete="off">
+                    <label class="btn  btn-primary mt-5 px-5 py-3" for="smokeBreak">
+                        Smoke Break
+                    </label>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
 @endsection
 @section('custom-js')
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-
     let timerInterval;
     let seconds = 0;
     let isOnBreak = false;
-    
-
 
     // Init Bootstrap Modal
     const breakModalEl = document.getElementById('breakModal');
+    const breakModalE2 = document.getElementById('breakModaltype');
     const breakModal = new bootstrap.Modal(breakModalEl, {
+        backdrop: 'static',
+        keyboard: false
+    });
+    const breakModaltype = new bootstrap.Modal(breakModalE2, {
         backdrop: 'static',
         keyboard: false
     });
@@ -504,77 +454,328 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // START BREAK
-    document.getElementById('startBreakBtn').addEventListener('click', function () {
+        // START BREAK
+        document.getElementById('startBreakBtn').addEventListener('click', function () {
+            // 1. Show the break type selection modal first
+            breakModaltype.show();
+            openFullscreen();
 
-        if (isOnBreak) return;
+            // 2. Listen for break type selection
+            document.querySelectorAll('input[name="breakType"]').forEach((elem) => {
+                elem.addEventListener('click', function () {
+                    const val = document.querySelector('input[name="breakType"]:checked').id;
+                    console.log('Selected break type:', val);
+                    // 3. Hide the type selection modal
+                    breakModaltype.hide();
+                    // 4. NOW send the fetch with the selected break type
+                    fetch('{{ route('front.stratBreak') }}', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                            'Content-Type': 'application/json'   // changed
+                        },
+                            body: JSON.stringify({ break_type: val })
+                    })
+                    .then(response => response.text())
+                    .then(data => {
+                        console.log(data);
+                        // 5. Only start the break UI after successful response
+                        isOnBreak = true;
+                        seconds = 0;
+                        breakModal.show();
+                        openFullscreen();
+                        startTimer();
+                    })
+                    .catch(error => {
+                        alert('Error starting break. Please try again.');
+                        console.error(error);
+                    });
+                });
+            });
+        });
 
-        fetch('{{ route('front.stratBreak') }}', {
-            method: 'POST',
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        // END BREAK
+        document.getElementById('endBreakBtn').addEventListener('click', function () {
+
+            if (!isOnBreak) return;
+
+            fetch('{{ route('front.endBreak') }}', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                }
+            });
+
+            isOnBreak = false;
+
+            stopTimer();
+            breakModal.hide();
+            exitFullscreen();
+            location.reload();
+        });
+
+        // Prevent leaving tab (basic)
+        document.addEventListener('visibilitychange', function () {
+            if (isOnBreak && document.hidden) {
+                alert('⚠️ You are on break. Please stay on this screen.');
+                {{-- location.reload(); --}}
+                // strict handling
             }
         });
 
-        isOnBreak = true;
-        seconds = 0;
-
-        breakModal.show();
-        openFullscreen();
-        startTimer();
-    });
-
-    // END BREAK
-    document.getElementById('endBreakBtn').addEventListener('click', function () {
-
-        if (!isOnBreak) return;
-
-        fetch('{{ route('front.endBreak') }}', {
-            method: 'POST',
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        // Prevent ESC key manually (extra safety)
+        document.addEventListener('keydown', function (e) {
+            if (isOnBreak && e.key === "Escape") {
+                e.preventDefault();
             }
         });
 
-        isOnBreak = false;
+        // Prevent right click (optional strict)
+        document.addEventListener('contextmenu', function (e) {
+            if (isOnBreak) {
+                e.preventDefault();
+            }
+        });
 
-        stopTimer();
-        breakModal.hide();
-        exitFullscreen();
-    });
-
-    // Prevent leaving tab (basic)
-    document.addEventListener('visibilitychange', function () {
-        if (isOnBreak && document.hidden) {
-            alert('⚠️ You are on break. Please stay on this screen.');
-            {{-- location.reload(); --}}
-             // strict handling
-        }
-    });
-
-    // Prevent ESC key manually (extra safety)
-    document.addEventListener('keydown', function (e) {
-        if (isOnBreak && e.key === "Escape") {
-            e.preventDefault();
-        }
-    });
-
-    // Prevent right click (optional strict)
-    document.addEventListener('contextmenu', function (e) {
-        if (isOnBreak) {
-            e.preventDefault();
-        }
-    });
-
-    // Force focus back (optional strict)
-    window.onblur = function () {
-        if (isOnBreak) {
-            setTimeout(() => {
-                window.focus();
-            }, 100);
-        }
-    };
+        // Force focus back (optional strict)
+        window.onblur = function () {
+            if (isOnBreak) {
+                setTimeout(() => {
+                    window.focus();
+                }, 100);
+            }
+        };
 
 });
+</script>
+{{-- <script>
+    const services = @json($services);
+const chartColors = {
+    donut: {
+      series1: config.colors.warning,
+      series2: '#fdb528cc',
+      series3: '#fdb52899',
+      series4: '#fdb52866',
+      series5: config.colors_label.warning
+    },
+    donut2: {
+      series1: config.colors.success,
+      series2: '#43ff64e6',
+      series3: '#43ff6473',
+      series4: '#43ff6433'
+    },
+    line: {
+      series1: config.colors.warning,
+      series2: config.colors.primary,
+      series3: '#7367f029'
+    }
+};
+
+      const salesCountryChartEl = document.querySelector('#salesCountryChart'),
+    salesCountryChartConfig = {
+      chart: {
+        type: 'bar',
+        height: 368,
+        parentHeightOffset: 0,
+        toolbar: {
+          show: false
+        }
+      },
+      series: [
+        {
+          name: 'Sales',
+          data: [20, 40, 12375, 76, 89]
+        }
+      ],
+      plotOptions: {
+        bar: {
+          borderRadius: 10,
+          barHeight: '60%',
+          horizontal: true,
+          distributed: true,
+          startingShape: 'rounded',
+          dataLabels: {
+            position: 'bottom'
+          }
+        }
+      },
+      dataLabels: {
+        enabled: true,
+        textAnchor: 'start',
+        offsetY: 8,
+        offsetX: 11,
+        style: {
+          fontWeight: 500,
+          fontSize: '0.9375rem',
+          fontFamily: 'Inter'
+        }
+      },
+      tooltip: {
+        enabled: false
+      },
+      legend: {
+        show: false
+      },
+      colors: [
+        config.colors.primary,
+        config.colors.success,
+        config.colors.warning,
+        config.colors.info,
+        config.colors.danger
+      ],
+      grid: {
+        strokeDashArray: 8,
+        borderColor,
+        xaxis: { lines: { show: true } },
+        yaxis: { lines: { show: false } },
+        padding: {
+          top: -18,
+          left: 21,
+          right: 33,
+          bottom: 10
+        }
+      },
+      xaxis: {
+        categories: ['SEO', 'LandingPage', 'GMB', 'Website Development', 'SMM'],
+        labels: {
+          formatter: function (val) {
+            return Number(val / 1000) + 'K';
+          },
+          style: {
+            fontSize: '0.9375rem',
+            colors: labelColor,
+            fontFamily: 'Inter'
+          }
+        },
+        axisBorder: {
+          show: false
+        },
+        axisTicks: {
+          show: false
+        }
+      },
+      yaxis: {
+        labels: {
+          style: {
+            fontWeight: 500,
+            fontSize: '0.9375rem',
+            colors: headingColor,
+            fontFamily: 'Inter'
+          }
+        }
+      },
+      states: {
+        hover: {
+          filter: {
+            type: 'none'
+          }
+        },
+        active: {
+          filter: {
+            type: 'none'
+          }
+        }
+      }
+    };
+  if (typeof salesCountryChartEl !== undefined && salesCountryChartEl !== null) {
+    const salesCountryChart = new ApexCharts(salesCountryChartEl, salesCountryChartConfig);
+    salesCountryChart.render();
+  }
+</script> --}}
+
+<script>
+const services = @json($services);
+
+const categories = services.map(item => item.name);
+const data = services.map(item => item.leads_count);
+
+const salesCountryChartEl = document.querySelector('#salescategoryChart');
+ let cardColor, labelColor, headingColor, borderColor, grayColor, currentTheme, bodyColorLabel;
+
+  if (isDarkStyle) {
+    cardColor = config.colors_dark.cardColor;
+    labelColor = config.colors_dark.textMuted;
+    headingColor = config.colors_dark.headingColor;
+    borderColor = config.colors_dark.borderColor;
+    grayColor = '#3b3e59';
+    currentTheme = 'dark';
+    bodyColorLabel = config.colors_dark.bodyColor;
+  } else {
+    cardColor = config.colors.cardColor;
+    labelColor = config.colors.textMuted;
+    headingColor = config.colors.headingColor;
+    borderColor = config.colors.borderColor;
+    grayColor = '#f4f4f6';
+    currentTheme = 'light';
+    bodyColorLabel = config.colors.bodyColor;
+  }
+
+  const chartColors = {
+    donut: {
+      series1: config.colors.warning,
+      series2: '#fdb528cc',
+      series3: '#fdb52899',
+      series4: '#fdb52866',
+      series5: config.colors_label.warning
+    },
+    donut2: {
+      series1: config.colors.success,
+      series2: '#43ff64e6',
+      series3: '#43ff6473',
+      series4: '#43ff6433'
+    },
+    line: {
+      series1: config.colors.warning,
+      series2: config.colors.primary,
+      series3: '#7367f029'
+    }
+  };
+const salesCountryChartConfig = {
+  chart: {
+    type: 'bar',
+    height: 368,
+    toolbar: { show: false }
+  },
+
+  series: [
+    {
+      name: 'Leads',
+      data: data
+    }
+  ],
+
+  plotOptions: {
+    bar: {
+      horizontal: true,
+      distributed: true,
+      borderRadius: 10,
+      barHeight: '60%'
+    }
+  },
+
+  dataLabels: {
+    enabled: true
+  },
+
+  colors: [
+    config.colors.primary,
+    config.colors.success,
+    config.colors.warning,
+    config.colors.info,
+    config.colors.danger
+  ],
+    // borderColor = config.colors.borderColor;
+  xaxis: {
+    categories: categories
+  },
+
+  grid: {
+    borderColor: borderColor
+  }
+};
+
+if (salesCountryChartEl) {
+  new ApexCharts(salesCountryChartEl, salesCountryChartConfig).render();
+}
 </script>
 @endsection

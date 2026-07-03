@@ -6,7 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class ClientReporting extends Model
 {
-    protected $fillable = [ 'client_id' , 'reporting_type' , 'created_by' , 'verified_by' , 'dispatched_by' , 'report_file' , 'report_status' , 'report_verified_at' , 'dispatch_at' ,
+        protected $table = 'client_reportings';
+
+    protected $fillable = [ 'client_id' , 'report_type' , 'report_month', 'report_year', 'uuid',  'created_by' , 'verified_by' , 'dispatched_by' , 'report_file' , 'report_status' , 'report_verified_at' , 'dispatch_at' ,
     ];
 
     public function client(){
@@ -20,5 +22,19 @@ class ClientReporting extends Model
     }
     public function dispatchedBy(){
         return $this->belongsTo(User::class, 'dispatched_by');
+    }
+    public function website()
+    {
+        return $this->hasOne(WebsiteReportDetail::class);
+    }
+
+    public function landingPage()
+    {
+        return $this->hasOne(LandingPageReportDetail::class, 'client_reporting_id');
+    }
+
+    public function gmb()
+    {
+        return $this->hasOne(GmbReportDetail::class);
     }
 }

@@ -28,4 +28,8 @@ class Attendance extends Model
     {
         return Carbon::parse($this->logout_time)->format('h:i A');
     }
+    public function breaks()
+    {
+        return $this->hasMany(Breaks::class);
+    }
 }

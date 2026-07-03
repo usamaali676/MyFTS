@@ -23,6 +23,7 @@ class UserController extends Controller
     }
     public function store(Request $request) {
 
+    // dd($request->all());
         $request->validate([
             'role_id' => 'required',
             'name' => 'required',
@@ -36,7 +37,10 @@ class UserController extends Controller
             'email' => $request->email,
             'password' => bcrypt($request->password),
             'slack_member_id' => $request->slack_member_id,
+            'status' => $request->status,
+            'user_type' => $request->user_type,
             'created_by' => Auth::user()->id,
+
         ]);
         Alert::success('Succes', "User Added Successfully");
         return redirect()->route('user.index');
@@ -60,6 +64,8 @@ class UserController extends Controller
         $user->email = $request->email;
         $user->slack_member_id = $request->slack_member_id;
         $user->updated_by = Auth::user()->id;
+        $user->status = $request->status;
+        $user->user_type = $request->user_type;
         if($request->password!=null){
             $user->password = bcrypt($request->password);
         }

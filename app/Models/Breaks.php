@@ -11,6 +11,8 @@ class Breaks extends Model
         'attendance_id',
         'break_start',
         'break_end',
+        'break_type',
+        'duration',
     ];
 
     public function user()

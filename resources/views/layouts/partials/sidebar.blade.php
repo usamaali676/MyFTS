@@ -165,7 +165,32 @@
             </ul>
         </li>
         @endif
-         @if(isset($attendance_perm) && $attendance_perm->view == 1)
+
+                {{-- <li class="menu-item">
+            <a href="javascript:void(0);" class="menu-link menu-toggle">
+                <i class="menu-icon tf-icons mdi mdi-table"></i>
+                <div data-i18n="Client Reports">Client Reports</div>
+            </a>
+            <ul class="menu-sub">
+                <li class="menu-item">
+                    <a href="{{ route('lead.index') }}" class="menu-link">
+                        <div data-i18n="LandingPage Report">LandingPage Report</div>
+                    </a>
+                </li>
+
+                <li class="menu-item">
+                    <a href="{{ route('lead.create') }}" class="menu-link">
+                        <div data-i18n="Website Report">Website Report</div>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="{{ route('lead.create') }}" class="menu-link">
+                        <div data-i18n="GMB Report">GMB Report</div>
+                    </a>
+                </li>
+            </ul>
+        </li> --}}
+        @if(isset($attendance_perm) && $attendance_perm->view == 1)
         <li class="menu-item">
             <a href="{{ route('attendance.index') }}" class="menu-link ">
                 <i class="menu-icon tf-icons mdi mdi-calendar"></i>
@@ -174,6 +199,13 @@
 
         </li>
         @endif
+
+        {{-- <li class="menu-item">
+            <a href="{{ route('ai.index') }}" class="menu-link">
+                <i class="menu-icon tf-icons mdi mdi-robot-outline"></i>
+                <div data-i18n="AI Assistant">AI Assistant</div>
+            </a>
+        </li> --}}
 
 
 

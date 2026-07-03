@@ -1896,11 +1896,10 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                     <div class="form-floating form-floating-outline">
                                                         <select id="select-report-type" name="report_type" class="select2 form-select">
                                                             <option value="">Select Report Type</option>
-                                                            <option value="Landing Pages">Landing Pages</option>
-                                                            <option value="SMM">SMM</option>
-                                                            <option value="GMB">GMB</option>
-                                                            <option value="Website Development">Website Development</option>
-                                                            <option value="Other">Other</option>
+                                                            <option value="landing_page">Landing Pages</option>
+                                                            <option value="smm">SMM</option>
+                                                            <option value="gmb">GMB</option>
+                                                            <option value="website">Website Development</option>
                                                         </select>
                                                         <label for="select-invoice">Select Report Type</label>
                                                     </div>
@@ -1937,11 +1936,614 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                         <label for="select-invoice">Select Dispatched By</label>
                                                     </div>
                                                 </div>
-                                                <div class="col-12">
-                                                    <button class="btn btn-primary">
-                                                        <input type="file" name="report_file" id="" placeholder="Upload File" accept="application/pdf,application/doc,.doc, .docx,">
-                                                    </button>
-                                                </div>
+
+                                                        {{-- ============================================================
+                                                        LANDING PAGE FIELDS — shown only when report_type=landing_page
+                                                    ============================================================ --}}
+                                                    <div id="landing-page-fields" class="col-12" style="display: none;">
+                                                        <div class="row g-4">
+
+                                                            {{-- SEO & Keywords --}}
+                                                            <div class="col-12">
+                                                                <h6 class="text-muted fw-semibold text-uppercase mb-0">
+                                                                    <i class="fas fa-chart-line me-1"></i> SEO &amp; Keywords
+                                                                </h6>
+                                                                <hr class="mt-1">
+                                                            </div>
+
+                                                            <div class="col-md-6">
+                                                                <div class="form-floating form-floating-outline">
+                                                                    <input type="number" class="form-control" id="keywords_count" name="keywords_count"
+                                                                        placeholder="Keywords Count" min="0">
+                                                                    <label for="keywords_count">Keywords Count</label>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-12">
+                                                                <label class="form-label fw-semibold">First Page Keywords</label>
+                                                                <textarea class="form-control ckeditor" style="border-radius: 0px" id="first_page_keywords" name="first_page_keywords"
+                                                                        cols="30" rows="5"></textarea>
+                                                            </div>
+
+                                                            <div class="col-12">
+                                                                <label class="form-label fw-semibold">Second Page Keywords</label>
+                                                                <textarea class="form-control ckeditor" style="border-radius: 0px" id="second_page_keywords" name="second_page_keywords"
+                                                                        cols="30" rows="5"></textarea>
+                                                            </div>
+
+                                                            {{-- Backlinks --}}
+                                                            <div class="col-12 mt-2">
+                                                                <h6 class="text-muted fw-semibold text-uppercase mb-0">
+                                                                    <i class="fas fa-link me-1"></i> Backlinks
+                                                                </h6>
+                                                                <hr class="mt-1">
+                                                            </div>
+
+                                                            <div class="col-md-6">
+                                                                <div class="form-floating form-floating-outline">
+                                                                    <input type="number" class="form-control" id="backlinks_count" name="backlinks_count"
+                                                                        placeholder="Backlinks Count" min="0">
+                                                                    <label for="backlinks_count">Backlinks Count</label>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-md-6">
+                                                                <div class="form-floating form-floating-outline">
+                                                                    <input type="number" class="form-control" id="social_bookmark_count" name="social_bookmark_count"
+                                                                        placeholder="Social Bookmark Count" min="0">
+                                                                    <label for="social_bookmark_count">Social Bookmark Count</label>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-12">
+                                                                <label class="form-label fw-semibold">Blog Backlinks</label>
+                                                                <textarea class="form-control ckeditor" style="border-radius: 0px" id="blog_backlinks" name="blog_backlinks"
+                                                                        cols="30" rows="5"></textarea>
+                                                            </div>
+
+                                                            <div class="col-12">
+                                                                <label class="form-label fw-semibold">Bookmark Backlinks</label>
+                                                                <textarea class="form-control ckeditor" style="border-radius: 0px" id="bookmark_backlinks" name="bookmark_backlinks"
+                                                                        cols="30" rows="5"></textarea>
+                                                            </div>
+
+                                                            {{-- Pages & Performance --}}
+                                                            <div class="col-12 mt-2">
+                                                                <h6 class="text-muted fw-semibold text-uppercase mb-0">
+                                                                    <i class="fas fa-tachometer-alt me-1"></i> Pages &amp; Performance
+                                                                </h6>
+                                                                <hr class="mt-1">
+                                                            </div>
+
+                                                            <div class="col-md-6">
+                                                                <div class="form-floating form-floating-outline">
+                                                                    <input type="number" class="form-control" id="landing_page_count" name="landing_page_count"
+                                                                        placeholder="Landing Pages Count" min="0">
+                                                                    <label for="landing_page_count">Landing Pages Count</label>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-12">
+                                                                <label class="form-label fw-semibold">Landing Page URLs</label>
+                                                                <textarea class="form-control ckeditor" style="border-radius: 0px" id="landing_page_urls" name="landing_page_urls"
+                                                                        cols="30" rows="5"></textarea>
+                                                            </div>
+
+                                                            <div class="col-md-6">
+                                                                <div class="form-floating form-floating-outline">
+                                                                    <input type="number" class="form-control" id="avg_pages_position" name="avg_pages_position"
+                                                                        placeholder="Avg Pages Position" min="0">
+                                                                    <label for="avg_pages_position">Avg Pages Position</label>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-md-6">
+                                                                <div class="form-floating form-floating-outline">
+                                                                    <input type="number" class="form-control" id="total_impressions" name="total_impressions"
+                                                                        placeholder="Total Impressions" min="0">
+                                                                    <label for="total_impressions">Total Impressions</label>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-md-6">
+                                                                <div class="form-floating form-floating-outline">
+                                                                    <input type="number" class="form-control" id="total_clicks" name="total_clicks"
+                                                                        placeholder="Total Clicks" min="0">
+                                                                    <label for="total_clicks">Total Clicks</label>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-md-6">
+                                                                <div class="form-floating form-floating-outline">
+                                                                    <input type="number" class="form-control" id="avg_ctr" name="avg_ctr"
+                                                                        placeholder="Avg CTR (%)" min="0" max="100" step="0.01">
+                                                                    <label for="avg_ctr">Avg CTR (%)</label>
+                                                                </div>
+                                                            </div>
+
+                                                            {{-- E-E-A-T Scores --}}
+                                                            <div class="col-12 mt-2">
+                                                                <h6 class="text-muted fw-semibold text-uppercase mb-0">
+                                                                    <i class="fas fa-star me-1"></i> E-E-A-T Scores
+                                                                </h6>
+                                                                <hr class="mt-1">
+                                                            </div>
+
+                                                            <div class="col-md-6">
+                                                                <div class="form-floating form-floating-outline">
+                                                                    <input type="number" class="form-control" id="experience_score" name="experience_score"
+                                                                        placeholder="Experience Score (Out of 100)" min="0" max="100">
+                                                                    <label for="experience_score">Experience Score</label>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-md-6">
+                                                                <div class="form-floating form-floating-outline">
+                                                                    <input type="number" class="form-control" id="expertise_score" name="expertise_score"
+                                                                        placeholder="Expertise Score (Out of 100)" min="0" max="100">
+                                                                    <label for="expertise_score">Expertise Score</label>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-md-6">
+                                                                <div class="form-floating form-floating-outline">
+                                                                    <input type="number" class="form-control" id="authority_score" name="authority_score"
+                                                                        placeholder="Authority Score (Out of 100)" min="0" max="100">
+                                                                    <label for="authority_score">Authority Score</label>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-md-6">
+                                                                <div class="form-floating form-floating-outline">
+                                                                    <input type="number" class="form-control" id="trust_score" name="trust_score"
+                                                                        placeholder="Trust Score (Out of 100)" min="0" max="100">
+                                                                    <label for="trust_score">Trust Score</label>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-md-6">
+                                                                <div class="form-floating form-floating-outline">
+                                                                    <input type="number" class="form-control" id="internal_links_count" name="internal_links_count"
+                                                                        placeholder="Internal Links Count" min="0">
+                                                                    <label for="internal_links_count">Internal Links Count</label>
+                                                                </div>
+                                                            </div>
+
+                                                            {{-- Core Web Vitals --}}
+                                                            <div class="col-12 mt-2">
+                                                                <h6 class="text-muted fw-semibold text-uppercase mb-0">
+                                                                    <i class="fas fa-bolt me-1"></i> Core Web Vitals
+                                                                </h6>
+                                                                <hr class="mt-1">
+                                                            </div>
+
+                                                            <div class="col-md-4">
+                                                                <div class="form-floating form-floating-outline">
+                                                                    <input type="number" class="form-control" id="lcp" name="lcp"
+                                                                        placeholder="LCP (s) [<2.5s] " min="0" step="0.01">
+                                                                    <label for="lcp">LCP (s)</label>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-md-4">
+                                                                <div class="form-floating form-floating-outline">
+                                                                    <input type="number" class="form-control" id="inp" name="inp"
+                                                                        placeholder="INP (ms) [<200ms]" min="0" step="0.01">
+                                                                    <label for="inp">INP (ms)</label>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-md-4">
+                                                                <div class="form-floating form-floating-outline">
+                                                                    <input type="number" class="form-control" id="cls" name="cls"
+                                                                        placeholder="CLS [ <0.1]" min="0" step="0.01">
+                                                                    <label for="cls">CLS</label>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-md-4">
+                                                                <div class="form-floating form-floating-outline">
+                                                                    <input type="number" class="form-control" id="fcp" name="fcp"
+                                                                        placeholder="FCP (s) [<1.8s]" min="0" step="0.01">
+                                                                    <label for="fcp">FCP (s)</label>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-md-4">
+                                                                <div class="form-floating form-floating-outline">
+                                                                    <input type="number" class="form-control" id="ttfb" name="ttfb"
+                                                                        placeholder="TTFB (ms) [<800ms]" min="0" step="0.01">
+                                                                    <label for="ttfb">TTFB (ms)</label>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-md-4">
+                                                                <div class="form-floating form-floating-outline">
+                                                                    <input type="number" class="form-control" id="page_speed" name="page_speed"
+                                                                        placeholder="Page Speed Score" min="0" max="100">
+                                                                    <label for="page_speed">Page Speed Score</label>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-md-6">
+                                                                <div class="form-floating form-floating-outline">
+                                                                    <input type="number" class="form-control" id="social_media_shares" name="social_media_shares"
+                                                                        placeholder="Social Media Shares" min="0">
+                                                                    <label for="social_media_shares">Social Media Shares</label>
+                                                                </div>
+                                                            </div>
+
+                                                        </div>{{-- end inner row --}}
+                                                    </div>{{-- end #landing-page-fields --}}
+
+                                                        {{-- ============================================================
+                                                        WEBSITE FIELDS — shown only when report_type=website
+                                                    ============================================================ --}}
+                                                    <div id="website-fields" class="col-12" style="display: none;">
+                                                        <div class="row g-4">
+
+                                                            {{-- SEO & Keywords --}}
+                                                            <div class="col-12">
+                                                                <h6 class="text-muted fw-semibold text-uppercase mb-0">
+                                                                    <i class="fas fa-chart-line me-1"></i> SEO &amp; Keywords
+                                                                </h6>
+                                                                <hr class="mt-1">
+                                                            </div>
+
+                                                            <div class="col-md-6">
+                                                                <div class="form-floating form-floating-outline">
+                                                                    <input type="number" class="form-control" id="keywordCount" name="keywordCount"
+                                                                        placeholder="Keywords Count" min="0">
+                                                                    <label for="keywordCount">Keywords Count</label>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-md-6">
+                                                                <div class="form-floating form-floating-outline">
+                                                                    <input type="number" class="form-control" id="web_avg_pages_position" name="avg_pages_position"
+                                                                        placeholder="Avg Pages Position" min="0">
+                                                                    <label for="web_avg_pages_position">Avg Pages Position</label>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-12">
+                                                                <label class="form-label fw-semibold">First Page Keywords</label>
+                                                                <textarea class="form-control ckeditor" style="border-radius: 0px" id="keywordFirstpage" name="keywordFirstpage"
+                                                                        cols="30" rows="5"></textarea>
+                                                            </div>
+
+                                                            <div class="col-12">
+                                                                <label class="form-label fw-semibold">Second Page Keywords</label>
+                                                                <textarea class="form-control ckeditor" style="border-radius: 0px" id="keywordSecondpage" name="keywordSecondpage"
+                                                                        cols="30" rows="5"></textarea>
+                                                            </div>
+
+                                                            {{-- On-Page SEO --}}
+                                                            <div class="col-12 mt-2">
+                                                                <h6 class="text-muted fw-semibold text-uppercase mb-0">
+                                                                    <i class="fas fa-file-alt me-1"></i> On-Page SEO
+                                                                </h6>
+                                                                <hr class="mt-1">
+                                                            </div>
+
+                                                            <div class="col-md-6">
+                                                                <div class="form-floating form-floating-outline">
+                                                                    <input type="number" class="form-control" id="titleOptimized" name="titleOptimized"
+                                                                        placeholder="Title Optimized (%)" min="0" max="100">
+                                                                    <label for="titleOptimized">Title Optimized (%)</label>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-md-6">
+                                                                <div class="form-floating form-floating-outline">
+                                                                    <input type="number" class="form-control" id="headingTags" name="headingTags"
+                                                                        placeholder="H1, H2, H3 Tags (%)" min="0" max="100">
+                                                                    <label for="headingTags">H1, H2, H3 Tags (%)</label>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-md-6">
+                                                                <div class="form-floating form-floating-outline">
+                                                                    <input type="number" class="form-control" id="metaDescription" name="metaDescription"
+                                                                        placeholder="Meta Description (%)" min="0" max="100">
+                                                                    <label for="metaDescription">Meta Description (%)</label>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-md-6">
+                                                                <div class="form-floating form-floating-outline">
+                                                                    <input type="number" class="form-control" id="seoMetaTags" name="seoMetaTags"
+                                                                        placeholder="SEO Meta Tags (%)" min="0" max="100">
+                                                                    <label for="seoMetaTags">SEO Meta Tags (%)</label>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-md-6">
+                                                                <div class="form-floating form-floating-outline">
+                                                                    <input type="number" class="form-control" id="optimizedurl" name="optimizedurl"
+                                                                        placeholder="Optimized URL (%)" min="0" max="100">
+                                                                    <label for="optimizedurl">Optimized URL (%)</label>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-md-6">
+                                                                <div class="form-floating form-floating-outline">
+                                                                    <input type="number" class="form-control" id="imageAltTags" name="imageAltTags"
+                                                                        placeholder="Image Alt Tags (%)" min="0" max="100">
+                                                                    <label for="imageAltTags">Image Alt Tags (%)</label>
+                                                                </div>
+                                                            </div>
+
+                                                            {{-- Technical SEO --}}
+                                                            <div class="col-12 mt-2">
+                                                                <h6 class="text-muted fw-semibold text-uppercase mb-0">
+                                                                    <i class="fas fa-cogs me-1"></i> Technical SEO
+                                                                </h6>
+                                                                <hr class="mt-1">
+                                                            </div>
+
+                                                            <div class="col-md-4">
+                                                                <div class="form-check form-switch mt-2">
+                                                                    <input type="hidden" name="googleSearchConsole" value="0">
+                                                                    <input class="form-check-input" type="checkbox" id="googleSearchConsole" name="googleSearchConsole" value="1">
+                                                                    <label class="form-check-label" for="googleSearchConsole">Google Search Console</label>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-md-4">
+                                                                <div class="form-check form-switch mt-2">
+                                                                    <input type="hidden" name="schemaMarkup" value="0">
+                                                                    <input class="form-check-input" type="checkbox" id="schemaMarkup" name="schemaMarkup" value="1">
+                                                                    <label class="form-check-label" for="schemaMarkup">Schema Markup</label>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-md-4">
+                                                                <div class="form-check form-switch mt-2">
+                                                                    <input type="hidden" name="robotTxt" value="0">
+                                                                    <input class="form-check-input" type="checkbox" id="robotTxt" name="robotTxt" value="1">
+                                                                    <label class="form-check-label" for="robotTxt">Robots.txt</label>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-md-6">
+                                                                <div class="form-floating form-floating-outline">
+                                                                    <input type="text" class="form-control" id="xmlSitemap" name="xmlSitemap"
+                                                                        placeholder="e.g. Submit" maxlength="50">
+                                                                    <label for="xmlSitemap">XML Sitemap Status</label>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-md-6">
+                                                                <div class="form-floating form-floating-outline">
+                                                                    <input type="number" class="form-control" id="indexOptimization" name="indexOptimization"
+                                                                        placeholder="Index Optimization (%)" min="0" max="100">
+                                                                    <label for="indexOptimization">Index Optimization (%)</label>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-md-6">
+                                                                <div class="form-floating form-floating-outline">
+                                                                    <input type="text" class="form-control" id="loadingSpeed" name="loadingSpeed"
+                                                                        placeholder="e.g. 92+" maxlength="20">
+                                                                    <label for="loadingSpeed">Loading Speed Score</label>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-md-6">
+                                                                <div class="form-floating form-floating-outline">
+                                                                    <input type="number" class="form-control" id="improveWebsiteSpeed" name="improveWebsiteSpeed"
+                                                                        placeholder="Improve Website Speed (%)" min="0" max="100">
+                                                                    <label for="improveWebsiteSpeed">Improve Website Speed (%)</label>
+                                                                </div>
+                                                            </div>
+
+                                                            {{-- Website Pages --}}
+                                                            <div class="col-12 mt-2">
+                                                                <h6 class="text-muted fw-semibold text-uppercase mb-0">
+                                                                    <i class="fas fa-sitemap me-1"></i> Website Pages
+                                                                </h6>
+                                                                <hr class="mt-1">
+                                                            </div>
+
+                                                            <div class="col-md-6">
+                                                                <div class="form-floating form-floating-outline">
+                                                                    <input type="number" class="form-control" id="websiteUrlsCount" name="websiteUrlsCount"
+                                                                        placeholder="Website URLs Count" min="0">
+                                                                    <label for="websiteUrlsCount">Website URLs Count</label>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-md-6">
+                                                                <div class="form-floating form-floating-outline">
+                                                                    <input type="number" class="form-control" id="web_internal_links_count" name="internalLinks"
+                                                                        placeholder="Internal Links" min="0">
+                                                                    <label for="web_internal_links_count">Internal Links</label>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-12">
+                                                                <label class="form-label fw-semibold">Website URLs</label>
+                                                                <textarea class="form-control ckeditor" style="border-radius: 0px" id="websiteUrls" name="websiteUrls"
+                                                                        cols="30" rows="5"></textarea>
+                                                            </div>
+
+                                                            {{-- Backlinks & Social --}}
+                                                            <div class="col-12 mt-2">
+                                                                <h6 class="text-muted fw-semibold text-uppercase mb-0">
+                                                                    <i class="fas fa-link me-1"></i> Backlinks &amp; Social
+                                                                </h6>
+                                                                <hr class="mt-1">
+                                                            </div>
+
+                                                            <div class="col-md-4">
+                                                                <div class="form-floating form-floating-outline">
+                                                                    <input type="number" class="form-control" id="backlinksCount" name="backlinksCount"
+                                                                        placeholder="Backlinks Count" min="0">
+                                                                    <label for="backlinksCount">Backlinks Count</label>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-md-4">
+                                                                <div class="form-floating form-floating-outline">
+                                                                    <input type="number" class="form-control" id="socialBookmarking" name="socialBookmarking"
+                                                                        placeholder="Social Bookmarking" min="0">
+                                                                    <label for="socialBookmarking">Social Bookmarking</label>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-md-4">
+                                                                <div class="form-floating form-floating-outline">
+                                                                    <input type="number" class="form-control" id="socialMediaSharing" name="socialMediaSharing"
+                                                                        placeholder="Social Media Sharing" min="0">
+                                                                    <label for="socialMediaSharing">Social Media Sharing</label>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-12">
+                                                                <label class="form-label fw-semibold">Blog Backlinks</label>
+                                                                <textarea class="form-control ckeditor" style="border-radius: 0px" id="blogBacklinks" name="blogBacklinks"
+                                                                        cols="30" rows="5"></textarea>
+                                                            </div>
+
+                                                            <div class="col-12">
+                                                                <label class="form-label fw-semibold">Bookmark Backlinks</label>
+                                                                <textarea class="form-control ckeditor" style="border-radius: 0px" id="web_bookmark_backlinks" name="web_bookmark_backlinks"
+                                                                        cols="30" rows="5"></textarea>
+                                                            </div>
+
+                                                            {{-- Search Console --}}
+                                                            <div class="col-12 mt-2">
+                                                                <h6 class="text-muted fw-semibold text-uppercase mb-0">
+                                                                    <i class="fas fa-search me-1"></i> Search Console Performance
+                                                                </h6>
+                                                                <hr class="mt-1">
+                                                            </div>
+
+                                                            <div class="col-md-4">
+                                                                <div class="form-floating form-floating-outline">
+                                                                    <input type="number" class="form-control" id="web_total_impressions" name="total_impressions"
+                                                                        placeholder="Total Impressions" min="0">
+                                                                    <label for="web_total_impressions">Total Impressions</label>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-md-4">
+                                                                <div class="form-floating form-floating-outline">
+                                                                    <input type="number" class="form-control" id="web_total_clicks" name="total_clicks"
+                                                                        placeholder="Total Clicks" min="0">
+                                                                    <label for="web_total_clicks">Total Clicks</label>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-md-4">
+                                                                <div class="form-floating form-floating-outline">
+                                                                    <input type="number" class="form-control" id="web_avg_ctr" name="avg_ctr"
+                                                                        placeholder="Avg CTR (%)" min="0" max="100" step="0.01">
+                                                                    <label for="web_avg_ctr">Avg CTR (%)</label>
+                                                                </div>
+                                                            </div>
+
+                                                            {{-- E-E-A-T Scores --}}
+                                                            <div class="col-12 mt-2">
+                                                                <h6 class="text-muted fw-semibold text-uppercase mb-0">
+                                                                    <i class="fas fa-star me-1"></i> E-E-A-T Scores
+                                                                </h6>
+                                                                <hr class="mt-1">
+                                                            </div>
+
+                                                            <div class="col-md-6">
+                                                                <div class="form-floating form-floating-outline">
+                                                                    <input type="number" class="form-control" id="web_experience_score" name="experience_score"
+                                                                        placeholder="Experience Score (Out of 100)" min="0" max="100">
+                                                                    <label for="web_experience_score">Experience Score</label>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-md-6">
+                                                                <div class="form-floating form-floating-outline">
+                                                                    <input type="number" class="form-control" id="web_expertise_score" name="expertise_score"
+                                                                        placeholder="Expertise Score (Out of 100)" min="0" max="100">
+                                                                    <label for="web_expertise_score">Expertise Score</label>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-md-6">
+                                                                <div class="form-floating form-floating-outline">
+                                                                    <input type="number" class="form-control" id="web_authority_score" name="authority_score"
+                                                                        placeholder="Authority Score (Out of 100)" min="0" max="100">
+                                                                    <label for="web_authority_score">Authority Score</label>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-md-6">
+                                                                <div class="form-floating form-floating-outline">
+                                                                    <input type="number" class="form-control" id="web_trust_score" name="trust_score"
+                                                                        placeholder="Trust Score (Out of 100)" min="0" max="100">
+                                                                    <label for="web_trust_score">Trust Score</label>
+                                                                </div>
+                                                            </div>
+
+                                                            {{-- Core Web Vitals --}}
+                                                            <div class="col-12 mt-2">
+                                                                <h6 class="text-muted fw-semibold text-uppercase mb-0">
+                                                                    <i class="fas fa-bolt me-1"></i> Core Web Vitals
+                                                                </h6>
+                                                                <hr class="mt-1">
+                                                            </div>
+
+                                                            <div class="col-md-4">
+                                                                <div class="form-floating form-floating-outline">
+                                                                    <input type="number" class="form-control" id="web_lcp" name="lcp"
+                                                                        placeholder="LCP (s) [<2.5s] " min="0" step="0.01">
+                                                                    <label for="web_lcp">LCP (s)</label>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-md-4">
+                                                                <div class="form-floating form-floating-outline">
+                                                                    <input type="number" class="form-control" id="web_inp" name="inp"
+                                                                        placeholder="INP (ms) [<200ms]" min="0" step="0.01">
+                                                                    <label for="web_inp">INP (ms)</label>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-md-4">
+                                                                <div class="form-floating form-floating-outline">
+                                                                    <input type="number" class="form-control" id="web_cls" name="cls"
+                                                                        placeholder="CLS [ <0.1]" min="0" step="0.01">
+                                                                    <label for="web_cls">CLS</label>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-md-4">
+                                                                <div class="form-floating form-floating-outline">
+                                                                    <input type="number" class="form-control" id="web_fcp" name="fcp"
+                                                                        placeholder="FCP (s) [<1.8s]" min="0" step="0.01">
+                                                                    <label for="web_fcp">FCP (s)</label>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-md-4">
+                                                                <div class="form-floating form-floating-outline">
+                                                                    <input type="number" class="form-control" id="web_ttfb" name="ttfb"
+                                                                        placeholder="TTFB (ms) [<800ms]" min="0" step="0.01">
+                                                                    <label for="web_ttfb">TTFB (ms)</label>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-md-4">
+                                                                <div class="form-floating form-floating-outline">
+                                                                    <input type="number" class="form-control" id="web_page_speed" name="page_speed"
+                                                                        placeholder="Page Speed Score" min="0" max="100">
+                                                                    <label for="web_page_speed">Page Speed Score</label>
+                                                                </div>
+                                                            </div>
+
+                                                        </div>{{-- end inner row --}}
+                                                    </div>{{-- end #website-fields --}}
+
+
                                                 <div class="col-12">
                                                     <button class="btn btn-primary">
                                                         <i class="fas fa-plus-circle me-2"></i>
@@ -1979,7 +2581,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                                 <tr>
                                                                     <td>{{ $key + 1 }}</td>
                                                                     <td>{{ $item->client->sale->lead->business_name_adv }}</td>
-                                                                    <td>{{ $item->reporting_type }}</td>
+                                                                    <td>{{ $item->report_type }}</td>
                                                                     <td>{{ $item->client->reporting_date }}</td>
                                                                     <td>{{ \Carbon\Carbon::parse($item->created_at)->format('Y-m-d') }}</td>
                                                                     <td>{{ $item->createdBy->name }}</td>
@@ -1995,12 +2597,12 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                                     <td>Not Dispatched</td>
                                                                     @endif
                                                                     <td>{{ \Carbon\Carbon::parse( $item->dispatch_at)->format('Y-m-d') }}</td>
-                                                                    <td>@if($item->report_status == "created")
-                                                                        <span class="badge rounded-pill bg-danger">{{ $item->report_status }}</span>
-                                                                        @elseif($item->report_status == "verified")
-                                                                        <span class="badge rounded-pill bg-info">{{ $item->report_status }}</span>
+                                                                    <td>@if($item->status == "draft")
+                                                                        <span class="badge rounded-pill bg-danger">{{ $item->status }}</span>
+                                                                        @elseif($item->status == "verified")
+                                                                        <span class="badge rounded-pill bg-info">{{ $item->status }}</span>
                                                                         @else
-                                                                         <span class="badge rounded-pill bg-success">{{ $item->report_status }}</span>
+                                                                         <span class="badge rounded-pill bg-success">{{ $item->status }}</span>
                                                                          @endif
                                                                         </td>
                                                                     <td>
@@ -2017,7 +2619,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                                                 data-bs-toggle="dropdown" aria-expanded="false"><i
                                                                                     class="mdi mdi-dots-vertical mdi-20px"></i></button>
                                                                             <div class="dropdown-menu dropdown-menu-end m-0" style="">
-                                                                                <a type="button" href="{{ asset('reports/report/'. $item->report_file) }}" target="_blank"
+                                                                                <a type="button" href="{{ route('reportShow', $item->uuid) }}" target="_blank"
 
                                                                                     class="dropdown-item delete-record"><i
                                                                                     class="mdi mdi-eye me-2"></i><span>Preview</span></a>
@@ -4498,11 +5100,27 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
         $('#report_create').on('submit', function (e) {
             e.preventDefault(); // Prevent the default form submission
 
+
+                            if (typeof CKEDITOR !== 'undefined') {
+                    for (var instanceName in CKEDITOR.instances) {
+                        CKEDITOR.instances[instanceName].updateElement();
+                    }
+                }
+            if (typeof window.updateLandingPageKeywordCount === 'function') {
+                window.updateLandingPageKeywordCount();
+            }
+            if (typeof window.updateLandingPageBacklinksCount === 'function') {
+                window.updateLandingPageBacklinksCount();
+            }
+            if (typeof window.updateLandingPageUrlCount === 'function') {
+                window.updateLandingPageUrlCount();
+            }
             // Store current form values before submission, particularly time and select elements
 
 
             // Create a FormData object to handle form data
             let formData = new FormData(this);
+
 
             // Clear previous error messages
 
@@ -4514,7 +5132,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                 contentType: false, // Important: content type is false
                 success: function (response) {
 
-                    console.log(response);
+                    // console.log(response);
 
                     var reports = response.reports;
                     var table_content = '';
@@ -4539,9 +5157,9 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                         var dispatch_at = report.dispatch_at ? formatDate(report.dispatch_at) : 'N/A';
 
                         var statusBadge = '';
-                        if (report.report_status === "created") {
+                        if (report.report_type === "draft") {
                             statusBadge = '<span class="badge rounded-pill bg-danger">' + report.report_status + '</span>';
-                        } else if (report.report_status === "verified") {
+                        } else if (report.report_type === "verified") {
                             statusBadge = '<span class="badge rounded-pill bg-info">' + report.report_status + '</span>';
                         } else {
                             statusBadge = '<span class="badge rounded-pill bg-success">' + report.report_status + '</span>';
@@ -4552,7 +5170,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                         table_content += '<tr>\
                                             <td>' + (index + 1) + '</td>\
                                             <td>' + report.client.sale.lead.business_name_adv + '</td>\
-                                            <td>' + report.reporting_type + '</td>\
+                                            <td>' + report.report_type + '</td>\
                                             <td>' + reporting_date + '</td>\
                                             <td>' + created_at + '</td>\
                                             <td>' + report.created_by.name + '</td>\
@@ -4659,6 +5277,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
             e.preventDefault(); // Prevent the default form submission
 
             // Store current form values before submission, particularly time and select elements
+
 
 
             // Create a FormData object to handle form data
@@ -5039,12 +5658,219 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
 
 </script>
 
+<script>
+    $(document).ready(function () {
+        const keywordFieldIds = ['first_page_keywords', 'second_page_keywords'];
+        const backlinkFieldIds = ['blog_backlinks', 'bookmark_backlinks'];
+        const landingPageUrlFieldIds = ['landing_page_urls'];
+        const keywordCountInput = $('#keywords_count');
+        const backlinkCountInput = $('#backlinks_count');
+        const landingPageCountInput = $('#landing_page_count');
+
+        function countKeywordsFromHtml(html) {
+            if (!html) {
+                return 0;
+            }
+
+            const container = document.createElement('div');
+            container.innerHTML = html;
+
+            const listItems = Array.from(container.querySelectorAll('li'))
+                .map(function (item) {
+                    return item.textContent.trim();
+                })
+                .filter(Boolean);
+
+            if (listItems.length) {
+                return listItems.length;
+            }
+
+            const text = html
+                .replace(/<br\s*\/?>/gi, '\n')
+                .replace(/<\/(p|div|li|h[1-6])>/gi, '\n')
+                .replace(/<[^>]*>/g, '');
+
+            const decoder = document.createElement('textarea');
+            decoder.innerHTML = text;
+
+            return decoder.value
+                .split(/[\n,;]+/)
+                .map(function (keyword) {
+                    return keyword.trim();
+                })
+                .filter(Boolean)
+                .length;
+        }
+
+        function getKeywordFieldContent(fieldId) {
+            if (typeof CKEDITOR !== 'undefined' && CKEDITOR.instances[fieldId]) {
+                return CKEDITOR.instances[fieldId].getData();
+            }
+
+            return $('#' + fieldId).val() || '';
+        }
+
+        function updateKeywordCount() {
+            const total = keywordFieldIds.reduce(function (count, fieldId) {
+                return count + countKeywordsFromHtml(getKeywordFieldContent(fieldId));
+            }, 0);
+
+            keywordCountInput.val(total);
+        }
+        window.updateLandingPageKeywordCount = updateKeywordCount;
+
+        function updateBacklinksCount() {
+            const total = backlinkFieldIds.reduce(function (count, fieldId) {
+                return count + countKeywordsFromHtml(getKeywordFieldContent(fieldId));
+            }, 0);
+
+            backlinkCountInput.val(total);
+        }
+        window.updateLandingPageBacklinksCount = updateBacklinksCount;
+
+        function updateLandingPageUrlCount() {
+            const total = landingPageUrlFieldIds.reduce(function (count, fieldId) {
+                return count + countKeywordsFromHtml(getKeywordFieldContent(fieldId));
+            }, 0);
+
+            landingPageCountInput.val(total);
+        }
+        window.updateLandingPageUrlCount = updateLandingPageUrlCount;
+
+        function updateLandingPageCounts() {
+            updateKeywordCount();
+            updateBacklinksCount();
+            updateLandingPageUrlCount();
+        }
+
+        // ---- Website report auto-counts (same approach as landing page) ----
+        const websiteKeywordFieldIds = ['keywordFirstpage', 'keywordSecondpage'];
+        const websiteBacklinkFieldIds = ['blogBacklinks', 'web_bookmark_backlinks'];
+        const websiteUrlFieldIds = ['websiteUrls'];
+        const keywordCountWebsiteInput = $('#keywordCount');
+        const backlinksCountWebsiteInput = $('#backlinksCount');
+        const websiteUrlsCountInput = $('#websiteUrlsCount');
+
+        function updateWebsiteKeywordCount() {
+            const total = websiteKeywordFieldIds.reduce(function (count, fieldId) {
+                return count + countKeywordsFromHtml(getKeywordFieldContent(fieldId));
+            }, 0);
+
+            keywordCountWebsiteInput.val(total);
+        }
+
+        function updateWebsiteBacklinksCount() {
+            const total = websiteBacklinkFieldIds.reduce(function (count, fieldId) {
+                return count + countKeywordsFromHtml(getKeywordFieldContent(fieldId));
+            }, 0);
+
+            backlinksCountWebsiteInput.val(total);
+        }
+
+        function updateWebsiteUrlsCount() {
+            const total = websiteUrlFieldIds.reduce(function (count, fieldId) {
+                return count + countKeywordsFromHtml(getKeywordFieldContent(fieldId));
+            }, 0);
+
+            websiteUrlsCountInput.val(total);
+        }
+
+        function updateWebsiteCounts() {
+            updateWebsiteKeywordCount();
+            updateWebsiteBacklinksCount();
+            updateWebsiteUrlsCount();
+        }
+
+        const allCountedFieldIds = keywordFieldIds.concat(backlinkFieldIds, landingPageUrlFieldIds,
+            websiteKeywordFieldIds, websiteBacklinkFieldIds, websiteUrlFieldIds);
+
+        function updateAllCounts() {
+            updateLandingPageCounts();
+            updateWebsiteCounts();
+        }
+
+        function bindLandingPageCountEditor(instance) {
+            if (!instance || allCountedFieldIds.indexOf(instance.name) === -1 || instance.landingPageCountBound) {
+                return;
+            }
+
+            instance.landingPageCountBound = true;
+            instance.on('change', updateAllCounts);
+            instance.on('key', function () {
+                setTimeout(updateAllCounts, 0);
+            });
+            instance.on('paste', function () {
+                setTimeout(updateAllCounts, 0);
+            });
+        }
+
+        allCountedFieldIds.forEach(function (fieldId) {
+            $('#' + fieldId).on('input change keyup paste', function () {
+                setTimeout(updateAllCounts, 0);
+            });
+        });
+
+        if (typeof CKEDITOR !== 'undefined') {
+            for (var instanceName in CKEDITOR.instances) {
+                bindLandingPageCountEditor(CKEDITOR.instances[instanceName]);
+            }
+
+            CKEDITOR.on('instanceReady', function (event) {
+                bindLandingPageCountEditor(event.editor);
+                updateAllCounts();
+            });
+        }
+
+        $('#report_create').on('submit', updateAllCounts);
+        updateAllCounts();
+
+        // Landing page and website reports both use a "bookmark_backlinks" column,
+        // so only the field for the selected report type should submit under that name.
+        $('#report_create').on('submit', function () {
+            const type = $('#select-report-type').val();
+            if (type === 'website') {
+                $('#bookmark_backlinks').removeAttr('name');
+                $('#web_bookmark_backlinks').attr('name', 'bookmark_backlinks');
+            } else {
+                $('#web_bookmark_backlinks').attr('name', 'web_bookmark_backlinks');
+                $('#bookmark_backlinks').attr('name', 'bookmark_backlinks');
+            }
+        });
+
+        function toggleReportTypeFields(type) {
+            const $landingFields = $('#landing-page-fields');
+            const $websiteFields = $('#website-fields');
+
+            // Disable hidden sections so duplicate field names (e.g. lcp, avg_ctr)
+            // don't get submitted from the wrong report type.
+            $landingFields.find('input, select').prop('disabled', true);
+            $websiteFields.find('input, select').prop('disabled', true);
+
+            if (type === 'landing_page') {
+                $websiteFields.slideUp(300);
+                $landingFields.slideDown(300, function () {
+                    $landingFields.find('input, select').prop('disabled', false);
+                });
+            } else if (type === 'website') {
+                $landingFields.slideUp(300);
+                $websiteFields.slideDown(300, function () {
+                    $websiteFields.find('input, select').prop('disabled', false);
+                });
+            } else {
+                $landingFields.slideUp(300);
+                $websiteFields.slideUp(300);
+            }
+        }
+
+        $('#select-report-type').on('change', function () {
+            toggleReportTypeFields($(this).val());
+        });
+
+        // Disable both sections' inputs on load (no animation) so an untouched
+        // report_type select doesn't submit fields with duplicate names.
+        $('#landing-page-fields, #website-fields').find('input, select').prop('disabled', true);
+    });
+</script>
+
 {{-- End Report --}}
 @endsection
-
-
-
-
-
-
-
