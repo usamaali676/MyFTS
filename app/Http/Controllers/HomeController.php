@@ -96,8 +96,9 @@ class HomeController extends Controller
         $total += Invoice::where('sale_id', $s->id)
                         ->whereMonth('created_at', now()->month)
                         ->whereYear('created_at', now()->year)
-                        ->sum('total_amout');
+                        ->sum('total_amount');
 
+        // dd($total );
 
 
         }
