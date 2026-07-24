@@ -265,5 +265,6 @@ Route::controller(RoleController::class)
         Route::get('/', 'index')->name('index');
         Route::post('/', 'store')->name('store');
         Route::get('/{uuid}', 'show')->name('show');
+        Route::get('/{uuid}/export/{format}', 'export')->name('export');
         Route::delete('/{uuid}', 'delete')->name('delete');
     });

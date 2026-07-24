@@ -7,12 +7,14 @@ use App\Http\Requests\GenerateTranscriptRequest;
 use App\Models\CallTranscription;
 use App\Models\User;
 use App\Services\CallTranscriptionService;
+use App\Services\TranscriptExportService;
 use Illuminate\Support\Facades\Auth;
 
 class CallTranscriptionController extends Controller
 {
     public function __construct(
         private readonly CallTranscriptionService $service,
+        private readonly TranscriptExportService $exportService,
     ) {}
 
     public function index()
@@ -45,6 +47,18 @@ class CallTranscriptionController extends Controller
         $record = CallTranscription::where('uuid', $uuid)->firstOrFail();
 
         return response()->json(['success' => true, 'data' => $this->transformRecord($record)]);
+    }
+
+    public function export(string $uuid, string $format)
+    {
+        $record = CallTranscription::where('uuid', $uuid)->firstOrFail();
+
+        return match ($format) {
+            'txt' => $this->exportService->toTxt($record),
+            'pdf' => $this->exportService->toPdf($record),
+            'docx' => $this->exportService->toDocx($record),
+            default => abort(404),
+        };
     }
 
     public function delete(string $uuid)
