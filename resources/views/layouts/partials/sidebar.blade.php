@@ -2,6 +2,7 @@
     $user = auth()->user();
     $salereport_perm = App\Models\Permission::where('role_id', $user->role_id)->where('name', "salereport")->first();
     $attendance_perm = App\Models\Permission::where('role_id', $user->role_id)->where('name', "attendance")->first();
+    $calltranscription_perm = App\Models\Permission::where('role_id', $user->role_id)->where('name', "calltranscription")->first();
 @endphp
 <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
     <div class="app-brand demo">
@@ -200,12 +201,21 @@
         </li>
         @endif
 
-        {{-- <li class="menu-item">
+        <li class="menu-item">
             <a href="{{ route('ai.index') }}" class="menu-link">
                 <i class="menu-icon tf-icons mdi mdi-robot-outline"></i>
                 <div data-i18n="AI Assistant">AI Assistant</div>
             </a>
-        </li> --}}
+        </li>
+
+        @if(isset($calltranscription_perm) && $calltranscription_perm->view == 1)
+        <li class="menu-item">
+            <a href="{{ route('calltranscription.index') }}" class="menu-link">
+                <i class="menu-icon tf-icons mdi mdi-microphone-message-outline"></i>
+                <div data-i18n="Call Transcription">Call Transcription</div>
+            </a>
+        </li>
+        @endif
 
 
 
