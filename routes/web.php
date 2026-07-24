@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AIController;
 use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\CallTranscriptionController;
 use App\Http\Controllers\ChargeBackController;
 use App\Http\Controllers\ClientReportingController;
 use App\Http\Controllers\ClientServicesController;
@@ -215,6 +216,8 @@ Route::controller(RoleController::class)
     ->middleware(PermissionMiddelware::class)
     ->group(function () {
         Route::post('store', 'store')->name('store');
+        Route::get('edit-report/{id}', 'editReport')->name('editReport');
+        Route::post('save-report/{id}', 'saveReport')->name('saveReport');
         Route::post('edit/{id}', 'edit')->name('edit');
         Route::post('update/{id}', 'update')->name('update');
         Route::get('delete', 'destroy')->name('delete');
@@ -254,3 +257,13 @@ Route::controller(RoleController::class)
         Route::delete('/destroy/{id}', 'destroy')->name('destroy');
     });
 
+    Route::controller(CallTranscriptionController::class)
+    ->prefix('call-transcription')
+    ->as('calltranscription.')
+    ->middleware(['auth', PermissionMiddelware::class])
+    ->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::post('/', 'store')->name('store');
+        Route::get('/{uuid}', 'show')->name('show');
+        Route::delete('/{uuid}', 'delete')->name('delete');
+    });
