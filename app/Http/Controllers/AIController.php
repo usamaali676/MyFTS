@@ -6,6 +6,7 @@ use App\Models\AiConversation;
 use App\Services\KnowledgeRetrievalService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use OpenAI\Laravel\Facades\OpenAI;
 
@@ -15,16 +16,39 @@ class AIController extends Controller
 
      private const MODEL = 'gpt-4o-mini'; // or whatever you use
 
-    private const PROMPT_TEMPLATE = <<<'PROMPT'
-        ... your original template with {date} and {message} placeholders ...
-        PROMPT;
+private const PROMPT_TEMPLATE = <<<'PROMPT'
+    Today's date is {date}.
 
-    private const SYSTEM_PROMPT = <<<'PROMPT'
-        You are FirmTech's AI assistant. Only answer using the business
-        knowledge provided below. If the answer is not covered by the
-        provided knowledge, say you don't know and suggest the user
-        contact FirmTech directly. Be concise and professional.
-        PROMPT;
+    A visitor on the FirmTech Services website has asked the following question.
+    Use the KNOWLEDGE provided in the system message to answer clearly and
+    helpfully, focusing on our services and pricing.
+
+    Customer message: {message}
+    PROMPT;
+
+private const SYSTEM_PROMPT = <<<'PROMPT'
+    You are the AI assistant for FirmTech Services, a digital marketing and
+    web development agency. Your job is to help website visitors understand
+    what FirmTech offers and what it costs, using only the KNOWLEDGE section
+    provided below.
+
+    Guidelines:
+    - Answer using only the information in the KNOWLEDGE section. Do not
+      invent services, features, prices, discounts, or timelines that
+      aren't listed there.
+    - When asked about pricing, give the specific numbers or ranges from
+      the KNOWLEDGE if available. If exact pricing isn't listed, say what
+      is known and suggest they contact FirmTech for a custom quote.
+    - Be warm, concise, and helpful — like a knowledgeable sales rep, not
+      pushy or overly salesy.
+    - Where it fits naturally, guide the customer toward a next step
+      (requesting a quote, booking a call, contacting the team).
+    - If the question isn't covered by the KNOWLEDGE at all, say you
+      don't have that information and suggest contacting FirmTech
+      directly rather than guessing.
+    - Never make up contact details, guarantees, or promises not present
+      in the KNOWLEDGE.
+    PROMPT;
 
     public function index()
     {
@@ -129,8 +153,8 @@ class AIController extends Controller
                     'ai_response'      => $aiResponse,
                     // Handy while testing retrieval — remove once satisfied:
                     'matched_sources'  => $relevantDocs->pluck('path')->values(),
-                    'created_at'       => $conversation->created_at?->format('M d, Y H:i')
-                                           ?? now()->format('M d, Y H:i'),
+            //         'created_at' => $conversation->created_at?->format('M d, Y H:i')
+            //    ?? now()->format('M d, Y H:i'),
                 ],
             ]);
 
@@ -164,6 +188,11 @@ class AIController extends Controller
         } catch (\Exception $e) {
             // RE-ENABLE:
             // $conversation->update(['status' => 'failed', 'error_message' => $e->getMessage()]);
+            Log::error('AI chat unexpected error', [
+                'message' => $e->getMessage(),
+                'file'    => $e->getFile(),
+                'line'    => $e->getLine(),
+            ]);
 
             return response()->json([
                 'success' => false,

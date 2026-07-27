@@ -5,10 +5,12 @@ namespace App\Http\Controllers;
 use App\Exceptions\TranscriptionFailedException;
 use App\Http\Requests\GenerateTranscriptRequest;
 use App\Models\CallTranscription;
+use App\Models\Role;
 use App\Models\User;
 use App\Services\CallTranscriptionService;
 use App\Services\TranscriptExportService;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class CallTranscriptionController extends Controller
 {
@@ -19,14 +21,34 @@ class CallTranscriptionController extends Controller
 
     public function index()
     {
-        $agents = User::orderBy('name')->get(['id', 'name']);
+        $roles = Role::whereIn('name', ['TSR', 'Customer Support', 'Closer'])->pluck('id');
+        $agents = User::whereIn('role_id', $roles)->orderBy('name')->get(['id', 'name']);
 
         return view('pages.callTranscription.index', compact('agents'));
     }
 
     public function store(GenerateTranscriptRequest $request)
     {
+
         $agent = User::findOrFail($request->integer('agent_user_id'));
+
+        $audio = $request->file('audio');
+
+        if (!$audio || !$audio->isValid()) {
+            $uploadError = $audio?->getError();
+
+            Log::warning('Call transcription upload rejected before processing', [
+                'upload_error_code' => $uploadError,
+                'upload_error_label' => $audio ? $audio->getErrorMessage() : 'no file present',
+                'php_ini_upload_max_filesize' => ini_get('upload_max_filesize'),
+                'php_ini_post_max_size' => ini_get('post_max_size'),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'The file failed to upload. This is usually caused by the recording exceeding the server\'s upload size limit, not by the recording itself. Please contact support if this keeps happening.',
+            ], 422);
+        }
 
         try {
             $record = $this->service->generate(

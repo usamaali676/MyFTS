@@ -318,7 +318,7 @@
     });
 
     if (window.jQuery && jQuery.fn.select2) {
-        jQuery('#ctAgentSelect').select2({ placeholder: 'Search for an agent…' });
+
         jQuery('#ctAgentSelect').on('change', updateGenerateEnabled);
     } else {
         agentSelect.addEventListener('change', updateGenerateEnabled);

@@ -25,6 +25,9 @@ CRM functionality.
 - `ffmpeg` is not installed on this dev machine (checked PATH and the
   Laragon install tree) — no path to audio chunking right now.
 - No PDF/DOCX libraries are installed yet.
+- `gpt-4o-mini-transcribe` does not support `verbose_json` / segment or
+  word timestamps (that's whisper-1 only) — it returns plain text. Real
+  per-word timestamps are not available from this model.
 - Permission system (`PermissionMiddelware` + `GlobalHelper::Permissions()`)
   derives the permission list dynamically from route names matching
   `entity.operation` — registering routes named `calltranscription.*` makes
@@ -60,7 +63,14 @@ CRM functionality.
    renders for roles with `view = 1` on that permission.
 5. **Export dependencies**: add `barryvdh/laravel-dompdf` (PDF) and
    `phpoffice/phpword` (DOCX) via composer — additive only.
-6. **Audio storage**: never write the uploaded audio to any disk/storage
+6. **Timestamps**: since `gpt-4o-mini-transcribe` returns no real
+   timestamps, add `james-heinrich/getid3` (pure-PHP, no ffmpeg binary
+   required) to read the actual total audio duration from the file
+   header. Per-turn `[00:00:02]` timestamps are then estimated by
+   distributing that real duration proportionally across turns by word
+   count — not frame-accurate, but no extra API calls and no ffmpeg
+   dependency.
+7. **Audio storage**: never write the uploaded audio to any disk/storage
    at all. Read directly from the PHP-managed upload tmp path and stream
    to OpenAI; let PHP's normal end-of-request cleanup remove it. This is
    strictly stronger than "delete after processing" since we never persist
@@ -106,15 +116,19 @@ New files only:
 - `app/Services/CallTranscriptionService.php` — the pipeline:
   1. Validate file.
   2. Read `$file->getRealPath()` directly — never `store()`/`move()`.
-  3. `OpenAI::audio()->transcribe()` with `gpt-4o-mini-transcribe`,
-     requesting segment timestamps.
-  4. Second `OpenAI::chat()->create()` call (gpt-4o-mini, temperature 0,
-     low max_tokens) to segment into agent/client turns given the
-     timestamped transcript + agent's name.
-  5. Map `agent` → selected user's real name, everything else → "Client".
-  6. Compute word/exchange counts, duration, processing time.
-  7. Persist `CallTranscription` row.
-  8. Retry-with-backoff (2 retries) on transient OpenAI errors; distinct
+  3. Read real total duration from the file via `getid3` (no ffmpeg).
+  4. `OpenAI::audio()->transcribe()` with `gpt-4o-mini-transcribe`,
+     `response_format: json` (plain text only — this model has no
+     timestamp support).
+  5. Second `OpenAI::chat()->create()` call (gpt-4o-mini, temperature 0,
+     low max_tokens) to split the plain text into ordered agent/client
+     turns given the agent's name.
+  6. Map `agent` → selected user's real name, everything else → "Client".
+     Estimate each turn's `[hh:mm:ss]` by distributing the real total
+     duration proportionally across turns by word count.
+  7. Compute word/exchange counts, processing time.
+  8. Persist `CallTranscription` row.
+  9. Retry-with-backoff (2 retries) on transient OpenAI errors; distinct
      catches for `RateLimitException` / `ServerException` /
      `TransporterException` / generic, following `AIController`'s
      existing error-handling pattern.

@@ -51,7 +51,7 @@ class ClientReportingController extends Controller
                  'report_year' => Carbon::now()->year,
                   'uuid'  => Str::uuid(),
             ]);
-            $reports = ClientReporting::where('client_id', $request->client_id)->with('client', 'client.sale.lead', 'createdBy', 'verifiedBy', 'dispatchedBy')->get();
+            $reports = ClientReporting::where('client_id', $request->client_id)->with('client', 'client.sale.lead', 'createdBy', 'verifiedBy', 'dispatchedBy', 'website', 'landingPage')->get();
             switch ($request->report_type) {
                 case 'landing_page':
                     // dd($request->all());
@@ -142,6 +142,8 @@ class ClientReportingController extends Controller
                     ]);
                     break;
             }
+
+
 
             return response()->json([
                'message' => 'Report created successfully.',
@@ -262,9 +264,182 @@ class ClientReportingController extends Controller
         }
     }
 
+    public function editReport($id)
+    {
+        $report = ClientReporting::with([
+            'client.sale.lead',
+            'createdBy',
+            'verifiedBy',
+            'dispatchedBy',
+            'landingPage',
+            'website',
+        ])->findOrFail($id);
+
+        if (! in_array($report->report_type, ['landing_page', 'website'])) {
+            return redirect()->back()->with('error', 'Only Landing Page and Website reports can be edited here.');
+        }
+
+        return view('pages.clientReport.edit', compact('report'));
+    }
+
     /**
      * Update the specified resource in storage.
      */
+    public function saveReport(Request $request, $id)
+    {
+        $report = ClientReporting::with(['landingPage', 'website'])->findOrFail($id);
+
+        if ($report->report_type === 'landing_page') {
+            $request->validate([
+                'keywords_count' => 'nullable|integer',
+                'first_page_keywords' => 'nullable|string',
+                'second_page_keywords' => 'nullable|string',
+                'backlinks_count' => 'nullable|integer',
+                'blog_backlinks' => 'nullable|string',
+                'bookmark_backlinks' => 'nullable|string',
+                'social_bookmark_count' => 'nullable|integer',
+                'landing_page_urls' => 'nullable|string',
+                'landing_page_count' => 'nullable|string',
+                'avg_pages_position' => 'nullable|integer',
+                'total_impressions' => 'nullable|integer',
+                'total_clicks' => 'nullable|integer',
+                'avg_ctr' => 'nullable|numeric',
+                'experience_score' => 'nullable|integer',
+                'expertise_score' => 'nullable|integer',
+                'authority_score' => 'nullable|integer',
+                'trust_score' => 'nullable|integer',
+                'internal_links_count' => 'nullable|integer',
+                'lcp' => 'nullable|numeric',
+                'inp' => 'nullable|numeric',
+                'cls' => 'nullable|numeric',
+                'fcp' => 'nullable|numeric',
+                'ttfb' => 'nullable|numeric',
+                'page_speed' => 'nullable|integer',
+                'social_media_shares' => 'nullable|integer',
+            ]);
+
+            $report->landingPage()->updateOrCreate(
+                ['client_reporting_id' => $report->id],
+                $request->only([
+                    'keywords_count',
+                    'first_page_keywords',
+                    'second_page_keywords',
+                    'backlinks_count',
+                    'blog_backlinks',
+                    'bookmark_backlinks',
+                    'social_bookmark_count',
+                    'landing_page_urls',
+                    'landing_page_count',
+                    'avg_pages_position',
+                    'total_impressions',
+                    'total_clicks',
+                    'avg_ctr',
+                    'experience_score',
+                    'expertise_score',
+                    'authority_score',
+                    'trust_score',
+                    'internal_links_count',
+                    'lcp',
+                    'inp',
+                    'cls',
+                    'fcp',
+                    'ttfb',
+                    'page_speed',
+                    'social_media_shares',
+                ])
+            );
+        } elseif ($report->report_type === 'website') {
+            $request->validate([
+                'keywordCount' => 'nullable|integer',
+                'keywordFirstpage' => 'nullable|string',
+                'keywordSecondpage' => 'nullable|string',
+                'avg_pages_position' => 'nullable|integer',
+                'improveWebsiteSpeed' => 'nullable|integer|min:0|max:100',
+                'seoMetaTags' => 'nullable|integer|min:0|max:100',
+                'optimizedurl' => 'nullable|integer|min:0|max:100',
+                'googleSearchConsole' => 'nullable|boolean',
+                'titleOptimized' => 'nullable|integer|min:0|max:100',
+                'headingTags' => 'nullable|integer|min:0|max:100',
+                'metaDescription' => 'nullable|integer|min:0|max:100',
+                'loadingSpeed' => 'nullable|string|max:20',
+                'imageAltTags' => 'nullable|integer|min:0|max:100',
+                'schemaMarkup' => 'nullable|boolean',
+                'robotTxt' => 'nullable|boolean',
+                'xmlSitemap' => 'nullable|string|max:50',
+                'indexOptimization' => 'nullable|integer|min:0|max:100',
+                'websiteUrlsCount' => 'nullable|integer',
+                'websiteUrls' => 'nullable|string',
+                'socialBookmarking' => 'nullable|integer',
+                'socialMediaSharing' => 'nullable|integer',
+                'internalLinks' => 'nullable|integer',
+                'backlinksCount' => 'nullable|integer',
+                'blogBacklinks' => 'nullable|string',
+                'bookmark_backlinks' => 'nullable|string',
+                'total_impressions' => 'nullable|integer',
+                'total_clicks' => 'nullable|integer',
+                'avg_ctr' => 'nullable|numeric',
+                'experience_score' => 'nullable|integer',
+                'expertise_score' => 'nullable|integer',
+                'authority_score' => 'nullable|integer',
+                'trust_score' => 'nullable|integer',
+                'lcp' => 'nullable|numeric',
+                'inp' => 'nullable|numeric',
+                'cls' => 'nullable|numeric',
+                'fcp' => 'nullable|numeric',
+                'ttfb' => 'nullable|numeric',
+                'page_speed' => 'nullable|integer',
+            ]);
+
+            $report->website()->updateOrCreate(
+                ['client_reporting_id' => $report->id],
+                $request->only([
+                    'keywordCount',
+                    'keywordFirstpage',
+                    'keywordSecondpage',
+                    'avg_pages_position',
+                    'improveWebsiteSpeed',
+                    'seoMetaTags',
+                    'optimizedurl',
+                    'googleSearchConsole',
+                    'titleOptimized',
+                    'headingTags',
+                    'metaDescription',
+                    'loadingSpeed',
+                    'imageAltTags',
+                    'schemaMarkup',
+                    'robotTxt',
+                    'xmlSitemap',
+                    'indexOptimization',
+                    'websiteUrlsCount',
+                    'websiteUrls',
+                    'socialBookmarking',
+                    'socialMediaSharing',
+                    'internalLinks',
+                    'backlinksCount',
+                    'blogBacklinks',
+                    'bookmark_backlinks',
+                    'total_impressions',
+                    'total_clicks',
+                    'avg_ctr',
+                    'experience_score',
+                    'expertise_score',
+                    'authority_score',
+                    'trust_score',
+                    'lcp',
+                    'inp',
+                    'cls',
+                    'fcp',
+                    'ttfb',
+                    'page_speed',
+                ])
+            );
+        }
+
+        return redirect()
+            ->route('clientReport.editReport', $report->id)
+            ->with('success', 'Report updated successfully.');
+    }
+
     public function update($id)
     {
         $client_report = ClientReporting::find($id);

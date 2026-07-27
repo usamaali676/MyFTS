@@ -38,9 +38,24 @@ class CallTranscriptionService
 
         $startedAt = microtime(true);
 
+        // Move the upload to a stable local path once, up front. The PHP temp-upload
+        // file behind $file->getRealPath() is not reliable to read from twice in the
+        // same request (e.g. it can transiently fail while an AV scan holds a lock
+        // on it on Windows), and it also has no file extension, which the Whisper
+        // API needs to detect the audio format. Working from one durable copy fixes
+        // both problems.
+        $extension = $file->getClientOriginalExtension() ?: 'mp3';
+        $storedDir = storage_path('app/tmp/call-transcriptions');
+        if (!is_dir($storedDir)) {
+            mkdir($storedDir, 0755, true);
+        }
+        $storedName = $requestUuid . '.' . $extension;
+        $file->move($storedDir, $storedName);
+        $storedPath = $storedDir . DIRECTORY_SEPARATOR . $storedName;
+
         try {
-            $durationSeconds = $this->readDuration($file->getRealPath());
-            $text = $this->transcribe($file);
+            $durationSeconds = $this->readDuration($storedPath);
+            $text = $this->transcribe($storedPath);
             $rawTurns = $this->diarize($text, $agent->name);
             $turns = $this->finalizeTurns($rawTurns, $agent->name, $durationSeconds);
 
@@ -58,10 +73,18 @@ class CallTranscriptionService
         } catch (\Throwable $e) {
             Log::error('Call transcription failed', [
                 'call_transcription_id' => $record->id,
+                'exception' => get_class($e),
                 'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString(),
             ]);
             $record->update(['status' => 'failed', 'error_message' => 'An unexpected error occurred.']);
             throw new TranscriptionFailedException('An unexpected error occurred while processing the recording.', 500);
+        } finally {
+            if (is_file($storedPath)) {
+                @unlink($storedPath);
+            }
         }
 
         return $record->fresh();
@@ -80,7 +103,7 @@ class CallTranscriptionService
         }
     }
 
-    private function transcribe(UploadedFile $file): string
+    private function transcribe(string $path): string
     {
         $attempt = 0;
 
@@ -88,7 +111,7 @@ class CallTranscriptionService
             try {
                 $response = OpenAI::audio()->transcribe([
                     'model' => self::TRANSCRIBE_MODEL,
-                    'file' => fopen($file->getRealPath(), 'r'),
+                    'file' => fopen($path, 'r'),
                     'response_format' => 'json',
                 ]);
 
