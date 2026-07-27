@@ -126,10 +126,16 @@ class CallTranscriptionService
                 throw $e;
             } catch (\OpenAI\Exceptions\RateLimitException|\OpenAI\Exceptions\ServerException|\OpenAI\Exceptions\TransporterException $e) {
                 if (++$attempt > self::MAX_RETRIES) {
+                    Log::error('OpenAI call failed after max retries', [
+                        'exception' => get_class($e),
+                        'message' => $e->getMessage(),
+                        'attempts' => $attempt,
+                    ]);
                     throw new TranscriptionFailedException('The transcription service is temporarily unavailable. Please try again shortly.', 503);
                 }
                 usleep(300000 * $attempt);
-            } catch (\OpenAI\Exceptions\ErrorException $e) {
+            }
+            catch (\OpenAI\Exceptions\ErrorException $e) {
                 throw new TranscriptionFailedException('The transcription service rejected the audio file: ' . $e->getMessage(), 422);
             }
         }
@@ -193,10 +199,16 @@ class CallTranscriptionService
                 throw $e;
             } catch (\OpenAI\Exceptions\RateLimitException|\OpenAI\Exceptions\ServerException|\OpenAI\Exceptions\TransporterException $e) {
                 if (++$attempt > self::MAX_RETRIES) {
+                    Log::error('OpenAI call failed after max retries', [
+                        'exception' => get_class($e),
+                        'message' => $e->getMessage(),
+                        'attempts' => $attempt,
+                    ]);
                     throw new TranscriptionFailedException('The transcription service is temporarily unavailable. Please try again shortly.', 503);
                 }
                 usleep(300000 * $attempt);
-            } catch (\OpenAI\Exceptions\ErrorException $e) {
+            }
+            catch (\OpenAI\Exceptions\ErrorException $e) {
                 throw new TranscriptionFailedException('The transcription service encountered an error while analyzing speakers.', 422);
             }
         }
