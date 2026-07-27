@@ -158,16 +158,17 @@ private const SYSTEM_PROMPT = <<<'PROMPT'
                 ],
             ]);
 
-        } catch (\OpenAI\Exceptions\RateLimitException $e) {
-            // RE-ENABLE:
-            // $conversation->update(['status' => 'failed', 'error_message' => $e->getMessage()]);
+         } catch (\OpenAI\Exceptions\RateLimitException $e) {
+            Log::error('OpenAI rate limit / quota error', [
+                'message' => $e->getMessage(),
+            ]);
 
             return response()->json([
                 'success' => false,
                 'message' => 'Too many requests. Please wait a moment and try again.',
             ], 429);
-
-        } catch (\OpenAI\Exceptions\ErrorException $e) {
+        }
+        catch (\OpenAI\Exceptions\ErrorException $e) {
             // RE-ENABLE:
             // $conversation->update(['status' => 'failed', 'error_message' => $e->getMessage()]);
 
