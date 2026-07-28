@@ -72,7 +72,7 @@ class CallTranscriptionControllerTest extends TestCase
             TranscriptionResponse::fake(['text' => 'Hello there.']),
             CreateResponse::fake([
                 'choices' => [[
-                    'message' => ['content' => json_encode(['turns' => [['speaker' => 'agent', 'text' => 'Hello there.']]])],
+                    'message' => ['content' => json_encode(['labels' => ['agent']])],
                 ]],
             ]),
         ]);

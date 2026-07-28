@@ -144,174 +144,173 @@ class CallTranscriptionService
     /**
      * @return array<int, array{speaker: string, text: string}>
      */
-    // private function diarize(string $text, string $agentName): array
-    // {
-    //     $prompt = <<<PROMPT
-    //         You are given a raw phone-call transcript with no speaker labels, between two people:
-    //         - "{$agentName}" (the agent / call center representative)
-    //         - the caller (their customer)
+    private function diarize(string $text, string $agentName): array
+    {
+        // Split into sentence-level lines and ask the model to label EVERY line
+        // individually (not choose its own grouping). Letting the model pick
+        // turn boundaries made it lazily merge most of a long call into 3-4
+        // giant blocks instead of real per-exchange turns. Forcing one label
+        // per line, then grouping consecutive same-speaker lines ourselves in
+        // PHP, keeps turns granular and timestamps meaningfully tied to the
+        // actual flow of the conversation.
+        $lines = preg_split('/(?<=[.?!])\s+|\n+/', trim($text), -1, PREG_SPLIT_NO_EMPTY);
+        $lines = array_values($lines);
 
-    //         Split the transcript into an ordered list of speaking turns. For each turn, decide whether
-    //         it was spoken by the agent or the client based on conversational role (who is greeting and
-    //         assisting versus who is requesting help or answering questions about their own account).
+        if (count($lines) === 0) {
+            throw new TranscriptionFailedException('Could not identify speaker turns in the recording.', 422);
+        }
 
-    //         Return strict JSON only, in this exact shape, no prose:
-    //         {"turns": [{"speaker": "agent", "text": "..."}, {"speaker": "client", "text": "..."}]}
+        $labels = $this->labelLines($lines, $agentName);
 
-    //         Transcript:
-    //         {$text}
-    //         PROMPT;
-
-    //     $attempt = 0;
-
-    //     while (true) {
-    //         try {
-    //             $response = OpenAI::chat()->create([
-    //                 'model' => self::DIARIZE_MODEL,
-    //                 'temperature' => 0,
-    //                 'response_format' => ['type' => 'json_object'],
-    //                 'messages' => [
-    //                     ['role' => 'system', 'content' => 'You split call transcripts into labeled speaker turns and respond with strict JSON only.'],
-    //                     ['role' => 'user', 'content' => $prompt],
-    //                 ],
-    //             ]);
-
-    //             $decoded = json_decode($response->choices[0]->message->content, true);
-    //             $turns = $decoded['turns'] ?? null;
-
-    //             if (!is_array($turns) || count($turns) === 0) {
-    //                 throw new TranscriptionFailedException('Could not identify speaker turns in the recording.', 422);
-    //             }
-
-    //             $mapped = array_values(array_filter(array_map(static function (array $t): array {
-    //                 return [
-    //                     'speaker' => ($t['speaker'] ?? '') === 'agent' ? 'agent' : 'client',
-    //                     'text' => trim((string) ($t['text'] ?? '')),
-    //                 ];
-    //             }, $turns), static fn (array $t): bool => $t['text'] !== ''));
-
-    //             if (count($mapped) === 0) {
-    //                 throw new TranscriptionFailedException('Could not identify speaker turns in the recording.', 422);
-    //             }
-
-    //             return $mapped;
-    //         } catch (TranscriptionFailedException $e) {
-    //             throw $e;
-    //         } catch (\OpenAI\Exceptions\RateLimitException|\OpenAI\Exceptions\ServerException|\OpenAI\Exceptions\TransporterException $e) {
-    //             if (++$attempt > self::MAX_RETRIES) {
-    //                 Log::error('OpenAI call failed after max retries', [
-    //                     'exception' => get_class($e),
-    //                     'message' => $e->getMessage(),
-    //                     'attempts' => $attempt,
-    //                 ]);
-    //                 throw new TranscriptionFailedException('The transcription service is temporarily unavailable. Please try again shortly.', 503);
-    //             }
-    //             usleep(300000 * $attempt);
-    //         }
-    //         catch (\OpenAI\Exceptions\ErrorException $e) {
-    //             throw new TranscriptionFailedException('The transcription service encountered an error while analyzing speakers.', 422);
-    //         }
-    //     }
-    // }
-
-    private const DIARIZE_TIMEOUT_SECONDS = 60;
-
-/**
- * @return array<int, array{speaker: string, text: string}>
- */
-private function diarize(string $text, string $agentName): array
-{
-    // Split into lines the model can reference by index, instead of asking
-    // it to retype the whole transcript (which is what was causing the
-    // ~30s+ generation time and timeouts on longer calls).
-    $lines = preg_split('/(?<=[.?!])\s+|\n+/', trim($text), -1, PREG_SPLIT_NO_EMPTY);
-    $lines = array_values($lines);
-
-    if (count($lines) === 0) {
-        throw new TranscriptionFailedException('Could not identify speaker turns in the recording.', 422);
+        return $this->groupLabeledLines($lines, $labels);
     }
 
-    $numbered = implode("\n", array_map(
-        static fn (int $i, string $line): string => ($i + 1) . ': ' . $line,
-        array_keys($lines),
-        $lines,
-    ));
+    /**
+     * @param  array<int, string>  $lines
+     * @return array<int, string> one 'agent'|'client' label per line, same order/length as $lines
+     */
+    private function labelLines(array $lines, string $agentName): array
+    {
+        $count = count($lines);
+        $numbered = implode("\n", array_map(
+            static fn (int $i, string $line): string => ($i + 1) . ': ' . $line,
+            array_keys($lines),
+            $lines,
+        ));
 
-    $prompt = <<<PROMPT
-        You are given a phone-call transcript split into numbered lines, between two people:
-        - "{$agentName}" (the agent / call center representative)
-        - the caller (their customer)
+        $basePrompt = <<<PROMPT
+            You are given a phone-call transcript split into {$count} numbered lines, between two people:
+            - "{$agentName}" (the agent / call center representative)
+            - the caller (their customer)
 
-        For each line number, decide whether it was spoken by the agent or the client, based on
-        conversational role (who is greeting and assisting versus who is requesting help or
-        answering questions about their own account). Group consecutive lines from the same
-        speaker into a single turn.
+            Real phone calls alternate speakers frequently, often every one or two sentences. Label EVERY
+            line individually based on conversational role (who is greeting/assisting versus who is
+            requesting help or answering questions about their own account). Do not lump many lines
+            together under one speaker unless they are clearly one uninterrupted monologue with no
+            response from the other person.
 
-        Return strict JSON only, no prose, in this exact shape:
-        {"turns": [{"speaker": "agent", "lines": [1,2]}, {"speaker": "client", "lines": [3]}]}
+            Return strict JSON only, no prose, in this exact shape — exactly {$count} labels, one per
+            line, in the same order as the transcript:
+            {"labels": ["agent", "client", "client", "agent"]}
 
-        Numbered transcript:
-        {$numbered}
-        PROMPT;
+            Numbered transcript:
+            {$numbered}
+            PROMPT;
 
-    $attempt = 0;
+        $attempt = 0;
+        $strict = false;
 
-    while (true) {
-        try {
-            $response = OpenAI::chat()->create([
-                'model' => self::DIARIZE_MODEL,
-                'temperature' => 0,
-                'response_format' => ['type' => 'json_object'],
-                'messages' => [
-                    ['role' => 'system', 'content' => 'You label phone-call transcript lines by speaker and respond with strict JSON only.'],
-                    ['role' => 'user', 'content' => $prompt],
-                ],
-            ]);
+        while (true) {
+            try {
+                $prompt = $strict
+                    ? $basePrompt . "\n\nYour previous response did not contain exactly {$count} labels. Count carefully and return exactly {$count} entries."
+                    : $basePrompt;
 
-            $decoded = json_decode($response->choices[0]->message->content, true);
-            $rawTurns = $decoded['turns'] ?? null;
-
-            if (!is_array($rawTurns) || count($rawTurns) === 0) {
-                throw new TranscriptionFailedException('Could not identify speaker turns in the recording.', 422);
-            }
-
-            $mapped = [];
-            foreach ($rawTurns as $t) {
-                $speaker = ($t['speaker'] ?? '') === 'agent' ? 'agent' : 'client';
-                $lineNumbers = is_array($t['lines'] ?? null) ? $t['lines'] : [];
-
-                $turnText = trim(implode(' ', array_filter(array_map(
-                    static fn ($n) => $lines[((int) $n) - 1] ?? null,
-                    $lineNumbers,
-                ))));
-
-                if ($turnText !== '') {
-                    $mapped[] = ['speaker' => $speaker, 'text' => $turnText];
-                }
-            }
-
-            if (count($mapped) === 0) {
-                throw new TranscriptionFailedException('Could not identify speaker turns in the recording.', 422);
-            }
-
-            return $mapped;
-        } catch (TranscriptionFailedException $e) {
-            throw $e;
-        } catch (\OpenAI\Exceptions\RateLimitException|\OpenAI\Exceptions\ServerException|\OpenAI\Exceptions\TransporterException $e) {
-            if (++$attempt > self::MAX_RETRIES) {
-                Log::error('OpenAI call failed after max retries', [
-                    'exception' => get_class($e),
-                    'message' => $e->getMessage(),
-                    'attempts' => $attempt,
+                $response = OpenAI::chat()->create([
+                    'model' => self::DIARIZE_MODEL,
+                    'temperature' => 0,
+                    'response_format' => ['type' => 'json_object'],
+                    'messages' => [
+                        ['role' => 'system', 'content' => 'You label phone-call transcript lines by speaker and respond with strict JSON only.'],
+                        ['role' => 'user', 'content' => $prompt],
+                    ],
                 ]);
-                throw new TranscriptionFailedException('The transcription service is temporarily unavailable. Please try again shortly.', 503);
+
+                $decoded = json_decode($response->choices[0]->message->content, true);
+                $labels = $decoded['labels'] ?? null;
+
+                if (!is_array($labels) || count($labels) === 0) {
+                    throw new TranscriptionFailedException('Could not identify speaker turns in the recording.', 422);
+                }
+
+                $normalized = array_map(
+                    static fn ($label): string => $label === 'agent' ? 'agent' : 'client',
+                    array_values($labels),
+                );
+
+                if (count($normalized) === $count) {
+                    return $normalized;
+                }
+
+                // Count mismatch: retry once with a stricter reminder, then fall
+                // back to padding/truncating rather than failing the whole
+                // (already paid-for) transcription outright.
+                if (!$strict && $attempt < self::MAX_RETRIES) {
+                    $strict = true;
+                    $attempt++;
+                    continue;
+                }
+
+                return $this->reconcileLabelCount($normalized, $count);
+            } catch (TranscriptionFailedException $e) {
+                throw $e;
+            } catch (\OpenAI\Exceptions\RateLimitException|\OpenAI\Exceptions\ServerException|\OpenAI\Exceptions\TransporterException $e) {
+                if (++$attempt > self::MAX_RETRIES) {
+                    Log::error('OpenAI call failed after max retries', [
+                        'exception' => get_class($e),
+                        'message' => $e->getMessage(),
+                        'attempts' => $attempt,
+                    ]);
+                    throw new TranscriptionFailedException('The transcription service is temporarily unavailable. Please try again shortly.', 503);
+                }
+                usleep(300000 * $attempt);
+            } catch (\OpenAI\Exceptions\ErrorException $e) {
+                throw new TranscriptionFailedException('The transcription service encountered an error while analyzing speakers.', 422);
             }
-            usleep(300000 * $attempt);
-        } catch (\OpenAI\Exceptions\ErrorException $e) {
-            throw new TranscriptionFailedException('The transcription service encountered an error while analyzing speakers.', 422);
         }
     }
-}
+
+    /**
+     * @param  array<int, string>  $labels
+     * @return array<int, string>
+     */
+    private function reconcileLabelCount(array $labels, int $targetCount): array
+    {
+        if (count($labels) > $targetCount) {
+            return array_slice($labels, 0, $targetCount);
+        }
+
+        $last = $labels[count($labels) - 1] ?? 'client';
+        while (count($labels) < $targetCount) {
+            $labels[] = $last;
+        }
+
+        return $labels;
+    }
+
+    /**
+     * @param  array<int, string>  $lines
+     * @param  array<int, string>  $labels
+     * @return array<int, array{speaker: string, text: string}>
+     */
+    private function groupLabeledLines(array $lines, array $labels): array
+    {
+        $turns = [];
+        $currentSpeaker = null;
+        $buffer = [];
+
+        foreach ($lines as $i => $line) {
+            $speaker = $labels[$i] ?? ($currentSpeaker ?? 'client');
+
+            if ($currentSpeaker !== null && $speaker !== $currentSpeaker) {
+                $turns[] = ['speaker' => $currentSpeaker, 'text' => trim(implode(' ', $buffer))];
+                $buffer = [];
+            }
+
+            $currentSpeaker = $speaker;
+            $buffer[] = $line;
+        }
+
+        if ($buffer !== []) {
+            $turns[] = ['speaker' => $currentSpeaker, 'text' => trim(implode(' ', $buffer))];
+        }
+
+        if (count($turns) === 0) {
+            throw new TranscriptionFailedException('Could not identify speaker turns in the recording.', 422);
+        }
+
+        return $turns;
+    }
 
     /**
      * @param  array<int, array{speaker: string, text: string}>  $turns

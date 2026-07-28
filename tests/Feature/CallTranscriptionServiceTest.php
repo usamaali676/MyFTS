@@ -43,11 +43,7 @@ class CallTranscriptionServiceTest extends TestCase
                 'choices' => [[
                     'message' => [
                         'content' => json_encode([
-                            'turns' => [
-                                ['speaker' => 'agent', 'text' => 'Hello thank you for calling.'],
-                                ['speaker' => 'client', 'text' => 'Hi I need help with my order.'],
-                                ['speaker' => 'agent', 'text' => 'I would be happy to assist.'],
-                            ],
+                            'labels' => ['agent', 'client', 'agent'],
                         ]),
                     ],
                 ]],
@@ -82,7 +78,7 @@ class CallTranscriptionServiceTest extends TestCase
             TranscriptionResponse::fake(['text' => 'Hello.']),
             CreateResponse::fake([
                 'choices' => [[
-                    'message' => ['content' => json_encode(['turns' => [['speaker' => 'agent', 'text' => 'Hello.']]])],
+                    'message' => ['content' => json_encode(['labels' => ['agent']])],
                 ]],
             ]),
         ]);

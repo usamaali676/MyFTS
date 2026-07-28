@@ -7,6 +7,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Response;
 use PhpOffice\PhpWord\IOFactory;
 use PhpOffice\PhpWord\PhpWord;
+use PhpOffice\PhpWord\Settings;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class TranscriptExportService
@@ -36,6 +37,17 @@ class TranscriptExportService
 
     public function toDocx(CallTranscription $record): BinaryFileResponse
     {
+        $phpWordTempDir = storage_path('app/tmp/phpword');
+        if (!is_dir($phpWordTempDir)) {
+            mkdir($phpWordTempDir, 0755, true);
+        }
+        // PhpWord builds the .docx in a scratch subfolder under its temp dir, then
+        // deletes it via scandir(). Left at the default sys_get_temp_dir(), that
+        // resolves to C:\Windows\Temp on this machine, which the web server's
+        // account can't fully read/write/delete in. Pointing it at a folder inside
+        // our own storage directory avoids that permissions problem entirely.
+        Settings::setTempDir($phpWordTempDir);
+
         $phpWord = new PhpWord();
         $section = $phpWord->addSection();
         $section->addText('Call Transcript', ['bold' => true, 'size' => 16]);
@@ -48,7 +60,7 @@ class TranscriptExportService
             $section->addTextBreak(1);
         }
 
-        $tempPath = tempnam(sys_get_temp_dir(), 'docx');
+        $tempPath = tempnam($phpWordTempDir, 'docx');
         IOFactory::createWriter($phpWord, 'Word2007')->save($tempPath);
 
         return response()->download($tempPath, 'transcript-' . $record->uuid . '.docx')->deleteFileAfterSend(true);
