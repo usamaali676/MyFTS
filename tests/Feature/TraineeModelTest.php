@@ -16,6 +16,7 @@ class TraineeModelTest extends TestCase
 
     private function makeUser(): User
     {
+        Role::firstOrCreate(['id' => 1], ['name' => 'Reserved Admin Placeholder']);
         $role = Role::create(['name' => 'Test Role ' . uniqid()]);
 
         return User::create([

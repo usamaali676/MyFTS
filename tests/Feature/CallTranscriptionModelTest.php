@@ -14,6 +14,7 @@ class CallTranscriptionModelTest extends TestCase
 
     public function test_it_stores_transcript_json_as_array(): void
     {
+        Role::firstOrCreate(['id' => 1], ['name' => 'Reserved Admin Placeholder']);
         $role = Role::create(['name' => 'Test Role']);
         $agent = User::create([
             'name' => 'John Smith',

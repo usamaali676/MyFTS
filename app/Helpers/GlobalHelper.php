@@ -116,23 +116,36 @@ class GlobalHelper
         $routeCollection = Route::getRoutes()->get();
         $permissions = []; // Initialize an empty array for permissions
 
-        // Define routes to ignore
-        $ignoreRoutesStartingWith = 'sanctum|livewire|ignition|verification|dashboard|password|logout|register|login|front|contact|listing|search|singcat|cities|test|filter|home|area.destroy|filament|storage|salereport.reportfilter|salereport.reportsupport';
-
         foreach ($routeCollection as $item) {
+            // A route only produces a togglable permission if something
+            // actually enforces it. Deriving the module list from route
+            // *names* (with a hand-maintained blacklist of "routes to
+            // ignore") is backwards -- it silently includes any route
+            // whose name doesn't happen to match the blacklist, which is
+            // exactly how unguarded utility routes like `reportShow` and
+            // `generate` ended up as dead checkboxes in the Role UI.
+            // Checking for the middleware itself is correct by
+            // construction and needs no list to maintain.
+            if (!in_array(\App\Http\Middleware\PermissionMiddelware::class, $item->gatherMiddleware(), true)) {
+                continue;
+            }
+
             $name = $item->action;
 
             if (!empty($name['as'])) {
-                $permission = trim(strtolower($name['as']));
-                // Strip out common suffixes to get the unique permission name
-                $permission = preg_replace('/\.(index|add|store|edit|update|delete|single|show|destroy|create|detail|conf-delete)$/', '', $permission);
+                $fullName = trim(strtolower($name['as']));
+                // Every route in this app is named `{module}.{action}` --
+                // the module is always the first segment. Trying to strip
+                // a hand-maintained list of known action suffixes instead
+                // (the old approach) breaks the moment a route uses an
+                // action name that isn't on the list (e.g. `ai.history`,
+                // `calltranscription.export`, `clientreport.editReport`),
+                // leaking it in as its own bogus "module". Taking the
+                // first segment works for every action name, known or not.
+                $permission = explode('.', $fullName)[0];
 
-                // Check if the route should be ignored
-                if (preg_match("($ignoreRoutesStartingWith)", $permission) === 0) {
-                    // If the permission is not empty, add it to the array
-                    if (!empty($permission)) {
-                        $permissions[$permission] = true; // Store as unique
-                    }
+                if ($permission !== '') {
+                    $permissions[$permission] = true; // Store as unique
                 }
             }
         }

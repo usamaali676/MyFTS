@@ -3,6 +3,7 @@
     $salereport_perm = App\Models\Permission::where('role_id', $user->role_id)->where('name', "salereport")->first();
     $attendance_perm = App\Models\Permission::where('role_id', $user->role_id)->where('name', "attendance")->first();
     $calltranscription_perm = App\Models\Permission::where('role_id', $user->role_id)->where('name', "calltranscription")->first();
+    $trainee_perm = App\Models\Permission::where('role_id', $user->role_id)->where('name', "trainee")->first();
 @endphp
 <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
     <div class="app-brand demo">
@@ -213,6 +214,15 @@
             <a href="{{ route('calltranscription.index') }}" class="menu-link">
                 <i class="menu-icon tf-icons mdi mdi-microphone-message-outline"></i>
                 <div data-i18n="Call Transcription">Call Transcription</div>
+            </a>
+        </li>
+        @endif
+
+        @if(isset($trainee_perm) && $trainee_perm->view == 1)
+        <li class="menu-item">
+            <a href="{{ route('trainee.index') }}" class="menu-link">
+                <i class="menu-icon tf-icons mdi mdi-school-outline"></i>
+                <div data-i18n="Trainees">Trainees</div>
             </a>
         </li>
         @endif

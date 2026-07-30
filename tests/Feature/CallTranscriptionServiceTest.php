@@ -21,6 +21,7 @@ class CallTranscriptionServiceTest extends TestCase
 
     private function makeAgent(): User
     {
+        Role::firstOrCreate(['id' => 1], ['name' => 'Reserved Admin Placeholder']);
         $role = Role::create(['name' => 'Test Role']);
 
         return User::create([
@@ -38,6 +39,12 @@ class CallTranscriptionServiceTest extends TestCase
         OpenAI::fake([
             TranscriptionResponse::fake([
                 'text' => 'Hello thank you for calling. Hi I need help with my order. I would be happy to assist.',
+                'duration' => 4.0,
+                'segments' => [
+                    ['id' => 0, 'start' => 0.0, 'end' => 1.0, 'text' => 'Hello thank you for calling.'],
+                    ['id' => 1, 'start' => 1.0, 'end' => 3.0, 'text' => 'Hi I need help with my order.'],
+                    ['id' => 2, 'start' => 3.0, 'end' => 4.0, 'text' => 'I would be happy to assist.'],
+                ],
             ]),
             CreateResponse::fake([
                 'choices' => [[
@@ -75,7 +82,12 @@ class CallTranscriptionServiceTest extends TestCase
         $agent = $this->makeAgent();
 
         OpenAI::fake([
-            TranscriptionResponse::fake(['text' => 'Hello.']),
+            TranscriptionResponse::fake([
+                'text' => 'Hello.',
+                'segments' => [
+                    ['id' => 0, 'start' => 0.0, 'end' => 1.0, 'text' => 'Hello.'],
+                ],
+            ]),
             CreateResponse::fake([
                 'choices' => [[
                     'message' => ['content' => json_encode(['labels' => ['agent']])],
@@ -98,7 +110,7 @@ class CallTranscriptionServiceTest extends TestCase
         $agent = $this->makeAgent();
 
         OpenAI::fake([
-            TranscriptionResponse::fake(['text' => '']),
+            TranscriptionResponse::fake(['text' => '', 'segments' => []]),
         ]);
 
         $file = $this->makeSilentWavUploadedFile(1);

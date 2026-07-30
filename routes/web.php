@@ -17,6 +17,9 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SaleController;
 use App\Http\Controllers\SaleReportController;
 use App\Http\Controllers\ServiceAreaController;
+use App\Http\Controllers\TraineeAttendanceController;
+use App\Http\Controllers\TraineeCommentController;
+use App\Http\Controllers\TraineeController;
 use App\Http\Controllers\UserController;
 use App\Http\Middleware\PermissionMiddelware;
 use App\Models\InvoiceServiceCharges;
@@ -267,4 +270,35 @@ Route::controller(RoleController::class)
         Route::get('/{uuid}', 'show')->name('show');
         Route::get('/{uuid}/export/{format}', 'export')->name('export');
         Route::delete('/{uuid}', 'delete')->name('delete');
+    });
+
+    Route::controller(TraineeController::class)
+    ->prefix('trainee')
+    ->as('trainee.')
+    ->middleware(PermissionMiddelware::class)
+    ->group(function () {
+        Route::get('index', 'index')->name('index');
+        Route::get('create', 'create')->name('create');
+        Route::post('store', 'store')->name('store');
+        Route::get('edit/{id}', 'edit')->name('edit');
+        Route::post('update/{id}', 'update')->name('update');
+        Route::get('delete/{id}', 'destroy')->name('delete');
+    });
+
+    Route::controller(TraineeAttendanceController::class)
+    ->prefix('trainee-attendance')
+    ->as('traineeattendance.')
+    ->middleware(PermissionMiddelware::class)
+    ->group(function () {
+        Route::get('{trainee}', 'index')->name('index');
+        Route::post('store', 'store')->name('store');
+    });
+
+    Route::controller(TraineeCommentController::class)
+    ->prefix('trainee-comment')
+    ->as('traineecomment.')
+    ->middleware(PermissionMiddelware::class)
+    ->group(function () {
+        Route::get('{trainee}', 'index')->name('index');
+        Route::post('store', 'store')->name('store');
     });

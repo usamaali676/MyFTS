@@ -15,6 +15,7 @@ class CallTranscriptionExportTest extends TestCase
 
     private function makeAuthorizedUser(): User
     {
+        Role::firstOrCreate(['id' => 1], ['name' => 'Reserved Admin Placeholder']);
         $role = Role::create(['name' => 'Test Role ' . uniqid()]);
 
         Permission::create([

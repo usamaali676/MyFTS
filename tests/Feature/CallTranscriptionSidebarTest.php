@@ -24,6 +24,7 @@ class CallTranscriptionSidebarTest extends TestCase
 
     private function makeUser(?bool $canView): User
     {
+        Role::firstOrCreate(['id' => 1], ['name' => 'Reserved Admin Placeholder']);
         $role = Role::create(['name' => 'Test Role ' . uniqid()]);
 
         if ($canView !== null) {

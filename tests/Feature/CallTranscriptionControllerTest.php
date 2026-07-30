@@ -19,6 +19,12 @@ class CallTranscriptionControllerTest extends TestCase
 
     private function makeUserWithPermission(bool $canView, bool $canCreate): User
     {
+        // role_id 1 is the fixed admin role (PermissionMiddelware bypasses
+        // all checks for it) and is permanently reserved in production
+        // (seeded first, never deletable) -- reserve it here too so this
+        // test's own role never accidentally lands on id 1 in the empty
+        // test database and gets an unintended free pass.
+        Role::firstOrCreate(['id' => 1], ['name' => 'Reserved Admin Placeholder']);
         $role = Role::create(['name' => 'Test Role ' . uniqid()]);
 
         Permission::create([

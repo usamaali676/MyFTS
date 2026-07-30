@@ -13,6 +13,7 @@ class Trainee extends Model
 
     protected $fillable = [
         'name',
+        'sudo_name',
         'sudo_options',
         'additional_info',
         'created_by_user_id',

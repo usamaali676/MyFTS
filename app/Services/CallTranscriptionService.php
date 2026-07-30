@@ -11,9 +11,15 @@ use OpenAI\Laravel\Facades\OpenAI;
 
 class CallTranscriptionService
 {
-    private const TRANSCRIBE_MODEL = 'gpt-4o-mini-transcribe';
+    // whisper-1, not the newer gpt-4o(-mini)-transcribe models: those are
+    // generative and have their own output-token ceiling with no internal
+    // audio chunking, so they silently truncate long calls partway through
+    // instead of transcribing the full file. whisper-1 is purpose-built for
+    // full-length audio and doesn't have that cutoff.
+    private const TRANSCRIBE_MODEL = 'whisper-1';
     private const DIARIZE_MODEL = 'gpt-4o-mini';
     private const MAX_RETRIES = 2;
+    private const LABEL_CHUNK_SIZE = 25;
 
     public function generate(UploadedFile $file, User $agent, string $requestUuid, int $createdByUserId): CallTranscription
     {
@@ -54,10 +60,10 @@ class CallTranscriptionService
         $storedPath = $storedDir . DIRECTORY_SEPARATOR . $storedName;
 
         try {
-            $durationSeconds = $this->readDuration($storedPath);
-            $text = $this->transcribe($storedPath);
-            $rawTurns = $this->diarize($text, $agent->name);
-            $turns = $this->finalizeTurns($rawTurns, $agent->name, $durationSeconds);
+            [$segments, $durationSeconds] = $this->transcribe($storedPath);
+            $durationSeconds ??= $this->readDuration($storedPath);
+            $rawTurns = $this->diarize($segments, $agent->name);
+            $turns = $this->finalizeTurns($rawTurns, $agent->name);
 
             $record->update([
                 'status' => 'completed',
@@ -103,25 +109,45 @@ class CallTranscriptionService
         }
     }
 
-    private function transcribe(string $path): string
+    /**
+     * @return array{0: array<int, array{text: string, start: int}>, 1: ?int}
+     */
+    private function transcribe(string $path): array
     {
         $attempt = 0;
 
         while (true) {
             try {
+                // verbose_json, not plain json: it returns real per-segment start
+                // timestamps from the audio itself, which we use directly instead
+                // of estimating turn timing from word-count proportions. It also
+                // sidesteps a separate bug -- whisper-1's plain-json output can
+                // come back with no punctuation at all on lower-quality phone
+                // audio, which broke sentence-boundary splitting entirely.
+                // Segments are natural pause-bounded phrases regardless of
+                // punctuation, so they work as diarization units either way.
                 $response = OpenAI::audio()->transcribe([
                     'model' => self::TRANSCRIBE_MODEL,
                     'file' => fopen($path, 'r'),
-                    'response_format' => 'json',
+                    'response_format' => 'verbose_json',
                 ]);
 
-                $text = trim($response->text);
+                $segments = [];
+                foreach ($response->segments as $segment) {
+                    $text = trim($segment->text);
 
-                if ($text === '') {
+                    if ($text !== '') {
+                        $segments[] = ['text' => $text, 'start' => (int) round($segment->start)];
+                    }
+                }
+
+                if (count($segments) === 0) {
                     throw new TranscriptionFailedException('No speech was detected in the uploaded recording.', 422);
                 }
 
-                return $text;
+                $duration = $response->duration !== null ? (int) round($response->duration) : null;
+
+                return [$segments, $duration];
             } catch (TranscriptionFailedException $e) {
                 throw $e;
             } catch (\OpenAI\Exceptions\RateLimitException|\OpenAI\Exceptions\ServerException|\OpenAI\Exceptions\TransporterException $e) {
@@ -142,27 +168,30 @@ class CallTranscriptionService
     }
 
     /**
-     * @return array<int, array{speaker: string, text: string}>
+     * @param  array<int, array{text: string, start: int}>  $segments
+     * @return array<int, array{speaker: string, text: string, start: int}>
      */
-    private function diarize(string $text, string $agentName): array
+    private function diarize(array $segments, string $agentName): array
     {
-        // Split into sentence-level lines and ask the model to label EVERY line
-        // individually (not choose its own grouping). Letting the model pick
-        // turn boundaries made it lazily merge most of a long call into 3-4
-        // giant blocks instead of real per-exchange turns. Forcing one label
-        // per line, then grouping consecutive same-speaker lines ourselves in
-        // PHP, keeps turns granular and timestamps meaningfully tied to the
-        // actual flow of the conversation.
-        $lines = preg_split('/(?<=[.?!])\s+|\n+/', trim($text), -1, PREG_SPLIT_NO_EMPTY);
-        $lines = array_values($lines);
-
-        if (count($lines) === 0) {
+        // Ask the model to label EVERY segment individually (not choose its own
+        // grouping), in small chunks. A single request covering a whole long
+        // call (100+ segments) reliably hits the model's output token cap
+        // mid-array (finish_reason "length"), producing truncated/invalid JSON
+        // that either fails outright or falls back to padding mismatched labels
+        // with a repeat of the last one -- collapsing most of the call into 1-2
+        // giant blocks. Small chunks keep each response tiny enough to never
+        // truncate, and confine any single request's mistakes to ~25 segments
+        // instead of the whole call.
+        if (count($segments) === 0) {
             throw new TranscriptionFailedException('Could not identify speaker turns in the recording.', 422);
         }
 
+        $lines = array_column($segments, 'text');
+        $starts = array_column($segments, 'start');
+
         $labels = $this->labelLines($lines, $agentName);
 
-        return $this->groupLabeledLines($lines, $labels);
+        return $this->groupLabeledLines($lines, $starts, $labels);
     }
 
     /**
@@ -171,6 +200,27 @@ class CallTranscriptionService
      */
     private function labelLines(array $lines, string $agentName): array
     {
+        $labels = [];
+        $previousSpeaker = null;
+        $previousLineText = null;
+
+        foreach (array_chunk($lines, self::LABEL_CHUNK_SIZE) as $chunk) {
+            $chunkLabels = $this->labelChunk($chunk, $agentName, $previousSpeaker, $previousLineText);
+            $labels = array_merge($labels, $chunkLabels);
+
+            $previousSpeaker = $chunkLabels[count($chunkLabels) - 1] ?? $previousSpeaker;
+            $previousLineText = $chunk[count($chunk) - 1] ?? $previousLineText;
+        }
+
+        return $labels;
+    }
+
+    /**
+     * @param  array<int, string>  $lines
+     * @return array<int, string> one 'agent'|'client' label per line, same order/length as $lines
+     */
+    private function labelChunk(array $lines, string $agentName, ?string $previousSpeaker, ?string $previousLineText): array
+    {
         $count = count($lines);
         $numbered = implode("\n", array_map(
             static fn (int $i, string $line): string => ($i + 1) . ': ' . $line,
@@ -178,18 +228,30 @@ class CallTranscriptionService
             $lines,
         ));
 
+        $context = $previousSpeaker !== null
+            ? "For continuity only (this line is from just before this excerpt and is already labeled -- do NOT include it in your output): line 0 was spoken by \"{$previousSpeaker}\": \"{$previousLineText}\". Keep applying that same speaker identity consistently; do not swap which name means agent vs client partway through.\n\n"
+            : '';
+
         $basePrompt = <<<PROMPT
-            You are given a phone-call transcript split into {$count} numbered lines, between two people:
+            You are given a phone-call transcript mechanically split into {$count} numbered text fragments
+            by PAUSES IN THE RAW AUDIO -- not by who is speaking. Many consecutive fragments are one
+            uninterrupted sentence or monologue from the SAME person, cut apart only because of a breath,
+            filler word, or the transcription engine's own chunking. A fragment that ends mid-word,
+            mid-thought, or without a natural sentence ending is almost always continued by the very next
+            fragment from the SAME speaker.
+
+            Two people are talking:
             - "{$agentName}" (the agent / call center representative)
             - the caller (their customer)
 
-            Real phone calls alternate speakers frequently, often every one or two sentences. Label EVERY
-            line individually based on conversational role (who is greeting/assisting versus who is
-            requesting help or answering questions about their own account). Do not lump many lines
-            together under one speaker unless they are clearly one uninterrupted monologue with no
-            response from the other person.
+            For each fragment, decide who is speaking. Default to keeping the SAME speaker as the previous
+            fragment. Only switch speakers when the content clearly signals a genuine handoff -- e.g. a
+            direct reply or acknowledgment to what was just said, a shift from the agent's pitch to the
+            client asking or answering something about their own account, or a statement that only makes
+            sense as a response to the fragment before it. Do not alternate speakers just because a
+            fragment boundary exists.
 
-            Return strict JSON only, no prose, in this exact shape — exactly {$count} labels, one per
+            {$context}Return strict JSON only, no prose, in this exact shape — exactly {$count} labels, one per
             line, in the same order as the transcript:
             {"labels": ["agent", "client", "client", "agent"]}
 
@@ -280,21 +342,27 @@ class CallTranscriptionService
 
     /**
      * @param  array<int, string>  $lines
+     * @param  array<int, int>  $starts
      * @param  array<int, string>  $labels
-     * @return array<int, array{speaker: string, text: string}>
+     * @return array<int, array{speaker: string, text: string, start: int}>
      */
-    private function groupLabeledLines(array $lines, array $labels): array
+    private function groupLabeledLines(array $lines, array $starts, array $labels): array
     {
         $turns = [];
         $currentSpeaker = null;
+        $turnStart = null;
         $buffer = [];
 
         foreach ($lines as $i => $line) {
             $speaker = $labels[$i] ?? ($currentSpeaker ?? 'client');
 
             if ($currentSpeaker !== null && $speaker !== $currentSpeaker) {
-                $turns[] = ['speaker' => $currentSpeaker, 'text' => trim(implode(' ', $buffer))];
+                $turns[] = ['speaker' => $currentSpeaker, 'text' => trim(implode(' ', $buffer)), 'start' => $turnStart];
                 $buffer = [];
+            }
+
+            if ($buffer === []) {
+                $turnStart = $starts[$i] ?? $turnStart ?? 0;
             }
 
             $currentSpeaker = $speaker;
@@ -302,7 +370,7 @@ class CallTranscriptionService
         }
 
         if ($buffer !== []) {
-            $turns[] = ['speaker' => $currentSpeaker, 'text' => trim(implode(' ', $buffer))];
+            $turns[] = ['speaker' => $currentSpeaker, 'text' => trim(implode(' ', $buffer)), 'start' => $turnStart];
         }
 
         if (count($turns) === 0) {
@@ -313,28 +381,22 @@ class CallTranscriptionService
     }
 
     /**
-     * @param  array<int, array{speaker: string, text: string}>  $turns
+     * @param  array<int, array{speaker: string, text: string, start: int}>  $turns
      * @return array<int, array{speaker: string, speaker_label: string, text: string, timestamp_seconds: ?int, timestamp_label: ?string}>
      */
-    private function finalizeTurns(array $turns, string $agentName, ?int $durationSeconds): array
+    private function finalizeTurns(array $turns, string $agentName): array
     {
-        $totalWords = max(1, array_sum(array_map(static fn (array $t): int => str_word_count($t['text']), $turns)));
-        $elapsedWords = 0;
         $result = [];
 
         foreach ($turns as $turn) {
-            $words = str_word_count($turn['text']);
-            $startSeconds = $durationSeconds !== null
-                ? (int) round(($elapsedWords / $totalWords) * $durationSeconds)
-                : null;
-            $elapsedWords += $words;
+            $startSeconds = $turn['start'];
 
             $result[] = [
                 'speaker' => $turn['speaker'],
                 'speaker_label' => $turn['speaker'] === 'agent' ? $agentName : 'Client',
                 'text' => $turn['text'],
                 'timestamp_seconds' => $startSeconds,
-                'timestamp_label' => $startSeconds !== null ? $this->formatTimestamp($startSeconds) : null,
+                'timestamp_label' => $this->formatTimestamp($startSeconds),
             ];
         }
 

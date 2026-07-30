@@ -11,6 +11,7 @@ return new class extends Migration
         Schema::create('trainees', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->string('sudo_name')->nullable();
             // Active/Inactive status flag (not a literal privilege/access flag).
             $table->boolean('sudo_options');
             $table->text('additional_info')->nullable();

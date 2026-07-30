@@ -34,6 +34,18 @@ class PermissionMiddelware
         // dd($user);
         // Ensure a user is authenticated before checking their permissions
         if ($user) {
+            // Role 1 is the fixed admin role throughout this app (see
+            // sidebar.blade.php's `role_id == 1` checks and
+            // RoleController::destroy() refusing to delete it). It's
+            // meant to always have full access; previously that only held
+            // because every checkbox happened to be manually checked for
+            // it, so a newly-added module with no saved Permission row yet
+            // would silently lock out admins too. Making the bypass
+            // structural here removes that trap for good.
+            if ((int) $user->role_id === 1) {
+                return $next($request);
+            }
+
             $role = Role::where('id', $user->role_id)->first();
             //  dd($role);
             // If route matches permission pattern
@@ -48,6 +60,8 @@ class PermissionMiddelware
                     // Check permission based on operation
                     switch ($routeNameMatches['operation']) {
                         case "index":
+                        case "show":
+                        case "detail":
                             $hasPermission = $perms->view == 1;
                             break;
                         case 'create':
@@ -105,7 +119,7 @@ class PermissionMiddelware
     {
         $matches = [];
         // dd($matches);
-       preg_match('/^(?P<entity>[a-z]+)\.(?P<operation>index|view|create|store|edit|update|delete|conf-delete)$/i', $routeName, $matches);
+       preg_match('/^(?P<entity>[a-z]+)\.(?P<operation>index|view|create|store|edit|update|delete|conf-delete|show|detail)$/i', $routeName, $matches);
 
 
         if (count($matches) > 2) {
