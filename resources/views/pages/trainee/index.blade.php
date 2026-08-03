@@ -15,6 +15,9 @@
                       <tr>
                         <th></th>
                         <th>Name</th>
+                        <th>Sudo Name</th>
+                        <th>Role</th>
+                        <th>Days</th>
                         <th>Status</th>
                         <th>Created By</th>
                         <th>Action</th>
@@ -25,11 +28,20 @@
                           <tr>
                             <td>{{ $srno++ }}</td>
                             <td>{{ $item->name }}</td>
+                            <td>{{ $item->sudo_name }}</td>
+                            <td>{{ $item->role }}</td>
+                            <td>{{ $item->days }}</td>
                             <td>
-                                @if($item->sudo_options)
+                                @if($item->status == 'active')
                                     <span class="badge rounded-pill bg-success">Active</span>
-                                @else
+                                @elseif($item->status == 'inactive')
                                     <span class="badge rounded-pill bg-danger">Inactive</span>
+                                @elseif($item->status == 'suspended')
+                                    <span class="badge rounded-pill bg-warning">Suspended</span>
+                                @elseif($item->status == 'onBoard')
+                                    <span class="badge rounded-pill bg-info">On Board</span>
+                                @else
+                                    <span class="badge rounded-pill bg-secondary">N/A</span>
                                 @endif
                             </td>
                             <td>{{ $item->createdBy->name ?? '-' }}</td>
@@ -46,6 +58,7 @@
                                         data-bs-toggle="modal"
                                         data-bs-target="#basicModal"
                                         class="dropdown-item delete-record"><i class="mdi mdi-delete-outline me-2"></i><span>Delete</span></a>
+                                        <a href="{{ route('trainee.show', $item->id) }}" class="dropdown-item"><i class="mdi mdi-eye-outline me-2"></i><span>View Details</span></a>
                                         <a href="javascript:;" data-bs-toggle="modal" data-bs-target="#markAttendance{{ $item->id }}" class="dropdown-item"><i class="mdi mdi-calendar-check-outline me-2"></i><span>Mark Attendance</span></a>
                                         <a href="{{ route('traineeattendance.index', $item->id) }}" class="dropdown-item"><i class="mdi mdi-calendar-month-outline me-2"></i><span>View Attendance</span></a>
                                         <a href="{{ route('traineecomment.index', $item->id) }}" class="dropdown-item"><i class="mdi mdi-comment-text-outline me-2"></i><span>Comments</span></a>

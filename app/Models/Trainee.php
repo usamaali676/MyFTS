@@ -14,16 +14,15 @@ class Trainee extends Model
     protected $fillable = [
         'name',
         'sudo_name',
-        'sudo_options',
+        'role',
+        'days',
+        'status',
         'additional_info',
         'created_by_user_id',
         'updated_by_user_id',
         'deleted_by_user_id',
     ];
 
-    protected $casts = [
-        'sudo_options' => 'boolean',
-    ];
 
     public function createdBy(): BelongsTo
     {

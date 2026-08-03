@@ -72,6 +72,16 @@ class TraineeAttendanceController extends Controller
             ['present' => $present, 'late' => $late, 'created_by_user_id' => Auth::id()]
         );
 
+        // Keep the trainee total in sync with unique days marked on-time or late.
+        // An absent record does not contribute to the total.
+        $attendanceDays = TraineeAttendance::where('trainee_id', $request->trainee_id)
+            ->where(function ($query) {
+                $query->where('present', true)->orWhere('late', true);
+            })
+            ->count();
+
+        Trainee::whereKey($request->trainee_id)->update(['days' => $attendanceDays]);
+
         Alert::success('Success', 'Attendance Saved Successfully');
 
         return redirect()->route('trainee.index');

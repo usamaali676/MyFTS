@@ -21,6 +21,10 @@ class CallTranscriptionService
     private const MAX_RETRIES = 2;
     private const LABEL_CHUNK_SIZE = 25;
 
+    public function __construct(
+        private readonly TranscriptComplianceService $complianceService,
+    ) {}
+
     public function generate(UploadedFile $file, User $agent, string $requestUuid, int $createdByUserId): CallTranscription
     {
         $existing = CallTranscription::where('uuid', $requestUuid)
@@ -73,6 +77,22 @@ class CallTranscriptionService
                 'exchange_count' => count($turns),
                 'processing_time_ms' => (int) round((microtime(true) - $startedAt) * 1000),
             ]);
+
+            // The transcript itself is already saved and successful at this point.
+            // TranscriptComplianceService::analyze() catches its own OpenAI/JSON
+            // errors internally and records them on the model rather than
+            // throwing, but it's wrapped here too so any truly unexpected failure
+            // in the compliance pass still can't roll a completed transcription
+            // back into a "failed" one.
+            try {
+                $this->complianceService->analyze($record);
+            } catch (\Throwable $e) {
+                Log::error('Compliance analysis threw unexpectedly after transcription succeeded', [
+                    'call_transcription_id' => $record->id,
+                    'exception' => get_class($e),
+                    'message' => $e->getMessage(),
+                ]);
+            }
         } catch (TranscriptionFailedException $e) {
             $record->update(['status' => 'failed', 'error_message' => $e->getMessage()]);
             throw $e;

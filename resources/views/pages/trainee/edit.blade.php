@@ -17,41 +17,47 @@
                   </div>
                   @endif
                   <div class="row g-4">
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                       <div class="form-floating form-floating-outline">
                         <input type="text" name="name" id="name" value="{{ old('name', $trainee->name) }}" class="form-control" placeholder="Alex Trainee" />
                         <label for="name">Full Name</label>
                       </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                       <div class="form-floating form-floating-outline">
                         <input type="text" name="sudo_name" id="sudo_name" value="{{ old('sudo_name', $trainee->sudo_name) }}" class="form-control" placeholder="Alex Trainee" />
                         <label for="sudo_name">Sudo Name</label>
                       </div>
                     </div>
-                    <div class="col-xl-4">
-                        <div class="row">
-                            <div class="col-md mb-md-0 mb-5">
-                            <div class="form-check custom-option custom-option-basic checked">
-                                <label class="form-check-label custom-option-content" for="sudo_options_1">
-                                <input class="form-check-input" name="sudo_options" type="radio" value="1" id="sudo_options_1" @if($trainee->sudo_options) checked @endif>
-                                <span class="custom-option-header">
-                                    <span class="h6 mb-0">Active</span>
-                                </span>
-                                </label>
-                            </div>
-                            </div>
-                            <div class="col-md">
-                            <div class="form-check custom-option custom-option-basic">
-                                <label class="form-check-label custom-option-content" for="sudo_options_0">
-                                <input class="form-check-input" name="sudo_options" type="radio" value="0" id="sudo_options_0" @if(!$trainee->sudo_options) checked @endif>
-                                <span class="custom-option-header">
-                                    <span class="h6 mb-0">Inactive</span>
-                                </span>
-                                </label>
-                            </div>
-                            </div>
-                        </div>
+                    <div class="col-md-6">
+                      <div class="form-floating form-floating-outline">
+                        <input type="text" name="role" id="role" value="{{ old('role', $trainee->role) }}" class="form-control" placeholder="TSR" />
+                        <label for="role">Role</label>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                                <div class="form-floating form-floating-outline">
+                                    <select id="status" name="status" class="select2 form-select" data-allow-clear="true" required>
+                                        <option value="">Please Select</option>
+
+                                        <option value="active" {{ $trainee->status == 'active' ? 'selected' : '' }}>
+                                            Active
+                                        </option>
+
+                                        <option value="inactive" {{ $trainee->status == 'inactive' ? 'selected' : '' }}>
+                                            Inactive
+                                        </option>
+
+                                        <option value="suspended" {{ $trainee->status == 'suspended' ? 'selected' : '' }}>
+                                            Suspended
+                                        </option>
+
+                                        <option value="onBoard" {{ $trainee->status == 'onBoard' ? 'selected' : '' }}>
+                                            On Board
+                                        </option>
+                                    </select>
+                                    <label for="multicol-country">Status</label>
+                                </div>
                     </div>
                     <div class="col-12">
                       <div class="form-floating form-floating-outline">

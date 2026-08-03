@@ -23,6 +23,16 @@ class TranscriptExportService
             $lines[] = '';
         }
 
+        if ($record->compliance_status === 'completed' && $record->compliance_summary) {
+            $lines[] = str_repeat('-', 40);
+            $lines[] = 'COMPLIANCE SUMMARY';
+            $lines[] = str_repeat('-', 40);
+            foreach ($record->compliance_summary as $label => $count) {
+                $lines[] = ucwords(str_replace('_', ' ', $label)) . ': ' . $count;
+            }
+            $lines[] = '';
+        }
+
         return response(implode("\n", $lines), 200, [
             'Content-Type' => 'text/plain; charset=UTF-8',
             'Content-Disposition' => 'attachment; filename="transcript-' . $record->uuid . '.txt"',
@@ -31,8 +41,11 @@ class TranscriptExportService
 
     public function toPdf(CallTranscription $record)
     {
-        return Pdf::loadView('pages.callTranscription.exports.pdf', ['record' => $record])
-            ->download('transcript-' . $record->uuid . '.pdf');
+        return Pdf::loadView('pages.callTranscription.exports.pdf', [
+            'record' => $record,
+            'complianceHtml' => $record->compliance_status === 'completed' ? $record->compliance_html : null,
+            'complianceSummary' => $record->compliance_status === 'completed' ? $record->compliance_summary : null,
+        ])->download('transcript-' . $record->uuid . '.pdf');
     }
 
     public function toDocx(CallTranscription $record): BinaryFileResponse
@@ -58,6 +71,14 @@ class TranscriptExportService
             $section->addText('[' . ($turn['timestamp_label'] ?? '--:--:--') . '] ' . $turn['speaker_label'] . ':', ['bold' => true]);
             $section->addText($turn['text']);
             $section->addTextBreak(1);
+        }
+
+        if ($record->compliance_status === 'completed' && $record->compliance_summary) {
+            $section->addTextBreak(1);
+            $section->addText('Compliance Summary', ['bold' => true, 'size' => 14]);
+            foreach ($record->compliance_summary as $label => $count) {
+                $section->addText(ucwords(str_replace('_', ' ', $label)) . ': ' . $count);
+            }
         }
 
         $tempPath = tempnam($phpWordTempDir, 'docx');

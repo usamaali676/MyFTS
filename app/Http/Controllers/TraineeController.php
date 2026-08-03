@@ -26,14 +26,16 @@ class TraineeController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'sudo_options' => 'required|boolean',
+            'status' => 'required|in:active,inactive,suspended,onBoard',
+            'role' => 'required|string|max:255',
             'additional_info' => 'nullable|string',
         ]);
 
         Trainee::create([
             'name' => $request->name,
             'sudo_name' => $request->sudo_name,
-            'sudo_options' => $request->boolean('sudo_options'),
+            'role' => $request->role,
+            'status' => $request->status,
             'additional_info' => $request->additional_info,
             'created_by_user_id' => Auth::id(),
         ]);
@@ -41,6 +43,13 @@ class TraineeController extends Controller
         Alert::success('Success', 'Trainee Added Successfully');
 
         return redirect()->route('trainee.index');
+    }
+
+    public function show($id)
+    {
+        $trainee = Trainee::findOrFail($id);
+
+        return view('pages.trainee.show', compact('trainee'));
     }
 
     public function edit($id)
@@ -54,13 +63,15 @@ class TraineeController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'sudo_options' => 'required|boolean',
+            'role' => 'required|string|max:255',
+            'status' => 'required|in:active,inactive,suspended,onBoard',
             'additional_info' => 'nullable|string',
         ]);
 
         $trainee = Trainee::findOrFail($id);
         $trainee->sudo_name = $request->sudo_name;
-        $trainee->sudo_options = $request->boolean('sudo_options');
+        $trainee->role = $request->role;
+        $trainee->status = $request->status;
         $trainee->additional_info = $request->additional_info;
         $trainee->updated_by_user_id = Auth::id();
         $trainee->save();

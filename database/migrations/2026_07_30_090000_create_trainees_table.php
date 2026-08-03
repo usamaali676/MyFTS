@@ -12,8 +12,9 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('sudo_name')->nullable();
-            // Active/Inactive status flag (not a literal privilege/access flag).
-            $table->boolean('sudo_options');
+            $table->string('role')->unique();
+            $table->bigInteger('days')->default(0);
+            $table->enum('status', ['active', 'inactive', 'suspended', 'onBoard'])->default('active');
             $table->text('additional_info')->nullable();
             $table->foreignId('created_by_user_id')->constrained('users');
             $table->foreignId('updated_by_user_id')->nullable()->constrained('users')->nullOnDelete();
