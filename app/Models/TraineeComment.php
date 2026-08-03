@@ -17,8 +17,9 @@ class TraineeComment extends Model
     ];
 
     protected $casts = [
-        'comment_date' => 'date',
+        'comment_date' => 'datetime',
     ];
+
 
     public function trainee(): BelongsTo
     {

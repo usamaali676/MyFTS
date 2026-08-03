@@ -13,7 +13,7 @@ return new class extends Migration
             $table->foreignId('trainee_id')->constrained('trainees')->cascadeOnDelete();
             $table->foreignId('user_id')->constrained('users');
             $table->text('comment');
-            $table->date('comment_date');
+            $table->dateTime('comment_date');
             $table->timestamp('created_at')->useCurrent();
         });
     }
