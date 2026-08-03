@@ -19,7 +19,7 @@
                             <div class="flex-grow-1">
                                 <div class="d-flex justify-content-between">
                                     <h6 class="mb-1">{{ $comment->user->name ?? 'Unknown' }}</h6>
-                                    <small class="text-muted">{{ $comment->comment_date->format('M d, Y') }}</small>
+                                    <small class="text-muted">{{ $comment->comment_date->format('M d, Y h:i A') }}</small>
                                 </div>
                                 <p class="mb-0">{{ $comment->comment }}</p>
                             </div>
