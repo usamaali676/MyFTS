@@ -29,7 +29,7 @@ class TraineeCommentController extends Controller
             'trainee_id' => $request->trainee_id,
             'user_id' => Auth::id(),
             'comment' => $request->comment,
-            'comment_date' => now()->toDateString(),
+            'comment_date' => now(),
         ]);
 
         Alert::success('Success', 'Comment Added Successfully');
