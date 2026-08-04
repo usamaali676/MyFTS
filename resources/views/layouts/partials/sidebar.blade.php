@@ -212,7 +212,7 @@
         @if(isset($calltranscription_perm) && $calltranscription_perm->view == 1)
         <li class="menu-item">
             <a href="{{ route('calltranscription.index') }}" class="menu-link">
-                <i class="menu-icon tf-icons mdi mdi-microphone-message-outline"></i>
+                <i class="menu-icon tf-icons mdi mdi-file-sign"></i>
                 <div data-i18n="Call Transcription">Call Transcription</div>
             </a>
         </li>
