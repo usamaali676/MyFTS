@@ -86,6 +86,13 @@
     .ct-turn .ct-speaker { font-weight: 600; font-size: .85rem; }
     .ct-turn .ct-text { font-size: .9rem; color: #4b4b4b; margin-top: 2px; white-space: pre-wrap; }
     .ct-copy-flash { color: #28c76f !important; }
+
+    /* Compliance -- highlights render inline inside .ct-text itself (see
+       renderTurns), so there's no separate highlighted-block style here,
+       just the summary badges and the "not run yet" empty state. */
+    .ct-compliance-badges { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: .75rem; }
+    .ct-compliance-badges .badge { font-size: .75rem; }
+    .ct-compliance-empty { font-size: .85rem; color: #a1acb8; margin-bottom: .5rem; }
 </style>
 @endsection
 
@@ -183,6 +190,14 @@
                     <span class="badge bg-label-secondary"><i class="mdi mdi-timer-outline me-1"></i><span id="ctMetaProcessingTime"></span></span>
                 </div>
 
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div id="ctComplianceBadges" class="ct-compliance-badges mb-0" style="display:none;"></div>
+                    <div id="ctComplianceEmpty" class="ct-compliance-empty mb-0" style="display:none;"></div>
+                    <button id="ctComplianceRerunBtn" type="button" class="btn btn-outline-secondary btn-sm ms-auto">
+                        <i class="mdi mdi-shield-check-outline me-1"></i> Run Compliance Check
+                    </button>
+                </div>
+
                 <div id="ctTurnsContainer"></div>
             </div>
         </div>
@@ -199,6 +214,7 @@
     const routes = {
         store: '{{ route('calltranscription.store') }}',
         exportUrl: (uuid, fmt) => '{{ url('call-transcription') }}/' + uuid + '/export/' + fmt,
+        analyzeUrl: (uuid) => '{{ url('call-transcription') }}/' + uuid + '/analyze-compliance',
     };
 
     const statusMessages = [
@@ -343,22 +359,110 @@
         resultStage.classList.toggle('show', stage === 'result');
     }
 
-    function renderTurns(turns) {
+    function renderTurns(turns, complianceTurns) {
         const container = document.getElementById('ctTurnsContainer');
-        container.innerHTML = turns.map((turn, idx) => `
+        container.innerHTML = turns.map((turn, idx) => {
+            // When a compliance analysis has run, complianceTurns[idx] holds this
+            // exact turn's own text with highlight spans inserted by the model --
+            // it replaces the plain escaped text in place, so the transcript is
+            // never rendered twice.
+            const hasHighlight = Array.isArray(complianceTurns) && typeof complianceTurns[idx] === 'string';
+            const textHtml = hasHighlight ? complianceTurns[idx] : escapeHtml(turn.text);
+
+            return `
             <div class="ct-turn ${turn.speaker}" style="animation-delay:${idx * 60}ms">
                 <div class="ct-avatar">${turn.speaker === 'agent' ? '<i class="mdi mdi-headset"></i>' : '<i class="mdi mdi-account"></i>'}</div>
                 <div class="flex-grow-1">
                     <div class="ct-ts">[${turn.timestamp_label || '--:--:--'}]</div>
                     <div class="ct-speaker">${escapeHtml(turn.speaker_label)}:</div>
-                    <div class="ct-text">${escapeHtml(turn.text)}</div>
+                    <div class="ct-text">${textHtml}</div>
                 </div>
                 <button type="button" class="btn btn-sm btn-icon ct-turn-copy" title="Copy this exchange" data-text="${escapeHtml('[' + (turn.timestamp_label || '--:--:--') + '] ' + turn.speaker_label + ': ' + turn.text)}">
                     <i class="mdi mdi-content-copy"></i>
                 </button>
             </div>
-        `).join('');
+        `;
+        }).join('');
     }
+
+    const COMPLIANCE_BADGE_LABELS = {
+        red_violations: { label: 'Red Violations', cls: 'bg-label-danger' },
+        yellow_review_items: { label: 'Yellow Review Items', cls: 'bg-label-warning' },
+        prices_below_150: { label: 'Prices Below $150', cls: 'bg-label-danger' },
+        position_commitments: { label: 'Position Commitments', cls: 'bg-label-danger' },
+        timeframe_violations: { label: 'Timeframe Violations', cls: 'bg-label-danger' },
+    };
+
+    function renderComplianceStatus(data) {
+        const badgesEl = document.getElementById('ctComplianceBadges');
+        const emptyEl = document.getElementById('ctComplianceEmpty');
+        const rerunBtn = document.getElementById('ctComplianceRerunBtn');
+
+        if (data.compliance_status === 'completed' && data.compliance_summary) {
+            emptyEl.style.display = 'none';
+            const summary = data.compliance_summary;
+            badgesEl.innerHTML = Object.keys(COMPLIANCE_BADGE_LABELS).map((key) => {
+                const meta = COMPLIANCE_BADGE_LABELS[key];
+                const count = summary[key] || 0;
+                return `<span class="badge ${meta.cls}">${meta.label}: ${count}</span>`;
+            }).join('');
+            badgesEl.style.display = 'flex';
+            rerunBtn.innerHTML = '<i class="mdi mdi-shield-check-outline me-1"></i> Re-run Compliance Check';
+        } else if (data.compliance_status === 'failed') {
+            badgesEl.style.display = 'none';
+            emptyEl.textContent = 'Compliance analysis failed' + (data.compliance_error ? ': ' + data.compliance_error : '.') + ' You can try again.';
+            emptyEl.style.display = 'block';
+            rerunBtn.innerHTML = '<i class="mdi mdi-shield-check-outline me-1"></i> Retry Compliance Check';
+        } else {
+            badgesEl.style.display = 'none';
+            emptyEl.textContent = data.compliance_status === 'processing'
+                ? 'Compliance analysis is still running…'
+                : 'Compliance analysis has not run yet.';
+            emptyEl.style.display = 'block';
+            rerunBtn.innerHTML = '<i class="mdi mdi-shield-check-outline me-1"></i> Run Compliance Check';
+        }
+    }
+
+    function runComplianceCheck() {
+        if (!lastResult) return;
+
+        const btn = document.getElementById('ctComplianceRerunBtn');
+        const original = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="mdi mdi-loading mdi-spin me-1"></i> Analyzing…';
+
+        fetch(routes.analyzeUrl(lastResult.uuid), {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': csrfToken(),
+                'Accept': 'application/json',
+            },
+        })
+            .then((res) => res.json())
+            .then((res) => {
+                lastResult.compliance_status = res.compliance_status;
+                lastResult.compliance_turns = res.compliance_turns;
+                lastResult.compliance_summary = res.compliance_summary;
+                lastResult.compliance_error = res.message;
+                // Re-render the transcript in place with the new highlights,
+                // then refresh the badges/status line above it.
+                renderTurns(lastResult.turns, lastResult.compliance_turns);
+                renderComplianceStatus(lastResult);
+            })
+            .catch(() => {
+                const emptyEl = document.getElementById('ctComplianceEmpty');
+                emptyEl.textContent = 'Network error while running the compliance check.';
+                emptyEl.style.display = 'block';
+            })
+            .finally(() => {
+                btn.disabled = false;
+                if (btn.innerHTML.includes('Analyzing')) {
+                    btn.innerHTML = original;
+                }
+            });
+    }
+
+    document.getElementById('ctComplianceRerunBtn').addEventListener('click', runComplianceCheck);
 
     document.getElementById('ctTurnsContainer').addEventListener('click', function (e) {
         const btn = e.target.closest('.ct-turn-copy');
@@ -390,7 +494,8 @@
         document.getElementById('ctMetaWords').textContent = data.word_count;
         document.getElementById('ctMetaExchanges').textContent = data.exchange_count;
         document.getElementById('ctMetaProcessingTime').textContent = data.processing_time_ms ? (data.processing_time_ms / 1000).toFixed(1) + 's' : '—';
-        renderTurns(data.turns);
+        renderTurns(data.turns, data.compliance_turns);
+        renderComplianceStatus(data);
 
         document.getElementById('ctExportTxt').href = routes.exportUrl(data.uuid, 'txt');
         document.getElementById('ctExportPdf').href = routes.exportUrl(data.uuid, 'pdf');

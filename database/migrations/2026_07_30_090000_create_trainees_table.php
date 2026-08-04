@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('sudo_name')->nullable();
-            $table->string('role')->unique();
+            $table->string('role')->nullable();
             $table->bigInteger('days')->default(0);
             $table->enum('status', ['active', 'inactive', 'suspended', 'onBoard'])->default('active');
             $table->text('additional_info')->nullable();

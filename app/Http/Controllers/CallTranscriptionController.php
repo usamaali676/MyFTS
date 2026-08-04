@@ -8,6 +8,7 @@ use App\Models\CallTranscription;
 use App\Models\Role;
 use App\Models\User;
 use App\Services\CallTranscriptionService;
+use App\Services\TranscriptComplianceService;
 use App\Services\TranscriptExportService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -17,6 +18,7 @@ class CallTranscriptionController extends Controller
     public function __construct(
         private readonly CallTranscriptionService $service,
         private readonly TranscriptExportService $exportService,
+        private readonly TranscriptComplianceService $complianceService,
     ) {}
 
     public function index()
@@ -83,6 +85,29 @@ class CallTranscriptionController extends Controller
         };
     }
 
+    public function analyzeCompliance(string $uuid)
+    {
+        $record = CallTranscription::where('uuid', $uuid)->firstOrFail();
+
+        if ($record->status !== 'completed') {
+            return response()->json([
+                'success' => false,
+                'message' => 'The transcript must finish processing before it can be audited.',
+            ], 422);
+        }
+
+        $this->complianceService->analyze($record);
+        $record = $record->fresh();
+
+        return response()->json([
+            'success' => $record->compliance_status === 'completed',
+            'compliance_status' => $record->compliance_status,
+            'compliance_turns' => $record->compliance_turns,
+            'compliance_summary' => $record->compliance_summary,
+            'message' => $record->compliance_error,
+        ]);
+    }
+
     public function delete(string $uuid)
     {
         $record = CallTranscription::where('uuid', $uuid)->firstOrFail();
@@ -103,6 +128,10 @@ class CallTranscriptionController extends Controller
             'exchange_count' => $record->exchange_count,
             'processing_time_ms' => $record->processing_time_ms,
             'turns' => $record->transcript_json ?? [],
+            'compliance_status' => $record->compliance_status,
+            'compliance_turns' => $record->compliance_turns,
+            'compliance_summary' => $record->compliance_summary,
+            'compliance_error' => $record->compliance_error,
         ];
     }
 }

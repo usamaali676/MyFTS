@@ -41,11 +41,8 @@ class TranscriptExportService
 
     public function toPdf(CallTranscription $record)
     {
-        return Pdf::loadView('pages.callTranscription.exports.pdf', [
-            'record' => $record,
-            'complianceHtml' => $record->compliance_status === 'completed' ? $record->compliance_html : null,
-            'complianceSummary' => $record->compliance_status === 'completed' ? $record->compliance_summary : null,
-        ])->download('transcript-' . $record->uuid . '.pdf');
+        return Pdf::loadView('pages.callTranscription.exports.pdf', ['record' => $record])
+            ->download('transcript-' . $record->uuid . '.pdf');
     }
 
     public function toDocx(CallTranscription $record): BinaryFileResponse

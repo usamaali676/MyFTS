@@ -24,6 +24,11 @@ return new class extends Migration
             $table->unsignedInteger('processing_time_ms')->nullable();
             $table->text('error_message')->nullable();
             $table->unsignedInteger('openai_audio_tokens')->nullable();
+            $table->string('compliance_status')->nullable();
+            $table->longText('compliance_html')->nullable();
+            $table->json('compliance_summary')->nullable();
+            $table->string('compliance_error')->nullable();
+            $table->json('compliance_turns')->nullable();
             $table->foreignId('created_by')->constrained('users');
             $table->timestamps();
             $table->softDeletes();

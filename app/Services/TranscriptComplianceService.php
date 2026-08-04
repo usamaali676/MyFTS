@@ -28,6 +28,12 @@ class TranscriptComplianceService
      * and persist the result onto the record. Never throws -- failures are
      * recorded on the model itself so a bad analysis never takes down an
      * otherwise-successful transcription.
+     *
+     * Stores compliance_turns as an array of HTML strings, index-aligned
+     * with $record->transcript_json, so the highlighted version of each
+     * turn can be swapped in for its plain text wherever the transcript is
+     * already rendered -- rather than producing a second, separate copy
+     * of the transcript.
      */
     public function analyze(CallTranscription $record): void
     {
@@ -42,7 +48,7 @@ class TranscriptComplianceService
             return;
         }
 
-        $transcriptText = $this->renderTurnsForPrompt($turns);
+        $numberedTranscript = $this->renderTurnsForPrompt($turns);
 
         $record->update(['compliance_status' => 'processing']);
 
@@ -55,18 +61,22 @@ class TranscriptComplianceService
                     'temperature' => 0,
                     'response_format' => ['type' => 'json_object'],
                     'messages' => [
-                        ['role' => 'system', 'content' => $this->systemPrompt()],
-                        ['role' => 'user', 'content' => $transcriptText],
+                        ['role' => 'system', 'content' => $this->systemPrompt(count($turns))],
+                        ['role' => 'user', 'content' => $numberedTranscript],
                     ],
                 ]);
 
                 $decoded = json_decode($response->choices[0]->message->content, true);
 
-                $html = $decoded['html'] ?? null;
+                $turnsOut = $decoded['turns'] ?? null;
                 $counts = $decoded['counts'] ?? null;
 
-                if (!is_string($html) || $html === '' || !is_array($counts)) {
-                    throw new \RuntimeException('Compliance response was missing the expected html/counts fields.');
+                if (!is_array($turnsOut) || count($turnsOut) !== count($turns) || !is_array($counts)) {
+                    throw new \RuntimeException(sprintf(
+                        'Compliance response shape mismatch: expected %d turns, got %s.',
+                        count($turns),
+                        is_array($turnsOut) ? count($turnsOut) : gettype($turnsOut)
+                    ));
                 }
 
                 $normalizedCounts = [];
@@ -76,7 +86,7 @@ class TranscriptComplianceService
 
                 $record->update([
                     'compliance_status' => 'completed',
-                    'compliance_html' => $html,
+                    'compliance_turns' => array_values($turnsOut),
                     'compliance_summary' => $normalizedCounts,
                     'compliance_error' => null,
                 ]);
@@ -137,25 +147,31 @@ class TranscriptComplianceService
     {
         $lines = [];
 
-        foreach ($turns as $turn) {
+        foreach (array_values($turns) as $index => $turn) {
             $label = $turn['speaker_label'] ?? ($turn['speaker'] ?? 'Unknown');
             $text = $turn['text'] ?? '';
-            $lines[] = "{$label}: {$text}";
+            $lines[] = "[{$index}] {$label}: {$text}";
         }
 
         return implode("\n", $lines);
     }
 
-    private function systemPrompt(): string
+    private function systemPrompt(int $turnCount): string
     {
-        // Verbatim rule set as provided, with the output contract changed from
-        // "HTML transcript then a compact summary" (free text) to a single
-        // strict JSON object. Free-text output would require fragile string
-        // splitting to separate the transcript from the counts on our end;
-        // JSON keeps both pieces machine-readable so the app can render the
-        // HTML and display the counts independently without re-parsing prose.
+        // Verbatim rule set as provided. The output contract is changed from
+        // "one flat HTML transcript plus a compact summary" to a JSON array
+        // of per-turn highlighted strings, index-aligned with the app's own
+        // transcript_json. A flat re-rendered transcript has no reliable way
+        // to be spliced back into the existing turn-by-turn UI/exports
+        // without duplicating the whole conversation a second time; per-turn
+        // output lets the highlighted text replace the plain text of the
+        // same turn in place.
         return <<<PROMPT
-            You are a sales-call compliance auditor. Analyze the transcript, identify the Closer/Salesperson and Customer, preserve the exact wording, order, and speaker labels, and produce an HTML-highlighted transcript plus a compact violation summary. Highlight the smallest relevant phrase.
+            You are a sales-call compliance auditor. You will be given a numbered list of transcript turns, each already labeled with the index and speaker who said it. Identify which speaker is the Closer/Salesperson and which is the Customer.
+
+            For every turn, in the same order and at the same index, return that turn's text unchanged in wording and order, with the smallest relevant phrases wrapped in highlight spans per the rules below. Do not add, remove, merge, split, or reorder turns. Do not include the "[index] Speaker:" prefix in your output -- return only the turn's own text (highlighted).
+
+            Escape any literal <, >, or & characters that appear in the turn's own text as &lt; &gt; &amp; before adding your span/strong tags around any part of it.
 
             Color priority: RED > YELLOW > SKY.
 
@@ -198,7 +214,11 @@ class TranscriptComplianceService
 
             Respond with strict JSON only, no prose, no markdown fences, in exactly this shape:
             {
-              "html": "<the full HTML-highlighted transcript, preserving speaker labels and line order, as a single string with <br> or <p> between turns>",
+              "turns": [
+                "<turn 0's own text, highlighted>",
+                "<turn 1's own text, highlighted>",
+                ... exactly {$turnCount} entries total, same order as given ...
+              ],
               "counts": {
                 "red_violations": <int>,
                 "yellow_review_items": <int>,
@@ -207,6 +227,7 @@ class TranscriptComplianceService
                 "timeframe_violations": <int>
               }
             }
+            The turns array must contain exactly {$turnCount} entries, one per input turn, in the same order.
             PROMPT;
     }
 }

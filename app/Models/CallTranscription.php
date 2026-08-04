@@ -25,10 +25,17 @@ class CallTranscription extends Model
         'error_message',
         'openai_audio_tokens',
         'created_by',
+        'compliance_status',
+        'compliance_html',
+        'compliance_turns',
+        'compliance_summary',
+        'compliance_error',
     ];
 
     protected $casts = [
         'transcript_json' => 'array',
+        'compliance_turns' => 'array',
+        'compliance_summary' => 'array',
     ];
 
     public function agent()
