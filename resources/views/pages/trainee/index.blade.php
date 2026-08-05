@@ -1,4 +1,9 @@
 @extends('layouts.dashboard')
+@section('css')
+    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css') }}" />
+    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css') }}" />
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css" rel="stylesheet" />
+@endsection
 @section('content')
           <div class="content-wrapper">
             <div class="container-xxl flex-grow-1 container-p-y">
