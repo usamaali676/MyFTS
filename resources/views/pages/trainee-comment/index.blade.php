@@ -21,7 +21,8 @@
                                     <h6 class="mb-1">{{ $comment->user->name ?? 'Unknown' }}</h6>
                                     <small class="text-muted">{{ $comment->comment_date->format('M d, Y h:i A') }}</small>
                                 </div>
-                                <p class="mb-0">{{ $comment->comment }}</p>
+                                {!!  $comment->comment  !!}
+                                {{-- <p class="mb-0"></p> --}}
                             </div>
                         </div>
                     @empty
@@ -45,8 +46,8 @@
                         <input type="hidden" name="trainee_id" value="{{ $trainee->id }}">
                         <div class="modal-body">
                             <div class="form-floating form-floating-outline">
-                                <textarea name="comment" id="comment" class="form-control" style="height: 120px" placeholder="Comment"></textarea>
-                                <label for="comment">Comment</label>
+                                <textarea name="comment"  id="comment" class="form-control ckeditor" style="height: 120px" placeholder="Comment"></textarea>
+                                {{-- <label for="comment">Comment</label> --}}
                             </div>
                         </div>
                         <div class="modal-footer">
@@ -57,4 +58,15 @@
                 </div>
             </div>
           </div>
+@endsection
+@section('js')
+    <script src="https://firmtechservices.com/ckeditor/ckeditor.js"></script>
+    <script>
+        CKEDITOR.replace('editor',{
+            //   extraPlugins : 'filebrowser',
+              extraPlugins : 'youtube',
+            //   filebrowserUploadUrl:'https://firmtechservices.com/blog/upload?_token=FfOFCqzCZEfH5NlC4x6e5X2a3BBobioiGwIjZvtH',
+            //   filebrowserUploadMethod:"form",
+          });
+    </script>
 @endsection
