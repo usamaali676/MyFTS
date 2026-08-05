@@ -11,7 +11,11 @@ class TraineeController extends Controller
 {
     public function index()
     {
-        $trainees = Trainee::with('createdBy')->orderBy('id', 'desc')->get();
+        // $trainees = Trainee::with('createdBy')->orderBy('id', 'desc')->get();
+         $trainees = Trainee::with('createdBy')
+        ->orderByRaw("FIELD(status, 'active', 'onBoard', 'suspended', 'inactive')")
+        ->orderByDesc('id') // optional: latest first within each status
+        ->get();
         $srno = 1;
 
         return view('pages.trainee.index', compact('trainees', 'srno'));
