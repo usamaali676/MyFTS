@@ -10,7 +10,7 @@
               <div class="card">
                 <h5 class="card-header">Trainees</h5>
                 <div class="card-datatable table-responsive">
-                  <table id="recodetable" class="table table-bordered">
+                  <table id="recordtable" class="table table-bordered">
                     <thead>
                       <tr>
                         <th></th>
@@ -98,4 +98,11 @@
             </div>
             <div class="content-backdrop fade"></div>
           </div>
+@endsection
+@section('js')
+    <script src="{{ asset('assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js') }}"></script>
+    <script src="{{ asset('assets/js/tables-datatables-advanced.js') }}"></script>
+    <script>
+        $('#recordtable').DataTable();
+    </script>
 @endsection
