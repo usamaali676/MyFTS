@@ -77,7 +77,7 @@
     </div>
     <div class="sidebar-user-card">
         {{-- <div class="sidebar-user-avatar">{{ strtoupper(substr($user->name, 0, 1)) }}</div> --}}
-        <span class="sidebar-user-name">{{ $user->name }}</span>
+        <span class="sidebar-user-name">{{  explode(' -',   $user->name )[0]  }}</span>
         <span class="sidebar-user-role">{{ $user->role->name }}</span>
     </div>
 
