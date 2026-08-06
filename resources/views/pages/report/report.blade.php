@@ -1,13 +1,13 @@
 @extends('layouts.dashboard')
 @section('css')
 
-
+<link rel="stylesheet" href="{{ asset('assets/css/sale-report-enhance.css') }}" />
 
 @endsection
 @section('content')
     <div class="content-wrapper">
-        <div class="container-xxl flex-grow-1 container-p-y">
-            <h4 class="py-3 mb-4"><span class="text-muted fw-light">Charts /</span> Chart.js</h4>
+        <div class="container-xxl flex-grow-1 container-p-y sale-report-enhanced">
+            <h4 class="py-3 mb-4"><span class="text-muted fw-light">User /</span> Yearly Report</h4>
 
             <div class="row">
               <!-- Line Charts -->

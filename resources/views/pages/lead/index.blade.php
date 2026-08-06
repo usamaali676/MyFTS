@@ -3,28 +3,23 @@
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css') }}" />
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css') }}" />
     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css" rel="stylesheet" />
+    <link rel="stylesheet" href="{{ asset('assets/css/leads-index-enhance.css') }}" />
 @endsection
 @section('content')
     <!-- Content wrapper -->
     <div class="content-wrapper">
         <!-- Content -->
 
-        <div class="container-xxl flex-grow-1">
+        <div class="container-xxl flex-grow-1 lead-index-enhanced">
             <h4 class="py-3 mb-4"><span class="text-muted fw-light">Lead/</span> All</h4>
             <!-- Responsive Datatable -->
             <div class="card">
-                <div class="card-header border-bottom">
-                    <h5 class="card-title">Leads</h5>
-                    <div class="d-flex justify-content-between align-items-center row py-3 gap-3 gap-md-0">
-                        <div class="col-md-4 user_role">&nbsp;</div>
-                        <div class="col-md-4 user_plan">&nbsp;</div>
-                        <div class="col-md-2 user_status">
-                            <a class="dt-button add-new btn btn-primary waves-effect waves-light" tabindex="0"
-                                href="{{ route('lead.create') }}" style="color: #fff"><span><i
-                                        class="mdi mdi-plus me-0 me-sm-1"></i><span class="d-none d-sm-inline-block">Add
-                                        Lead</span></span></a>
-                        </div>
-                    </div>
+                <div class="card-header border-bottom d-flex justify-content-between align-items-center flex-wrap gap-2 py-3">
+                    <h5 class="card-title mb-0">Leads</h5>
+                    <a class="dt-button add-new btn btn-primary waves-effect waves-light" tabindex="0"
+                        href="{{ route('lead.create') }}" style="color: #fff"><span><i
+                                class="mdi mdi-plus me-0 me-sm-1"></i><span class="d-none d-sm-inline-block">Add
+                                Lead</span></span></a>
                 </div>
                 <div class="card-datatable table-responsive">
                     <table id="recodetable" class="table table-bordered">
@@ -186,14 +181,6 @@
                                                     @else
                                                         N/A
                                                     @endif</td>
-                                                <td>
-                                                    {{-- <p>{{ $item->sale }}</p> --}}
-                                                    @if (isset($item->sale) && $item->sale->status == 1)
-                                                        <span class="badge rounded-pill bg-success">Active</span>
-                                                    @else
-                                                        <span class="badge rounded-pill bg-danger">Inactive</span>
-                                                    @endif
-                                                </td>
                                                 <td>
                                                     {{-- <p>{{ $item->sale }}</p> --}}
                                                     @if (isset($item->sale) && $item->sale->status == 1)
@@ -493,6 +480,8 @@
     <script src="{{ asset('assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js') }}"></script>
     <script src="{{ asset('assets/js/tables-datatables-advanced.js') }}"></script>
     <script>
-        $('#recodetable').DataTable();
+        $('#recodetable').DataTable({
+            autoWidth: false
+        });
     </script>
 @endsection

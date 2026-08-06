@@ -5,11 +5,11 @@ $user = Auth::user();
 @endauth
 @extends('layouts.dashboard')
 @section('styles')
-
+<link rel="stylesheet" href="{{ asset('assets/css/dashboard-enhance.css') }}" />
 @endsection
 @section('content')
 
-<div class="container-xxl flex-grow-1 container-p-y">
+<div class="container-xxl flex-grow-1 container-p-y dashboard-enhanced">
     <div class="row gy-4">
         <!-- Gamification Card -->
         <div class="col-md-6 col-lg-6">
@@ -374,14 +374,19 @@ $user = Auth::user();
         @if ($user->role->name == 'Creator' || $user->role->name == 'Executives' || $user->role->name == 'Closer' || $user->role->name == 'QA' || $user->role->name == 'Customer Support'  )
             <!-- Sales Country Chart -->
             <div class="col-12 col-xl-4 col-md-6">
-                <div class="card h-100">
+                <div class="card " style="height: fit-content">
                     <div class="card-header">
-                        <div class="d-flex justify-content-between">
+                        <div class="d-flex justify-content-between align-items-start">
                             <h5 class="mb-1">Service Leads</h5>
+                            <div class="avatar avatar-sm">
+                                <div class="avatar-initial bg-label-primary rounded">
+                                    <i class="mdi mdi-chart-bar mdi-20px"></i>
+                                </div>
+                            </div>
                         </div>
-                        <p class="mb-0 text-body">Total {{ $services->sum('leads_count') }} Leads</p>
+                        <p class="mb-0 text-body">Total <span class="fw-bold text-primary">{{ $services->sum('leads_count') }}</span> Leads</p>
                     </div>
-                    <div class="card-body pb-1 px-0">
+                    <div class="card-body pb-1 px-0" style="    padding-left: 6px !important;">
                         <div id="salescategoryChart"></div>
                     </div>
                 </div>
@@ -776,8 +781,15 @@ const salesCountryChartEl = document.querySelector('#salescategoryChart');
 const salesCountryChartConfig = {
   chart: {
     type: 'bar',
-    height: 368,
-    toolbar: { show: false }
+    height: 380,
+    toolbar: { show: false },
+    dropShadow: {
+      enabled: true,
+      top: 3,
+      left: 0,
+      blur: 4,
+      opacity: 0.1
+    }
   },
 
   series: [
@@ -791,13 +803,39 @@ const salesCountryChartConfig = {
     bar: {
       horizontal: true,
       distributed: true,
-      borderRadius: 10,
-      barHeight: '60%'
+      borderRadius: 8,
+      borderRadiusApplication: 'end',
+      barHeight: '55%',
+      dataLabels: {
+        position: 'center'
+      }
     }
   },
 
+  fill: {
+    type: 'gradient',
+    gradient: {
+      shade: 'light',
+      type: 'horizontal',
+      shadeIntensity: 0.35,
+      opacityFrom: 1,
+      opacityTo: 0.88,
+      stops: [0, 100]
+    }
+  },
+
+  stroke: {
+    width: 0
+  },
+
   dataLabels: {
-    enabled: true
+    enabled: true,
+    style: {
+      fontSize: '12.5px',
+      fontWeight: 700,
+      fontFamily: 'Inter',
+      colors: ['#fff']
+    }
   },
 
   colors: [
@@ -807,13 +845,61 @@ const salesCountryChartConfig = {
     config.colors.info,
     config.colors.danger
   ],
-    // borderColor = config.colors.borderColor;
+
   xaxis: {
-    categories: categories
+    categories: categories,
+    labels: {
+      style: {
+        fontSize: '12.5px',
+        colors: labelColor,
+        fontFamily: 'Inter'
+      }
+    },
+    axisBorder: { show: false },
+    axisTicks: { show: false }
+  },
+
+  yaxis: {
+    labels: {
+      style: {
+        fontSize: '12.5px',
+        fontWeight: 500,
+        colors: headingColor,
+        fontFamily: 'Inter'
+      }
+    }
   },
 
   grid: {
-    borderColor: borderColor
+    borderColor: borderColor,
+    strokeDashArray: 6,
+    xaxis: { lines: { show: true } },
+    yaxis: { lines: { show: false } },
+    padding: { top: -10, right: 24 }
+  },
+
+  legend: {
+    position: 'bottom',
+    fontSize: '12.5px',
+    fontFamily: 'Inter',
+    labels: { colors: labelColor },
+    markers: { radius: 12 },
+    itemMargin: { horizontal: 10, vertical: 4 }
+  },
+
+  tooltip: {
+    theme: currentTheme,
+    y: {
+      formatter: function (val) {
+        return val + ' leads';
+      }
+    }
+  },
+
+  states: {
+    hover: {
+      filter: { type: 'darken', value: 0.9 }
+    }
   }
 };
 

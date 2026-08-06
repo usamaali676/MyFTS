@@ -32,6 +32,7 @@
 <link rel="stylesheet" href="{{ asset('assets/vendor/libs/quill/katex.css') }}" />
 <link rel="stylesheet" href="{{ asset('assets/vendor/libs/quill/editor.css') }}" />
 {{-- <link rel="stylesheet" href="{{ asset('assets/vendor/libs/dropzone/dropzone.css') }}" /> --}}
+<link rel="stylesheet" href="{{ asset('assets/css/sale-create-enhance.css') }}" />
 
 <link
     href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css"
@@ -85,7 +86,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
 <div class="content-wrapper">
     <!-- Content -->
 
-    <div class="container-xxl flex-grow-1 container-p-y">
+    <div class="container-xxl flex-grow-1 container-p-y sale-create-enhanced">
         <div class="d-flex">
             <h4 class="py-3 mb-4"><span class="text-muted fw-light">Sale /</span> Client Details</h4>
         </div>

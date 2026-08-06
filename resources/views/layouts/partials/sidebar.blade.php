@@ -75,15 +75,18 @@
             $user = Auth::user();
         @endphp
     </div>
-    <span class="badge rounded-pill bg-primary" style="text-align: center; width: fit-content; margin: auto; padding: 7px 10px">{{ $user->name }}</span>
-    <p style="text-align: center; margin-bottom: 0px;" >{{ $user->role->name }}</p>
+    <div class="sidebar-user-card">
+        {{-- <div class="sidebar-user-avatar">{{ strtoupper(substr($user->name, 0, 1)) }}</div> --}}
+        <span class="sidebar-user-name">{{ $user->name }}</span>
+        <span class="sidebar-user-role">{{ $user->role->name }}</span>
+    </div>
 
 
     <div class="menu-inner-shadow"></div>
 
     <ul class="menu-inner py-1">
         <!-- Dashboards -->
-        <li class="menu-item active ">
+        <li class="menu-item {{ request()->routeIs('home') ? 'active' : '' }}">
             <a href="{{ route('home') }}" class="menu-link ">
                 <i class="menu-icon tf-icons mdi mdi-home-outline"></i>
                 <div data-i18n="Dashboards">Dashboards</div>
@@ -98,18 +101,18 @@
             <span class="menu-header-text" data-i18n="Apps & Pages">Apps &amp; Pages</span>
         </li>
         @if(isset($user) && $user->role_id == 1)
-        <li class="menu-item">
+        <li class="menu-item {{ request()->routeIs(['role.*', 'user.*']) ? 'active open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons mdi mdi-shield-outline"></i>
                 <div data-i18n="Roles & Permissions">Roles & Permissions</div>
             </a>
             <ul class="menu-sub">
-                <li class="menu-item">
+                <li class="menu-item {{ request()->routeIs('role.*') ? 'active' : '' }}">
                     <a href="{{ route('role.index') }}" class="menu-link">
                         <div data-i18n="Roles">Roles</div>
                     </a>
                 </li>
-                <li class="menu-item">
+                <li class="menu-item {{ request()->routeIs('user.*') ? 'active' : '' }}">
                     <a href="{{ route('user.index') }}" class="menu-link">
                         <div data-i18n="Users">Users</div>
                     </a>
@@ -122,19 +125,19 @@
             </ul>
         </li>
         @endif
-        <li class="menu-item">
+        <li class="menu-item {{ request()->routeIs('lead.*') ? 'active open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons mdi mdi-table"></i>
                 <div data-i18n="Leads">Leads</div>
             </a>
             <ul class="menu-sub">
-                <li class="menu-item">
+                <li class="menu-item {{ request()->routeIs('lead.index') ? 'active' : '' }}">
                     <a href="{{ route('lead.index') }}" class="menu-link">
                         <div data-i18n="View">View</div>
                     </a>
                 </li>
 
-                <li class="menu-item">
+                <li class="menu-item {{ request()->routeIs('lead.create') ? 'active' : '' }}">
                     <a href="{{ route('lead.create') }}" class="menu-link">
                         <div data-i18n="Create">Create</div>
                     </a>
@@ -142,24 +145,24 @@
             </ul>
         </li>
          @if(isset($salereport_perm) && $salereport_perm->view == 1)
-        <li class="menu-item">
+        <li class="menu-item {{ request()->routeIs('salereport.*') ? 'active open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
-                <i class="menu-icon icon-base ri ri-bar-chart-2-line"></i>
+                <i class="menu-icon icon-base mdi mdi-chart-line"></i>
                 <div data-i18n="Reports">Reports</div>
             </a>
             <ul class="menu-sub">
-                <li class="menu-item">
+                <li class="menu-item {{ request()->routeIs('salereport.index') ? 'active' : '' }}">
                     <a href="{{ route('salereport.index') }}" class="menu-link">
                         <div data-i18n="Sale Report">Sale Report</div>
                     </a>
                 </li>
 
-                <li class="menu-item">
+                <li class="menu-item {{ request()->routeIs('salereport.edit') ? 'active' : '' }}">
                     <a href="{{ route('salereport.edit') }}" class="menu-link">
                         <div data-i18n="Yearly Report">Yearly Report</div>
                     </a>
                 </li>
-                <li class="menu-item">
+                <li class="menu-item {{ request()->routeIs('salereport.update') ? 'active' : '' }}">
                     <a href="{{ route('salereport.update') }}" class="menu-link">
                         <div data-i18n="Support Report">Support Report</div>
                     </a>
@@ -193,7 +196,7 @@
             </ul>
         </li> --}}
         @if(isset($attendance_perm) && $attendance_perm->view == 1)
-        <li class="menu-item">
+        <li class="menu-item {{ request()->routeIs('attendance.*') ? 'active' : '' }}">
             <a href="{{ route('attendance.index') }}" class="menu-link ">
                 <i class="menu-icon tf-icons mdi mdi-calendar"></i>
                 <div data-i18n="Attendance">Attendance</div>
@@ -202,7 +205,7 @@
         </li>
         @endif
 
-        <li class="menu-item">
+        <li class="menu-item {{ request()->routeIs('ai.*') ? 'active' : '' }}">
             <a href="{{ route('ai.index') }}" class="menu-link">
                 <i class="menu-icon tf-icons mdi mdi-robot-outline"></i>
                 <div data-i18n="AI Assistant">AI Assistant</div>
@@ -210,7 +213,7 @@
         </li>
 
         @if(isset($calltranscription_perm) && $calltranscription_perm->view == 1)
-        <li class="menu-item">
+        <li class="menu-item {{ request()->routeIs('calltranscription.*') ? 'active' : '' }}">
             <a href="{{ route('calltranscription.index') }}" class="menu-link">
                 <i class="menu-icon tf-icons mdi mdi-file-sign"></i>
                 <div data-i18n="Call Transcription">Call Transcription</div>
@@ -219,7 +222,7 @@
         @endif
 
         @if(isset($trainee_perm) && $trainee_perm->view == 1)
-        <li class="menu-item">
+        <li class="menu-item {{ request()->routeIs('trainee.*') ? 'active' : '' }}">
             <a href="{{ route('trainee.index') }}" class="menu-link">
                 <i class="menu-icon tf-icons mdi mdi-school-outline"></i>
                 <div data-i18n="Trainees">Trainees</div>

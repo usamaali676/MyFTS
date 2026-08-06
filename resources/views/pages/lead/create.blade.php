@@ -17,13 +17,14 @@
     }
 
 </style>
+<link rel="stylesheet" href="{{ asset('assets/css/leads-enhance.css') }}" />
 @endsection
 @section('content')
 <!-- Content wrapper -->
 <div class="content-wrapper">
     <!-- Content -->
 
-    <div class="container-xxl flex-grow-1 container-p-y">
+    <div class="container-xxl flex-grow-1 container-p-y lead-form-enhanced">
         <h4 class="py-3 mb-4"><span class="text-muted fw-light">Lead/</span> Create</h4>
 
 

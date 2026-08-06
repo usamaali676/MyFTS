@@ -25,13 +25,14 @@
             }
         }
     </style>
+    <link rel="stylesheet" href="{{ asset('assets/css/sale-report-enhance.css') }}" />
 
 @endsection
 @section('content')
 <div class="content-wrapper">
     <!-- Content -->
 
-    <div class="container-xxl flex-grow-1 container-p-y">
+    <div class="container-xxl flex-grow-1 container-p-y sale-report-enhanced">
       <h4 class="py-3 mb-4"><span class="text-muted fw-light">Sale /</span> Report</h4>
 
       <!-- Product List Widget -->
@@ -52,7 +53,7 @@
                     </p> --}}
                   </div>
                   <div class="avatar me-sm-4">
-                    <span class="avatar-initial rounded bg-label-secondary">
+                    <span class="avatar-initial rounded bg-label-primary">
                         <i class="mdi mdi-laptop mdi-24px"></i>
                     </span>
                   </div>
@@ -71,7 +72,7 @@
                     </p> --}}
                   </div>
                   <div class="avatar me-lg-4">
-                    <span class="avatar-initial rounded bg-label-secondary">
+                    <span class="avatar-initial rounded bg-label-info">
                         <i class="mdi mdi-home-outline mdi-24px"></i>
 
                     </span>
@@ -87,8 +88,8 @@
                     <h4 class="mb-2" id="charge_back">--</h4>
                   </div>
                   <div class="avatar me-sm-4">
-                    <span class="avatar-initial rounded bg-label-secondary">
-                      <i class="mdi ri:arrow-down-double-fill mdi-24px"></i>
+                    <span class="avatar-initial rounded bg-label-danger">
+                      <i class="mdi mdi-bank-off-outline mdi-24px"></i>
 
                     </span>
                   </div>
@@ -102,7 +103,7 @@
 
                   </div>
                   <div class="avatar">
-                    <span class="avatar-initial rounded bg-label-secondary">
+                    <span class="avatar-initial rounded bg-label-success">
                       <i class="mdi mdi-currency-usd mdi-24px"></i>
                     </span>
                   </div>

@@ -1,7 +1,10 @@
 @extends('layouts.dashboard')
+@section('css')
+    <link rel="stylesheet" href="{{ asset('assets/css/trainee-enhance.css') }}" />
+@endsection
 @section('content')
           <div class="content-wrapper">
-            <div class="container-xxl flex-grow-1 container-p-y">
+            <div class="container-xxl flex-grow-1 container-p-y trainee-enhanced">
               <div class="d-flex justify-content-between align-items-center">
                 <h4 class="py-3 mb-4">
                     <span class="text-muted fw-light">Trainee/{{ $trainee->name }}/</span> Comments

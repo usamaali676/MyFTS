@@ -3,10 +3,11 @@
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css') }}" />
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css') }}" />
     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css" rel="stylesheet" />
+    <link rel="stylesheet" href="{{ asset('assets/css/trainee-enhance.css') }}" />
 @endsection
 @section('content')
           <div class="content-wrapper">
-            <div class="container-xxl flex-grow-1 container-p-y">
+            <div class="container-xxl flex-grow-1 container-p-y trainee-enhanced">
               <div class="d-flex justify-content-between align-items-center">
                 <h4 class="py-3 mb-4"><span class="text-muted fw-light">Trainee/</span> List</h4>
                 <a href="{{ route('trainee.create') }}" class="btn btn-primary">Create Trainee</a>

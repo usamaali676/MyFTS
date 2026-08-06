@@ -25,13 +25,14 @@
             }
         }
     </style>
+    <link rel="stylesheet" href="{{ asset('assets/css/sale-report-enhance.css') }}" />
 
 @endsection
 @section('content')
 <div class="content-wrapper">
     <!-- Content -->
 
-    <div class="container-xxl flex-grow-1 container-p-y">
+    <div class="container-xxl flex-grow-1 container-p-y sale-report-enhanced">
       <h4 class="py-3 mb-4"><span class="text-muted fw-light">User's /</span> Attendance  </h4>
 
       <!-- Product List Widget -->
@@ -203,8 +204,20 @@
                         }}</td>
                         {{-- <td>{{ $attendance->logout_time }}</td> --}}
                         <td>{{ $hours }} hours : {{ $remainingMinutes }} minutes</td>
-                        <td>{{ $attendance->is_late ? 'Yes' : 'No' }}</td>
-                        <td>{{ $attendance->half_day ? 'Yes' : 'No' }}</
+                        <td>
+                            @if($attendance->is_late)
+                                <span class="badge bg-label-danger">Yes</span>
+                            @else
+                                <span class="text-muted">No</span>
+                            @endif
+                        </td>
+                        <td>
+                            @if($attendance->half_day)
+                                <span class="badge bg-label-warning">Yes</span>
+                            @else
+                                <span class="text-muted">No</span>
+                            @endif
+                        </td>
                     </tr>
                 @endforeach
             </tbody>
