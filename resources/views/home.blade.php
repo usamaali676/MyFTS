@@ -326,7 +326,7 @@ $user = Auth::user();
                         </div>
                     </div>
             <!--/ Project Statistics -->
-        @elseif ( $user->role->name == 'QA'  || $user->role->name == 'Customer Support')
+        @elseif ( $user->role->name == 'QA'  || $user->role->name == 'Customer Support' || $user->role->name == 'Closer' && $user->id != 4 )
                     <div class="col-md-6 col-xl-4">
                         <div class="card h-100">
                             <div class="card-header d-flex align-items-center justify-content-between">
