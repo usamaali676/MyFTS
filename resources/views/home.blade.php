@@ -281,7 +281,7 @@ $user = Auth::user();
             </div>
         </div>
         <!--/ Multiple widgets -->
-        @if ($user->role->name == 'Creator' || $user->role->name == 'Executives' || $user->role->name == 'Closer' || $user->role->name == 'QA')
+        @if ($user->role->name == 'Creator' || $user->role->name == 'Executives' || $user->id == 4 )
             <!-- Project Statistics -->
                     <div class="col-md-6 col-xl-4">
                         <div class="card h-100">
@@ -326,9 +326,52 @@ $user = Auth::user();
                         </div>
                     </div>
             <!--/ Project Statistics -->
+        @elseif ( $user->role->name == 'QA'  || $user->role->name == 'Customer Support')
+                    <div class="col-md-6 col-xl-4">
+                        <div class="card h-100">
+                            <div class="card-header d-flex align-items-center justify-content-between">
+                                <h5 class="card-title m-0 me-2">Today's Break Duration</h5>
+                            </div>
+                            <div class="d-flex justify-content-between py-2 px-4 border-bottom">
+                                <h6 class="mb-0 small">NAME</h6>
+                                <h6 class="mb-0 small">Duration</h6>
+                            </div>
+                            <div class="card-body">
+                                <ul class="p-0 m-0">
+                                    @foreach ($tsrusers as $tsr_users)
+                                        <li class="d-flex mb-4">
+                                            <div class="avatar avatar-md flex-shrink-0 me-3">
+                                                <div class="avatar-initial bg-lighter rounded">
+                                                    <div>
+                                                        <img src="{{ asset('assets/img/avatars/5.png') }}" alt="User"
+                                                            class="h-25" style="border-radius: 10%" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+                                                <div class="me-2">
+                                                    <h6 class="mb-0">{{ $tsr_users->name }}</h6>
+                                                    <small>{{ $tsr_users->role->name }}</small>
+                                                </div>
+                                                <div class="badge bg-label-primary rounded-pill">
+                                                    @php
+                                                        $todayBreaks = $tsr_users->attendances
+                                                            ->where('shift_date', $shiftDate)
+                                                            ->flatMap->breaks;
+                                                    @endphp
+                                                    {{ gmdate('H:i:s', $todayBreaks->sum('duration')) }}
+                                                </div>
+                                            </div>
+                                        </li>
+                                    @endforeach
+
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
         @endif
 
-        @if ($user->role->name == 'Creator' || $user->role->name == 'Executives' || $user->role->name == 'Closer' || $user->role->name == 'QA')
+        @if ($user->role->name == 'Creator' || $user->role->name == 'Executives' || $user->role->name == 'Closer' || $user->role->name == 'QA' || $user->role->name == 'Customer Support'  )
             <!-- Sales Country Chart -->
             <div class="col-12 col-xl-4 col-md-6">
                 <div class="card h-100">

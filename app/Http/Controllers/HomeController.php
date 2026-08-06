@@ -103,22 +103,48 @@ class HomeController extends Controller
 
         }
         // $user = User::all();
-        $role = Role::where('name', 'TSR')->first();
-        $users = User::where('role_id', $role->id)->where('status', 1)->with([
-            'attendances' => function ($query) {
-                $query->whereBetween('created_at', [
-                    now()->startOfMonth(),
-                    now()->endOfMonth()
-                ])->with('breaks');
-            }
-        ])->get();
+        // $role = Role::whereIn('name', ['TSR', 'Closer', 'QA'])->first();
+        // $users = User::where('role_id', $role->id)->where('status', 1)->with([
+        //     'attendances' => function ($query) {
+        //         $query->whereBetween('created_at', [
+        //             now()->startOfMonth(),
+        //             now()->endOfMonth()
+        //         ])->with('breaks');
+        //     }
+        // ])->get();
+        $roleIds = Role::whereIn('name', ['TSR', 'Closer', 'QA'])->pluck('id');
+
+        $users = User::whereIn('role_id', $roleIds)
+            ->where('status', 1)
+            ->with([
+                'attendances' => function ($query) {
+                    $query->whereBetween('created_at', [
+                        now()->startOfMonth(),
+                        now()->endOfMonth()
+                    ])->with('breaks');
+                }
+            ])
+            ->get();
+        $tsrrole = Role::where('name', 'TSR')->first('id');
+
+        $tsrusers = User::where('role_id', $tsrrole->id)
+            ->where('status', 1)
+            ->with([
+                'attendances' => function ($query) {
+                    $query->whereBetween('created_at', [
+                        now()->startOfMonth(),
+                        now()->endOfMonth()
+                    ])->with('breaks');
+                }
+            ])
+            ->get();
         $shiftDate = $this->getShiftDate();
 
         $services = CompanyServices::withCount('leads')->get();
         // dd($services);
         // dd($users[1]->attendances->pluck('breaks')->flatten());
         // dd($total);
-        return view('home', compact('route', 'notifications', 'totalRevenue', 'sale_count', 'last_sale_count', 'total', 'lates', 'users', 'shiftDate', 'services'));
+        return view('home', compact('route', 'notifications', 'totalRevenue', 'sale_count', 'last_sale_count', 'total', 'lates', 'users', 'shiftDate', 'services','tsrusers'));
     }
     // public function breaksduration()
     // {
