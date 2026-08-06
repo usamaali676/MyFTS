@@ -1,0 +1,75 @@
+/*
+  Small, global, additive visual tweak: give the sidebar a light shadow so it
+  reads as a distinct surface from the page content, in both light and dark
+  mode. No layout/behaviour changes.
+*/
+
+#layout-menu {
+  box-shadow: 4px 0 18px -8px rgba(76, 78, 100, 0.18);
+}
+
+.dark-style #layout-menu {
+  box-shadow: 4px 0 22px -6px rgba(0, 0, 0, 0.55), 1px 0 0 rgba(255, 255, 255, 0.04);
+}
+
+/* sidebar user identity card (avatar + name + role) */
+.sidebar-user-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: calc(100% - 24px);
+  margin: 4px auto 14px;
+  padding: 16px 10px 14px;
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(102, 108, 255, 0.08), rgba(102, 108, 255, 0));
+  border: 1px solid rgba(102, 108, 255, 0.12);
+}
+
+.sidebar-user-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 15px;
+  color: #fff;
+  background: linear-gradient(135deg, #7a7fff, #5f5aec);
+  box-shadow: 0 6px 16px -6px rgba(102, 108, 255, 0.6);
+}
+
+.sidebar-user-name {
+  font-weight: 700;
+  font-size: 13px;
+  line-height: 1;
+  color: #fff;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #7a7fff, #5f5aec);
+  box-shadow: 0 6px 14px -8px rgba(102, 108, 255, 0.55);
+}
+
+.sidebar-user-role {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #8b8ba7;
+}
+
+/* collapsed (icon-only) sidebar: hide the card instead of letting it overflow,
+   matching how the template already hides the brand text in this state */
+.layout-menu-collapsed:not(.layout-menu-hover):not(.layout-menu-offcanvas):not(.layout-menu-fixed-offcanvas) .sidebar-user-card {
+  display: none;
+}
+
+.dark-style .sidebar-user-card {
+  background: linear-gradient(180deg, rgba(102, 108, 255, 0.16), rgba(102, 108, 255, 0));
+  border-color: rgba(102, 108, 255, 0.24);
+}
+
+.dark-style .sidebar-user-role {
+  color: #a0a1b8;
+}

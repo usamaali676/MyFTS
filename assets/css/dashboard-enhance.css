@@ -1,0 +1,126 @@
+/*
+  Visual-only enhancement layer for the main dashboard (home.blade.php).
+  Scoped under .dashboard-enhanced so nothing else in the app is affected.
+  No layout, markup structure, or JS behaviour is touched by this file.
+*/
+
+.dashboard-enhanced {
+  position: relative;
+  padding-top: 6px;
+}
+
+/* soft brand-tinted glow behind the top of the dashboard, instead of flat white */
+.dashboard-enhanced::before {
+  content: "";
+  position: absolute;
+  inset: -16px -16px auto -16px;
+  height: 240px;
+  background: radial-gradient(120% 140% at 18% 0%, rgba(102, 108, 255, 0.09), rgba(102, 108, 255, 0) 72%);
+  border-radius: 28px;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.dashboard-enhanced > .row {
+  position: relative;
+  z-index: 1;
+}
+
+/* ---------- cards ---------- */
+.dashboard-enhanced .card {
+  border: 1px solid rgba(102, 108, 255, 0.09);
+  border-radius: 14px;
+  box-shadow: 0 4px 18px -10px rgba(76, 78, 100, 0.16), 0 1px 3px rgba(76, 78, 100, 0.05);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.dashboard-enhanced .card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px -12px rgba(102, 108, 255, 0.28), 0 2px 6px rgba(76, 78, 100, 0.06);
+}
+
+.dashboard-enhanced .card-header {
+  border-bottom-color: rgba(102, 108, 255, 0.08);
+}
+
+/* ---------- headings / key metrics ---------- */
+.dashboard-enhanced .card-title,
+.dashboard-enhanced .card-header h4,
+.dashboard-enhanced .card-header h5 {
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.dashboard-enhanced .card-info h5,
+.dashboard-enhanced .chart-statistics h3,
+.dashboard-enhanced .card-header h4 {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- icon avatars ---------- */
+.dashboard-enhanced .avatar-initial.rounded {
+  border-radius: 10px;
+  box-shadow: 0 6px 16px -6px rgba(102, 108, 255, 0.35);
+}
+
+.dashboard-enhanced .avatar-initial.bg-label-primary {
+  background: linear-gradient(135deg, rgba(102, 108, 255, 0.22), rgba(102, 108, 255, 0.12));
+}
+
+/* photo avatars (break-duration list) get a touch of depth, no colour change */
+.dashboard-enhanced .avatar-initial.bg-lighter {
+  border-radius: 10px;
+  box-shadow: 0 3px 10px -4px rgba(76, 78, 100, 0.25);
+}
+
+/* ---------- badges / pills ---------- */
+.dashboard-enhanced .badge.rounded-pill {
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  padding-top: 0.45em;
+  padding-bottom: 0.45em;
+}
+
+.dashboard-enhanced .badge.bg-label-secondary {
+  background-color: rgba(102, 108, 255, 0.12);
+  color: #5f5aec;
+}
+
+/* ---------- lists (e.g. Today's Break Duration) ---------- */
+.dashboard-enhanced .border-bottom {
+  border-color: rgba(102, 108, 255, 0.1) !important;
+}
+
+/* ---------- buttons ---------- */
+.dashboard-enhanced .btn-primary {
+  background: linear-gradient(135deg, #7a7fff, #5f5aec);
+  border-color: transparent;
+  box-shadow: 0 10px 22px -10px rgba(102, 108, 255, 0.6);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.dashboard-enhanced .btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 26px -10px rgba(102, 108, 255, 0.7);
+}
+
+/* break-type / end-break modals belong to the same flow, keep them in step */
+#breakModaltype .btn-primary,
+#breakModal .btn-danger {
+  border-radius: 10px;
+  box-shadow: 0 10px 24px -10px rgba(76, 78, 100, 0.35);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+#breakModaltype .btn-primary:hover,
+#breakModal .btn-danger:hover {
+  transform: translateY(-1px);
+}
+
+/* ---------- chart containers ---------- */
+.dashboard-enhanced .card-body > div[id$="Chart"],
+.dashboard-enhanced .card-body > #sessions {
+  border-radius: 10px;
+}

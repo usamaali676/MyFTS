@@ -1,0 +1,117 @@
+/*
+  Visual-only enhancement layer for the Leads index/list page
+  (resources/views/pages/lead/index.blade.php). Scoped under
+  .lead-index-enhanced so no other table in the app is affected.
+  No data, sorting, search, or row-action logic is touched here.
+*/
+
+.lead-index-enhanced .card {
+  border: 1px solid rgba(102, 108, 255, 0.09);
+  border-radius: 12px;
+  box-shadow: 0 4px 18px -10px rgba(76, 78, 100, 0.16), 0 1px 3px rgba(76, 78, 100, 0.05);
+}
+
+.lead-index-enhanced .card-header {
+  border-left: 4px solid #666cff;
+  border-bottom-color: rgba(102, 108, 255, 0.1);
+}
+
+.lead-index-enhanced .card-title {
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.lead-index-enhanced .btn-primary.add-new {
+  background: linear-gradient(135deg, #7a7fff, #5f5aec);
+  border-color: transparent;
+  box-shadow: 0 8px 18px -10px rgba(102, 108, 255, 0.6);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.lead-index-enhanced .btn-primary.add-new:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 22px -10px rgba(102, 108, 255, 0.7);
+}
+
+/* ---------- table shell: fit the viewport instead of scrolling ---------- */
+.lead-index-enhanced #recodetable {
+  table-layout: fixed;
+  width: 100%;
+}
+
+.lead-index-enhanced #recodetable th,
+.lead-index-enhanced #recodetable td {
+  word-break: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
+  vertical-align: middle;
+  font-size: 14.5px;
+  line-height: 1.45;
+  padding: 0.7rem 0.6rem;
+}
+
+.lead-index-enhanced #recodetable td:last-child,
+.lead-index-enhanced #recodetable th:last-child {
+  white-space: nowrap;
+}
+
+.lead-index-enhanced #recodetable th:nth-child(1) { width: 3%; }
+.lead-index-enhanced #recodetable th:nth-child(2) { width: 14%; }
+.lead-index-enhanced #recodetable th:nth-child(3) { width: 9%; }
+.lead-index-enhanced #recodetable th:nth-child(4) { width: 13%; }
+.lead-index-enhanced #recodetable th:nth-child(5) { width: 12%; }
+.lead-index-enhanced #recodetable th:nth-child(6) { width: 8%; }
+.lead-index-enhanced #recodetable th:nth-child(7) { width: 9%; }
+.lead-index-enhanced #recodetable th:nth-child(8) { width: 10%; }
+.lead-index-enhanced #recodetable th:nth-child(9) { width: 8%; }
+.lead-index-enhanced #recodetable th:nth-child(10) { width: 14%; }
+
+.lead-index-enhanced #recodetable thead th {
+  background-color: rgba(102, 108, 255, 0.06);
+  color: #5f5aec;
+  font-weight: 600;
+  font-size: 12.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  border-bottom: none;
+}
+
+.lead-index-enhanced #recodetable tbody tr:hover {
+  background-color: rgba(102, 108, 255, 0.035);
+}
+
+.lead-index-enhanced #recodetable > :not(caption) > * > * {
+  border-bottom-color: rgba(102, 108, 255, 0.08);
+}
+
+/* ---------- DataTables chrome: search box, length select, pagination ---------- */
+.lead-index-enhanced .dataTables_filter input,
+.lead-index-enhanced .dataTables_length select {
+  border-radius: 8px;
+  border-color: rgba(102, 108, 255, 0.25);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.lead-index-enhanced .dataTables_filter input:focus,
+.lead-index-enhanced .dataTables_length select:focus {
+  border-color: #666cff;
+  box-shadow: 0 0 0 0.15rem rgba(102, 108, 255, 0.18);
+  outline: none;
+}
+
+.lead-index-enhanced .page-link {
+  border-radius: 8px !important;
+  margin: 0 2px;
+}
+
+.lead-index-enhanced .page-item.active .page-link {
+  background: linear-gradient(135deg, #7a7fff, #5f5aec);
+  border-color: transparent;
+  box-shadow: 0 6px 14px -8px rgba(102, 108, 255, 0.55);
+}
+
+/* ---------- action icon buttons ---------- */
+.lead-index-enhanced .btn-icon.btn-text-secondary:hover {
+  background-color: rgba(102, 108, 255, 0.12);
+  color: #5f5aec;
+}

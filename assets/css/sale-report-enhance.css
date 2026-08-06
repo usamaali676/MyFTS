@@ -1,0 +1,147 @@
+/*
+  Visual-only enhancement layer shared by the Reports pages
+  (resources/views/pages/report/index.blade.php, view.blade.php,
+  report.blade.php, support.blade.php). Scoped under .sale-report-enhanced
+  so no other page is affected. No filter, ajax, print, DataTable, or
+  chart logic is touched here.
+*/
+
+.sale-report-enhanced .card {
+  border: 1px solid rgba(102, 108, 255, 0.09);
+  border-radius: 12px;
+  box-shadow: 0 4px 18px -10px rgba(76, 78, 100, 0.16), 0 1px 3px rgba(76, 78, 100, 0.05);
+}
+
+/* ---------- revenue stat widgets ---------- */
+.sale-report-enhanced .card-widget-separator p {
+  color: #8b8ba7;
+  font-size: 13px;
+}
+
+.sale-report-enhanced .card-widget-separator h4 {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.sale-report-enhanced .card-widget-separator .avatar-initial {
+  border-radius: 10px;
+  box-shadow: 0 6px 16px -6px rgba(76, 78, 100, 0.25);
+}
+
+.sale-report-enhanced .card-widget-separator .avatar-initial.bg-label-primary {
+  box-shadow: 0 6px 16px -6px rgba(102, 108, 255, 0.4);
+}
+
+.sale-report-enhanced .card-widget-separator .avatar-initial.bg-label-info {
+  box-shadow: 0 6px 16px -6px rgba(3, 195, 236, 0.4);
+}
+
+.sale-report-enhanced .card-widget-separator .avatar-initial.bg-label-danger {
+  box-shadow: 0 6px 16px -6px rgba(255, 77, 73, 0.4);
+}
+
+.sale-report-enhanced .card-widget-separator .avatar-initial.bg-label-success {
+  box-shadow: 0 6px 16px -6px rgba(113, 221, 55, 0.4);
+}
+
+/* ---------- filter card ---------- */
+.sale-report-enhanced .card-header {
+  border-left: 4px solid #666cff;
+  border-bottom-color: rgba(102, 108, 255, 0.1);
+}
+
+.sale-report-enhanced .card-title {
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.sale-report-enhanced .form-floating-outline > .form-control,
+.sale-report-enhanced .form-floating-outline > .form-select,
+.sale-report-enhanced .select2-container .select2-selection {
+  border-radius: 9px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.sale-report-enhanced .form-control:focus,
+.sale-report-enhanced .form-select:focus {
+  border-color: #666cff !important;
+  box-shadow: 0 0 0 0.15rem rgba(102, 108, 255, 0.18) !important;
+}
+
+.sale-report-enhanced .form-control:hover,
+.sale-report-enhanced .form-select:hover {
+  border-color: rgba(102, 108, 255, 0.45);
+}
+
+.sale-report-enhanced .btn-primary {
+  background: linear-gradient(135deg, #7a7fff, #5f5aec);
+  border-color: transparent;
+  box-shadow: 0 8px 18px -10px rgba(102, 108, 255, 0.6);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.sale-report-enhanced .btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 22px -10px rgba(102, 108, 255, 0.7);
+}
+
+/* ---------- report table ---------- */
+.sale-report-enhanced table.dataTable thead th {
+  background-color: rgba(102, 108, 255, 0.06);
+  color: #5f5aec;
+  font-weight: 600;
+  font-size: 12.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  border-bottom: none;
+}
+
+.sale-report-enhanced table.dataTable tbody tr:hover {
+  background-color: rgba(102, 108, 255, 0.035);
+}
+
+.sale-report-enhanced table.dataTable td:last-child,
+.sale-report-enhanced table.dataTable th:last-child {
+  text-align: right;
+  font-weight: 700;
+  color: #2b2c40;
+}
+
+.sale-report-enhanced .dataTables_filter input,
+.sale-report-enhanced .dataTables_length select {
+  border-radius: 8px;
+  border-color: rgba(102, 108, 255, 0.25);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.sale-report-enhanced .dataTables_filter input:focus,
+.sale-report-enhanced .dataTables_length select:focus {
+  border-color: #666cff;
+  box-shadow: 0 0 0 0.15rem rgba(102, 108, 255, 0.18);
+  outline: none;
+}
+
+.sale-report-enhanced .page-link {
+  border-radius: 8px !important;
+  margin: 0 2px;
+}
+
+.sale-report-enhanced .page-item.active .page-link {
+  background: linear-gradient(135deg, #7a7fff, #5f5aec);
+  border-color: transparent;
+  box-shadow: 0 6px 14px -8px rgba(102, 108, 255, 0.55);
+}
+
+/* ---------- chart cards (Yearly detail report) ---------- */
+.sale-report-enhanced .card-header.header-elements {
+  border-bottom-color: rgba(102, 108, 255, 0.1);
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.sale-report-enhanced .card-header-elements h5 {
+  font-weight: 700;
+  color: #5f5aec;
+  font-variant-numeric: tabular-nums;
+}

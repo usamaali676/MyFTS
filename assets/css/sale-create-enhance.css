@@ -1,0 +1,149 @@
+/*
+  Visual-only enhancement layer for the "Sale / Create" wizard
+  (resources/views/pages/sale/create.blade.php). Scoped under
+  .sale-create-enhanced so no other page or form in the app is affected.
+  No markup structure, validation, or submit logic is touched here.
+*/
+
+.sale-create-enhanced {
+  position: relative;
+}
+
+/* ---------- wizard shell ---------- */
+.sale-create-enhanced .bs-stepper {
+  border-radius: 16px;
+  box-shadow: 0 6px 24px -12px rgba(76, 78, 100, 0.18), 0 1px 3px rgba(76, 78, 100, 0.05) !important;
+}
+
+.sale-create-enhanced .bs-stepper-header {
+  border-bottom-color: rgba(102, 108, 255, 0.1) !important;
+  padding: 1.25rem 1rem 0.75rem;
+}
+
+.sale-create-enhanced .bs-stepper-content {
+  padding-top: 1.75rem;
+}
+
+/* step icons: calmer at rest, clear hover affordance, glow when active */
+.sale-create-enhanced .step .step-trigger .bs-stepper-icon {
+  border-radius: 12px;
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+.sale-create-enhanced .step:not(.active) .step-trigger:hover .bs-stepper-icon svg {
+  fill: #9a9dff;
+}
+
+.sale-create-enhanced .step:not(.active) .step-trigger:hover .bs-stepper-label {
+  color: #666cff;
+}
+
+.sale-create-enhanced .step.active .bs-stepper-icon svg {
+  filter: drop-shadow(0 4px 10px rgba(102, 108, 255, 0.45));
+}
+
+.sale-create-enhanced .line i {
+  color: rgba(102, 108, 255, 0.35);
+}
+
+/* ---------- section headers (e.g. "Lead Details", "Business Hours") ---------- */
+.sale-create-enhanced .content-header h6 {
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  position: relative;
+  padding-left: 12px;
+}
+
+.sale-create-enhanced .content-header h6::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 2px;
+  bottom: 2px;
+  width: 4px;
+  border-radius: 4px;
+  background: #666cff;
+}
+
+.sale-create-enhanced .content-header small {
+  color: #8b8ba7;
+}
+
+/* ---------- inputs ---------- */
+.sale-create-enhanced .form-floating-outline > .form-control,
+.sale-create-enhanced .form-floating-outline > .form-select,
+.sale-create-enhanced .select2-container .select2-selection {
+  border-radius: 9px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.sale-create-enhanced .form-control:focus,
+.sale-create-enhanced .form-select:focus {
+  border-color: #666cff !important;
+  box-shadow: 0 0 0 0.15rem rgba(102, 108, 255, 0.18) !important;
+}
+
+.sale-create-enhanced .form-control:hover,
+.sale-create-enhanced .form-select:hover {
+  border-color: rgba(102, 108, 255, 0.45);
+}
+
+/* ---------- Open / Closed / 24-7 style toggles ---------- */
+.sale-create-enhanced .custom-option {
+  border-radius: 9px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.1s ease;
+}
+
+.sale-create-enhanced .custom-option:hover {
+  box-shadow: 0 4px 12px -6px rgba(102, 108, 255, 0.3);
+}
+
+.sale-create-enhanced .custom-option.checked {
+  box-shadow: 0 6px 16px -8px rgba(102, 108, 255, 0.45);
+}
+
+/* ---------- buttons ---------- */
+.sale-create-enhanced .btn-primary {
+  background: linear-gradient(135deg, #7a7fff, #5f5aec);
+  border-color: transparent;
+  box-shadow: 0 8px 18px -10px rgba(102, 108, 255, 0.6);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.sale-create-enhanced .btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 22px -10px rgba(102, 108, 255, 0.7);
+}
+
+.sale-create-enhanced .btn-label-primary {
+  background-color: rgba(102, 108, 255, 0.12);
+}
+
+.sale-create-enhanced .btn-outline-secondary:hover {
+  border-color: rgba(102, 108, 255, 0.5);
+  color: #5f5aec;
+}
+
+/* ---------- nested cards / tables inside later steps (Services, Keywords, Invoice) ---------- */
+.sale-create-enhanced .card {
+  border: 1px solid rgba(102, 108, 255, 0.09);
+  border-radius: 12px;
+  box-shadow: 0 4px 16px -10px rgba(76, 78, 100, 0.16);
+}
+
+.sale-create-enhanced .table thead th {
+  background-color: rgba(102, 108, 255, 0.06);
+  color: #5f5aec;
+  font-weight: 600;
+  border-bottom: none;
+}
+
+.sale-create-enhanced .table > :not(caption) > * > * {
+  border-bottom-color: rgba(102, 108, 255, 0.08);
+}
+
+/* ---------- badges ---------- */
+.sale-create-enhanced .badge.bg-label-secondary {
+  background-color: rgba(102, 108, 255, 0.12);
+  color: #5f5aec;
+}
