@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Helpers\GlobalHelper;
 use App\Models\Attendance;
+use App\Models\Breaks;
 use App\Models\CompanyServices;
+use Carbon\Carbon;
 use App\Models\Invoice;
 use App\Models\Lead;
 use App\Models\Role;
@@ -141,10 +143,25 @@ class HomeController extends Controller
         $shiftDate = $this->getShiftDate();
 
         $services = CompanyServices::withCount('leads')->get();
+
+        // Resume an in-progress break on page load instead of relying on
+        // client-only state, so a page refresh (e.g. after a session/CSRF
+        // expiry) doesn't strand the user with no way to end their break.
+        $todayAttendance = Attendance::where('user_id', $user->id)
+            ->where('shift_date', $shiftDate)
+            ->first();
+
+        $activeBreak = $todayAttendance
+            ? Breaks::where('attendance_id', $todayAttendance->id)->whereNull('break_end')->first()
+            : null;
+
+        $activeBreakElapsedSeconds = $activeBreak
+            ? Carbon::parse($activeBreak->break_start, 'Asia/Karachi')->diffInSeconds(now('Asia/Karachi'))
+            : 0;
         // dd($services);
         // dd($users[1]->attendances->pluck('breaks')->flatten());
         // dd($total);
-        return view('home', compact('route', 'notifications', 'totalRevenue', 'sale_count', 'last_sale_count', 'total', 'lates', 'users', 'shiftDate', 'services','tsrusers'));
+        return view('home', compact('route', 'notifications', 'totalRevenue', 'sale_count', 'last_sale_count', 'total', 'lates', 'users', 'shiftDate', 'services', 'tsrusers', 'activeBreak', 'activeBreakElapsedSeconds'));
     }
     // public function breaksduration()
     // {

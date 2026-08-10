@@ -281,6 +281,13 @@ $user = Auth::user();
             </div>
         </div>
         <!--/ Multiple widgets -->
+        @php
+            $breakTypeIcons = [
+                'mealBreak'  => ['icon' => 'mdi-food-fork-drink', 'label' => 'Meal Break'],
+                '2ndBreak'   => ['icon' => 'mdi-coffee', 'label' => '2nd Break'],
+                'smokeBreak' => ['icon' => 'mdi-smoking', 'label' => 'Smoke Break'],
+            ];
+        @endphp
         @if ($user->role->name == 'Creator' || $user->role->name == 'Executives' || $user->id == 4 )
             <!-- Project Statistics -->
                     <div class="col-md-6 col-xl-4">
@@ -295,6 +302,14 @@ $user = Auth::user();
                             <div class="card-body">
                                 <ul class="p-0 m-0">
                                     @foreach ($users as $b_user)
+                                        @php
+                                            $todayBreaks = $b_user->attendances
+                                                ->where('shift_date', $shiftDate)
+                                                ->flatMap->breaks;
+                                            $userActiveBreak = $todayBreaks->whereNull('break_end')->first();
+                                            $onBreak = (bool) $userActiveBreak;
+                                            $breakIcon = $onBreak ? ($breakTypeIcons[$userActiveBreak->break_type] ?? null) : null;
+                                        @endphp
                                         <li class="d-flex mb-4">
                                             <div class="avatar avatar-md flex-shrink-0 me-3">
                                                 <div class="avatar-initial bg-lighter rounded">
@@ -307,14 +322,17 @@ $user = Auth::user();
                                             <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
                                                 <div class="me-2">
                                                     <h6 class="mb-0">{{ $b_user->name }}</h6>
+                                                    @if ($onBreak && $breakIcon)
+                                                        <div class="my-1">
+                                                            <span class="badge bg-label-warning rounded-pill d-inline-flex align-items-center gap-1 px-2 py-1"
+                                                                title="{{ $breakIcon['label'] }}">
+                                                                <i class="mdi {{ $breakIcon['icon'] }}"></i> {{ $breakIcon['label'] }}
+                                                            </span>
+                                                        </div>
+                                                    @endif
                                                     <small>{{ $b_user->role->name }}</small>
                                                 </div>
                                                 <div class="badge bg-label-primary rounded-pill">
-                                                    @php
-                                                        $todayBreaks = $b_user->attendances
-                                                            ->where('shift_date', $shiftDate)
-                                                            ->flatMap->breaks;
-                                                    @endphp
                                                     {{ gmdate('H:i:s', $todayBreaks->sum('duration')) }}
                                                 </div>
                                             </div>
@@ -339,6 +357,14 @@ $user = Auth::user();
                             <div class="card-body">
                                 <ul class="p-0 m-0">
                                     @foreach ($tsrusers as $tsr_users)
+                                        @php
+                                            $todayBreaks = $tsr_users->attendances
+                                                ->where('shift_date', $shiftDate)
+                                                ->flatMap->breaks;
+                                            $userActiveBreak = $todayBreaks->whereNull('break_end')->first();
+                                            $onBreak = (bool) $userActiveBreak;
+                                            $breakIcon = $onBreak ? ($breakTypeIcons[$userActiveBreak->break_type] ?? null) : null;
+                                        @endphp
                                         <li class="d-flex mb-4">
                                             <div class="avatar avatar-md flex-shrink-0 me-3">
                                                 <div class="avatar-initial bg-lighter rounded">
@@ -351,14 +377,17 @@ $user = Auth::user();
                                             <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
                                                 <div class="me-2">
                                                     <h6 class="mb-0">{{ $tsr_users->name }}</h6>
+                                                    @if ($onBreak && $breakIcon)
+                                                        <div class="my-1">
+                                                            <span class="badge bg-label-warning rounded-pill d-inline-flex align-items-center gap-1 px-2 py-1"
+                                                                title="{{ $breakIcon['label'] }}">
+                                                                <i class="mdi {{ $breakIcon['icon'] }}"></i> {{ $breakIcon['label'] }}
+                                                            </span>
+                                                        </div>
+                                                    @endif
                                                     <small>{{ $tsr_users->role->name }}</small>
                                                 </div>
                                                 <div class="badge bg-label-primary rounded-pill">
-                                                    @php
-                                                        $todayBreaks = $tsr_users->attendances
-                                                            ->where('shift_date', $shiftDate)
-                                                            ->flatMap->breaks;
-                                                    @endphp
                                                     {{ gmdate('H:i:s', $todayBreaks->sum('duration')) }}
                                                 </div>
                                             </div>
@@ -406,7 +435,9 @@ $user = Auth::user();
 
             <div class="text-center">
                 <img src="{{asset('assets/img/coffee-break-pana.svg')}}" style="width: 100%; height: 400px;">
-                <h1 style="padding-top: 20px; color: #636578" class="mb-4">{{$user->name}} is On Break</h1>
+                <i id="breakTypeIcon" class="mdi mdi-food-fork-drink" style="font-size: 40px; color: #666cff;"></i>
+                <h1 style="padding-top: 10px; color: #636578" class="mb-1">{{$user->name}} is On Break</h1>
+                <p id="breakTypeLabel" class="mb-4" style="color: #8a8d93;">Meal Break</p>
 
                 <h2 id="breakTimer" style="font-size: 60px; color: #666cff">
                     00:00:00
@@ -429,15 +460,18 @@ $user = Auth::user();
                 <h1 style="padding-top: 20px; color: #636578" class="mb-4">Select Break Type</h1>
                 <div class="d-flex justify-content-center gap-4">
                     <input type="radio" class="btn-check" name="breakType" id="mealBreak" autocomplete="off" checked>
-                    <label class="btn  btn-primary mt-5 px-5 py-3" for="mealBreak">
+                    <label class="btn btn-primary mt-5 px-5 py-3 d-flex flex-column align-items-center gap-2" for="mealBreak">
+                        <i class="mdi mdi-food-fork-drink mdi-24px"></i>
                         Meal Break
                     </label>
                     <input type="radio" class="btn-check" name="breakType" id="2ndBreak" autocomplete="off">
-                    <label class="btn  btn-primary mt-5 px-5 py-3" for="2ndBreak">
+                    <label class="btn btn-primary mt-5 px-5 py-3 d-flex flex-column align-items-center gap-2" for="2ndBreak">
+                        <i class="mdi mdi-coffee mdi-24px"></i>
                         2nd Break
                     </label>
                     <input type="radio" class="btn-check" name="breakType" id="smokeBreak" autocomplete="off">
-                    <label class="btn  btn-primary mt-5 px-5 py-3" for="smokeBreak">
+                    <label class="btn btn-primary mt-5 px-5 py-3 d-flex flex-column align-items-center gap-2" for="smokeBreak">
+                        <i class="mdi mdi-smoking mdi-24px"></i>
                         Smoke Break
                     </label>
                 </div>
@@ -453,6 +487,18 @@ document.addEventListener('DOMContentLoaded', function () {
     let timerInterval;
     let seconds = 0;
     let isOnBreak = false;
+
+    const BREAK_TYPES = {
+        mealBreak: { icon: 'mdi-food-fork-drink', label: 'Meal Break' },
+        '2ndBreak': { icon: 'mdi-coffee', label: '2nd Break' },
+        smokeBreak: { icon: 'mdi-smoking', label: 'Smoke Break' }
+    };
+
+    function setBreakTypeUI(type) {
+        const info = BREAK_TYPES[type] || BREAK_TYPES.mealBreak;
+        document.getElementById('breakTypeIcon').className = 'mdi ' + info.icon;
+        document.getElementById('breakTypeLabel').innerText = info.label;
+    }
 
     // Init Bootstrap Modal
     const breakModalEl = document.getElementById('breakModal');
@@ -502,6 +548,21 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    // RESUME IN-PROGRESS BREAK ON LOAD
+    // Server tells us if a break is still open (break_end null) and how many
+    // seconds have elapsed. Without this, a page refresh mid-break (e.g. after
+    // a session/CSRF token expiry) hides the End Break button with no way
+    // back in, since "Start Break" is also blocked while a break is open.
+    @if($activeBreak)
+        isOnBreak = true;
+        seconds = {{ (int) $activeBreakElapsedSeconds }};
+        document.getElementById('breakTimer').innerText = formatTime(seconds);
+        setBreakTypeUI('{{ $activeBreak->break_type }}');
+        breakModal.show();
+        openFullscreen();
+        startTimer();
+    @endif
+
         // START BREAK
         document.getElementById('startBreakBtn').addEventListener('click', function () {
             // 1. Show the break type selection modal first
@@ -520,16 +581,25 @@ document.addEventListener('DOMContentLoaded', function () {
                         method: 'POST',
                         headers: {
                             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                            'Content-Type': 'application/json'   // changed
+                            'Content-Type': 'application/json',   // changed
+                            'Accept': 'application/json'
                         },
                             body: JSON.stringify({ break_type: val })
                     })
-                    .then(response => response.text())
-                    .then(data => {
-                        console.log(data);
-                        // 5. Only start the break UI after successful response
+                    .then(response => response.json().then(data => ({ ok: response.ok, data })))
+                    .then(({ ok, data }) => {
+                        // Only start the break UI once the server confirms the
+                        // Breaks row was actually created — previously this ran
+                        // even on a failed (e.g. CSRF 419) response, showing a
+                        // "phantom" break with nothing saved server-side.
+                        if (!ok) {
+                            alert(data.error || 'Error starting break. Please try again.');
+                            return;
+                        }
+
                         isOnBreak = true;
                         seconds = 0;
+                        setBreakTypeUI(val);
                         breakModal.show();
                         openFullscreen();
                         startTimer();
