@@ -528,7 +528,6 @@
         });
 
         xhr.onload = function () {
-            stopStatusRotation();
             let res;
             try {
                 res = JSON.parse(xhr.responseText);
@@ -537,8 +536,15 @@
             }
 
             if (xhr.status >= 200 && xhr.status < 300 && res.success) {
-                showResult(res.data);
+                stopStatusRotation();
+                if (res.data.status === 'completed') {
+                    showResult(res.data);
+                } else {
+                    showStage('upload');
+                    showFileError(res.data.error_message || 'Something went wrong while generating the transcript.');
+                }
             } else {
+                stopStatusRotation();
                 showStage('upload');
                 showFileError(res.message || 'Something went wrong while generating the transcript.');
             }
@@ -554,6 +560,8 @@
     });
 
     document.getElementById('ctNewTranscriptBtn').addEventListener('click', function () {
+        stopPolling();
+        stopStatusRotation();
         selectedFile = null;
         fileInput.value = '';
         fileChip.classList.remove('show');

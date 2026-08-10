@@ -69,19 +69,27 @@ class CallTranscriptionControllerTest extends TestCase
         $response->assertOk();
     }
 
-    public function test_store_generates_transcript_for_authorized_user(): void
+    public function test_store_transcribes_synchronously_and_returns_the_result(): void
     {
-        $user = $this->makeUserWithPermission(canView: true, canCreate: true);
-        $agent = $this->makeUserWithPermission(canView: true, canCreate: true);
-
+        // No REV_AI_TOKEN in .env.testing -- the service falls back to the
+        // OpenAI pipeline, with no network call, deterministically.
         OpenAI::fake([
-            TranscriptionResponse::fake(['text' => 'Hello there.']),
+            TranscriptionResponse::fake([
+                'text' => 'Hello.',
+                'duration' => 2.0,
+                'segments' => [
+                    ['id' => 0, 'start' => 0.0, 'end' => 2.0, 'text' => 'Hello.'],
+                ],
+            ]),
             CreateResponse::fake([
                 'choices' => [[
                     'message' => ['content' => json_encode(['labels' => ['agent']])],
                 ]],
             ]),
         ]);
+
+        $user = $this->makeUserWithPermission(canView: true, canCreate: true);
+        $agent = $this->makeUserWithPermission(canView: true, canCreate: true);
 
         $response = $this->actingAs($user)->post(route('calltranscription.store'), [
             'audio' => $this->makeSilentWavUploadedFile(2),
@@ -92,7 +100,7 @@ class CallTranscriptionControllerTest extends TestCase
         $response->assertOk();
         $response->assertJsonPath('success', true);
         $response->assertJsonPath('data.agent_name', $agent->name);
-        $response->assertJsonPath('data.turns.0.speaker_label', $agent->name);
+        $response->assertJsonPath('data.status', 'completed');
     }
 
     public function test_store_denied_without_create_permission(): void

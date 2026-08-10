@@ -388,7 +388,10 @@
                             function formatTime(time) {
                                 if (!time) return '-';
 
-                                const dateObj = new Date('1970-01-01T' + time);
+                                // login_time/logout_time now come back as full
+                                // "YYYY-MM-DD HH:MM:SS" datetimes, not bare "HH:MM:SS"
+                                const timePart = time.includes(' ') ? time.split(' ')[1] : time;
+                                const dateObj = new Date('1970-01-01T' + timePart);
                                 return dateObj.toLocaleTimeString('en-US', {
                                     hour: '2-digit',
                                     minute: '2-digit',

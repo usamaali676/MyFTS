@@ -550,16 +550,30 @@ document.addEventListener('DOMContentLoaded', function () {
             fetch('{{ route('front.endBreak') }}', {
                 method: 'POST',
                 headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Accept': 'application/json'
                 }
+            })
+            .then(response => response.json().then(data => ({ ok: response.ok, data })))
+            .then(({ ok, data }) => {
+                // Only clear the break UI once the server confirms break_end
+                // was actually saved — previously this ran unconditionally,
+                // so a failed request still looked like a successful end-break.
+                if (!ok) {
+                    alert(data.error || 'Error ending break. Please try again.');
+                    return;
+                }
+
+                isOnBreak = false;
+                stopTimer();
+                breakModal.hide();
+                exitFullscreen();
+                location.reload();
+            })
+            .catch(error => {
+                alert('Error ending break. Please try again.');
+                console.error(error);
             });
-
-            isOnBreak = false;
-
-            stopTimer();
-            breakModal.hide();
-            exitFullscreen();
-            location.reload();
         });
 
         // Prevent leaving tab (basic)

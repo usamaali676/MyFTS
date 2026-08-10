@@ -233,29 +233,9 @@ public function generate(Request $request)
                 }
             public function cronlogout()
             {
-                $now = now('Asia/Karachi');
-                    // Only run at 04:15
-                    if ($now->format('H:i') !== '04:15') {
-                        return response()->json(['message' => 'Skipped']);
-                    }
-                $shiftDate = $this->getShiftDate();
-                $attendances = Attendance::whereNull('logout_time')
-                    ->where('shift_date', '=', $shiftDate)
-                    ->get();
-                    $logoutTime = now('Asia/Karachi');
+                \Illuminate\Support\Facades\Artisan::call('attendance:close-shift');
 
-
-                foreach ($attendances as $attendance) {
-                     if ($logoutTime->lessThan($attendance->login_time)) {
-                            $logoutTime->addDay();
-                    }
-                    $attendance->logout_time = $logoutTime;
-                    $attendance->working_minutes = Carbon::parse($attendance->login_time)->diffInMinutes($logoutTime);
-                    $attendance->save();
-                }
-                  DB::table('sessions')->truncate();
-
-                return response()->json(['message' => 'Cron logout executed successfully.']);
+                return response()->json(['message' => \Illuminate\Support\Facades\Artisan::output()]);
             }
 
 
@@ -384,35 +364,41 @@ public function generate(Request $request)
         $shiftDate = $this->getShiftDate();
         $user = Auth::user();
 
-        $attendance = Attendance::where('user_id', $user->id)
-            ->where('shift_date', $shiftDate)
-            ->first();
-
-        // Catch the most common causes of 500
-        if (!$attendance) {
-            return response()->json(['error' => 'No attendance record found for today'], 404);
-        }
-
         if (!$breakType) {
             return response()->json(['error' => 'Break type is missing'], 422);
         }
 
-        $activeBreak = Breaks::where('user_id', $user->id)
-            ->whereNull('break_end')
-            ->first();
+        return DB::transaction(function () use ($user, $shiftDate, $breakType) {
+            $attendance = Attendance::where('user_id', $user->id)
+                ->where('shift_date', $shiftDate)
+                ->lockForUpdate()
+                ->first();
 
-        if ($activeBreak) {
-            return response()->json(['error' => 'Already on break'], 400);
-        }
+            if (!$attendance) {
+                return response()->json(['error' => 'No attendance record found for today'], 404);
+            }
 
-        Breaks::create([
-            'user_id'       => $user->id,
-            'attendance_id' => $attendance->id,
-            'break_type'    => $breakType,
-            'break_start'   => Carbon::parse($shiftDate)->setTimeFrom(now('Asia/Karachi')),
-        ]);
+            // Scoped to today's attendance_id (not just user_id) so a stale
+            // unfinished break from a previous shift can't permanently block
+            // this user from starting a new break.
+            $activeBreak = Breaks::where('attendance_id', $attendance->id)
+                ->whereNull('break_end')
+                ->lockForUpdate()
+                ->first();
 
-        return response()->json(['success' => true, 'break_type' => $breakType]);
+            if ($activeBreak) {
+                return response()->json(['error' => 'Already on break'], 400);
+            }
+
+            Breaks::create([
+                'user_id'       => $user->id,
+                'attendance_id' => $attendance->id,
+                'break_type'    => $breakType,
+                'break_start'   => Carbon::parse($shiftDate)->setTimeFrom(now('Asia/Karachi')),
+            ]);
+
+            return response()->json(['success' => true, 'break_type' => $breakType]);
+        });
 
     } catch (\Exception $e) {
         return response()->json([
@@ -424,21 +410,44 @@ public function generate(Request $request)
 }
             public function endBreak()
             {
-                $shiftDate = $this->getShiftDate();
-                $user = Auth::user();
+                try {
+                    $shiftDate = $this->getShiftDate();
+                    $user = Auth::user();
 
-                $break = Breaks::where('user_id', $user->id)
-                    ->whereNull('break_end')
-                    ->latest()
-                    ->first();
-                    $breakStart = Carbon::parse($break->break_start, 'Asia/Karachi');
-                    $breakEnd = Carbon::parse($shiftDate)
-                    ->setTimeFrom(now('Asia/Karachi'));
+                    return DB::transaction(function () use ($user, $shiftDate) {
+                        $attendance = Attendance::where('user_id', $user->id)
+                            ->where('shift_date', $shiftDate)
+                            ->first();
 
-                if ($break) {
-                    $break->break_end = $breakEnd;
-                    $break->duration = $breakStart->diffInSeconds($breakEnd);
-                    $break->save();
+                        $break = Breaks::where('user_id', $user->id)
+                            ->when($attendance, fn ($q) => $q->where('attendance_id', $attendance->id))
+                            ->whereNull('break_end')
+                            ->latest()
+                            ->lockForUpdate()
+                            ->first();
+
+                        // Null-check BEFORE reading break_start: double-clicking
+                        // End Break (or clicking it with no active break) used to
+                        // dereference a null $break and throw a fatal error here.
+                        if (!$break) {
+                            return response()->json(['error' => 'No active break found'], 404);
+                        }
+
+                        $breakStart = Carbon::parse($break->break_start, 'Asia/Karachi');
+                        $breakEnd = Carbon::parse($shiftDate)->setTimeFrom(now('Asia/Karachi'));
+
+                        $break->break_end = $breakEnd;
+                        $break->duration = $breakStart->diffInSeconds($breakEnd);
+                        $break->save();
+
+                        return response()->json(['success' => true, 'duration' => $break->duration]);
+                    });
+                } catch (\Exception $e) {
+                    return response()->json([
+                        'error' => $e->getMessage(),
+                        'line'  => $e->getLine(),
+                        'file'  => $e->getFile(),
+                    ], 500);
                 }
             }
 

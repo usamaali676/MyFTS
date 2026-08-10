@@ -6,6 +6,7 @@ use App\Exceptions\TranscriptionFailedException;
 use App\Models\CallTranscription;
 use App\Models\User;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use OpenAI\Laravel\Facades\OpenAI;
 
@@ -17,15 +18,29 @@ class CallTranscriptionService
     // instead of transcribing the full file. whisper-1 is purpose-built for
     // full-length audio and doesn't have that cutoff.
     private const TRANSCRIBE_MODEL = 'whisper-1';
-    private const DIARIZE_MODEL = 'gpt-4o';
+    private const DIARIZE_MODEL = 'gpt-4o-mini';
     private const MAX_RETRIES = 2;
     private const LABEL_CHUNK_SIZE = 25;
-    private const CONTEXT_LINES = 5;
+
+    private const REV_AI_BASE_URL = 'https://api.rev.ai/speechtotext/v1';
+    private const REV_AI_POLL_INTERVAL_SECONDS = 5;
+    // Safety ceiling, not the expected time -- a 17-minute benchmark call
+    // transcribed in ~100s in testing. This just bounds how long a stuck
+    // Rev AI job can hold up the queue job before falling back to OpenAI.
+    private const REV_AI_MAX_WAIT_SECONDS = 1800;
 
     public function __construct(
         private readonly TranscriptComplianceService $complianceService,
     ) {}
 
+    /**
+     * Creates the record, transcribes/diarizes the recording, and returns it
+     * with a final status of 'completed' or 'failed'. Runs synchronously in
+     * the request: Rev AI (real acoustic diarization) typically finishes a
+     * call in one to two minutes, which is well within a normal HTTP request,
+     * so there's no need for a queued job and the polling/worker-process
+     * machinery that comes with one.
+     */
     public function generate(UploadedFile $file, User $agent, string $requestUuid, int $createdByUserId): CallTranscription
     {
         $existing = CallTranscription::where('uuid', $requestUuid)
@@ -47,14 +62,9 @@ class CallTranscriptionService
             'created_by' => $createdByUserId,
         ]);
 
-        $startedAt = microtime(true);
-
-        // Move the upload to a stable local path once, up front. The PHP temp-upload
-        // file behind $file->getRealPath() is not reliable to read from twice in the
-        // same request (e.g. it can transiently fail while an AV scan holds a lock
-        // on it on Windows), and it also has no file extension, which the Whisper
-        // API needs to detect the audio format. Working from one durable copy fixes
-        // both problems.
+        // Move the upload to a stable local path. The PHP temp-upload file behind
+        // $file->getRealPath() has no file extension, which the Whisper API needs
+        // to detect the audio format.
         $extension = $file->getClientOriginalExtension() ?: 'mp3';
         $storedDir = storage_path('app/tmp/call-transcriptions');
         if (!is_dir($storedDir)) {
@@ -64,11 +74,33 @@ class CallTranscriptionService
         $file->move($storedDir, $storedName);
         $storedPath = $storedDir . DIRECTORY_SEPARATOR . $storedName;
 
+        $this->process($record, $storedPath, $agent->name);
+
+        return $record->fresh();
+    }
+
+    /**
+     * The actual transcription/diarization work. Tries Rev AI (real acoustic
+     * diarization) first; if it's unreachable, times out, or returns something
+     * malformed, falls back to the OpenAI-only pipeline so a call still gets
+     * transcribed either way.
+     */
+    private function process(CallTranscription $record, string $storedPath, string $agentName): void
+    {
+        $startedAt = microtime(true);
+
         try {
-            [$segments, $durationSeconds] = $this->transcribe($storedPath);
+            $viaRevAi = $this->transcribeViaRevAi($storedPath);
+
+            if ($viaRevAi !== null) {
+                [$rawTurns, $durationSeconds] = $viaRevAi;
+            } else {
+                [$segments, $durationSeconds] = $this->transcribe($storedPath);
+                $rawTurns = $this->diarize($segments, $agentName);
+            }
+
             $durationSeconds ??= $this->readDuration($storedPath);
-            $rawTurns = $this->diarize($segments, $agent->name);
-            $turns = $this->finalizeTurns($rawTurns, $agent->name);
+            $turns = $this->finalizeTurns($rawTurns, $agentName);
 
             $record->update([
                 'status' => 'completed',
@@ -96,7 +128,6 @@ class CallTranscriptionService
             }
         } catch (TranscriptionFailedException $e) {
             $record->update(['status' => 'failed', 'error_message' => $e->getMessage()]);
-            throw $e;
         } catch (\Throwable $e) {
             Log::error('Call transcription failed', [
                 'call_transcription_id' => $record->id,
@@ -107,14 +138,182 @@ class CallTranscriptionService
                 'trace' => $e->getTraceAsString(),
             ]);
             $record->update(['status' => 'failed', 'error_message' => 'An unexpected error occurred.']);
-            throw new TranscriptionFailedException('An unexpected error occurred while processing the recording.', 500);
         } finally {
             if (is_file($storedPath)) {
                 @unlink($storedPath);
             }
         }
+    }
 
-        return $record->fresh();
+    /**
+     * Calls Rev AI's async speech-to-text API (real acoustic diarization).
+     * Returns null on any failure -- not configured, submission rejected,
+     * job failed/timed out, or a malformed transcript -- so process() can
+     * fall back to the OpenAI pipeline instead of failing the transcription
+     * outright. Never throws.
+     *
+     * @return array{0: array<int, array{speaker: string, text: string, start: int}>, 1: ?int}|null
+     */
+    private function transcribeViaRevAi(string $path): ?array
+    {
+        $token = config('services.revai.token');
+
+        if (!$token) {
+            return null;
+        }
+
+        try {
+            $submission = Http::timeout(120)
+                ->connectTimeout(10)
+                ->withToken($token)
+                ->attach('media', fopen($path, 'r'), basename($path))
+                ->post(self::REV_AI_BASE_URL . '/jobs');
+
+            if (!$submission->successful()) {
+                Log::warning('Rev AI job submission failed; falling back to OpenAI', [
+                    'status' => $submission->status(),
+                ]);
+
+                return null;
+            }
+
+            $jobId = $submission->json('id');
+
+            if (!$jobId) {
+                Log::warning('Rev AI job submission returned no job id; falling back to OpenAI');
+
+                return null;
+            }
+
+            $durationSeconds = null;
+            $waited = 0;
+
+            while (true) {
+                sleep(self::REV_AI_POLL_INTERVAL_SECONDS);
+                $waited += self::REV_AI_POLL_INTERVAL_SECONDS;
+
+                $jobStatus = Http::timeout(30)->withToken($token)
+                    ->get(self::REV_AI_BASE_URL . '/jobs/' . $jobId);
+
+                if (!$jobStatus->successful()) {
+                    Log::warning('Rev AI job status check failed; falling back to OpenAI', [
+                        'status' => $jobStatus->status(),
+                    ]);
+
+                    return null;
+                }
+
+                $status = $jobStatus->json('status');
+
+                if ($status === 'transcribed') {
+                    $durationSeconds = $jobStatus->json('duration_seconds');
+
+                    break;
+                }
+
+                if ($status === 'failed') {
+                    Log::warning('Rev AI job failed; falling back to OpenAI', [
+                        'failure_detail' => $jobStatus->json('failure_detail'),
+                    ]);
+
+                    return null;
+                }
+
+                if ($waited >= self::REV_AI_MAX_WAIT_SECONDS) {
+                    Log::warning('Rev AI job did not finish within the wait ceiling; falling back to OpenAI', [
+                        'waited_seconds' => $waited,
+                    ]);
+
+                    return null;
+                }
+            }
+
+            $transcript = Http::timeout(60)
+                ->withToken($token)
+                ->withHeaders(['Accept' => 'application/vnd.rev.transcript.v1.0+json'])
+                ->get(self::REV_AI_BASE_URL . '/jobs/' . $jobId . '/transcript');
+
+            if (!$transcript->successful()) {
+                Log::warning('Rev AI transcript retrieval failed; falling back to OpenAI', [
+                    'status' => $transcript->status(),
+                ]);
+
+                return null;
+            }
+
+            $monologues = $transcript->json('monologues');
+
+            if (!is_array($monologues) || count($monologues) === 0) {
+                Log::warning('Rev AI returned no monologues; falling back to OpenAI');
+
+                return null;
+            }
+
+            $rawTurns = [];
+            $wordCountsBySpeaker = [];
+
+            foreach ($monologues as $monologue) {
+                $speaker = $monologue['speaker'] ?? null;
+                $elements = $monologue['elements'] ?? null;
+
+                if ($speaker === null || !is_array($elements)) {
+                    continue;
+                }
+
+                $text = '';
+                $start = null;
+
+                foreach ($elements as $element) {
+                    $type = $element['type'] ?? null;
+
+                    if ($type === 'text' || $type === 'punct') {
+                        $text .= $element['value'] ?? '';
+                    }
+
+                    if ($type === 'text' && $start === null) {
+                        $start = $element['ts'] ?? null;
+                    }
+                }
+
+                $text = trim($text);
+
+                if ($text === '') {
+                    continue;
+                }
+
+                $rawTurns[] = ['speaker' => $speaker, 'text' => $text, 'start' => (int) round($start ?? 0)];
+                $wordCountsBySpeaker[$speaker] = ($wordCountsBySpeaker[$speaker] ?? 0) + str_word_count($text);
+            }
+
+            if (count($rawTurns) === 0) {
+                Log::warning('Rev AI transcript had no usable text; falling back to OpenAI');
+
+                return null;
+            }
+
+            // Rev AI numbers speakers anonymously (0, 1, ...) -- it doesn't know
+            // which one is the agent. Sales calls are agent-monologue-heavy, so
+            // whichever speaker has the most total words is far more reliable
+            // than assuming whoever speaks first is the agent (wrong whenever
+            // the client opens the call with small talk, as confirmed on our
+            // benchmark call).
+            arsort($wordCountsBySpeaker);
+            $agentSpeaker = array_key_first($wordCountsBySpeaker);
+
+            foreach ($rawTurns as &$turn) {
+                $turn['speaker'] = $turn['speaker'] === $agentSpeaker ? 'agent' : 'client';
+            }
+            unset($turn);
+
+            return [$rawTurns, $durationSeconds !== null ? (int) round($durationSeconds) : null];
+        } catch (\Throwable $e) {
+            Log::warning('Rev AI call failed; falling back to OpenAI', [
+                'exception' => get_class($e),
+                'message' => $e->getMessage(),
+            ]);
+
+            return null;
+        }
     }
 
     private function readDuration(string $path): ?int
@@ -131,7 +330,7 @@ class CallTranscriptionService
     }
 
     /**
-     * @return array{0: array<int, array{text: string, start: int, pause_before: float}>, 1: ?int}
+     * @return array{0: array<int, array{text: string, start: int}>, 1: ?int}
      */
     private function transcribe(string $path): array
     {
@@ -154,22 +353,12 @@ class CallTranscriptionService
                 ]);
 
                 $segments = [];
-                $previousEnd = null;
-
                 foreach ($response->segments as $segment) {
                     $text = trim($segment->text);
 
                     if ($text !== '') {
-                        $pauseBefore = $previousEnd !== null ? max(0.0, $segment->start - $previousEnd) : 0.0;
-
-                        $segments[] = [
-                            'text' => $text,
-                            'start' => (int) round($segment->start),
-                            'pause_before' => round($pauseBefore, 1),
-                        ];
+                        $segments[] = ['text' => $text, 'start' => (int) round($segment->start)];
                     }
-
-                    $previousEnd = $segment->end;
                 }
 
                 if (count($segments) === 0) {
@@ -219,33 +408,28 @@ class CallTranscriptionService
 
         $lines = array_column($segments, 'text');
         $starts = array_column($segments, 'start');
-        $pauses = array_column($segments, 'pause_before');
 
-        $labels = $this->labelLines($lines, $pauses, $agentName);
-        $turns = $this->groupLabeledLines($lines, $starts, $labels);
+        $labels = $this->labelLines($lines, $agentName);
 
-        return $this->reconcileTurnsWithFullContext($turns, $agentName);
+        return $this->groupLabeledLines($lines, $starts, $labels);
     }
 
     /**
      * @param  array<int, string>  $lines
-     * @param  array<int, float>  $pauses
      * @return array<int, string> one 'agent'|'client' label per line, same order/length as $lines
      */
-    private function labelLines(array $lines, array $pauses, string $agentName): array
+    private function labelLines(array $lines, string $agentName): array
     {
         $labels = [];
-        $context = [];
+        $previousSpeaker = null;
+        $previousLineText = null;
 
-        foreach (array_chunk($lines, self::LABEL_CHUNK_SIZE) as $chunkIndex => $chunk) {
-            $pauseChunk = array_slice($pauses, $chunkIndex * self::LABEL_CHUNK_SIZE, count($chunk));
-            $chunkLabels = $this->labelChunk($chunk, $pauseChunk, $agentName, $context);
+        foreach (array_chunk($lines, self::LABEL_CHUNK_SIZE) as $chunk) {
+            $chunkLabels = $this->labelChunk($chunk, $agentName, $previousSpeaker, $previousLineText);
             $labels = array_merge($labels, $chunkLabels);
 
-            foreach ($chunk as $i => $line) {
-                $context[] = ['speaker' => $chunkLabels[$i] ?? 'client', 'text' => $line];
-            }
-            $context = array_slice($context, -self::CONTEXT_LINES);
+            $previousSpeaker = $chunkLabels[count($chunkLabels) - 1] ?? $previousSpeaker;
+            $previousLineText = $chunk[count($chunk) - 1] ?? $previousLineText;
         }
 
         return $labels;
@@ -253,35 +437,20 @@ class CallTranscriptionService
 
     /**
      * @param  array<int, string>  $lines
-     * @param  array<int, float>  $pauses
      * @return array<int, string> one 'agent'|'client' label per line, same order/length as $lines
      */
-    /**
-     * @param  array<int, array{speaker: string, text: string}>  $context  already-labeled lines immediately before this chunk, oldest first, at most self::CONTEXT_LINES entries
-     */
-    private function labelChunk(array $lines, array $pauses, string $agentName, array $context): array
+    private function labelChunk(array $lines, string $agentName, ?string $previousSpeaker, ?string $previousLineText): array
     {
         $count = count($lines);
         $numbered = implode("\n", array_map(
-            static fn (int $i, string $line, float $pause): string => ($i + 1)
-                . ' [pause before this line: ' . number_format($pause, 1) . 's]: ' . $line,
+            static fn (int $i, string $line): string => ($i + 1) . ': ' . $line,
             array_keys($lines),
             $lines,
-            $pauses,
         ));
 
-        $contextBlock = '';
-        if ($context !== []) {
-            $renderedContext = implode("\n", array_map(
-                static fn (array $c): string => '"' . $c['speaker'] . '": "' . $c['text'] . '"',
-                $context,
-            ));
-
-            $contextBlock = "For continuity only (these lines are from just before this excerpt and are"
-                . " already labeled -- do NOT include them in your output), oldest first:\n{$renderedContext}\n"
-                . "Keep applying the same speaker identity consistently; do not swap which name means agent"
-                . " vs client partway through.\n\n";
-        }
+        $context = $previousSpeaker !== null
+            ? "For continuity only (this line is from just before this excerpt and is already labeled -- do NOT include it in your output): line 0 was spoken by \"{$previousSpeaker}\": \"{$previousLineText}\". Keep applying that same speaker identity consistently; do not swap which name means agent vs client partway through.\n\n"
+            : '';
 
         $basePrompt = <<<PROMPT
             You are given a phone-call transcript mechanically split into {$count} numbered text fragments
@@ -290,12 +459,6 @@ class CallTranscriptionService
             filler word, or the transcription engine's own chunking. A fragment that ends mid-word,
             mid-thought, or without a natural sentence ending is almost always continued by the very next
             fragment from the SAME speaker.
-
-            Each fragment is annotated with the real silence gap (in seconds) measured between the end of
-            the previous fragment and the start of this one. A near-zero pause means the same speaker very
-            likely kept talking without a real break; a longer pause more often (but not always) lines up
-            with a change of speaker. Treat this as a supporting signal alongside the words themselves, not
-            as a strict rule on its own.
 
             Two people are talking:
             - "{$agentName}" (the agent / call center representative)
@@ -308,7 +471,7 @@ class CallTranscriptionService
             sense as a response to the fragment before it. Do not alternate speakers just because a
             fragment boundary exists.
 
-            {$contextBlock}Return strict JSON only, no prose, in this exact shape — exactly {$count} labels, one per
+            {$context}Return strict JSON only, no prose, in this exact shape — exactly {$count} labels, one per
             line, in the same order as the transcript:
             {"labels": ["agent", "client", "client", "agent"]}
 
@@ -435,106 +598,6 @@ class CallTranscriptionService
         }
 
         return $turns;
-    }
-
-    /**
-     * Best-effort final pass: re-reads the WHOLE assembled transcript (turns,
-     * not raw segments) with full conversational context and corrects any
-     * turn whose speaker looks wrong now that the complete conversation is
-     * visible -- catches drift the forward-only chunked pass above can't see.
-     * Never throws -- on any failure or malformed response this returns
-     * $turns unchanged, since a chunk-labeled transcript is still a valid,
-     * already-paid-for result.
-     *
-     * @param  array<int, array{speaker: string, text: string, start: int}>  $turns
-     * @return array<int, array{speaker: string, text: string, start: int}>
-     */
-    private function reconcileTurnsWithFullContext(array $turns, string $agentName): array
-    {
-        $count = count($turns);
-
-        if ($count < 2) {
-            return $turns;
-        }
-
-        $numbered = implode("\n", array_map(
-            static fn (int $i, array $turn): string => "[{$i}] " . ($turn['speaker'] === 'agent' ? $agentName : 'the caller') . ': ' . $turn['text'],
-            array_keys($turns),
-            $turns,
-        ));
-
-        $prompt = <<<PROMPT
-            You are given a complete phone-call transcript, already split into {$count} numbered turns and
-            labeled by speaker. Two people are talking: "{$agentName}" (the agent) and the caller (their
-            customer). Re-read the ENTIRE conversation for full context and identify any turn whose speaker
-            label looks wrong now that you can see the whole call -- for example a turn that reads like a
-            direct reply to a question the agent just asked, but is currently labeled as the agent's own
-            turn.
-
-            Return strict JSON only, no prose, in this exact shape -- exactly {$count} labels, one per
-            line, in the same order as the transcript, reflecting your corrected judgment (repeat the
-            existing label for any turn you agree with):
-            {"labels": ["agent", "client", "client", "agent"]}
-
-            Numbered transcript:
-            {$numbered}
-            PROMPT;
-
-        try {
-            $response = OpenAI::chat()->create([
-                'model' => self::DIARIZE_MODEL,
-                'temperature' => 0,
-                'response_format' => ['type' => 'json_object'],
-                'messages' => [
-                    ['role' => 'system', 'content' => 'You review phone-call transcripts for speaker-labeling consistency and respond with strict JSON only.'],
-                    ['role' => 'user', 'content' => $prompt],
-                ],
-            ]);
-
-            $decoded = json_decode($response->choices[0]->message->content, true);
-            $labels = $decoded['labels'] ?? null;
-
-            if (!is_array($labels) || count($labels) !== $count) {
-                return $turns;
-            }
-
-            $corrected = [];
-            foreach (array_values($turns) as $i => $turn) {
-                $turn['speaker'] = ($labels[$i] ?? $turn['speaker']) === 'agent' ? 'agent' : 'client';
-                $corrected[] = $turn;
-            }
-
-            return $this->mergeAdjacentSameSpeakerTurns($corrected);
-        } catch (\Throwable $e) {
-            Log::warning('Transcript reconciliation pass failed; using chunk-labeled turns as-is', [
-                'exception' => get_class($e),
-                'message' => $e->getMessage(),
-            ]);
-
-            return $turns;
-        }
-    }
-
-    /**
-     * @param  array<int, array{speaker: string, text: string, start: int}>  $turns
-     * @return array<int, array{speaker: string, text: string, start: int}>
-     */
-    private function mergeAdjacentSameSpeakerTurns(array $turns): array
-    {
-        $merged = [];
-
-        foreach ($turns as $turn) {
-            $last = count($merged) - 1;
-
-            if ($last >= 0 && $merged[$last]['speaker'] === $turn['speaker']) {
-                $merged[$last]['text'] = trim($merged[$last]['text'] . ' ' . $turn['text']);
-                continue;
-            }
-
-            $merged[] = $turn;
-        }
-
-        return $merged;
     }
 
     /**

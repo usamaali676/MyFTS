@@ -161,6 +161,14 @@ class LoginController extends Controller
         protected function markAttendance($user)
         {
             $now = now('Asia/Karachi');
+
+            // Shift only runs 7 PM - 4 AM. Ignore logins in the 5 AM - 5 PM
+            // window so a stray daytime login can't create today's attendance
+            // row early and block the real evening check-in from being recorded.
+            if ($now->hour >= 5 && $now->hour < 17) {
+                return;
+            }
+
             $shiftDate = $this->getShiftDate();
 
             $attendance = Attendance::where('user_id', $user->id)

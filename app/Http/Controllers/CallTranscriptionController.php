@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Exceptions\TranscriptionFailedException;
 use App\Http\Requests\GenerateTranscriptRequest;
 use App\Models\CallTranscription;
 use App\Models\Role;
@@ -52,16 +51,12 @@ class CallTranscriptionController extends Controller
             ], 422);
         }
 
-        try {
-            $record = $this->service->generate(
-                $request->file('audio'),
-                $agent,
-                (string) $request->string('request_uuid'),
-                Auth::id(),
-            );
-        } catch (TranscriptionFailedException $e) {
-            return response()->json(['success' => false, 'message' => $e->getMessage()], $e->httpStatus);
-        }
+        $record = $this->service->generate(
+            $request->file('audio'),
+            $agent,
+            (string) $request->string('request_uuid'),
+            Auth::id(),
+        );
 
         return response()->json(['success' => true, 'data' => $this->transformRecord($record)]);
     }
@@ -127,6 +122,7 @@ class CallTranscriptionController extends Controller
             'word_count' => $record->word_count,
             'exchange_count' => $record->exchange_count,
             'processing_time_ms' => $record->processing_time_ms,
+            'error_message' => $record->error_message,
             'turns' => $record->transcript_json ?? [],
             'compliance_status' => $record->compliance_status,
             'compliance_turns' => $record->compliance_turns,

@@ -35,4 +35,11 @@ return [
         ],
     ],
 
+    'revai' => [
+        // Real acoustic speaker diarization via Rev AI's async speech-to-text
+        // API. CallTranscriptionService falls back to the OpenAI pipeline
+        // whenever this is unset, unreachable, or fails.
+        'token' => env('REV_AI_TOKEN'),
+    ],
+
 ];
