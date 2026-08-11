@@ -480,8 +480,15 @@
     <script src="{{ asset('assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js') }}"></script>
     <script src="{{ asset('assets/js/tables-datatables-advanced.js') }}"></script>
     <script>
-        $('#recodetable').DataTable({
-            autoWidth: false
+        var leadsTable = $('#recodetable').DataTable({
+            autoWidth: false,
+            language: window.rsEmptyStateHTML ? { emptyTable: rsEmptyStateHTML('leads') } : undefined
         });
+
+        // Coming from a notification click (?search=Business Name) - apply it as the table's global search.
+        var leadSearchParam = new URLSearchParams(window.location.search).get('search');
+        if (leadSearchParam) {
+            leadsTable.search(leadSearchParam).draw();
+        }
     </script>
 @endsection

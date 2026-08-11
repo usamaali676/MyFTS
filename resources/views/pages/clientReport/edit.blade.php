@@ -41,11 +41,23 @@
     </div>
 
     @if(session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                if (window.toastr) {
+                    toastr.success(@json(session('success')));
+                }
+            });
+        </script>
     @endif
 
     @if(session('error'))
-        <div class="alert alert-danger">{{ session('error') }}</div>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                if (window.toastr) {
+                    toastr.error(@json(session('error')));
+                }
+            });
+        </script>
     @endif
 
     @if ($errors->any())

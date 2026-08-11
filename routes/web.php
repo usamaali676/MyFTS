@@ -70,6 +70,8 @@ Route::controller(FrontController::class)
     Route::post('/endBreak', 'endBreak')->name('endBreak');
     Route::get('/zkteco', 'ZktecoIntegnew')->name('zkteco');
     Route::get('/callbacknotification', 'callbacknotification')->name('callbacknotification');
+    Route::post('/notifications/{id}/read', 'markNotificationRead')->name('notifications.read');
+    Route::get('/notifications', 'allNotifications')->name('notifications.index');
 
 
 

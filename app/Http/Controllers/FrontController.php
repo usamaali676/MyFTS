@@ -658,6 +658,27 @@ public function ZktecoDebug()
 
     }
 
+    public function markNotificationRead($id)
+    {
+        $notification = auth()->user()->notifications()->where('id', $id)->first();
+
+        if ($notification && is_null($notification->read_at)) {
+            $notification->markAsRead();
+        }
+
+        return response()->json([
+            'success' => true,
+            'unread_count' => auth()->user()->unreadNotifications()->count(),
+        ]);
+    }
+
+    public function allNotifications()
+    {
+        $notifications = auth()->user()->notifications()->latest()->paginate(20);
+
+        return view('pages.notifications.index', compact('notifications'));
+    }
+
     }
 
 

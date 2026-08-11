@@ -97,10 +97,20 @@
             <form id="formAuthentication" class="mb-3" method="POST" action="{{ route('login') }}">
                 @csrf
                 @if (session('status'))
-                <div class="alert alert-success" role="alert">
-                    {{ session('status') }}
-                </div>
+                <script>
+                    document.addEventListener('DOMContentLoaded', function () {
+                        if (window.toastr) {
+                            toastr.success(@json(session('status')));
+                        }
+                    });
+                </script>
                 @endif
+              @include('auth.partials.robot-sentry', [
+                  'botId' => 'loginRobotSentry',
+                  'mode' => 'password',
+                  'target' => '#password',
+                  'toggle' => '#passwordVisibilityToggle',
+              ])
               <div class="form-floating form-floating-outline mb-3">
                 <input
                   type="text"
@@ -134,7 +144,7 @@
                         @enderror
                       <label for="password">Password</label>
                     </div>
-                    <span class="input-group-text cursor-pointer"><i class="mdi mdi-eye-off-outline"></i></span>
+                    <span id="passwordVisibilityToggle" class="input-group-text cursor-pointer"><i class="mdi mdi-eye-off-outline"></i></span>
                   </div>
                 </div>
               </div>

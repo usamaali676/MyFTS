@@ -27,6 +27,10 @@
     <!-- Main JS -->
     <script src="{{ asset('assets/js/main.js') }}"></script>
 
+    <!-- Portal micro-interactions -->
+    <script src="{{ asset('assets/vendor/libs/toastr/toastr.js') }}"></script>
+    <script src="{{ asset('assets/js/custom/interactions.js') }}"></script>
+
     <!-- Page JS -->
     <script src="{{ asset('assets/js/pages-auth.js') }}"></script>
     <script src="{{ asset('assets/js/form-layouts.js') }}"></script>

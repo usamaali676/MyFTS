@@ -80,7 +80,9 @@
 <script src="{{ asset('assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js') }}"></script>
 <script src="{{ asset('assets/js/tables-datatables-advanced.js') }}"></script>
 <script>
-    $('#recodetable').DataTable();
+    $('#recodetable').DataTable({
+        language: window.rsEmptyStateHTML ? { emptyTable: rsEmptyStateHTML('users') } : undefined
+    });
 
 </script>
 @endsection

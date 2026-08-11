@@ -513,7 +513,9 @@
 
 <script src="{{ asset('assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js') }}"></script>
 <script>
-    $('#recodetable').DataTable();
+    $('#recodetable').DataTable({
+        language: window.rsEmptyStateHTML ? { emptyTable: rsEmptyStateHTML('roles') } : undefined
+    });
 
 </script>
 

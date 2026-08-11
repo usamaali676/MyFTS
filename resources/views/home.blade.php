@@ -36,7 +36,7 @@ $user = Auth::user();
 
         <!-- Statistics Total Order -->
         <div class="col-lg-3 col-sm-6">
-            <div class="card h-100">
+            <div class="card h-100 hover-lift">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
                         <div class="avatar">
@@ -51,7 +51,7 @@ $user = Auth::user();
                     </div>
                     <div class="card-info mt-4 pt-1 mt-lg-1 mt-xl-4">
                         @if(isset($sale_count))
-                        <h5 class="mb-2">{{ $sale_count }}</h5>
+                        <h5 class="mb-2" id="statSalesCount" data-countup="{{ $sale_count }}">0</h5>
                         @else
                         <h5 class="mb-2">0</h5>
                         @endif
@@ -65,10 +65,10 @@ $user = Auth::user();
 
         <!-- Sessions line chart -->
         <div class="col-lg-3 col-sm-6">
-            <div class="card h-100">
+            <div class="card h-100 hover-lift">
                 <div class="card-header pb-0">
                     <div class="d-flex align-items-end mb-1 flex-wrap gap-2">
-                        <h4 class="mb-0 me-2">${{ $total }}</h4>
+                        <h4 class="mb-0 me-2" id="statRevenueTotal" data-countup="{{ $total }}" data-countup-prefix="$" data-countup-decimals="2">$0.00</h4>
                     </div>
                     <span class="d-block mb-2 text-body">Revenue </span>
                 </div>
@@ -183,7 +183,7 @@ $user = Auth::user();
         <div class="col-md-6 col-xl-4">
             <div class="row g-4">
                 <div class="col-xl-12">
-          <div class="card h-100">
+          <div class="card h-100 hover-lift">
             <div class="card-body d-flex justify-content-between">
               <div class="d-flex flex-column">
                 <div class="card-title mb-auto">
@@ -191,7 +191,7 @@ $user = Auth::user();
                   <p class="mb-0">This Month</p>
                 </div>
                 <div class="chart-statistics">
-                  <h3 class="card-title mb-0">{{ $lates }} Lates</h3>
+                  <h3 class="card-title mb-0"><span id="statLatesCount" data-countup="{{ $lates }}">0</span> Lates</h3>
                   {{-- <p class="text-success text-nowrap mb-0"><i class="icon-base ti tabler-chevron-up me-1"></i> 15.8%</p> --}}
                 </div>
               </div>
