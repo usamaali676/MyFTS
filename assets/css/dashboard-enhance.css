@@ -106,6 +106,156 @@
   box-shadow: 0 14px 26px -10px rgba(102, 108, 255, 0.7);
 }
 
+/* ---------- Total Lates / Total Absents cards + details modals ---------- */
+.dashboard-enhanced .hover-lift[data-bs-target="#latesDetailModal"]:hover,
+.dashboard-enhanced .hover-lift[data-bs-target="#absentsDetailModal"]:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px -12px rgba(255, 99, 71, 0.35), 0 2px 6px rgba(76, 78, 100, 0.06);
+}
+
+.lates-modal .modal-content {
+  border: none;
+  border-radius: 16px;
+  box-shadow: 0 24px 48px -18px rgba(76, 78, 100, 0.35);
+}
+
+.lates-modal-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(255, 159, 67, 0.25), rgba(255, 99, 71, 0.18));
+  color: #e0621f;
+  font-size: 1.35rem;
+  flex-shrink: 0;
+}
+
+.lates-modal-icon--absent {
+  background: linear-gradient(135deg, rgba(255, 61, 96, 0.25), rgba(255, 61, 96, 0.14));
+  color: #e0213f;
+}
+
+.lates-group + .lates-group {
+  padding-top: 12px;
+  border-top: 1px solid rgba(76, 78, 100, 0.1);
+}
+
+.lates-summary .badge {
+  background: rgba(102, 108, 255, 0.12);
+  color: #5f5aec;
+  font-weight: 600;
+  padding: 0.5em 0.9em;
+}
+
+.lates-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.lates-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #f8f8fb;
+  border: 1px solid transparent;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.lates-row:hover {
+  transform: translateX(3px);
+  box-shadow: 0 6px 16px -8px rgba(76, 78, 100, 0.25);
+  border-color: rgba(102, 108, 255, 0.15);
+}
+
+.lates-row-date {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 3px 10px -4px rgba(76, 78, 100, 0.25);
+  flex-shrink: 0;
+}
+
+.lates-row-dow {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #8a8d93;
+  letter-spacing: 0.02em;
+}
+
+.lates-row-day {
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.lates-row-body {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.lates-row-title {
+  font-weight: 600;
+  font-size: 0.92rem;
+}
+
+.lates-row-time {
+  font-size: 0.82rem;
+  color: #8a8d93;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.lates-row-badges {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.lates-badge {
+  font-weight: 600;
+  font-size: 0.72rem;
+  padding: 0.4em 0.75em;
+  white-space: nowrap;
+}
+
+.lates-badge--mild {
+  background: rgba(40, 199, 111, 0.14);
+  color: #1a9c58;
+}
+
+.lates-badge--warn {
+  background: rgba(255, 159, 67, 0.18);
+  color: #cc6d10;
+}
+
+.lates-badge--severe {
+  background: rgba(255, 61, 96, 0.14);
+  color: #e0213f;
+}
+
+.lates-row--severe {
+  background: rgba(255, 61, 96, 0.06);
+}
+
+.lates-empty i {
+  font-size: 2.75rem;
+  color: #28c76f;
+}
+
 /* break-type / end-break modals belong to the same flow, keep them in step */
 #breakModaltype .btn-primary,
 #breakModal .btn-danger {
