@@ -54,6 +54,28 @@ class HomeController extends Controller
         ->where('is_late', true)
         ->count();
         // dd($lates);
+
+        // Days this month, up to (not including) today, with no attendance
+        // punch at all and not a weekend — same "absent" rule as the
+        // Attendance calendar view.
+        $monthStart = now('Asia/Karachi')->startOfMonth();
+        $today = now('Asia/Karachi')->startOfDay();
+        $markedDates = Attendance::where('user_id', $user->id)
+            ->whereYear('shift_date', $monthStart->year)
+            ->whereMonth('shift_date', $monthStart->month)
+            ->pluck('shift_date')
+            ->map(fn ($d) => Carbon::parse($d)->format('Y-m-d'))
+            ->flip();
+
+        $absents = 0;
+        $cursor = $monthStart->copy();
+        while ($cursor->lt($today)) {
+            if (!$cursor->isWeekend() && !$markedDates->has($cursor->format('Y-m-d'))) {
+                $absents++;
+            }
+            $cursor->addDay();
+        }
+
         $totalRevenue =
         $notifications = Auth::user()->notifications;
         $notifications->each(function ($notification) {
@@ -140,6 +162,64 @@ class HomeController extends Controller
                 }
             ])
             ->get();
+
+        // Team-wide lates/absents, only needed for the Creator/Executives
+        // (and user #4) dashboard cards that roll up every TSR's attendance.
+        // Each is a per-TSR summary (name + count) that also carries the
+        // individual day-by-day records, so the popup can show exactly
+        // which date/time each late punch or absence happened on.
+        $isTeamView = $user->role->name === 'Creator' || $user->role->name === 'Executives' || $user->id == 4;
+        $teamLates = 0;
+        $teamAbsents = 0;
+        $teamLatesByUser = collect();
+        $teamAbsentsByUser = collect();
+
+        if ($isTeamView) {
+            $tsrMonthAttendances = Attendance::whereIn('user_id', $tsrusers->pluck('id'))
+                ->whereYear('shift_date', $monthStart->year)
+                ->whereMonth('shift_date', $monthStart->month)
+                ->get()
+                ->groupBy('user_id');
+
+            foreach ($tsrusers as $tsrUser) {
+                $userAttendances = $tsrMonthAttendances->get($tsrUser->id, collect());
+
+                $userLateRecords = $userAttendances->where('is_late', true)->sortByDesc('shift_date')->values();
+                $teamLates += $userLateRecords->count();
+                if ($userLateRecords->isNotEmpty()) {
+                    $teamLatesByUser->push((object) [
+                        'user' => $tsrUser,
+                        'count' => $userLateRecords->count(),
+                        'records' => $userLateRecords,
+                    ]);
+                }
+
+                $markedTsrDates = $userAttendances->pluck('shift_date')
+                    ->map(fn ($d) => Carbon::parse($d)->format('Y-m-d'))
+                    ->flip();
+
+                $userAbsentDates = collect();
+                $tsrCursor = $monthStart->copy();
+                while ($tsrCursor->lt($today)) {
+                    if (!$tsrCursor->isWeekend() && !$markedTsrDates->has($tsrCursor->format('Y-m-d'))) {
+                        $userAbsentDates->push($tsrCursor->copy());
+                    }
+                    $tsrCursor->addDay();
+                }
+                $teamAbsents += $userAbsentDates->count();
+                if ($userAbsentDates->isNotEmpty()) {
+                    $teamAbsentsByUser->push((object) [
+                        'user' => $tsrUser,
+                        'count' => $userAbsentDates->count(),
+                        'dates' => $userAbsentDates->sortByDesc(fn ($d) => $d->format('Y-m-d'))->values(),
+                    ]);
+                }
+            }
+
+            $teamLatesByUser = $teamLatesByUser->sortByDesc('count')->values();
+            $teamAbsentsByUser = $teamAbsentsByUser->sortByDesc('count')->values();
+        }
+
         $shiftDate = $this->getShiftDate();
 
         $services = CompanyServices::withCount('leads')->get();
@@ -161,7 +241,7 @@ class HomeController extends Controller
         // dd($services);
         // dd($users[1]->attendances->pluck('breaks')->flatten());
         // dd($total);
-        return view('home', compact('route', 'notifications', 'totalRevenue', 'sale_count', 'last_sale_count', 'total', 'lates', 'users', 'shiftDate', 'services', 'tsrusers', 'activeBreak', 'activeBreakElapsedSeconds'));
+        return view('home', compact('route', 'notifications', 'totalRevenue', 'sale_count', 'last_sale_count', 'total', 'lates', 'absents', 'isTeamView', 'teamLates', 'teamAbsents', 'teamLatesByUser', 'teamAbsentsByUser', 'users', 'shiftDate', 'services', 'tsrusers', 'activeBreak', 'activeBreakElapsedSeconds'));
     }
     // public function breaksduration()
     // {

@@ -16,13 +16,18 @@ class CloseShiftAttendance extends Command
     public function handle(): int
     {
         $now = now('Asia/Karachi');
-        $shiftDate = $now->hour < 5
-            ? $now->copy()->subDay()->toDateString()
-            : $now->toDateString();
 
+        // A shift runs 7 PM -> 4 AM the next day. Only auto-close an
+        // attendance once its shift has actually finished (shift_date + 1
+        // day, 4 AM) — otherwise a stray call to this command mid-shift
+        // (e.g. via the public /front/cronlogout endpoint) would force-close
+        // and log out every user who is still legitimately clocked in.
         $attendances = Attendance::whereNull('logout_time')
-            ->where('shift_date', $shiftDate)
-            ->get();
+            ->get()
+            ->filter(function ($attendance) use ($now) {
+                $shiftEnd = Carbon::parse($attendance->shift_date, 'Asia/Karachi')->addDay()->setTime(4, 0);
+                return $now->greaterThanOrEqualTo($shiftEnd);
+            });
 
         foreach ($attendances as $attendance) {
             $loginTime = Carbon::parse($attendance->login_time, 'Asia/Karachi');
@@ -43,7 +48,7 @@ class CloseShiftAttendance extends Command
                 ->delete();
         }
 
-        $this->info("Closed {$attendances->count()} open attendance record(s) for shift {$shiftDate}.");
+        $this->info("Closed {$attendances->count()} open attendance record(s).");
 
         return self::SUCCESS;
     }

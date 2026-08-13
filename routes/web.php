@@ -40,7 +40,7 @@ Route::get('/config-cache', function() {
 
 Auth::routes();
 
-Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->middleware('auth')->name('home');
 Route::get('/generate', [App\Http\Controllers\FrontController::class, 'generate'])->name('generate');
 Route::post('otp-verify',  [App\Http\Controllers\Auth\LoginController::class, 'verify'])->name('front.otp.verify.post');
 

@@ -200,6 +200,24 @@ $user = Auth::user();
             </div>
           </div>
         </div>
+        <div class="col-xl-12">
+          <div class="card h-100 hover-lift">
+            <div class="card-body d-flex justify-content-between">
+              <div class="d-flex flex-column">
+                <div class="card-title mb-auto">
+                  <h5 class="mb-0 text-nowrap">Total Absents</h5>
+                  <p class="mb-0">This Month</p>
+                </div>
+                <div class="chart-statistics">
+                  <h3 class="card-title mb-0"><span id="statAbsentsCount" data-countup="{{ $absents }}">0</span> Absents</h3>
+                </div>
+              </div>
+              <div class="d-flex align-items-center">
+                <span class="badge rounded-pill bg-label-danger p-3"><i class="mdi mdi-calendar-remove-outline mdi-24px"></i></span>
+              </div>
+            </div>
+          </div>
+        </div>
                 <!-- Total Revenue chart -->
                 {{-- <div class="col-md-6 col-sm-6">
                     <div class="card h-100">
@@ -278,6 +296,46 @@ $user = Auth::user();
                     </div>
                 </div> --}}
                 <!--/ overview Radial chart -->
+                @if($isTeamView)
+                <div class="col-xl-12">
+                    <div class="card h-100 hover-lift" style="cursor: pointer;" role="button" tabindex="0"
+                         data-bs-toggle="modal" data-bs-target="#teamLatesDetailModal">
+                        <div class="card-body d-flex justify-content-between">
+                            <div class="d-flex flex-column">
+                                <div class="card-title mb-auto">
+                                    <h5 class="mb-0 text-nowrap">Team Lates</h5>
+                                    <p class="mb-0">All TSRs &middot; This Month</p>
+                                </div>
+                                <div class="chart-statistics">
+                                    <h3 class="card-title mb-0"><span id="statTeamLatesCount" data-countup="{{ $teamLates }}">0</span> Lates</h3>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <span class="badge rounded-pill bg-label-warning p-3"><i class="mdi mdi-account-clock-outline mdi-24px"></i></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-12">
+                    <div class="card h-100 hover-lift" style="cursor: pointer;" role="button" tabindex="0"
+                         data-bs-toggle="modal" data-bs-target="#teamAbsentsDetailModal">
+                        <div class="card-body d-flex justify-content-between">
+                            <div class="d-flex flex-column">
+                                <div class="card-title mb-auto">
+                                    <h5 class="mb-0 text-nowrap">Team Absents</h5>
+                                    <p class="mb-0">All TSRs &middot; This Month</p>
+                                </div>
+                                <div class="chart-statistics">
+                                    <h3 class="card-title mb-0"><span id="statTeamAbsentsCount" data-countup="{{ $teamAbsents }}">0</span> Absents</h3>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <span class="badge rounded-pill bg-label-danger p-3"><i class="mdi mdi-account-off-outline mdi-24px"></i></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @endif
             </div>
         </div>
         <!--/ Multiple widgets -->
@@ -480,6 +538,154 @@ $user = Auth::user();
         </div>
     </div>
 </div>
+@if($isTeamView)
+<div class="modal fade lates-modal" id="teamLatesDetailModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="lates-modal-icon">
+                        <i class="mdi mdi-clock-alert-outline"></i>
+                    </div>
+                    <div>
+                        <h5 class="modal-title mb-0">Team Late Arrivals</h5>
+                        <p class="text-muted mb-0 small">This month, all TSRs</p>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body pt-2">
+                @if($teamLatesByUser->isEmpty())
+                    <div class="lates-empty text-center py-4">
+                        <i class="mdi mdi-emoticon-happy-outline"></i>
+                        <p class="mb-0 mt-2 fw-semibold">No late check-ins this month</p>
+                        <p class="text-muted small mb-0">The whole team is on time!</p>
+                    </div>
+                @else
+                    <div class="lates-summary mb-3">
+                        <span class="badge rounded-pill">{{ $teamLatesByUser->count() }} TSR{{ $teamLatesByUser->count() === 1 ? '' : 's' }} with lates</span>
+                    </div>
+                    @foreach($teamLatesByUser as $entry)
+                        @php $userSeverity = $entry->count >= 3 ? 'severe' : ($entry->count >= 2 ? 'warn' : 'mild'); @endphp
+                        <div class="lates-group mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <div>
+                                    <strong>{{ explode(' -', $entry->user->name)[0] }}</strong>
+                                    <small class="text-muted d-block">{{ $entry->user->role->name }}</small>
+                                </div>
+                                <span class="badge rounded-pill lates-badge lates-badge--{{ $userSeverity }}">
+                                    {{ $entry->count }} late{{ $entry->count === 1 ? '' : 's' }}
+                                </span>
+                            </div>
+                            <div class="lates-list">
+                                @foreach($entry->records as $record)
+                                    @php
+                                        $mins = $record->late_minutes;
+                                        $rowSeverity = $record->half_day ? 'severe' : ($mins !== null && $mins >= 60 ? 'warn' : 'mild');
+                                    @endphp
+                                    <div class="lates-row lates-row--{{ $rowSeverity }}">
+                                        <div class="lates-row-date">
+                                            <span class="lates-row-dow">{{ \Carbon\Carbon::parse($record->shift_date)->format('D') }}</span>
+                                            <span class="lates-row-day">{{ \Carbon\Carbon::parse($record->shift_date)->format('d') }}</span>
+                                        </div>
+                                        <div class="lates-row-body">
+                                            <div class="lates-row-title">{{ \Carbon\Carbon::parse($record->shift_date)->format('d M, Y') }}</div>
+                                            <div class="lates-row-time">
+                                                <i class="mdi mdi-clock-outline"></i>
+                                                {{ $record->login_time ? $record->formatted_login_time : '—' }}
+                                            </div>
+                                        </div>
+                                        <div class="lates-row-badges">
+                                            @if($mins !== null)
+                                                <span class="badge rounded-pill lates-badge lates-badge--{{ $rowSeverity }}">
+                                                    {{ intdiv($mins, 60) > 0 ? intdiv($mins, 60) . 'h ' : '' }}{{ $mins % 60 }}m late
+                                                </span>
+                                            @endif
+                                            @if($record->half_day)
+                                                <span class="badge rounded-pill lates-badge lates-badge--severe">Half Day</span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endforeach
+                @endif
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade lates-modal" id="teamAbsentsDetailModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="lates-modal-icon lates-modal-icon--absent">
+                        <i class="mdi mdi-calendar-remove-outline"></i>
+                    </div>
+                    <div>
+                        <h5 class="modal-title mb-0">Team Absent Days</h5>
+                        <p class="text-muted mb-0 small">This month, all TSRs</p>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body pt-2">
+                @if($teamAbsentsByUser->isEmpty())
+                    <div class="lates-empty text-center py-4">
+                        <i class="mdi mdi-emoticon-happy-outline"></i>
+                        <p class="mb-0 mt-2 fw-semibold">No absences this month</p>
+                        <p class="text-muted small mb-0">The whole team showed up!</p>
+                    </div>
+                @else
+                    <div class="lates-summary mb-3">
+                        <span class="badge rounded-pill">{{ $teamAbsentsByUser->count() }} TSR{{ $teamAbsentsByUser->count() === 1 ? '' : 's' }} with absences</span>
+                    </div>
+                    @foreach($teamAbsentsByUser as $entry)
+                        <div class="lates-group mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <div>
+                                    <strong>{{ explode(' -', $entry->user->name)[0] }}</strong>
+                                    <small class="text-muted d-block">{{ $entry->user->role->name }}</small>
+                                </div>
+                                <span class="badge rounded-pill lates-badge lates-badge--severe">
+                                    {{ $entry->count }} absent{{ $entry->count === 1 ? '' : 's' }}
+                                </span>
+                            </div>
+                            <div class="lates-list">
+                                @foreach($entry->dates as $date)
+                                    <div class="lates-row lates-row--severe">
+                                        <div class="lates-row-date">
+                                            <span class="lates-row-dow">{{ $date->format('D') }}</span>
+                                            <span class="lates-row-day">{{ $date->format('d') }}</span>
+                                        </div>
+                                        <div class="lates-row-body">
+                                            <div class="lates-row-title">{{ $date->format('d M, Y') }}</div>
+                                            <div class="lates-row-time">
+                                                <i class="mdi mdi-close-circle-outline"></i>
+                                                No punch recorded
+                                            </div>
+                                        </div>
+                                        <div class="lates-row-badges">
+                                            <span class="badge rounded-pill lates-badge lates-badge--severe">Absent</span>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endforeach
+                @endif
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+@endif
 @endsection
 @section('custom-js')
 <script>
@@ -573,6 +779,8 @@ document.addEventListener('DOMContentLoaded', function () {
             document.querySelectorAll('input[name="breakType"]').forEach((elem) => {
                 elem.addEventListener('click', function () {
                     const val = document.querySelector('input[name="breakType"]:checked').id;
+                    var csrf = document.querySelector('meta[name="csrf-token"]').content;
+                    console.log('CSRF Token:', csrf);
                     console.log('Selected break type:', val);
                     // 3. Hide the type selection modal
                     breakModaltype.hide();
@@ -586,14 +794,24 @@ document.addEventListener('DOMContentLoaded', function () {
                         },
                             body: JSON.stringify({ break_type: val })
                     })
-                    .then(response => response.json().then(data => ({ ok: response.ok, data })))
-                    .then(({ ok, data }) => {
+                    .then(response => response.json().then(data => ({ ok: response.ok, status: response.status, data })))
+                    .then(({ ok, status, data }) => {
                         // Only start the break UI once the server confirms the
                         // Breaks row was actually created — previously this ran
                         // even on a failed (e.g. CSRF 419) response, showing a
                         // "phantom" break with nothing saved server-side.
                         if (!ok) {
-                            alert(data.error || 'Error starting break. Please try again.');
+                            if (status === 419) {
+                                // The tab sat open past the session lifetime, so the
+                                // csrf-token meta tag baked into this page is stale.
+                                // Retrying with the same token would just 419 again —
+                                // reload to pick up a fresh token (or the login page,
+                                // if the session is truly gone).
+                                alert('Your session has expired. The page will refresh.');
+                                location.reload();
+                                return;
+                            }
+                            alert(data.error || data.message || 'Error starting break. Please try again.');
                             return;
                         }
 
@@ -624,13 +842,18 @@ document.addEventListener('DOMContentLoaded', function () {
                     'Accept': 'application/json'
                 }
             })
-            .then(response => response.json().then(data => ({ ok: response.ok, data })))
-            .then(({ ok, data }) => {
+            .then(response => response.json().then(data => ({ ok: response.ok, status: response.status, data })))
+            .then(({ ok, status, data }) => {
                 // Only clear the break UI once the server confirms break_end
                 // was actually saved — previously this ran unconditionally,
                 // so a failed request still looked like a successful end-break.
                 if (!ok) {
-                    alert(data.error || 'Error ending break. Please try again.');
+                    if (status === 419) {
+                        alert('Your session has expired. The page will refresh.');
+                        location.reload();
+                        return;
+                    }
+                    alert(data.error || data.message || 'Error ending break. Please try again.');
                     return;
                 }
 
@@ -649,8 +872,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // Prevent leaving tab (basic)
         document.addEventListener('visibilitychange', function () {
             if (isOnBreak && document.hidden) {
-                alert('⚠️ You are on break. Please stay on this screen.');
-                {{-- location.reload(); --}}
+                // alert('⚠️ You are on break. Please stay on this screen.');
                 // strict handling
             }
         });

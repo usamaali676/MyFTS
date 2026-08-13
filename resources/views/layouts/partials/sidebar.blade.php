@@ -1,9 +1,9 @@
 @php
     $user = auth()->user();
-    $salereport_perm = App\Models\Permission::where('role_id', $user->role_id)->where('name', "salereport")->first();
-    $attendance_perm = App\Models\Permission::where('role_id', $user->role_id)->where('name', "attendance")->first();
-    $calltranscription_perm = App\Models\Permission::where('role_id', $user->role_id)->where('name', "calltranscription")->first();
-    $trainee_perm = App\Models\Permission::where('role_id', $user->role_id)->where('name', "trainee")->first();
+    $salereport_perm = $user ? App\Models\Permission::where('role_id', $user->role_id)->where('name', "salereport")->first() : null;
+    $attendance_perm = $user ? App\Models\Permission::where('role_id', $user->role_id)->where('name', "attendance")->first() : null;
+    $calltranscription_perm = $user ? App\Models\Permission::where('role_id', $user->role_id)->where('name', "calltranscription")->first() : null;
+    $trainee_perm = $user ? App\Models\Permission::where('role_id', $user->role_id)->where('name', "trainee")->first() : null;
 @endphp
 <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
     <div class="app-brand demo">

@@ -111,11 +111,23 @@
       <!-- Product List Table -->
       <div class="card">
         <div class="card-header no-print">
-            <div class="d-flex" style="justify-content: space-between;">
+            <div class="d-flex flex-wrap gap-3" style="justify-content: space-between;">
                 <h5 class="card-title" style="margin: auto 0px;">Filter</h5>
-                <button id="print" type="btn" onclick="(function() { window.print(); })()" class="btn btn-primary waves-effect waves-light ">Print</button>
+                <div class="d-flex align-items-center gap-3">
+                    <div class="btn-group" role="group" aria-label="View toggle">
+                        <a href="{{ route('attendance.index', array_filter(['view' => 'list', 'agent' => $calendarUserId])) }}"
+                           class="btn btn-sm {{ $view === 'list' ? 'btn-primary' : 'btn-outline-primary' }}">
+                            <i class="mdi mdi-table"></i> List
+                        </a>
+                        <a href="{{ route('attendance.index', array_filter(['view' => 'calendar', 'agent' => $calendarUserId])) }}"
+                           class="btn btn-sm {{ $view === 'calendar' ? 'btn-primary' : 'btn-outline-primary' }}">
+                            <i class="mdi mdi-calendar-month-outline"></i> Calendar
+                        </a>
+                    </div>
+                    <button id="print" type="btn" onclick="(function() { window.print(); })()" class="btn btn-primary waves-effect waves-light ">Print</button>
+                </div>
             </div>
-          <div class="d-flex justify-content-between align-items-center row py-3 gap-3 gap-md-0 no-print">
+          <div class="d-flex justify-content-between align-items-center row py-3 gap-3 gap-md-0 no-print" @if($view === 'calendar') style="display:none !important;" @endif>
             <div class="col-md-4 product_status">
                           <div class="form-floating form-floating-outline">
                             <input type="text" id="flatpickr-range" class="form-control" />
@@ -168,6 +180,152 @@
             </div>
           </div>
         </div>
+        @if($view === 'calendar')
+        <div class="card-body">
+            <form method="GET" action="{{ route('attendance.index') }}" class="row g-3 align-items-end mb-4 no-print">
+                <input type="hidden" name="view" value="calendar">
+                <input type="hidden" name="month" value="{{ $month->format('Y-m') }}">
+                <div class="col-md-4">
+                    <div class="form-floating form-floating-outline">
+                        <select name="agent" class="form-select" onchange="this.form.submit()">
+                            <option value="">Select an agent</option>
+                            @foreach($user as $usr)
+                                <option value="{{ $usr->id }}" {{ $calendarUser && $calendarUser->id === $usr->id ? 'selected' : '' }}>
+                                    {{ explode(' -', $usr->name)[0] }}
+                                </option>
+                            @endforeach
+                        </select>
+                        <label>Agent</label>
+                    </div>
+                </div>
+            </form>
+
+            @if(!$calendarUser)
+                <p class="text-muted text-center py-5 mb-0">Select an agent above to view their attendance calendar.</p>
+            @else
+                <div class="row mb-4 g-4">
+                    <div class="col-sm-6 col-lg-4">
+                        <div class="card h-100">
+                            <div class="card-body d-flex align-items-center gap-3">
+                                <span class="badge rounded-pill bg-label-success p-2"><i class="mdi mdi-check-circle-outline mdi-24px"></i></span>
+                                <div>
+                                    <h5 class="mb-0">{{ $onTimeCount }}</h5>
+                                    <small class="text-muted">On-Time</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-lg-4">
+                        <div class="card h-100">
+                            <div class="card-body d-flex align-items-center gap-3">
+                                <span class="badge rounded-pill bg-label-warning p-2"><i class="mdi mdi-clock-alert-outline mdi-24px"></i></span>
+                                <div>
+                                    <h5 class="mb-0">{{ $lateCount }}</h5>
+                                    <small class="text-muted">Late</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-lg-4">
+                        <div class="card h-100">
+                            <div class="card-body d-flex align-items-center gap-3">
+                                <span class="badge rounded-pill bg-label-danger p-2"><i class="mdi mdi-close-circle-outline mdi-24px"></i></span>
+                                <div>
+                                    <h5 class="mb-0">{{ $absentCount }}</h5>
+                                    <small class="text-muted">Absent</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mb-3 no-print">
+                    <a href="{{ route('attendance.index', ['view' => 'calendar', 'agent' => $calendarUser->id, 'month' => $month->copy()->subMonth()->format('Y-m')]) }}" class="btn btn-sm btn-outline-secondary">
+                        <i class="mdi mdi-chevron-left"></i> Prev
+                    </a>
+                    <h5 class="mb-0">{{ explode(' -', $calendarUser->name)[0] }} &mdash; {{ $month->format('F Y') }}</h5>
+                    <a href="{{ route('attendance.index', ['view' => 'calendar', 'agent' => $calendarUser->id, 'month' => $month->copy()->addMonth()->format('Y-m')]) }}" class="btn btn-sm btn-outline-secondary">
+                        Next <i class="mdi mdi-chevron-right"></i>
+                    </a>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-bordered text-center align-middle mb-3">
+                        <thead>
+                            <tr>
+                                <th>Sun</th>
+                                <th>Mon</th>
+                                <th>Tue</th>
+                                <th>Wed</th>
+                                <th>Thu</th>
+                                <th>Fri</th>
+                                <th>Sat</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @php $today = now('Asia/Karachi')->startOfDay(); @endphp
+                            @foreach($weeks as $week)
+                                <tr>
+                                    @foreach($week as $day)
+                                        @php
+                                            $key = $day->format('Y-m-d');
+                                            $inMonth = $day->month === $month->month;
+                                            $record = $records->get($key);
+                                            $isToday = $day->isToday();
+
+                                            $cellClass = 'text-muted';
+                                            $label = null;
+                                            if ($inMonth && $record) {
+                                                if ($record->is_late) {
+                                                    $cellClass = 'bg-label-warning';
+                                                    $label = 'Late';
+                                                } else {
+                                                    $cellClass = 'bg-label-success';
+                                                    $label = 'On-Time';
+                                                }
+                                            } elseif ($inMonth && $day->isWeekend()) {
+                                                $cellClass = 'bg-label-secondary';
+                                                $label = 'Weekend';
+                                            } elseif ($inMonth && $day->lt($today)) {
+                                                $cellClass = 'bg-label-danger';
+                                                $label = 'Absent';
+                                            } elseif (!$inMonth) {
+                                                $cellClass = 'text-muted bg-light';
+                                            }
+                                        @endphp
+                                        <td class="{{ $cellClass }}" style="height: 70px; vertical-align: top; {{ $isToday ? 'outline: 2px solid var(--bs-primary); outline-offset: -2px;' : '' }}">
+                                            <div class="fw-semibold">{{ $day->day }}</div>
+                                            @if($label)
+                                                <small class="d-block">{{ $label }}</small>
+                                            @endif
+                                        </td>
+                                    @endforeach
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="d-flex flex-wrap gap-4 no-print">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge rounded-pill bg-label-success">&nbsp;</span> On-Time
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge rounded-pill bg-label-warning">&nbsp;</span> Late
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge rounded-pill bg-label-danger">&nbsp;</span> Absent
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge rounded-pill bg-label-secondary">&nbsp;</span> Weekend
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge rounded-pill bg-light border">&nbsp;</span> Outside Month
+                    </div>
+                </div>
+            @endif
+        </div>
+        @else
         <div class="card-datatable table-responsive">
             {{-- <div class="dt-buttons btn-group flex-wrap"> <div class="btn-group"><button class="btn buttons-collection btn-label-primary dropdown-toggle me-4 waves-effect border-none" tabindex="0" aria-controls="attendance-table" type="button" aria-haspopup="dialog" aria-expanded="false"><span><span class="d-flex align-items-center gap-2"><i class="icon-base ri ri-external-link-line icon-18px"></i> <span class="d-none d-sm-inline-block">Export</span></span></span></button></div> <button class="btn create-new btn-primary" tabindex="0" aria-controls="DataTables_Table_0" type="button"><span><span class="d-flex align-items-center"><i class="icon-base ri ri-add-line icon-18px me-sm-1"></i><span class="d-none d-sm-inline-block">Add New Record</span></span></span></button> </div> --}}
 
@@ -223,6 +381,7 @@
             </tbody>
           </table>
         </div>
+        @endif
       </div>
     </div>
     <!-- / Content -->
