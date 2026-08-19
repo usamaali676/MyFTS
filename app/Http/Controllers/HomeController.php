@@ -12,6 +12,7 @@ use App\Models\Lead;
 use App\Models\Role;
 use App\Models\Sale;
 use App\Models\User;
+use App\Services\TeamAttendanceOverviewService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -57,7 +58,8 @@ class HomeController extends Controller
 
         // Days this month, up to (not including) today, with no attendance
         // punch at all and not a weekend — same "absent" rule as the
-        // Attendance calendar view.
+        // Attendance calendar view. Never mark a day absent before the
+        // user's account even existed.
         $monthStart = now('Asia/Karachi')->startOfMonth();
         $today = now('Asia/Karachi')->startOfDay();
         $markedDates = Attendance::where('user_id', $user->id)
@@ -68,7 +70,8 @@ class HomeController extends Controller
             ->flip();
 
         $absents = 0;
-        $cursor = $monthStart->copy();
+        $createdAt = Carbon::parse($user->created_at, 'Asia/Karachi')->startOfDay();
+        $cursor = $monthStart->gt($createdAt) ? $monthStart->copy() : $createdAt->copy();
         while ($cursor->lt($today)) {
             if (!$cursor->isWeekend() && !$markedDates->has($cursor->format('Y-m-d'))) {
                 $absents++;
@@ -162,63 +165,31 @@ class HomeController extends Controller
                 }
             ])
             ->get();
-
-        // Team-wide lates/absents, only needed for the Creator/Executives
-        // (and user #4) dashboard cards that roll up every TSR's attendance.
-        // Each is a per-TSR summary (name + count) that also carries the
-        // individual day-by-day records, so the popup can show exactly
-        // which date/time each late punch or absence happened on.
-        $isTeamView = $user->role->name === 'Creator' || $user->role->name === 'Executives' || $user->id == 4;
-        $teamLates = 0;
-        $teamAbsents = 0;
-        $teamLatesByUser = collect();
-        $teamAbsentsByUser = collect();
-
-        if ($isTeamView) {
-            $tsrMonthAttendances = Attendance::whereIn('user_id', $tsrusers->pluck('id'))
-                ->whereYear('shift_date', $monthStart->year)
-                ->whereMonth('shift_date', $monthStart->month)
-                ->get()
-                ->groupBy('user_id');
-
-            foreach ($tsrusers as $tsrUser) {
-                $userAttendances = $tsrMonthAttendances->get($tsrUser->id, collect());
-
-                $userLateRecords = $userAttendances->where('is_late', true)->sortByDesc('shift_date')->values();
-                $teamLates += $userLateRecords->count();
-                if ($userLateRecords->isNotEmpty()) {
-                    $teamLatesByUser->push((object) [
-                        'user' => $tsrUser,
-                        'count' => $userLateRecords->count(),
-                        'records' => $userLateRecords,
-                    ]);
-                }
-
-                $markedTsrDates = $userAttendances->pluck('shift_date')
-                    ->map(fn ($d) => Carbon::parse($d)->format('Y-m-d'))
-                    ->flip();
-
-                $userAbsentDates = collect();
-                $tsrCursor = $monthStart->copy();
-                while ($tsrCursor->lt($today)) {
-                    if (!$tsrCursor->isWeekend() && !$markedTsrDates->has($tsrCursor->format('Y-m-d'))) {
-                        $userAbsentDates->push($tsrCursor->copy());
+            $csrrole = Role::where('name', 'Customer Support')->first('id');
+            $csrusers = User::where('role_id', $csrrole->id)
+                ->where('status', 1)
+                ->with([
+                    'attendances' => function ($query) {
+                        $query->whereBetween('created_at', [
+                            now()->startOfMonth(),
+                            now()->endOfMonth()
+                        ])->with('breaks');
                     }
-                    $tsrCursor->addDay();
-                }
-                $teamAbsents += $userAbsentDates->count();
-                if ($userAbsentDates->isNotEmpty()) {
-                    $teamAbsentsByUser->push((object) [
-                        'user' => $tsrUser,
-                        'count' => $userAbsentDates->count(),
-                        'dates' => $userAbsentDates->sortByDesc(fn ($d) => $d->format('Y-m-d'))->values(),
-                    ]);
-                }
-            }
+                ])
+                ->get();
 
-            $teamLatesByUser = $teamLatesByUser->sortByDesc('count')->values();
-            $teamAbsentsByUser = $teamAbsentsByUser->sortByDesc('count')->values();
-        }
+        // Team-wide lates/absents for the dashboard cards. Who can see whose
+        // attendance (Creator/Executives see everyone non-IT, user #4 sees
+        // TSR+Closer, user #3 sees Customer Support, IT roles are always
+        // excluded, #3/#4 never see their own record) is centralized in
+        // TeamAttendanceOverviewService so it isn't duplicated/drifting here.
+        $teamOverview = (new TeamAttendanceOverviewService())->forViewer($user, $monthStart, $today);
+        $isTeamView = $teamOverview['visible'];
+        $teamLabel = $teamOverview['label'];
+        $teamLates = $teamOverview['lates'];
+        $teamAbsents = $teamOverview['absents'];
+        $teamLatesByUser = $teamOverview['latesByUser'];
+        $teamAbsentsByUser = $teamOverview['absentsByUser'];
 
         $shiftDate = $this->getShiftDate();
 
@@ -241,7 +212,7 @@ class HomeController extends Controller
         // dd($services);
         // dd($users[1]->attendances->pluck('breaks')->flatten());
         // dd($total);
-        return view('home', compact('route', 'notifications', 'totalRevenue', 'sale_count', 'last_sale_count', 'total', 'lates', 'absents', 'isTeamView', 'teamLates', 'teamAbsents', 'teamLatesByUser', 'teamAbsentsByUser', 'users', 'shiftDate', 'services', 'tsrusers', 'activeBreak', 'activeBreakElapsedSeconds'));
+        return view('home', compact('route', 'notifications', 'totalRevenue', 'sale_count', 'last_sale_count', 'total', 'lates', 'absents', 'isTeamView', 'teamLabel', 'teamLates', 'teamAbsents', 'teamLatesByUser', 'teamAbsentsByUser', 'users', 'shiftDate', 'services', 'tsrusers', 'activeBreak', 'activeBreakElapsedSeconds', 'csrusers'));
     }
     // public function breaksduration()
     // {

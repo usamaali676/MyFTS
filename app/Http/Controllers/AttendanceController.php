@@ -29,6 +29,7 @@ class AttendanceController extends Controller
         $weeks = [];
         $records = collect();
         $onTimeCount = $lateCount = $absentCount = 0;
+        $joinedAt = null;
 
         if ($calendarUser) {
             $records = Attendance::where('user_id', $calendarUser->id)
@@ -41,6 +42,7 @@ class AttendanceController extends Controller
             $calendarEnd = $month->copy()->endOfMonth()->endOfWeek(Carbon::SUNDAY);
 
             $today = now('Asia/Karachi')->startOfDay();
+            $joinedAt = Carbon::parse($calendarUser->created_at, 'Asia/Karachi')->startOfDay();
             $cursor = $calendarStart->copy();
             while ($cursor->lte($calendarEnd)) {
                 $week = [];
@@ -63,6 +65,8 @@ class AttendanceController extends Controller
                         $record->is_late ? $lateCount++ : $onTimeCount++;
                     } elseif ($day->isWeekend()) {
                         // Weekends aren't working days, so a missing punch isn't an absence.
+                    } elseif ($day->lt($joinedAt)) {
+                        // The user's account didn't exist yet on this day.
                     } elseif ($day->lt($today)) {
                         // No punch recorded for a day that has already fully passed: absent.
                         // Today is excluded — the shift may not have started/finished yet.
@@ -74,7 +78,7 @@ class AttendanceController extends Controller
 
         return view('pages.attendance', compact(
             'attendances', 'sr', 'user', 'view', 'calendarUser', 'calendarUserId', 'month', 'weeks', 'records',
-            'onTimeCount', 'lateCount', 'absentCount'
+            'onTimeCount', 'lateCount', 'absentCount', 'joinedAt'
         ));
     }
 

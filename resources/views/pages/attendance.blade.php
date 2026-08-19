@@ -286,6 +286,9 @@
                                             } elseif ($inMonth && $day->isWeekend()) {
                                                 $cellClass = 'bg-label-secondary';
                                                 $label = 'Weekend';
+                                            } elseif ($inMonth && $joinedAt && $day->lt($joinedAt)) {
+                                                // Not yet a user on this day — not absent, just doesn't apply.
+                                                $cellClass = 'text-muted bg-light';
                                             } elseif ($inMonth && $day->lt($today)) {
                                                 $cellClass = 'bg-label-danger';
                                                 $label = 'Absent';

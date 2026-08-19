@@ -256,6 +256,120 @@
   color: #28c76f;
 }
 
+/* ---------- team lates/absents role filter chips ---------- */
+.lates-role-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.lates-role-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0.4em 0.95em;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font-size: 0.8rem;
+  font-weight: 600;
+  line-height: 1.4;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.lates-role-chip i {
+  font-size: 0.95rem;
+}
+
+.lates-role-chip:hover {
+  transform: translateY(-1px);
+}
+
+.lates-role-chip:active {
+  transform: translateY(0) scale(0.97);
+}
+
+/* Each role gets its own colour so the row reads at a glance instead of
+   blending into one flat pill shape; the active chip switches to a solid
+   fill of that same colour rather than one universal accent. */
+.lates-role-chip--purple {
+  background: rgba(102, 108, 255, 0.12);
+  color: #5f5aec;
+}
+.lates-role-chip--purple:hover { box-shadow: 0 6px 14px -8px rgba(102, 108, 255, 0.5); }
+.lates-role-chip--purple.active {
+  background: linear-gradient(135deg, #7a7fff, #5f5aec);
+  color: #fff;
+  box-shadow: 0 8px 18px -8px rgba(102, 108, 255, 0.6);
+}
+
+.lates-role-chip--green {
+  background: rgba(40, 199, 111, 0.14);
+  color: #1a9c58;
+}
+.lates-role-chip--green:hover { box-shadow: 0 6px 14px -8px rgba(40, 199, 111, 0.45); }
+.lates-role-chip--green.active {
+  background: linear-gradient(135deg, #3ddb85, #1a9c58);
+  color: #fff;
+  box-shadow: 0 8px 18px -8px rgba(40, 199, 111, 0.55);
+}
+
+.lates-role-chip--amber {
+  background: rgba(255, 159, 67, 0.18);
+  color: #cc6d10;
+}
+.lates-role-chip--amber:hover { box-shadow: 0 6px 14px -8px rgba(255, 159, 67, 0.5); }
+.lates-role-chip--amber.active {
+  background: linear-gradient(135deg, #ffb976, #e07f1f);
+  color: #fff;
+  box-shadow: 0 8px 18px -8px rgba(255, 159, 67, 0.6);
+}
+
+.lates-role-chip--red {
+  background: rgba(255, 61, 96, 0.14);
+  color: #e0213f;
+}
+.lates-role-chip--red:hover { box-shadow: 0 6px 14px -8px rgba(255, 61, 96, 0.45); }
+.lates-role-chip--red.active {
+  background: linear-gradient(135deg, #ff6b85, #e0213f);
+  color: #fff;
+  box-shadow: 0 8px 18px -8px rgba(255, 61, 96, 0.55);
+}
+
+.lates-role-chip--blue {
+  background: rgba(0, 176, 224, 0.16);
+  color: #0a7ea6;
+}
+.lates-role-chip--blue:hover { box-shadow: 0 6px 14px -8px rgba(0, 176, 224, 0.5); }
+.lates-role-chip--blue.active {
+  background: linear-gradient(135deg, #33c6ee, #0a7ea6);
+  color: #fff;
+  box-shadow: 0 8px 18px -8px rgba(0, 176, 224, 0.6);
+}
+
+.lates-role-chip--teal {
+  background: rgba(0, 194, 168, 0.16);
+  color: #0a8f7c;
+}
+.lates-role-chip--teal:hover { box-shadow: 0 6px 14px -8px rgba(0, 194, 168, 0.5); }
+.lates-role-chip--teal.active {
+  background: linear-gradient(135deg, #2fdcc2, #0a8f7c);
+  color: #fff;
+  box-shadow: 0 8px 18px -8px rgba(0, 194, 168, 0.6);
+}
+
+.lates-role-chip--pink {
+  background: rgba(234, 84, 165, 0.16);
+  color: #c22685;
+}
+.lates-role-chip--pink:hover { box-shadow: 0 6px 14px -8px rgba(234, 84, 165, 0.5); }
+.lates-role-chip--pink.active {
+  background: linear-gradient(135deg, #f184c0, #c22685);
+  color: #fff;
+  box-shadow: 0 8px 18px -8px rgba(234, 84, 165, 0.6);
+}
+
 /* break-type / end-break modals belong to the same flow, keep them in step */
 #breakModaltype .btn-primary,
 #breakModal .btn-danger {

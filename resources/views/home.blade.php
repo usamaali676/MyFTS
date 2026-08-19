@@ -304,7 +304,7 @@ $user = Auth::user();
                             <div class="d-flex flex-column">
                                 <div class="card-title mb-auto">
                                     <h5 class="mb-0 text-nowrap">Team Lates</h5>
-                                    <p class="mb-0">All TSRs &middot; This Month</p>
+                                    <p class="mb-0">{{ $teamLabel }} &middot; This Month</p>
                                 </div>
                                 <div class="chart-statistics">
                                     <h3 class="card-title mb-0"><span id="statTeamLatesCount" data-countup="{{ $teamLates }}">0</span> Lates</h3>
@@ -323,7 +323,7 @@ $user = Auth::user();
                             <div class="d-flex flex-column">
                                 <div class="card-title mb-auto">
                                     <h5 class="mb-0 text-nowrap">Team Absents</h5>
-                                    <p class="mb-0">All TSRs &middot; This Month</p>
+                                    <p class="mb-0">{{ $teamLabel }} &middot; This Month</p>
                                 </div>
                                 <div class="chart-statistics">
                                     <h3 class="card-title mb-0"><span id="statTeamAbsentsCount" data-countup="{{ $teamAbsents }}">0</span> Absents</h3>
@@ -456,6 +456,60 @@ $user = Auth::user();
                             </div>
                         </div>
                     </div>
+        @elseif ( $user->id == 3 && $user->id != 4 )
+                    <div class="col-md-6 col-xl-4">
+                        <div class="card h-100">
+                            <div class="card-header d-flex align-items-center justify-content-between">
+                                <h5 class="card-title m-0 me-2">Today's Break Duration</h5>
+                            </div>
+                            <div class="d-flex justify-content-between py-2 px-4 border-bottom">
+                                <h6 class="mb-0 small">NAME</h6>
+                                <h6 class="mb-0 small">Duration</h6>
+                            </div>
+                            <div class="card-body">
+                                <ul class="p-0 m-0">
+                                    @foreach ($csrusers as $csr_users)
+                                        @php
+                                            $todayBreaks = $csr_users->attendances
+                                                ->where('shift_date', $shiftDate)
+                                                ->flatMap->breaks;
+                                            $userActiveBreak = $todayBreaks->whereNull('break_end')->first();
+                                            $onBreak = (bool) $userActiveBreak;
+                                            $breakIcon = $onBreak ? ($breakTypeIcons[$userActiveBreak->break_type] ?? null) : null;
+                                        @endphp
+                                        <li class="d-flex mb-4">
+                                            <div class="avatar avatar-md flex-shrink-0 me-3">
+                                                <div class="avatar-initial bg-lighter rounded">
+                                                    <div>
+                                                        <img src="{{ asset('assets/img/avatars/5.png') }}" alt="User"
+                                                            class="h-25" style="border-radius: 10%" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+                                                <div class="me-2">
+                                                    <h6 class="mb-0">{{ $csr_users->name }}</h6>
+                                                    @if ($onBreak && $breakIcon)
+                                                        <div class="my-1">
+                                                            <span class="badge bg-label-warning rounded-pill d-inline-flex align-items-center gap-1 px-2 py-1"
+                                                                title="{{ $breakIcon['label'] }}">
+                                                                <i class="mdi {{ $breakIcon['icon'] }}"></i> {{ $breakIcon['label'] }}
+                                                            </span>
+                                                        </div>
+                                                    @endif
+                                                    <small>{{ $csr_users->role->name }}</small>
+                                                </div>
+                                                <div class="badge bg-label-primary rounded-pill">
+                                                    {{ gmdate('H:i:s', $todayBreaks->sum('duration')) }}
+                                                </div>
+                                            </div>
+                                        </li>
+                                    @endforeach
+
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
         @endif
 
         @if ($user->role->name == 'Creator' || $user->role->name == 'Executives' || $user->role->name == 'Closer' || $user->role->name == 'QA'   )
@@ -480,10 +534,6 @@ $user = Auth::user();
             </div>
             <!--/ Sales Country Chart -->
         @endif
-
-
-
-
 
     </div>
 </div>
@@ -549,7 +599,7 @@ $user = Auth::user();
                     </div>
                     <div>
                         <h5 class="modal-title mb-0">Team Late Arrivals</h5>
-                        <p class="text-muted mb-0 small">This month, all TSRs</p>
+                        <p class="text-muted mb-0 small">This month, {{ $teamLabel }}</p>
                     </div>
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -562,12 +612,27 @@ $user = Auth::user();
                         <p class="text-muted small mb-0">The whole team is on time!</p>
                     </div>
                 @else
-                    <div class="lates-summary mb-3">
-                        <span class="badge rounded-pill">{{ $teamLatesByUser->count() }} TSR{{ $teamLatesByUser->count() === 1 ? '' : 's' }} with lates</span>
+                    @php
+                        $lateRoles = $teamLatesByUser->pluck('user.role.name')->unique()->sort()->values();
+                        $chipPalette = ['green', 'amber', 'red', 'blue', 'teal', 'pink'];
+                    @endphp
+                    @if($lateRoles->count() > 1)
+                        <div class="lates-role-chips mb-3" data-modal="teamLatesDetailModal">
+                            <button type="button" class="lates-role-chip lates-role-chip--purple active" data-role="">
+                                <i class="mdi mdi-view-grid-outline"></i> All Roles
+                            </button>
+                            @foreach($lateRoles as $roleName)
+                                <button type="button" class="lates-role-chip lates-role-chip--{{ $chipPalette[$loop->index % count($chipPalette)] }}" data-role="{{ $roleName }}">{{ $roleName }}</button>
+                            @endforeach
+                        </div>
+                    @endif
+                    <div class="mb-3">
+                        <span class="badge rounded-pill lates-role-count" data-noun="lates">{{ $teamLatesByUser->count() }} member{{ $teamLatesByUser->count() === 1 ? '' : 's' }} with lates</span>
                     </div>
+                    <p class="lates-role-empty text-muted text-center py-3 mb-0" style="display: none;">No members with that role have any lates this month.</p>
                     @foreach($teamLatesByUser as $entry)
                         @php $userSeverity = $entry->count >= 3 ? 'severe' : ($entry->count >= 2 ? 'warn' : 'mild'); @endphp
-                        <div class="lates-group mb-3">
+                        <div class="lates-group mb-3" data-role="{{ $entry->user->role->name }}">
                             <div class="d-flex justify-content-between align-items-center mb-2">
                                 <div>
                                     <strong>{{ explode(' -', $entry->user->name)[0] }}</strong>
@@ -628,7 +693,7 @@ $user = Auth::user();
                     </div>
                     <div>
                         <h5 class="modal-title mb-0">Team Absent Days</h5>
-                        <p class="text-muted mb-0 small">This month, all TSRs</p>
+                        <p class="text-muted mb-0 small">This month, {{ $teamLabel }}</p>
                     </div>
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -641,11 +706,26 @@ $user = Auth::user();
                         <p class="text-muted small mb-0">The whole team showed up!</p>
                     </div>
                 @else
-                    <div class="lates-summary mb-3">
-                        <span class="badge rounded-pill">{{ $teamAbsentsByUser->count() }} TSR{{ $teamAbsentsByUser->count() === 1 ? '' : 's' }} with absences</span>
+                    @php
+                        $absentRoles = $teamAbsentsByUser->pluck('user.role.name')->unique()->sort()->values();
+                        $chipPalette = ['green', 'amber', 'red', 'blue', 'teal', 'pink'];
+                    @endphp
+                    @if($absentRoles->count() > 1)
+                        <div class="lates-role-chips mb-3" data-modal="teamAbsentsDetailModal">
+                            <button type="button" class="lates-role-chip lates-role-chip--purple active" data-role="">
+                                <i class="mdi mdi-view-grid-outline"></i> All Roles
+                            </button>
+                            @foreach($absentRoles as $roleName)
+                                <button type="button" class="lates-role-chip lates-role-chip--{{ $chipPalette[$loop->index % count($chipPalette)] }}" data-role="{{ $roleName }}">{{ $roleName }}</button>
+                            @endforeach
+                        </div>
+                    @endif
+                    <div class="mb-3">
+                        <span class="badge rounded-pill lates-role-count" data-noun="absences">{{ $teamAbsentsByUser->count() }} member{{ $teamAbsentsByUser->count() === 1 ? '' : 's' }} with absences</span>
                     </div>
+                    <p class="lates-role-empty text-muted text-center py-3 mb-0" style="display: none;">No members with that role have any absences this month.</p>
                     @foreach($teamAbsentsByUser as $entry)
-                        <div class="lates-group mb-3">
+                        <div class="lates-group mb-3" data-role="{{ $entry->user->role->name }}">
                             <div class="d-flex justify-content-between align-items-center mb-2">
                                 <div>
                                     <strong>{{ explode(' -', $entry->user->name)[0] }}</strong>
@@ -689,6 +769,45 @@ $user = Auth::user();
 @endsection
 @section('custom-js')
 <script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Team Lates / Team Absents modals: filter the per-member groups by role
+    // using a row of clickable chips instead of a plain <select>.
+    document.querySelectorAll('.lates-role-chips').forEach(function (chipRow) {
+        const modal = document.getElementById(chipRow.dataset.modal);
+        if (!modal) return;
+
+        const chips = chipRow.querySelectorAll('.lates-role-chip');
+        const groups = modal.querySelectorAll('.lates-group[data-role]');
+        const emptyState = modal.querySelector('.lates-role-empty');
+        const countBadge = modal.querySelector('.lates-role-count');
+        const noun = countBadge ? countBadge.dataset.noun : '';
+
+        chips.forEach(function (chip) {
+            chip.addEventListener('click', function () {
+                chips.forEach(function (c) { c.classList.remove('active'); });
+                chip.classList.add('active');
+
+                const role = chip.dataset.role;
+                let visibleCount = 0;
+
+                groups.forEach(function (group) {
+                    const match = !role || group.dataset.role === role;
+                    group.style.display = match ? '' : 'none';
+                    if (match) visibleCount++;
+                });
+
+                if (emptyState) {
+                    emptyState.style.display = visibleCount === 0 ? '' : 'none';
+                }
+
+                if (countBadge) {
+                    countBadge.textContent = visibleCount + ' member' + (visibleCount === 1 ? '' : 's') + ' with ' + noun;
+                }
+            });
+        });
+    });
+});
+
 document.addEventListener('DOMContentLoaded', function () {
     let timerInterval;
     let seconds = 0;
