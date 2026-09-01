@@ -4,6 +4,7 @@
 <link rel="stylesheet" href="{{ asset('assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css') }}" />
 @endsection
 @section('content')
+          @php $userPerm = \App\Helpers\GlobalHelper::modulePermission(auth()->user(), 'user'); @endphp
           <!-- Content wrapper -->
           <div class="content-wrapper">
             <!-- Content -->
@@ -11,7 +12,9 @@
             <div class="container-xxl flex-grow-1 container-p-y">
               <div class="d-flex justify-content-between align-items-center">
                 <h4 class="py-3 mb-4"><span class="text-muted fw-light">User/</span> List</h4>
-                <a href="{{ route('user.create') }}" class="btn btn-primary">Create User</a>
+                @if($userPerm->create)
+                    <a href="{{ route('user.create') }}" class="btn btn-primary">Create User</a>
+                @endif
                 </div>
 
 
@@ -41,16 +44,19 @@
                                     <button
                                     class="btn btn-sm btn-icon btn-text-secondary rounded-pill dropdown-toggle hide-arrow"
                                     data-bs-toggle="dropdown" aria-expanded="false"><i class="mdi mdi-dots-vertical mdi-20px"></i></button>
-                                    <div class="dropdown-menu dropdown-menu-end m-0" style=""><a
-                                    href="{{ route('user.edit', $item->id) }}" class="dropdown-item"><i
-                                        class="mdi mdi-pencil-outline me-2"></i><span>Edit</span></a>
-                                        {{-- <button type="button" class="btn btn-primary" id="confirm-color">Alert</button> --}}
-                                        <a  type="button"
-                                        data-id="{{ $item->id }}"
-                                        data-route="user"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#basicModal"
-                                        class="dropdown-item delete-record"><i class="mdi mdi-delete-outline me-2"></i><span>Delete</span></a>
+                                    <div class="dropdown-menu dropdown-menu-end m-0" style="">
+                                        @if($userPerm->edit)
+                                            <a href="{{ route('user.edit', $item->id) }}" class="dropdown-item"><i
+                                                class="mdi mdi-pencil-outline me-2"></i><span>Edit</span></a>
+                                        @endif
+                                        @if($userPerm->delete)
+                                            <a  type="button"
+                                            data-id="{{ $item->id }}"
+                                            data-route="user"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#basicModal"
+                                            class="dropdown-item delete-record"><i class="mdi mdi-delete-outline me-2"></i><span>Delete</span></a>
+                                        @endif
                                 </div>
                             </td>
                           </tr>

@@ -11,6 +11,31 @@ use Illuminate\Support\Facades\Route;
 
 class GlobalHelper
 {
+    /**
+     * What a user can do in a given permission module ('trainee',
+     * 'traineeattendance', 'user', ...), matching PermissionMiddelware's
+     * own admin bypass and Permission-row lookup so a UI element is never
+     * hidden from someone the backend would actually allow through, or
+     * shown to someone the backend would block.
+     */
+    public static function modulePermission($user, string $module): object
+    {
+        // Role 1 is the fixed admin role throughout this app (see
+        // PermissionMiddelware) — always full access, no Permission row needed.
+        $isAdmin = $user && (int) $user->role_id === 1;
+
+        $permission = ($user && !$isAdmin)
+            ? \App\Models\Permission::where('role_id', $user->role_id)->where('name', $module)->first()
+            : null;
+
+        return (object) [
+            'view' => $isAdmin || (bool) optional($permission)->view,
+            'create' => $isAdmin || (bool) optional($permission)->create,
+            'edit' => $isAdmin || (bool) optional($permission)->edit,
+            'delete' => $isAdmin || (bool) optional($permission)->delete,
+        ];
+    }
+
         public static function getShiftDate()
     {
         $now = now('UTC')->setTimezone(config('app.shift_timezone'));

@@ -138,11 +138,20 @@ class LeadController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Display the specified resource. Used as the "Preview" target for a
+     * lead that doesn't have a sale yet (once a sale exists, the dropdown
+     * links to sale.detail instead) — same page layout as sale/view, built
+     * from the lead's own fields.
      */
-    public function show(Lead $lead)
+    public function show($id)
     {
-        //
+        // The route param is {id}, not {lead} — type-hinting Lead $lead here
+        // would silently skip implicit binding and hand us an empty, unsaved
+        // model (id === null) instead of erroring, so look it up explicitly.
+        $lead = Lead::with(['closers.user', 'company_services', 'saler'])->findOrFail($id);
+        $comments = Comments::where('lead_id', $lead->id)->orderBy('id', 'DESC')->get();
+
+        return view('pages.lead.view', compact('lead', 'comments'));
     }
 
     /**

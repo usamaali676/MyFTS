@@ -6,11 +6,18 @@
     <link rel="stylesheet" href="{{ asset('assets/css/trainee-enhance.css') }}" />
 @endsection
 @section('content')
+          @php
+              $traineePerm = \App\Helpers\GlobalHelper::modulePermission(auth()->user(), 'trainee');
+              $traineeAttendancePerm = \App\Helpers\GlobalHelper::modulePermission(auth()->user(), 'traineeattendance');
+              $traineeCommentPerm = \App\Helpers\GlobalHelper::modulePermission(auth()->user(), 'traineecomment');
+          @endphp
           <div class="content-wrapper">
             <div class="container-xxl flex-grow-1 container-p-y trainee-enhanced">
               <div class="d-flex justify-content-between align-items-center">
                 <h4 class="py-3 mb-4"><span class="text-muted fw-light">Trainee/</span> List</h4>
-                <a href="{{ route('trainee.create') }}" class="btn btn-primary">Create Trainee</a>
+                @if($traineePerm->create)
+                    <a href="{{ route('trainee.create') }}" class="btn btn-primary">Create Trainee</a>
+                @endif
               </div>
 
               <div class="card">
@@ -57,17 +64,29 @@
                                     class="btn btn-sm btn-icon btn-text-secondary rounded-pill dropdown-toggle hide-arrow"
                                     data-bs-toggle="dropdown" aria-expanded="false"><i class="mdi mdi-dots-vertical mdi-20px"></i></button>
                                     <div class="dropdown-menu dropdown-menu-end m-0">
-                                        <a href="{{ route('trainee.edit', $item->id) }}" class="dropdown-item"><i class="mdi mdi-pencil-outline me-2"></i><span>Edit</span></a>
-                                        <a href="javascript:;"
-                                        data-id="{{ $item->id }}"
-                                        data-route="trainee"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#basicModal"
-                                        class="dropdown-item delete-record"><i class="mdi mdi-delete-outline me-2"></i><span>Delete</span></a>
-                                        <a href="{{ route('trainee.show', $item->id) }}" class="dropdown-item"><i class="mdi mdi-eye-outline me-2"></i><span>View Details</span></a>
-                                        <a href="javascript:;" data-bs-toggle="modal" data-bs-target="#markAttendance{{ $item->id }}" class="dropdown-item"><i class="mdi mdi-calendar-check-outline me-2"></i><span>Mark Attendance</span></a>
-                                        <a href="{{ route('traineeattendance.index', $item->id) }}" class="dropdown-item"><i class="mdi mdi-calendar-month-outline me-2"></i><span>View Attendance</span></a>
-                                        <a href="{{ route('traineecomment.index', $item->id) }}" class="dropdown-item"><i class="mdi mdi-comment-text-outline me-2"></i><span>Comments</span></a>
+                                        @if($traineePerm->edit)
+                                            <a href="{{ route('trainee.edit', $item->id) }}" class="dropdown-item"><i class="mdi mdi-pencil-outline me-2"></i><span>Edit</span></a>
+                                        @endif
+                                        @if($traineePerm->delete)
+                                            <a href="javascript:;"
+                                            data-id="{{ $item->id }}"
+                                            data-route="trainee"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#basicModal"
+                                            class="dropdown-item delete-record"><i class="mdi mdi-delete-outline me-2"></i><span>Delete</span></a>
+                                        @endif
+                                        @if($traineePerm->view)
+                                            <a href="{{ route('trainee.show', $item->id) }}" class="dropdown-item"><i class="mdi mdi-eye-outline me-2"></i><span>View Details</span></a>
+                                        @endif
+                                        @if($traineeAttendancePerm->create)
+                                            <a href="javascript:;" data-bs-toggle="modal" data-bs-target="#markAttendance{{ $item->id }}" class="dropdown-item"><i class="mdi mdi-calendar-check-outline me-2"></i><span>Mark Attendance</span></a>
+                                        @endif
+                                        @if($traineeAttendancePerm->view)
+                                            <a href="{{ route('traineeattendance.index', $item->id) }}" class="dropdown-item"><i class="mdi mdi-calendar-month-outline me-2"></i><span>View Attendance</span></a>
+                                        @endif
+                                        @if($traineeCommentPerm->view)
+                                            <a href="{{ route('traineecomment.index', $item->id) }}" class="dropdown-item"><i class="mdi mdi-comment-text-outline me-2"></i><span>Comments</span></a>
+                                        @endif
                                     </div>
                                 </div>
                             </td>

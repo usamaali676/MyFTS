@@ -4,6 +4,7 @@
 <link rel="stylesheet" href="{{ asset('assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css') }}" />
 @endsection
 @section('content')
+@php $rolePerm = \App\Helpers\GlobalHelper::modulePermission(auth()->user(), 'role'); @endphp
 
 <div class="container-xxl flex-grow-1 container-p-y">
     <h4 class="mb-1">Roles List</h4>
@@ -44,8 +45,10 @@
                     <div class="d-flex justify-content-between align-items-end">
                         <div class="role-heading">
                             <h4 class="mb-1 text-body">{{ $item->name }}</h4>
-                            <a href="{{ route('role.edit', $item->id) }}"
-                                class="role-edit-modal"><span>Edit Role</span></a>
+                            @if($rolePerm->edit)
+                                <a href="{{ route('role.edit', $item->id) }}"
+                                    class="role-edit-modal"><span>Edit Role</span></a>
+                            @endif
                         </div>
                         <a href="javascript:void(0);" class="text-muted"><i
                                 class="mdi mdi-content-copy mdi-20px"></i></a>
@@ -255,15 +258,18 @@
                                     <div class="d-inline-block text-nowrap"><button
                                             class="btn btn-sm btn-icon btn-text-secondary rounded-pill dropdown-toggle hide-arrow"
                                             data-bs-toggle="dropdown" aria-expanded="false"><i class="mdi mdi-dots-vertical mdi-20px"></i></button>
-                                        <div class="dropdown-menu dropdown-menu-end m-0" style=""><a
-                                                href="{{ route('role.edit', $item->id) }}" class="dropdown-item"><i
-                                                    class="mdi mdi-pencil-outline me-2"></i><span>Edit</span></a>
-                                                    {{-- <button type="button" class="btn btn-primary" id="confirm-color">Alert</button> --}}
+                                        <div class="dropdown-menu dropdown-menu-end m-0" style="">
+                                                @if($rolePerm->edit)
+                                                    <a href="{{ route('role.edit', $item->id) }}" class="dropdown-item"><i
+                                                        class="mdi mdi-pencil-outline me-2"></i><span>Edit</span></a>
+                                                @endif
+                                                @if($rolePerm->delete)
                                                     <a type="button"
                                                     data-id="{{ $item->id }}"
                                                     data-route="role"
                                                     data-bs-toggle="modal"
-                                                    data-bs-target="#basicModal"  class="dropdown-item delete-record" class="dropdown-item delete-record"><i class="mdi mdi-delete-outline me-2"></i><span>Delete</span></a>
+                                                    data-bs-target="#basicModal" class="dropdown-item delete-record"><i class="mdi mdi-delete-outline me-2"></i><span>Delete</span></a>
+                                                @endif
                                         </div>
                                     </div>
                                 </td>
