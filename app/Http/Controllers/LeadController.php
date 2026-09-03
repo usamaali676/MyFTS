@@ -38,6 +38,45 @@ class LeadController extends Controller
     }
 
     /**
+     * Manager Customer Support's team-wide overview: every lead currently
+     * assigned (via its sale) to any Customer Support rep, with an optional
+     * filter down to one specific rep. Not permission-gated (see
+     * PermissionMiddelware's ignore list) — access is checked here instead.
+     */
+    public function teamLeads(Request $request)
+    {
+        $user = Auth::user();
+
+        if ((int) $user->role_id !== 1 && optional($user->role)->name !== 'Manager Customer Support') {
+            Alert::error('Oops', "You don't have access to this page");
+            return redirect()->route('home');
+        }
+
+        $csRoleId = Role::where('name', 'Customer Support')->value('id');
+
+        $csUsers = User::where('role_id', $csRoleId)
+            ->where('status', 1)
+            ->orderBy('name')
+            ->get();
+
+        $selectedCsId = $request->query('cs_id');
+
+        $leads = Lead::with(['sale.Customer_support.user', 'closers.user', 'saler'])
+            ->whereHas('sale.Customer_support.user', function ($query) use ($csRoleId) {
+                $query->where('role_id', $csRoleId);
+            })
+            ->when($selectedCsId, function ($query) use ($selectedCsId) {
+                $query->whereHas('sale.Customer_support', function ($q) use ($selectedCsId) {
+                    $q->where('cs_id', $selectedCsId);
+                });
+            })
+            ->orderByDesc('id')
+            ->get();
+
+        return view('pages.lead.team', compact('leads', 'csUsers', 'selectedCsId'));
+    }
+
+    /**
      * Show the form for creating a new resource.
      */
     public function create()

@@ -142,6 +142,13 @@
                         <div data-i18n="Create">Create</div>
                     </a>
                 </li>
+                @if(isset($user) && ($user->role_id == 1 || optional($user->role)->name == 'Manager Customer Support'))
+                <li class="menu-item {{ request()->routeIs('lead.team') ? 'active' : '' }}">
+                    <a href="{{ route('lead.team') }}" class="menu-link">
+                        <div data-i18n="Team Leads">Team Leads</div>
+                    </a>
+                </li>
+                @endif
             </ul>
         </li>
          @if(isset($salereport_perm) && $salereport_perm->view == 1)

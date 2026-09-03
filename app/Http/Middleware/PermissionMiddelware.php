@@ -17,6 +17,14 @@ use Illuminate\Support\Str;
 
 class PermissionMiddelware
 {
+    // Routes that intentionally sit outside the Permission-row system —
+    // access to these is gated some other way (e.g. an inline role check in
+    // the controller) rather than a per-role Permission record. Add a route
+    // *name* here, not a URI.
+    private const PERMISSION_IGNORED_ROUTES = [
+        'lead.team', // Manager Customer Support's team-wide lead overview.
+    ];
+
     /**
      * Handle an incoming request.
      *
@@ -44,6 +52,10 @@ class PermissionMiddelware
 
             Alert::error('Session Expired', 'Please login again.');
             return redirect()->route('login');
+        }
+
+        if (in_array($routeName, self::PERMISSION_IGNORED_ROUTES, true)) {
+            return $next($request);
         }
 
         // Role 1 is the fixed admin role throughout this app (see
