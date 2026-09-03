@@ -62,13 +62,18 @@ class LeadController extends Controller
         $selectedCsId = $request->query('cs_id');
 
         $leads = Lead::with(['sale.Customer_support.user', 'closers.user', 'saler'])
-            ->whereHas('sale.Customer_support.user', function ($query) use ($csRoleId) {
-                $query->where('role_id', $csRoleId);
-            })
-            ->when($selectedCsId, function ($query) use ($selectedCsId) {
-                $query->whereHas('sale.Customer_support', function ($q) use ($selectedCsId) {
-                    $q->where('cs_id', $selectedCsId);
-                });
+            ->whereHas('sale', function ($query) use ($csRoleId, $selectedCsId) {
+                // Only active sales — a de-active (or missing) sale shouldn't
+                // clutter the team's active-lead overview.
+                $query->where('status', 1)
+                    ->whereHas('Customer_support.user', function ($q) use ($csRoleId) {
+                        $q->where('role_id', $csRoleId);
+                    })
+                    ->when($selectedCsId, function ($q) use ($selectedCsId) {
+                        $q->whereHas('Customer_support', function ($q2) use ($selectedCsId) {
+                            $q2->where('cs_id', $selectedCsId);
+                        });
+                    });
             })
             ->orderByDesc('id')
             ->get();

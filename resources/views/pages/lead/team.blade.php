@@ -60,22 +60,14 @@
                                         @endforeach
                                     </td>
                                     <td>
-                                        @if($item->sale)
-                                            @foreach($item->sale->Customer_support as $cs)
-                                                @if($cs->user)
-                                                    <span class="badge rounded-pill bg-label-info">{{ explode(' -', $cs->user->name)[0] }}</span>
-                                                @endif
-                                            @endforeach
-                                        @endif
+                                        @foreach($item->sale->Customer_support as $cs)
+                                            @if($cs->user)
+                                                <span class="badge rounded-pill bg-label-info">{{ explode(' -', $cs->user->name)[0] }}</span>
+                                            @endif
+                                        @endforeach
                                     </td>
                                     <td>
-                                        @if($item->sale)
-                                            <span class="badge rounded-pill {{ $item->sale->status == 1 ? 'bg-label-success' : 'bg-label-secondary' }}">
-                                                {{ $item->sale->status == 1 ? 'Active' : 'De-active' }}
-                                            </span>
-                                        @else
-                                            <span class="badge rounded-pill bg-label-warning">No Sale</span>
-                                        @endif
+                                        <span class="badge rounded-pill bg-label-success">Active</span>
                                     </td>
                                     <td>
                                         <div class="d-inline-block text-nowrap">
@@ -92,14 +84,9 @@
                                                     <a href="{{ route('lead.edit', $item->id) }}" class="dropdown-item"><i
                                                         class="mdi mdi-pencil-outline me-2"></i><span>Edit</span></a>
                                                 @endif
-                                                @if (isset($item) && isset($item->sale))
-                                                    <a href="{{ route('sale.detail', $item->sale->id) }}"
-                                                        class="dropdown-item" target="_blank"><i
-                                                            class="mdi mdi-eye me-2"></i><span>Preview</span></a>
-                                                @else
-                                                    <a href="{{ route('lead.detail', $item->id) }}" class="dropdown-item"><i
-                                                            class="mdi mdi-eye me-2"></i><span>Preview</span></a>
-                                                @endif
+                                                <a href="{{ route('sale.detail', $item->sale->id) }}"
+                                                    class="dropdown-item" target="_blank"><i
+                                                        class="mdi mdi-eye me-2"></i><span>Preview</span></a>
                                                 @if($leadPerm->delete)
                                                     <a type="button" data-id="{{ $item->id }}" data-route="lead"
                                                         data-bs-toggle="modal" data-bs-target="#basicModal"
