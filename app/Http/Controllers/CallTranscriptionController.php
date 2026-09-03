@@ -22,7 +22,7 @@ class CallTranscriptionController extends Controller
 
     public function index()
     {
-        $roles = Role::whereIn('name', ['TSR', 'Customer Support', 'Closer'])->pluck('id');
+        $roles = Role::whereIn('name', ['TSR', 'Customer Support', 'Manager Customer Support', 'Closer'])->pluck('id');
         $agents = User::whereIn('role_id', $roles)->orderBy('name')->get(['id', 'name']);
 
         return view('pages.callTranscription.index', compact('agents'));

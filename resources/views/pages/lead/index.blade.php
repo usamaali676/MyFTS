@@ -144,7 +144,7 @@
                                         </tr>
 
                                     @endforeach
-                                @elseif ($user->role->name == 'Customer Support')
+                                @elseif (in_array($user->role->name, ['Customer Support', 'Manager Customer Support']))
                                     @foreach ($leads as $item)
                                         @if (isset($item->sale) && $item->sale->Customer_support->contains('cs_id', $user->id) || $item->saler_id == $user->id || $item->closers->contains('closer_id', $user->id) )
                                             <tr>

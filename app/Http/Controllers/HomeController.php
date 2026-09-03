@@ -165,8 +165,8 @@ class HomeController extends Controller
                 }
             ])
             ->get();
-            $csrrole = Role::where('name', 'Customer Support')->first('id');
-            $csrusers = User::where('role_id', $csrrole->id)
+            $csrRoleIds = Role::whereIn('name', ['Customer Support', 'Manager Customer Support'])->pluck('id');
+            $csrusers = User::whereIn('role_id', $csrRoleIds)
                 ->where('status', 1)
                 ->with([
                     'attendances' => function ($query) {

@@ -697,7 +697,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                         <input type="checkbox" class="switch-input" name="sale_status"
                                                             @if(isset($sale) &&
                                                             $sale->status == 1) checked
-                                                                @if($user->role_id == 1 || $user->role->name == "Customer Support")
+                                                                @if($user->role_id == 1 || in_array($user->role->name, ['Customer Support', 'Manager Customer Support']))
                                                                 {{-- <p>{{ $user->role_id }}</p> --}}
                                                                     @readonly(false)
                                                                 @else

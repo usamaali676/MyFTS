@@ -56,7 +56,7 @@ class SaleController extends Controller
         $social_links = DB::select("SHOW COLUMNS FROM social_links LIKE 'social_name'");
         $social_links = $social_links[0]->Type; // Get the type string
         $social_links = explode("','", substr($social_links, 6, -2));
-        $roles = Role::whereIn('name', ['Closer', 'Customer Support', 'Executives'])->get();
+        $roles = Role::whereIn('name', ['Closer', 'Customer Support', 'Manager Customer Support', 'Executives'])->get();
         $closers = User::whereIn('role_id', $roles->pluck('id'))->get();
         // $csrole = Role::where('name', "Customer Support")->first();
         $csr = User::whereIn('role_id', $roles->pluck('id'))
@@ -126,7 +126,7 @@ class SaleController extends Controller
         if (isset($request->sale_id)) {
             $sale = Sale::find($request->sale_id);
             $user = Auth::user();
-            if($user->role_id == 1 || $user->role->name == "Customer Support"){
+            if($user->role_id == 1 || in_array($user->role->name, ['Customer Support', 'Manager Customer Support'], true)){
                 $sale->update([
                     'signup_date' => $request->signup_date,
                     'status' => $request->sale_status  ? 1 : 0,

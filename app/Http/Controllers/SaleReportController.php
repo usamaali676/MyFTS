@@ -13,7 +13,7 @@ use Illuminate\Http\Request;
 class SaleReportController extends Controller
 {
    public function index() {
-        $role_id = Role::whereIn('name', ['Closer', 'TSR', 'Customer Support'])->get();
+        $role_id = Role::whereIn('name', ['Closer', 'TSR', 'Customer Support', 'Manager Customer Support'])->get();
         $agent = User::whereIn('role_id', $role_id->pluck('id'))->get();
     //    $role_id = Role::where('name', "TSR","Closer")->first();
     //    $agent = User::where('role_id' , $role_id->id)->get();
@@ -270,7 +270,7 @@ public function filterData(Request $request)
 }
 
 public function getstats() {
-    $role_id = Role::whereIn('name', ['Closer', 'TSR', 'Customer Support'])->get();
+    $role_id = Role::whereIn('name', ['Closer', 'TSR', 'Customer Support', 'Manager Customer Support'])->get();
     $agent = User::whereIn('role_id', $role_id->pluck('id'))->get();
 //    $role_id = Role::where('name', "TSR","Closer")->first();
 //    $agent = User::where('role_id' , $role_id->id)->get();
@@ -498,7 +498,7 @@ $monthlyMarketing = $monthlySummary->pluck('marketing')->values();
 public function update(){
 
 
-    $roleIds = Role::where('name', "Customer Support")->pluck('id');
+    $roleIds = Role::whereIn('name', ["Customer Support", "Manager Customer Support"])->pluck('id');
 
     $users = User::whereIn('role_id', $roleIds)->orwhere('id', 14)->get();
 
@@ -599,7 +599,7 @@ public function update(){
     }
     // dd($salesWithPayments);
 
-//     $roleIds = Role::where('name', "Customer Support")->pluck('id');
+//     $roleIds = Role::whereIn('name', ["Customer Support", "Manager Customer Support"])->pluck('id');
 
 // $users = User::whereIn('role_id', $roleIds)->get();
 
@@ -641,7 +641,7 @@ public function reportsupport(Request $request){
     $request->validate([
         'month' =>  'required',
     ]);
-    $roleIds = Role::where('name', "Customer Support")->pluck('id');
+    $roleIds = Role::whereIn('name', ["Customer Support", "Manager Customer Support"])->pluck('id');
 
     $users = User::whereIn('role_id', $roleIds)->get();
 
