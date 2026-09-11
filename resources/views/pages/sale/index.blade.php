@@ -2,39 +2,20 @@
 @section('css')
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css') }}" />
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css') }}" />
-        <link href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css" rel="stylesheet" />
-
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css" rel="stylesheet" />
 @endsection
 @section('content')
     @php $leadPerm = \App\Helpers\GlobalHelper::modulePermission(auth()->user(), 'lead'); @endphp
     <div class="content-wrapper">
         <div class="container-xxl flex-grow-1 container-p-y">
-            <h4 class="py-3 mb-4"><span class="text-muted fw-light">Lead /</span> Team Leads</h4>
+            <h4 class="py-3 mb-4"><span class="text-muted fw-light">Sales /</span> All</h4>
 
             <div class="card">
                 <div class="card-header border-bottom d-flex justify-content-between align-items-center flex-wrap gap-3 py-3">
-                    <h5 class="card-title mb-0">All leads assigned to your Customer Support team</h5>
-                    <form method="GET" action="{{ route('lead.team') }}" class="d-flex align-items-center gap-2">
-                        <div class="form-floating form-floating-outline team-leads-cs-filter" style="min-width: 260px;">
-                            <select name="cs_id" id="csFilterSelect" class="select2 form-select" data-allow-clear="true">
-                                <option value="">All Customer Support</option>
-                                @foreach($csUsers as $csUser)
-                                    <option value="{{ $csUser->id }}" {{ (string) $selectedCsId === (string) $csUser->id ? 'selected' : '' }}>
-                                        {{ explode(' -', $csUser->name)[0] }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            <label>Filter by Customer Support</label>
-                        </div>
-                        @if($selectedCsId)
-                            <a href="{{ route('lead.team') }}" class="btn btn-outline-secondary btn-sm" title="Clear filter">
-                                <i class="mdi mdi-close"></i>
-                            </a>
-                        @endif
-                    </form>
+                    <h5 class="card-title mb-0">Sales</h5>
                 </div>
                 <div class="card-datatable table-responsive">
-                    <table id="teamLeadsTable" class="table table-bordered">
+                    <table id="salesTable" class="table table-bordered">
                         <thead>
                             <tr>
                                 <th></th>
@@ -47,8 +28,8 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($leads as $item)
-                                <tr>
+                            @foreach($sales as $item)
+                                <tr @if(isset($item->chargeback)) style="background-color: rgb(255, 222, 222)" @endif>
                                     <td>{{ $loop->index + 1 }}</td>
                                     <td>{{ $item->business_name_adv }}</td>
                                     <td>{{ $item->business_number_adv }}</td>
@@ -67,13 +48,19 @@
                                         @endforeach
                                     </td>
                                     <td>
-                                        <span class="badge rounded-pill bg-label-success">Active</span>
+                                        @if(isset($item->chargeback))
+                                            <span class="badge rounded-pill bg-danger">Chargeback</span>
+                                        @elseif($item->sale->status == 1)
+                                            <span class="badge rounded-pill bg-success">Active</span>
+                                        @else
+                                            <span class="badge rounded-pill bg-label-info">Charged</span>
+                                        @endif
                                     </td>
                                     <td>
                                         <div class="d-inline-block text-nowrap">
                                             <a href="{{ route('sale.create', $item->id) }}"
                                                 class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect"
-                                                data-bs-toggle="tooltip" title="Active"><i
+                                                data-bs-toggle="tooltip" title="Sale"><i
                                                     class="ri-send-plane-2-line ri-20px"></i></a>
                                             <button
                                                 class="btn btn-sm btn-icon btn-text-secondary rounded-pill dropdown-toggle hide-arrow"
@@ -110,15 +97,9 @@
     <script src="{{ asset('assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js') }}"></script>
     <script src="{{ asset('assets/js/tables-datatables-advanced.js') }}"></script>
     <script>
-        $('#teamLeadsTable').DataTable({
+        $('#salesTable').DataTable({
             autoWidth: false,
-            language: window.rsEmptyStateHTML ? { emptyTable: rsEmptyStateHTML('leads') } : undefined
-        });
-
-        // Auto-filter as soon as a Customer Support rep is picked or cleared
-        // — no submit button, matches the rest of this page's select2 filters.
-        $('#csFilterSelect').on('select2:select select2:unselect', function () {
-            this.form.submit();
+            language: window.rsEmptyStateHTML ? { emptyTable: rsEmptyStateHTML('sales') } : undefined
         });
     </script>
 @endsection

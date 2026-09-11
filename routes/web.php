@@ -119,10 +119,6 @@ Route::controller(RoleController::class)
         Route::post('update/{id}', 'update')->name('update');
         Route::get('conf-delete/{id}', 'delete')->name('conf-delete');
         Route::get('delete/{id}','destroy')->name('delete');
-        // Manager Customer Support's team-wide lead overview. Not part of
-        // the Permission-row system (see PermissionMiddelware's ignore
-        // list) — access is gated inline in the controller instead.
-        Route::get('team', 'teamLeads')->name('team');
     });
 
     Route::controller(SaleController::class)
@@ -138,6 +134,10 @@ Route::controller(RoleController::class)
         Route::post('update/{id}', 'update')->name('update');
         Route::get('conf-delete/{id}', 'delete')->name('conf-delete');
         Route::get('delete/{id}','destroy')->name('delete');
+        // Manager Customer Support's team-wide sales overview. Not part of
+        // the Permission-row system (see PermissionMiddelware's ignore
+        // list) — access is gated inline in the controller instead.
+        Route::get('team', 'teamSales')->name('team');
     });
 
     Route::controller(SaleController::class)

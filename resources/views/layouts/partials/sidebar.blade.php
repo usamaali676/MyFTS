@@ -4,6 +4,9 @@
     $attendance_perm = $user ? App\Models\Permission::where('role_id', $user->role_id)->where('name', "attendance")->first() : null;
     $calltranscription_perm = $user ? App\Models\Permission::where('role_id', $user->role_id)->where('name', "calltranscription")->first() : null;
     $trainee_perm = $user ? App\Models\Permission::where('role_id', $user->role_id)->where('name', "trainee")->first() : null;
+    // Uses the admin-bypassing helper (unlike the raw lookups above) so
+    // admin never loses this link just because no Permission row exists yet.
+    $lead_perm = $user ? App\Helpers\GlobalHelper::modulePermission($user, 'lead') : (object) ['view' => false, 'create' => false];
 @endphp
 <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
     <div class="app-brand demo">
@@ -125,6 +128,7 @@
             </ul>
         </li>
         @endif
+        @if($lead_perm->view)
         <li class="menu-item {{ request()->routeIs('lead.*') ? 'active open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons mdi mdi-table"></i>
@@ -137,20 +141,38 @@
                     </a>
                 </li>
 
+                @if($lead_perm->create)
                 <li class="menu-item {{ request()->routeIs('lead.create') ? 'active' : '' }}">
                     <a href="{{ route('lead.create') }}" class="menu-link">
                         <div data-i18n="Create">Create</div>
                     </a>
                 </li>
-                @if(isset($user) && ($user->role_id == 1 || optional($user->role)->name == 'Manager Customer Support'))
-                <li class="menu-item {{ request()->routeIs('lead.team') ? 'active' : '' }}">
-                    <a href="{{ route('lead.team') }}" class="menu-link">
-                        <div data-i18n="Team Leads">Team Leads</div>
+                @endif
+            </ul>
+        </li>
+        @endif
+        @if(isset($user) && \App\Services\SaleVisibilityService::canAccess($user))
+        <li class="menu-item {{ request()->routeIs('sale.index', 'sale.team') ? 'active open' : '' }}">
+            <a href="javascript:void(0);" class="menu-link menu-toggle">
+                <i class="menu-icon tf-icons mdi mdi-cash-multiple"></i>
+                <div data-i18n="Sales">Sales</div>
+            </a>
+            <ul class="menu-sub">
+                <li class="menu-item {{ request()->routeIs('sale.index') ? 'active' : '' }}">
+                    <a href="{{ route('sale.index') }}" class="menu-link">
+                        <div data-i18n="View">View</div>
+                    </a>
+                </li>
+                @if(\App\Services\SaleVisibilityService::canAccessTeam($user))
+                <li class="menu-item {{ request()->routeIs('sale.team') ? 'active' : '' }}">
+                    <a href="{{ route('sale.team') }}" class="menu-link">
+                        <div data-i18n="Team Sales">Team Sales</div>
                     </a>
                 </li>
                 @endif
             </ul>
         </li>
+        @endif
          @if(isset($salereport_perm) && $salereport_perm->view == 1)
         <li class="menu-item {{ request()->routeIs('salereport.*') ? 'active open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle">

@@ -22,7 +22,8 @@ class PermissionMiddelware
     // the controller) rather than a per-role Permission record. Add a route
     // *name* here, not a URI.
     private const PERMISSION_IGNORED_ROUTES = [
-        'lead.team', // Manager Customer Support's team-wide lead overview.
+        'sale.index', // Sales menu — role-based access is checked inline via SaleVisibilityService.
+        'sale.team',  // Manager Customer Support's separate team-wide sales overview.
     ];
 
     /**

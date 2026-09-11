@@ -29,56 +29,17 @@ class LeadController extends Controller
      */
     public function index()
     {
-        $leads = Lead::with('closers') // Eager load the closers relationship directly in the query
-        ->orderBy('id', 'DESC')
-        ->get();
-        // dd($leads);
-        // $sale = Sale::where('lead_id', $leads->id)->first();
-        return view('pages.lead.index', compact('leads'));
-    }
-
-    /**
-     * Manager Customer Support's team-wide overview: every lead currently
-     * assigned (via its sale) to any Customer Support rep, with an optional
-     * filter down to one specific rep. Not permission-gated (see
-     * PermissionMiddelware's ignore list) — access is checked here instead.
-     */
-    public function teamLeads(Request $request)
-    {
-        $user = Auth::user();
-
-        if ((int) $user->role_id !== 1 && optional($user->role)->name !== 'Manager Customer Support') {
-            Alert::error('Oops', "You don't have access to this page");
-            return redirect()->route('home');
-        }
-
-        $csRoleId = Role::where('name', 'Customer Support')->value('id');
-
-        $csUsers = User::where('role_id', $csRoleId)
-            ->where('status', 1)
-            ->orderBy('name')
-            ->get();
-
-        $selectedCsId = $request->query('cs_id');
-
-        $leads = Lead::with(['sale.Customer_support.user', 'closers.user', 'saler'])
-            ->whereHas('sale', function ($query) use ($csRoleId, $selectedCsId) {
-                // Only active sales — a de-active (or missing) sale shouldn't
-                // clutter the team's active-lead overview.
-                $query->where('status', 1)
-                    ->whereHas('Customer_support.user', function ($q) use ($csRoleId) {
-                        $q->where('role_id', $csRoleId);
-                    })
-                    ->when($selectedCsId, function ($q) use ($selectedCsId) {
-                        $q->whereHas('Customer_support', function ($q2) use ($selectedCsId) {
-                            $q2->where('cs_id', $selectedCsId);
-                        });
-                    });
+        // Leads and Sales are mutually exclusive lists — once a lead's sale
+        // is active or has had a payment charged, it moves to the Sales
+        // menu (see SaleVisibilityService) and drops out of here.
+        $leads = Lead::with('closers')
+            ->whereDoesntHave('sale', function ($query) {
+                $query->where('status', 1)->orWhereHas('invoice.payments');
             })
-            ->orderByDesc('id')
+            ->orderBy('id', 'DESC')
             ->get();
 
-        return view('pages.lead.team', compact('leads', 'csUsers', 'selectedCsId'));
+        return view('pages.lead.index', compact('leads'));
     }
 
     /**
