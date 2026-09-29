@@ -3,63 +3,61 @@
 namespace App\Http\Controllers;
 
 use App\Models\Holidays;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use RealRashid\SweetAlert\Facades\Alert;
 
 class HolidaysController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        $holidays = Holidays::orderBy('date')->get();
+
+        return view('pages.settings.holiday', compact('holidays'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'date' => 'required|date',
+        ]);
+
+        Holidays::create([
+            'name' => $request->name,
+            'date' => $request->date,
+            'day' => Carbon::parse($request->date)->format('l'),
+        ]);
+
+        Alert::success('Success', 'Holiday added successfully');
+        return redirect()->route('holiday.index');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Holidays $holidays)
+    public function update(Request $request, $id)
     {
-        //
+        $holiday = Holidays::findOrFail($id);
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'date' => 'required|date',
+        ]);
+
+        $holiday->update([
+            'name' => $request->name,
+            'date' => $request->date,
+            'day' => Carbon::parse($request->date)->format('l'),
+        ]);
+
+        Alert::success('Success', 'Holiday updated successfully');
+        return redirect()->route('holiday.index');
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Holidays $holidays)
+    public function destroy($id)
     {
-        //
-    }
+        // No deleted_at column on this table — hard delete is the only option.
+        Holidays::findOrFail($id)->delete();
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Holidays $holidays)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Holidays $holidays)
-    {
-        //
+        Alert::success('Success', 'Holiday deleted successfully');
+        return redirect()->route('holiday.index');
     }
 }

@@ -2,25 +2,34 @@
 
 use App\Http\Controllers\AIController;
 use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\BankAccountController;
+use App\Http\Controllers\BusinessCategoryController;
 use App\Http\Controllers\CallTranscriptionController;
+use App\Http\Controllers\CashappController;
 use App\Http\Controllers\ChargeBackController;
 use App\Http\Controllers\ClientReportingController;
 use App\Http\Controllers\ClientServicesController;
 use App\Http\Controllers\CommentsController;
+use App\Http\Controllers\CompanyServicesController;
 use App\Http\Controllers\FrontController;
+use App\Http\Controllers\HolidaysController;
 use App\Http\Controllers\InvoiceServiceChargesController;
 use App\Http\Controllers\KeywordController;
 use App\Http\Controllers\LeadController;
+use App\Http\Controllers\MerchantAccountController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\RefundController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SaleController;
 use App\Http\Controllers\SaleReportController;
 use App\Http\Controllers\ServiceAreaController;
+use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\SubCategoryController;
 use App\Http\Controllers\TraineeAttendanceController;
 use App\Http\Controllers\TraineeCommentController;
 use App\Http\Controllers\TraineeController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\ZelleAccountController;
 use App\Http\Middleware\PermissionMiddelware;
 use App\Models\InvoiceServiceCharges;
 use App\Models\ServiceArea;
@@ -184,6 +193,103 @@ Route::controller(RoleController::class)
     ->group(function () {
         Route::post('store', 'store')->name('store');
         Route::get('delete', 'destroy')->name('delete');
+    });
+
+    // Settings: simple lookup/reference tables with no front-end before now.
+    // Uses plain 'auth' (not PermissionMiddelware) — access is a per-card
+    // check against each of the 8 modules' own permissions (see
+    // SettingsController), not a permission of its own, so it must not
+    // register "settings" as a bogus extra module in Role Permissions.
+    Route::get('settings', [SettingsController::class, 'index'])
+        ->middleware('auth')
+        ->name('settings.index');
+
+    Route::controller(BankAccountController::class)
+    ->prefix('settings/bank-account')
+    ->as('bankaccount.')
+    ->middleware(PermissionMiddelware::class)
+    ->group(function () {
+        Route::get('index', 'index')->name('index');
+        Route::post('store', 'store')->name('store');
+        Route::post('update/{id}', 'update')->name('update');
+        Route::get('delete/{id}', 'destroy')->name('delete');
+    });
+
+    Route::controller(CashappController::class)
+    ->prefix('settings/cashapp')
+    ->as('cashapp.')
+    ->middleware(PermissionMiddelware::class)
+    ->group(function () {
+        Route::get('index', 'index')->name('index');
+        Route::post('store', 'store')->name('store');
+        Route::post('update/{id}', 'update')->name('update');
+        Route::get('delete/{id}', 'destroy')->name('delete');
+    });
+
+    Route::controller(MerchantAccountController::class)
+    ->prefix('settings/merchant-account')
+    ->as('merchantaccount.')
+    ->middleware(PermissionMiddelware::class)
+    ->group(function () {
+        Route::get('index', 'index')->name('index');
+        Route::post('store', 'store')->name('store');
+        Route::post('update/{id}', 'update')->name('update');
+        Route::get('delete/{id}', 'destroy')->name('delete');
+    });
+
+    Route::controller(ZelleAccountController::class)
+    ->prefix('settings/zelle-account')
+    ->as('zelleaccount.')
+    ->middleware(PermissionMiddelware::class)
+    ->group(function () {
+        Route::get('index', 'index')->name('index');
+        Route::post('store', 'store')->name('store');
+        Route::post('update/{id}', 'update')->name('update');
+        Route::get('delete/{id}', 'destroy')->name('delete');
+    });
+
+    Route::controller(BusinessCategoryController::class)
+    ->prefix('settings/business-category')
+    ->as('businesscategory.')
+    ->middleware(PermissionMiddelware::class)
+    ->group(function () {
+        Route::get('index', 'index')->name('index');
+        Route::post('store', 'store')->name('store');
+        Route::post('update/{id}', 'update')->name('update');
+        Route::get('delete/{id}', 'destroy')->name('delete');
+    });
+
+    Route::controller(SubCategoryController::class)
+    ->prefix('settings/sub-category')
+    ->as('subcategory.')
+    ->middleware(PermissionMiddelware::class)
+    ->group(function () {
+        Route::get('index', 'index')->name('index');
+        Route::post('store', 'store')->name('store');
+        Route::post('update/{id}', 'update')->name('update');
+        Route::get('delete/{id}', 'destroy')->name('delete');
+    });
+
+    Route::controller(CompanyServicesController::class)
+    ->prefix('settings/company-service')
+    ->as('companyservice.')
+    ->middleware(PermissionMiddelware::class)
+    ->group(function () {
+        Route::get('index', 'index')->name('index');
+        Route::post('store', 'store')->name('store');
+        Route::post('update/{id}', 'update')->name('update');
+        Route::get('delete/{id}', 'destroy')->name('delete');
+    });
+
+    Route::controller(HolidaysController::class)
+    ->prefix('settings/holiday')
+    ->as('holiday.')
+    ->middleware(PermissionMiddelware::class)
+    ->group(function () {
+        Route::get('index', 'index')->name('index');
+        Route::post('store', 'store')->name('store');
+        Route::post('update/{id}', 'update')->name('update');
+        Route::get('delete/{id}', 'destroy')->name('delete');
     });
 
     Route::controller(PaymentController::class)

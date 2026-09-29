@@ -4,62 +4,66 @@ namespace App\Http\Controllers;
 
 use App\Models\CompanyServices;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use RealRashid\SweetAlert\Facades\Alert;
 
 class CompanyServicesController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        $companyServices = CompanyServices::orderBy('name')->get();
+
+        return view('pages.settings.company-service', compact('companyServices'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'name' => 'required|string|max:255|unique:company_services,name,NULL,id,deleted_at,NULL',
+            'price' => 'required|numeric',
+            'category' => 'required|in:Marketing,Development',
+        ]);
+
+        CompanyServices::create([
+            'name' => $request->name,
+            'price' => $request->price,
+            'category' => $request->category,
+            'created_by' => Auth::user()->id,
+        ]);
+
+        Alert::success('Success', 'Company service added successfully');
+        return redirect()->route('companyservice.index');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(CompanyServices $companyServices)
+    public function update(Request $request, $id)
     {
-        //
+        $companyService = CompanyServices::findOrFail($id);
+
+        $request->validate([
+            'name' => 'required|string|max:255|unique:company_services,name,' . $companyService->id . ',id,deleted_at,NULL',
+            'price' => 'required|numeric',
+            'category' => 'required|in:Marketing,Development',
+        ]);
+
+        $companyService->update([
+            'name' => $request->name,
+            'price' => $request->price,
+            'category' => $request->category,
+            'updated_by' => Auth::user()->id,
+        ]);
+
+        Alert::success('Success', 'Company service updated successfully');
+        return redirect()->route('companyservice.index');
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(CompanyServices $companyServices)
+    public function destroy($id)
     {
-        //
-    }
+        $companyService = CompanyServices::findOrFail($id);
+        $companyService->deleted_by = Auth::user()->id;
+        $companyService->save();
+        $companyService->delete();
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, CompanyServices $companyServices)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(CompanyServices $companyServices)
-    {
-        //
+        Alert::success('Success', 'Company service deleted successfully');
+        return redirect()->route('companyservice.index');
     }
 }

@@ -4,62 +4,58 @@ namespace App\Http\Controllers;
 
 use App\Models\BusinessCategory;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use RealRashid\SweetAlert\Facades\Alert;
 
 class BusinessCategoryController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        $businessCategories = BusinessCategory::orderBy('name')->get();
+
+        return view('pages.settings.business-category', compact('businessCategories'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'name' => 'required|string|max:255|unique:business_categories,name,NULL,id,deleted_at,NULL',
+        ]);
+
+        BusinessCategory::create([
+            'name' => $request->name,
+            'created_by' => Auth::user()->id,
+        ]);
+
+        Alert::success('Success', 'Business category added successfully');
+        return redirect()->route('businesscategory.index');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(BusinessCategory $businessCategory)
+    public function update(Request $request, $id)
     {
-        //
+        $businessCategory = BusinessCategory::findOrFail($id);
+
+        $request->validate([
+            'name' => 'required|string|max:255|unique:business_categories,name,' . $businessCategory->id . ',id,deleted_at,NULL',
+        ]);
+
+        $businessCategory->update([
+            'name' => $request->name,
+            'updated_by' => Auth::user()->id,
+        ]);
+
+        Alert::success('Success', 'Business category updated successfully');
+        return redirect()->route('businesscategory.index');
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(BusinessCategory $businessCategory)
+    public function destroy($id)
     {
-        //
-    }
+        $businessCategory = BusinessCategory::findOrFail($id);
+        $businessCategory->deleted_by = Auth::user()->id;
+        $businessCategory->save();
+        $businessCategory->delete();
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, BusinessCategory $businessCategory)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(BusinessCategory $businessCategory)
-    {
-        //
+        Alert::success('Success', 'Business category deleted successfully');
+        return redirect()->route('businesscategory.index');
     }
 }

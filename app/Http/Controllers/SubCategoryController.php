@@ -2,64 +2,66 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BusinessCategory;
 use App\Models\SubCategory;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use RealRashid\SweetAlert\Facades\Alert;
 
 class SubCategoryController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        $subCategories = SubCategory::with('businessCategory')->orderBy('name')->get();
+        $businessCategories = BusinessCategory::orderBy('name')->get();
+
+        return view('pages.settings.sub-category', compact('subCategories', 'businessCategories'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'business_category_id' => 'required|exists:business_categories,id',
+            'name' => 'required|string|max:255',
+        ]);
+
+        SubCategory::create([
+            'business_category_id' => $request->business_category_id,
+            'name' => $request->name,
+            'created_by' => Auth::user()->id,
+        ]);
+
+        Alert::success('Success', 'Sub category added successfully');
+        return redirect()->route('subcategory.index');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(SubCategory $subCategory)
+    public function update(Request $request, $id)
     {
-        //
+        $subCategory = SubCategory::findOrFail($id);
+
+        $request->validate([
+            'business_category_id' => 'required|exists:business_categories,id',
+            'name' => 'required|string|max:255',
+        ]);
+
+        $subCategory->update([
+            'business_category_id' => $request->business_category_id,
+            'name' => $request->name,
+            'updated_by' => Auth::user()->id,
+        ]);
+
+        Alert::success('Success', 'Sub category updated successfully');
+        return redirect()->route('subcategory.index');
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(SubCategory $subCategory)
+    public function destroy($id)
     {
-        //
-    }
+        $subCategory = SubCategory::findOrFail($id);
+        $subCategory->deleted_by = Auth::user()->id;
+        $subCategory->save();
+        $subCategory->delete();
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, SubCategory $subCategory)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(SubCategory $subCategory)
-    {
-        //
+        Alert::success('Success', 'Sub category deleted successfully');
+        return redirect()->route('subcategory.index');
     }
 }

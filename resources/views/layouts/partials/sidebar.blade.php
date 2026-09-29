@@ -7,6 +7,28 @@
     // Uses the admin-bypassing helper (unlike the raw lookups above) so
     // admin never loses this link just because no Permission row exists yet.
     $lead_perm = $user ? App\Helpers\GlobalHelper::modulePermission($user, 'lead') : (object) ['view' => false, 'create' => false];
+
+    // Settings: simple lookup/reference tables, each independently permission-gated.
+    $settingsModules = [
+        'bankaccount' => ['route' => 'bankaccount.index', 'label' => 'Bank Accounts'],
+        'businesscategory' => ['route' => 'businesscategory.index', 'label' => 'Business Categories'],
+        'subcategory' => ['route' => 'subcategory.index', 'label' => 'Sub Categories'],
+        'cashapp' => ['route' => 'cashapp.index', 'label' => 'CashApp Accounts'],
+        'companyservice' => ['route' => 'companyservice.index', 'label' => 'Company Services'],
+        'holiday' => ['route' => 'holiday.index', 'label' => 'Holidays'],
+        'merchantaccount' => ['route' => 'merchantaccount.index', 'label' => 'Merchant Accounts'],
+        'zelleaccount' => ['route' => 'zelleaccount.index', 'label' => 'Zelle Accounts'],
+    ];
+    $settingsPerms = [];
+    $settingsVisible = false;
+    if ($user) {
+        foreach ($settingsModules as $key => $module) {
+            $settingsPerms[$key] = App\Helpers\GlobalHelper::modulePermission($user, $key);
+            if ($settingsPerms[$key]->view) {
+                $settingsVisible = true;
+            }
+        }
+    }
 @endphp
 <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
     <div class="app-brand demo">
@@ -259,7 +281,17 @@
         </li>
         @endif
 
-
+        @if($settingsVisible)
+        <li class="menu-header fw-medium mt-4">
+            <span class="menu-header-text" data-i18n="Settings">Settings</span>
+        </li>
+        <li class="menu-item {{ request()->routeIs('settings.index') || request()->routeIs(array_map(fn($m) => $m['route'], $settingsModules)) ? 'active' : '' }}">
+            <a href="{{ route('settings.index') }}" class="menu-link">
+                <i class="menu-icon tf-icons mdi mdi-cog-outline"></i>
+                <div data-i18n="Settings">Settings</div>
+            </a>
+        </li>
+        @endif
 
 
 
