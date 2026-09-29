@@ -26,7 +26,9 @@
                                 <th></th>
                                 <th>Name</th>
                                 <th>Business Category</th>
-                                <th>Action</th>
+                                @if($perm->edit || $perm->delete)
+                                    <th>Action</th>
+                                @endif
                             </tr>
                         </thead>
                         <tbody>
@@ -35,27 +37,29 @@
                                     <td>{{ $loop->index + 1 }}</td>
                                     <td>{{ $item->name }}</td>
                                     <td>{{ $item->businessCategory->name ?? 'N/A' }}</td>
-                                    <td>
-                                        <div class="d-inline-block text-nowrap">
-                                            <button class="btn btn-sm btn-icon btn-text-secondary rounded-pill dropdown-toggle hide-arrow"
-                                                data-bs-toggle="dropdown" aria-expanded="false"><i class="mdi mdi-dots-vertical mdi-20px"></i></button>
-                                            <div class="dropdown-menu dropdown-menu-end m-0">
-                                                @if($perm->edit)
-                                                    <a href="javascript:;" class="dropdown-item edit-record"
-                                                        data-id="{{ $item->id }}" data-name="{{ $item->name }}"
-                                                        data-category-id="{{ $item->business_category_id }}"
-                                                        data-bs-toggle="modal" data-bs-target="#editModal"><i
-                                                            class="mdi mdi-pencil-outline me-2"></i><span>Edit</span></a>
-                                                @endif
-                                                @if($perm->delete)
-                                                    <a type="button" data-id="{{ $item->id }}" data-route="subcategory"
-                                                        data-bs-toggle="modal" data-bs-target="#basicModal"
-                                                        class="dropdown-item delete-record"><i
-                                                            class="mdi mdi-delete-outline me-2"></i><span>Delete</span></a>
-                                                @endif
+                                    @if($perm->edit || $perm->delete)
+                                        <td>
+                                            <div class="d-inline-block text-nowrap">
+                                                <button class="btn btn-sm btn-icon btn-text-secondary rounded-pill dropdown-toggle hide-arrow"
+                                                    data-bs-toggle="dropdown" aria-expanded="false"><i class="mdi mdi-dots-vertical mdi-20px"></i></button>
+                                                <div class="dropdown-menu dropdown-menu-end m-0">
+                                                    @if($perm->edit)
+                                                        <a href="javascript:;" class="dropdown-item edit-record"
+                                                            data-id="{{ $item->id }}" data-name="{{ $item->name }}"
+                                                            data-category-id="{{ $item->business_category_id }}"
+                                                            data-bs-toggle="modal" data-bs-target="#editModal"><i
+                                                                class="mdi mdi-pencil-outline me-2"></i><span>Edit</span></a>
+                                                    @endif
+                                                    @if($perm->delete)
+                                                        <a type="button" data-id="{{ $item->id }}" data-route="subcategory"
+                                                            data-bs-toggle="modal" data-bs-target="#basicModal"
+                                                            class="dropdown-item delete-record"><i
+                                                                class="mdi mdi-delete-outline me-2"></i><span>Delete</span></a>
+                                                    @endif
+                                                </div>
                                             </div>
-                                        </div>
-                                    </td>
+                                        </td>
+                                    @endif
                                 </tr>
                             @endforeach
                         </tbody>
