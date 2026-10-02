@@ -36,6 +36,27 @@ class GlobalHelper
         ];
     }
 
+    /**
+     * A duration in seconds as a short human string ("1h 5m", "12m 30s",
+     * "45s") — used on the Profile page for break/attendance totals.
+     */
+    public static function formatSeconds(int $seconds): string
+    {
+        $hours = intdiv($seconds, 3600);
+        $minutes = intdiv($seconds % 3600, 60);
+        $secs = $seconds % 60;
+
+        if ($hours > 0) {
+            return "{$hours}h {$minutes}m";
+        }
+
+        if ($minutes > 0) {
+            return "{$minutes}m {$secs}s";
+        }
+
+        return "{$secs}s";
+    }
+
         public static function getShiftDate()
     {
         $now = now('UTC')->setTimezone(config('app.shift_timezone'));

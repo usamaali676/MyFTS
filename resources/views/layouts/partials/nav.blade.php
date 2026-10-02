@@ -308,6 +308,14 @@ id="layout-navbar">
                     window.location.href = viewAllBtn.getAttribute('href');
                 });
             }
+
+            // Same preventDefault issue affects the user dropdown too.
+            var myProfileLink = document.getElementById('myProfileLink');
+            if (myProfileLink) {
+                myProfileLink.addEventListener('click', function () {
+                    window.location.href = myProfileLink.getAttribute('href');
+                });
+            }
         });
     </script>
 
@@ -341,7 +349,7 @@ id="layout-navbar">
           <div class="dropdown-divider"></div>
         </li>
         <li>
-          <a class="dropdown-item" href="#">
+          <a id="myProfileLink" class="dropdown-item" href="{{ route('profile.show') }}">
             <i class="mdi mdi-account-outline me-2"></i>
             <span class="align-middle">My Profile</span>
           </a>

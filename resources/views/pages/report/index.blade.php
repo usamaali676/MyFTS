@@ -2,563 +2,258 @@
 @section('css')
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css') }}" />
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css') }}" />
-    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css" rel="stylesheet" />
-    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/flatpickr/flatpickr.css') }}" />
-
-    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/bootstrap-datepicker/bootstrap-datepicker.css') }}" />
-    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/bootstrap-daterangepicker/bootstrap-daterangepicker.css') }}" />
-    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/pickr/pickr-themes.css') }}" />
-
-    <style>
-        @media print {
-            .layout-navbar{
-                display: none !important;
-            }
-            .no-print{
-                display: none !important;
-            }
-            #layout-menu{
-                display: none !important;
-            }
-            .layout-menu-fixed:not(.layout-menu-collapsed) .layout-page, .layout-menu-fixed-offcanvas:not(.layout-menu-collapsed) .layout-page{
-                padding-left: 0px !important;
-            }
-        }
-    </style>
-    <link rel="stylesheet" href="{{ asset('assets/css/sale-report-enhance.css') }}" />
-
+    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/apex-charts/apex-charts.css') }}" />
+    <link rel="stylesheet" href="{{ asset('assets/css/profile-enhance.css') }}" />
 @endsection
 @section('content')
-<div class="content-wrapper">
-    <!-- Content -->
+    <div class="content-wrapper">
+        <div class="container-xxl flex-grow-1 container-p-y profile-page">
+            <h4 class="py-3 mb-4"><span class="text-muted fw-light">Reports /</span> Sale Report</h4>
 
-    <div class="container-xxl flex-grow-1 container-p-y sale-report-enhanced">
-      <h4 class="py-3 mb-4"><span class="text-muted fw-light">Sale /</span> Report</h4>
-
-      <!-- Product List Widget -->
-
-      <div class="card mb-4">
-        <div class="card-widget-separator-wrapper">
-          <div class="card-body card-widget-separator">
-            <div class="row gy-4 gy-sm-1">
-              <div class="col-sm-6 col-lg-3">
-                <div
-                  class="d-flex justify-content-between align-items-start card-widget-1 border-end pb-3 pb-sm-0">
-                  <div>
-                    <p class="mb-2">Development Revenue</p>
-                    <h4 class="mb-2" id="dev_rev">--</h4>
-                    {{-- <p class="mb-0">
-                      <span class="me-2">5k orders</span
-                      ><span class="badge rounded-pill bg-label-success">+5.7%</span>
-                    </p> --}}
-                  </div>
-                  <div class="avatar me-sm-4">
-                    <span class="avatar-initial rounded bg-label-primary">
-                        <i class="mdi mdi-laptop mdi-24px"></i>
-                    </span>
-                  </div>
+            <!-- Range filter -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form method="GET" action="{{ route('salereport.index') }}" class="row g-3 align-items-end">
+                        <div class="col-md-3">
+                            <label class="form-label">Time Range</label>
+                            <select name="range" id="report_range_select" class="form-select">
+                                <option value="all" {{ $rangeKey == 'all' ? 'selected' : '' }}>All Time</option>
+                                <option value="this_month" {{ $rangeKey == 'this_month' ? 'selected' : '' }}>This Month</option>
+                                <option value="last_month" {{ $rangeKey == 'last_month' ? 'selected' : '' }}>Last Month</option>
+                                <option value="custom" {{ $rangeKey == 'custom' ? 'selected' : '' }}>Custom Range</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 report-custom-range-field" {{ $rangeKey == 'custom' ? '' : 'style=display:none' }}>
+                            <label class="form-label">From</label>
+                            <input type="date" name="from" class="form-control" value="{{ $customFrom }}">
+                        </div>
+                        <div class="col-md-3 report-custom-range-field" {{ $rangeKey == 'custom' ? '' : 'style=display:none' }}>
+                            <label class="form-label">To</label>
+                            <input type="date" name="to" class="form-control" value="{{ $customTo }}">
+                        </div>
+                        <div class="col-md-3">
+                            <button type="submit" class="btn btn-primary">Apply</button>
+                        </div>
+                    </form>
+                    <div class="text-muted small mt-2">Showing: {{ $range['label'] }}</div>
                 </div>
-                <hr class="d-none d-sm-block d-lg-none me-4" />
-              </div>
-              <div class="col-sm-6 col-lg-3">
-                <div
-                  class="d-flex justify-content-between align-items-start card-widget-2 border-end pb-3 pb-sm-0">
-                  <div>
-                    <p class="mb-2">Marketing Revenue</p>
-                    <h4 class="mb-2" id="mark_rev">--</h4>
-                    {{-- <p class="mb-0">
-                      <span class="me-2">21k orders</span
-                      ><span class="badge rounded-pill bg-label-success">+12.4%</span>
-                    </p> --}}
-                  </div>
-                  <div class="avatar me-lg-4">
-                    <span class="avatar-initial rounded bg-label-info">
-                        <i class="mdi mdi-home-outline mdi-24px"></i>
-
-                    </span>
-                  </div>
-                </div>
-                <hr class="d-none d-sm-block d-lg-none" />
-              </div>
-              <div class="col-sm-6 col-lg-3">
-                <div
-                  class="d-flex justify-content-between align-items-start border-end pb-3 pb-sm-0 card-widget-3">
-                  <div>
-                    <p class="mb-2">Charge Back / Refund</p>
-                    <h4 class="mb-2" id="charge_back">--</h4>
-                  </div>
-                  <div class="avatar me-sm-4">
-                    <span class="avatar-initial rounded bg-label-danger">
-                      <i class="mdi mdi-bank-off-outline mdi-24px"></i>
-
-                    </span>
-                  </div>
-                </div>
-              </div>
-              <div class="col-sm-6 col-lg-3">
-                <div class="d-flex justify-content-between align-items-start">
-                  <div>
-                    <p class="mb-2">Total Revenue</p>
-                    <h4 class="mb-2" id="total_rev">--</h4>
-
-                  </div>
-                  <div class="avatar">
-                    <span class="avatar-initial rounded bg-label-success">
-                      <i class="mdi mdi-currency-usd mdi-24px"></i>
-                    </span>
-                  </div>
-                </div>
-              </div>
             </div>
-          </div>
+
+            <!-- KPI tiles -->
+            <div class="row g-4 mb-4">
+                @php
+                    $cards = [
+                        ['icon' => 'mdi-currency-usd', 'label' => 'Net Revenue', 'value' => '$' . number_format($kpis['net_revenue'], 2), 'sub' => 'Revenue minus chargebacks', 'color' => 'bg-label-success'],
+                        ['icon' => 'mdi-handshake-outline', 'label' => 'Total Sales', 'value' => $kpis['total_sales'], 'color' => 'bg-label-primary'],
+                        ['icon' => 'mdi-laptop', 'label' => 'Development Revenue', 'value' => '$' . number_format($kpis['development_revenue'], 2), 'color' => 'bg-label-info'],
+                        ['icon' => 'mdi-bullhorn-outline', 'label' => 'Marketing Revenue', 'value' => '$' . number_format($kpis['marketing_revenue'], 2), 'color' => 'bg-label-warning'],
+                        ['icon' => 'mdi-cash-refund', 'label' => 'Chargebacks', 'value' => '$' . number_format($kpis['chargeback_amount'], 2), 'color' => 'bg-label-danger'],
+                    ];
+                @endphp
+                @foreach($cards as $card)
+                    @include('pages.profile.partials.stat-card', $card)
+                @endforeach
+            </div>
+
+            <!-- Invoices -->
+            <div class="card mb-4">
+                <h5 class="card-header">Sales / Invoices</h5>
+                <div class="card-datatable table-responsive">
+                    @php
+                        $agentOptions = $invoices->pluck('agent')->filter()->unique()->sort()->values();
+                        $closerOptions = $invoices->flatMap(fn($r) => collect($r['closers'])->pluck('name'))->filter()->unique()->sort()->values();
+                        $typeOptions = $invoices->flatMap(fn($r) => $r['types'])->filter()->unique()->sort()->values();
+                    @endphp
+                    <table id="salesReportTable" class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Sr#</th>
+                                <th>Date</th>
+                                <th>Agent</th>
+                                <th>Closer(s)</th>
+                                <th>Service Type(s)</th>
+                                <th>Amount</th>
+                                <th>Action</th>
+                            </tr>
+                            <tr class="report-column-filters">
+                                <th></th>
+                                <th></th>
+                                <th>
+                                    <select class="form-select form-select-sm column-filter select2" data-column="2">
+                                        <option value="">All Agents</option>
+                                        @foreach($agentOptions as $option)
+                                            <option value="{{ $option }}">{{ $option }}</option>
+                                        @endforeach
+                                    </select>
+                                </th>
+                                <th>
+                                    <select class="form-select form-select-sm column-filter select2" data-column="3">
+                                        <option value="">All Closers</option>
+                                        @foreach($closerOptions as $option)
+                                            <option value="{{ $option }}">{{ $option }}</option>
+                                        @endforeach
+                                    </select>
+                                </th>
+                                <th>
+                                    <select class="form-select form-select-sm column-filter select2" data-column="4">
+                                        <option value="">All Services</option>
+                                        @foreach($typeOptions as $option)
+                                            <option value="{{ $option }}">{{ $option }}</option>
+                                        @endforeach
+                                    </select>
+                                </th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($invoices as $row)
+                                <tr>
+                                    <td>{{ $row['sr_no'] }}</td>
+                                    <td>{{ $row['date'] }}</td>
+                                    <td>{{ $row['agent'] }}</td>
+                                    <td>
+                                        @forelse($row['closers'] as $closer)
+                                            {{ $closer['name'] }}@if(!$loop->last), @endif
+                                        @empty
+                                            N/A
+                                        @endforelse
+                                    </td>
+                                    <td>
+                                        @foreach($row['types'] as $type)
+                                            <span class="badge bg-label-secondary me-1">{{ $type }}</span>
+                                        @endforeach
+                                    </td>
+                                    <td>${{ number_format($row['amount'], 2) }}</td>
+                                    <td>
+                                        @if($row['agent_id'] || $row['closers']->isNotEmpty())
+                                            <div class="d-inline-block text-nowrap">
+                                                <button class="btn btn-sm btn-icon btn-text-secondary rounded-pill dropdown-toggle hide-arrow"
+                                                    data-bs-toggle="dropdown" aria-expanded="false"><i class="mdi mdi-dots-vertical mdi-20px"></i></button>
+                                                <div class="dropdown-menu dropdown-menu-end m-0">
+                                                    @if($row['agent_id'])
+                                                        <a href="{{ route('profile.show', $row['agent_id']) }}" class="dropdown-item"><i
+                                                            class="mdi mdi-account-outline me-2"></i><span>View {{ $row['agent'] }}</span></a>
+                                                    @endif
+                                                    @foreach($row['closers'] as $closer)
+                                                        @if($closer['id'])
+                                                            <a href="{{ route('profile.show', $closer['id']) }}" class="dropdown-item"><i
+                                                                class="mdi mdi-account-outline me-2"></i><span>View {{ $closer['name'] }}</span></a>
+                                                        @endif
+                                                    @endforeach
+                                                </div>
+                                            </div>
+                                        @endif
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Revenue trend -->
+            <div class="card mb-4">
+                <h5 class="card-header">Revenue Trend</h5>
+                <div class="card-body">
+                    @if(count($trend['labels']))
+                        <div id="revenueTrendChart"></div>
+                    @else
+                        <div class="text-muted">No revenue in this range yet.</div>
+                    @endif
+                </div>
+            </div>
         </div>
-      </div>
-
-      <!-- Product List Table -->
-      <div class="card">
-        <div class="card-header no-print">
-            <div class="d-flex" style="justify-content: space-between;">
-                <h5 class="card-title" style="margin: auto 0px;">Filter</h5>
-                <button id="print" type="btn" onclick="(function() { window.print(); })()" class="btn btn-primary waves-effect waves-light ">Print</button>
-            </div>
-          <div class="d-flex justify-content-between align-items-center row py-3 gap-3 gap-md-0 no-print">
-            <div class="col-md-3 product_status">
-                          <div class="form-floating form-floating-outline">
-                            <input type="text" id="flatpickr-range" class="form-control" />
-                            <label for="flatpickr-range">Date</label>
-                          </div>
-            </div>
-            <div class="col-md-3 product_category">
-                <div class="form-floating form-floating-outline">
-                    <select id="agnet_select" name="agent" class="select2 form-select"
-                        data-allow-clear="true">
-                        @if(isset($agent))
-                        <option value="">Please Select</option>
-                        @foreach($agent as $user)
-                            <option value="{{ $user->id }}">{{ explode(' -', $user->name )[0] }}</option>
-                        @endforeach
-                        @endif
-
-                    </select>
-                    <label for="multicol-country">Agent</label>
-                </div>
-                {{-- <div class="filters-agent"></div> --}}
-            </div>
-            <div class="col-md-3 product_stock">
-                <div class="form-floating form-floating-outline">
-                    <select id="closer" name="agent" class="select2 form-select"
-                        data-allow-clear="true">
-                        @if(isset($closer))
-                        <option value="">Please Select</option>
-                        @foreach($closer as $user)
-                            <option value="{{ $user->id }}">{{ explode(' -', $user->name )[0] }}</option>
-                        @endforeach
-                        @endif
-
-                    </select>
-                    <label for="multicol-country">Closer</label>
-                </div>
-            </div>
-            <div class="col-md-3 product_stock">
-                <div class="form-floating form-floating-outline">
-                    <select id="type" name="agent" class="select2 form-select"
-                        data-allow-clear="true">
-                        <option value="">Please Select</option>
-                        <option value="Development">Development</option>
-                        <option value="Marketing">Marketing</option>
-
-                    </select>
-                    <label for="multicol-country">Type</label>
-                </div>
-
-            </div>
-          </div>
-        </div>
-        <div class="card-datatable table-responsive">
-            {{-- <div class="dt-buttons btn-group flex-wrap"> <div class="btn-group"><button class="btn buttons-collection btn-label-primary dropdown-toggle me-4 waves-effect border-none" tabindex="0" aria-controls="report-table" type="button" aria-haspopup="dialog" aria-expanded="false"><span><span class="d-flex align-items-center gap-2"><i class="icon-base ri ri-external-link-line icon-18px"></i> <span class="d-none d-sm-inline-block">Export</span></span></span></button></div> <button class="btn create-new btn-primary" tabindex="0" aria-controls="DataTables_Table_0" type="button"><span><span class="d-flex align-items-center"><i class="icon-base ri ri-add-line icon-18px me-sm-1"></i><span class="d-none d-sm-inline-block">Add New Record</span></span></span></button> </div> --}}
-
-          <table id="report-table" class="datatables-products table datatables-basic ">
-
-            <thead class="table-light">
-              <tr>
-                <th></th>
-                <th></th>
-                <th>Agent</th>
-                <th>Closer</th>
-                <th>Type</th>
-                <th>Comment</th>
-                <th>Price</th>
-                {{-- <th>qty</th>
-                <th>status</th>
-                <th>actions</th> --}}
-              </tr>
-
-            </thead>
-          </table>
-        </div>
-      </div>
+        <div class="content-backdrop fade"></div>
     </div>
-    <!-- / Content -->
-
-
-  </div>
 @endsection
 @section('js')
-    <script src="{{ asset('assets/vendor/js/template-customizer.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js') }}"></script>
     <script src="{{ asset('assets/js/tables-datatables-advanced.js') }}"></script>
-    {{-- <script src="{{ asset('assets/js/app-ecommerce-product-list.js') }}"></script> --}}
-       <script src="{{ asset('assets/vendor/libs/bootstrap-datepicker/bootstrap-datepicker.js') }}"></script>
-       {{-- <script src="{{ asset('assets/vendor/libs/pickr/pickr.js') }}"></script> --}}
-       <script src="{{ asset('assets/vendor/libs/flatpickr/flatpickr.js') }}"></script>
-       <script src="{{ asset('assets/vendor/libs/bootstrap-datepicker/bootstrap-datepicker.js') }}"></script>
-    <script src="{{ asset('assets/vendor/libs/bootstrap-daterangepicker/bootstrap-daterangepicker.js') }}"></script>
-    <script src="{{ asset('assets/vendor/libs/jquery-timepicker/jquery-timepicker.js') }}"></script>
-    <script src="{{ asset('assets/vendor/libs/pickr/pickr.js') }}"></script>
-    <script src="{{ asset('assets/js/forms-pickers.js') }}"></script>
-
-
+    <script src="{{ asset('assets/vendor/libs/apex-charts/apexcharts.js') }}"></script>
     <script>
-            $(function () {
-        let borderColor, bodyBg, headingColor;
-
-        if (isDarkStyle) {
-            borderColor = config.colors_dark.borderColor;
-            bodyBg = config.colors_dark.bodyBg;
-            headingColor = config.colors_dark.headingColor;
-        } else {
-            borderColor = config.colors.borderColor;
-            bodyBg = config.colors.bodyBg;
-            headingColor = config.colors.headingColor;
-        }
-
-        const dt_product_table = $('.datatables-products');
-
-        if (dt_product_table.length > 0) {
-            dt_product_table.DataTable({
-            ajax: '{{ route('salereport.show') }}', // <-- Replace this with your controller JSON URL
-            columns: [
-                { data: 'sr_no' },      // Sr#
-                { data: 'date' },       // Date
-                { data: 'agent' },      // Agent
-                { data: 'closer' },     // Closer
-                { data: 'type' },       // Type
-                { data: 'comment' },    // Comment
-                { data: 'price' }       // Price
-            ],
-            columnDefs: [
-                {
-                targets: 0,
-                title: 'Sr#'
-                },
-                {
-                targets: 1,
-                title: 'Date',
-                //   render: function (data) {
-                //     return moment(data).format('YYYY-MM-DD'); // Format as needed
-                //   }
-                },
-                {
-                targets: 2,
-                title: 'Agent'
-                },
-                {
-                targets: 3,
-                title: 'Closer'
-                },
-                {
-                targets: 4,
-                title: 'Type'
-                },
-                {
-                targets: 5,
-                title: 'Comment'
-                },
-                {
-                targets: 6,
-                title: 'Price',
-                render: function (data) {
-                    return '$' + parseFloat(data).toFixed(2); // Optional formatting
-                }
-                }
-            ],
-            order: [[1, 'desc']], // Default sort by Date
-            responsive: true,
-            language: {
-                search: '',
-                searchPlaceholder: 'Search...',
-                info: 'Showing _START_ to _END_ of _TOTAL_ entries'
-            }
-            });
-        }
+        var salesReportTable = $('#salesReportTable').DataTable({
+            orderCellsTop: true,
+            language: window.rsEmptyStateHTML ? { emptyTable: rsEmptyStateHTML('invoices') } : undefined
         });
 
-    </script>
-
-
-
-
-
-{{-- <script>
-    flatpickr("#flatpickr-range", {
-    mode: "range",
-    dateFormat: "Y-m-d",
-    onChange: function(selectedDates, dateStr) {
-        $('#flatpickr-range').val(dateStr).trigger('input');
-    }
-    });
-
-</script> --}}
-
-<script>
-    $(document).ready(function () {
-        function fetchFilteredData() {
-            $.ajax({
-                url: '{{ route("salereport.reportfilter") }}', // Update to match your route
-                type: 'GET',
-                data: {
-                date: $('#flatpickr-range').val(),
-                agent: $('#agnet_select').val(),
-                closer: $('#closer').val(),
-                type: $('#type').val()
-            },
-
-            // success: function (response) {
-            //     const tableBody = $('#report-table-body');
-            //     tableBody.empty(); // Clear previous data
-
-            //     if (response.data.length === 0) {
-            //         tableBody.append('<tr><td colspan="7" class="text-center">No data found</td></tr>');
-            //         return;
-            //     }
-
-            //     response.data.forEach(row => {
-            //         const date = Array.isArray(row.date) ? row.date.join(', ') : row.date;
-            //         const closer = Array.isArray(row.closer) ? row.closer.join(', ') : row.closer;
-            //         const type = Array.isArray(row.type) ? row.type.join(', ') : row.type;
-            //         const price = parseFloat(row.price).toFixed(2);
-
-            //         tableBody.append(`
-            //             <tr>
-            //                 <td>${row.sr_no}</td>
-            //                 <td>${date}</td>
-            //                 <td>${row.agent}</td>
-            //                 <td>${closer}</td>
-            //                 <td>${type}</td>
-            //                 <td>${row.comment}</td>
-            //                 <td>$${price}</td>
-            //             </tr>
-            //         `);
-            //     });
-            // },
-            success: function (response) {
-                console.log(response);
-
-                const table = $('#report-table');
-                const tableBody = $('#report-table').find('tbody');
-
-                // Destroy previous DataTable instance (if exists)
-                if ($.fn.DataTable.isDataTable(table)) {
-                    table.DataTable().clear().destroy();
+        // The page-wide .select2 auto-init (form-layouts.js) registers via
+        // $(document).ready(), which fires AFTER this inline script block
+        // has already run — so reinitializing here directly gets silently
+        // overwritten a moment later by that auto-init (dropdownParent
+        // reverts to the default, and the dropdown renders inline instead
+        // of escaping to <body>, getting visually buried under the table
+        // rows below it). Registering this in its own ready handler queues
+        // it to run strictly after the auto-init's, guaranteeing this
+        // config wins.
+        $(function () {
+            $('.report-column-filters .select2').each(function () {
+                var $el = $(this);
+                if ($el.hasClass('select2-hidden-accessible')) {
+                    $el.select2('destroy');
                 }
-
-                tableBody.empty(); // Clear previous rows
-
-                if (response.data.length === 0) {
-                    $('#dev_rev').html("$"+ response.summary.development);
-                    $('#mark_rev').html("$"+ response.summary.marketing);
-                    $('#charge_back').html("$"+ response.summary.chargeback);
-                    $('#total_rev').html("$"+ response.summary.total);
-                    // alert("No Data Found");
-                    // tableBody.append('<tr><td colspan="7" class="text-center">No data found</td></tr>');
-                } else {
-                    response.data.forEach(row => {
-                        const date = Array.isArray(row.date) ? row.date.join(', ') : row.date;
-                        const closer = Array.isArray(row.closer) ? row.closer.join(', ') : row.closer;
-                        const type = Array.isArray(row.type) ? row.type.join(', ') : row.type;
-                        const price = parseFloat(row.price).toFixed(2);
-
-                        tableBody.append(`
-                            <tr>
-                                <td>${row.sr_no}</td>
-                                <td>${date}</td>
-                                <td>${row.agent}</td>
-                                <td>${closer}</td>
-                                <td>${type}</td>
-                                <td>${row.comment}</td>
-                                <td>$${price}</td>
-                            </tr>
-                        `);
-                    });
-
-                    $('#dev_rev').html("$"+ response.summary.development);
-                    $('#mark_rev').html("$"+ response.summary.marketing);
-                    $('#charge_back').html("$"+ response.summary.chargeback);
-                    $('#total_rev').html("$"+ response.summary.total);
-                }
-
-                // ✅ Reinitialize DataTable
-                table.DataTable({
-                order: [[1, 'desc']],
-                responsive: true,
-                language: {
-                    search: '',
-                    searchPlaceholder: 'Search...',
-                    info: 'Showing _START_ to _END_ of _TOTAL_ entries'
-                },
-                // dom: 'Bfrtip',
-                // buttons: ['excel', 'pdf', 'print'],
-                // Add bootstrap styling class if required
-                drawCallback: function () {
-                    $('.dataTables_paginate > .pagination').addClass('pagination-rounded');
-                }
+                $el.select2({
+                    width: '100%',
+                    dropdownParent: $('body')
                 });
-
-            },
-            error: function (err) {
-                console.error("Filter fetch error:", err);
-            }
-        });
-    }
-
-    // Bind the change/input/select events to all filter fields
-    $('#flatpickr-range, #agnet_select, #closer, #type').on('change input', function () {
-        fetchFilteredData();
-    });
-
-    // If you're using Select2, this ensures it triggers as well
-    $('#agnet_select, #closer, #type').on('select2:select select2:unselect', function () {
-        fetchFilteredData();
-    });
-});
-</script>
-
-{{-- <script>
-    $(document).ready(function () {
-        let table;
-        const dt_product_table = $('.datatables-products');
-
-        if (!$.fn.DataTable.isDataTable(dt_product_table)) {
-            table = dt_product_table.DataTable({
-                ajax: {
-                    url: '{{ route("salereport.reportfilter") }}',
-                    type: 'GET',
-                    data: {
-                        date: $('#flatpickr-range').val(),
-                        agent: $('#agnet_select').val(),
-                        closer: $('#closer').val(),
-                        type: $('#type').val()
-                    },
-                },
-                columns: [
-                    { data: 'sr_no' },
-                    { data: 'date', render: data => Array.isArray(data) ? data.join(', ') : data },
-                    { data: 'agent' },
-                    { data: 'closer', render: data => Array.isArray(data) ? data.join(', ') : data },
-                    { data: 'type', render: data => Array.isArray(data) ? data.join(', ') : data },
-                    { data: 'comment' },
-                    { data: 'price', render: data => '$' + parseFloat(data).toFixed(2) }
-                ],
-                order: [[1, 'desc']],
-                responsive: true,
-                language: {
-                    search: '',
-                    searchPlaceholder: 'Search...',
-                    info: 'Showing _START_ to _END_ of _TOTAL_ entries'
-                }
             });
-        } else {
-            table = dt_product_table.DataTable();
-        }
-
-        // ✅ Make sure this is after DataTable is initialized
-        $('#flatpickr-range, #agnet_select, #closer, #type').on('change input', function () {
-            table.ajax.reload();
         });
 
-        $('#agnet_select, #closer, #type').on('select2:select select2:unselect', function () {
-            table.ajax.reload();
+        $('.report-column-filters .column-filter').on('change', function () {
+            var columnIndex = $(this).data('column');
+            salesReportTable.column(columnIndex).search(this.value).draw();
         });
 
-        flatpickr("#flatpickr-range", {
-            mode: "range",
-            dateFormat: "Y-m-d",
-            onChange: function (selectedDates, dateStr) {
-                $('#flatpickr-range').val(dateStr).trigger('input');
-            }
+        // The filter row's <select> clicks shouldn't trigger the column
+        // sort click handler bound to the header row above it.
+        $('.report-column-filters th').on('click', function (e) {
+            e.stopPropagation();
         });
-    });
-    </script> --}}
 
+        document.getElementById('report_range_select').addEventListener('change', function () {
+            var isCustom = this.value === 'custom';
+            document.querySelectorAll('.report-custom-range-field').forEach(function (el) {
+                el.style.display = isCustom ? '' : 'none';
+            });
+        });
 
+        var trendEl = document.querySelector('#revenueTrendChart');
+        if (trendEl) {
+            var labelColor = (typeof isDarkStyle !== 'undefined' && isDarkStyle) ? config.colors_dark.textMuted : config.colors.textMuted;
 
-
-{{-- <script>
-    $(function () {
-        let borderColor, bodyBg, headingColor;
-
-        if (isDarkStyle) {
-            borderColor = config.colors_dark.borderColor;
-            bodyBg = config.colors_dark.bodyBg;
-            headingColor = config.colors_dark.headingColor;
-        } else {
-            borderColor = config.colors.borderColor;
-            bodyBg = config.colors.bodyBg;
-            headingColor = config.colors.headingColor;
-        }
-
-        const dt_product_table = $('.datatables-products');
-
-        if (dt_product_table.length) {
-            const table = dt_product_table.DataTable({
-                ajax: {
-                    url: '{{ route("salereport.reportfilter") }}',
-                    data: function (d) {
-                        d.date = $('#flatpickr-range').val();
-                        d.agent = $('#agnet_select').val();
-                        d.closer = $('#closer').val();
-                        d.type = $('#type').val();
+            new ApexCharts(trendEl, {
+                chart: {
+                    height: 350,
+                    type: 'area',
+                    toolbar: { show: false },
+                    parentHeightOffset: 0
+                },
+                series: [
+                    { name: 'Development', data: @json($trend['development']) },
+                    { name: 'Marketing', data: @json($trend['marketing']) }
+                ],
+                xaxis: {
+                    categories: @json($trend['labels']),
+                    labels: { style: { colors: labelColor } }
+                },
+                yaxis: {
+                    labels: {
+                        style: { colors: labelColor },
+                        formatter: function (val) { return '$' + Math.round(val).toLocaleString(); }
                     }
                 },
-                columns: [
-                    { data: 'sr_no' },
-                    { data: 'date', render: data => Array.isArray(data) ? data.join(', ') : data },
-                    { data: 'agent' },
-                    { data: 'closer', render: data => Array.isArray(data) ? data.join(', ') : data },
-                    { data: 'type', render: data => Array.isArray(data) ? data.join(', ') : data },
-                    { data: 'comment' },
-                    { data: 'price', render: data => '$' + parseFloat(data).toFixed(2) }
-                ],
-                order: [[1, 'desc']],
-                responsive: true,
-                language: {
-                    search: '',
-                    searchPlaceholder: 'Search...',
-                    info: 'Showing _START_ to _END_ of _TOTAL_ entries'
+                colors: [config.colors.info, config.colors.warning],
+                dataLabels: { enabled: false },
+                stroke: { curve: 'smooth', width: 2 },
+                fill: {
+                    type: 'gradient',
+                    gradient: { shadeIntensity: 1, opacityFrom: 0.4, opacityTo: 0.1 }
+                },
+                legend: { position: 'top' },
+                tooltip: {
+                    y: { formatter: function (val) { return '$' + Number(val).toLocaleString(); } }
                 }
-            });
-
-            // Reload table on input change
-            $('#flatpickr-range, #agnet_select, #closer, #type').on('change input', function () {
-                table.ajax.reload();
-            });
-
-            // Support Select2 changes
-            $('#agnet_select, #closer, #type').on('select2:select select2:unselect', function () {
-                table.ajax.reload();
-            });
+            }).render();
         }
-
-        // Optional: Initialize flatpickr if not already done
-        flatpickr("#flatpickr-range", {
-            mode: "range",
-            dateFormat: "Y-m-d",
-            onChange: function(selectedDates, dateStr) {
-                $('#flatpickr-range').val(dateStr).trigger('input');
-            }
-        });
-    });
-    </script> --}}
-
-
+    </script>
 @endsection

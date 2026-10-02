@@ -18,6 +18,7 @@ use App\Http\Controllers\KeywordController;
 use App\Http\Controllers\LeadController;
 use App\Http\Controllers\MerchantAccountController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RefundController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SaleController;
@@ -204,6 +205,14 @@ Route::controller(RoleController::class)
         ->middleware('auth')
         ->name('settings.index');
 
+    // Profile: self-view by default, or Admin/Executives viewing another
+    // user's profile via {id}. Access is checked in the controller, not
+    // PermissionMiddelware, so "profile" never appears as a Role Permissions
+    // module (same reasoning as settings.index above).
+    Route::get('profile/{id?}', [ProfileController::class, 'show'])
+        ->middleware('auth')
+        ->name('profile.show');
+
     Route::controller(BankAccountController::class)
     ->prefix('settings/bank-account')
     ->as('bankaccount.')
@@ -338,16 +347,14 @@ Route::controller(RoleController::class)
         Route::get('delete', 'destroy')->name('delete');
     });
 
+    // Unified Sale Report dashboard (replaces the old separate Sale Report
+    // + Yearly Report pages) plus the still-separate Support Report.
     Route::controller(SaleReportController::class)
     ->prefix('salereport')
     ->as('salereport.')
     ->middleware(PermissionMiddelware::class)
     ->group(function () {
         Route::get('/index', 'index')->name('index');
-        Route::get('/getdata', 'show')->name('show');
-        Route::get('/reportfilter', 'filterData')->name('reportfilter');
-        Route::get('/get-stats', 'getstats')->name('edit');
-        Route::post('/stats', 'stats')->name('store');
         Route::get('/support', 'update')->name('update');
         Route::get('/reportSupport', 'reportsupport')->name('reportsupport');
     });

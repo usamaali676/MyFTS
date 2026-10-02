@@ -4,7 +4,10 @@
 <link rel="stylesheet" href="{{ asset('assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css') }}" />
 @endsection
 @section('content')
-          @php $userPerm = \App\Helpers\GlobalHelper::modulePermission(auth()->user(), 'user'); @endphp
+          @php
+              $userPerm = \App\Helpers\GlobalHelper::modulePermission(auth()->user(), 'user');
+              $canViewProfiles = (int) auth()->user()->role_id === 1 || optional(auth()->user()->role)->name === 'Executives';
+          @endphp
           <!-- Content wrapper -->
           <div class="content-wrapper">
             <!-- Content -->
@@ -45,6 +48,10 @@
                                     class="btn btn-sm btn-icon btn-text-secondary rounded-pill dropdown-toggle hide-arrow"
                                     data-bs-toggle="dropdown" aria-expanded="false"><i class="mdi mdi-dots-vertical mdi-20px"></i></button>
                                     <div class="dropdown-menu dropdown-menu-end m-0" style="">
+                                        @if($canViewProfiles)
+                                            <a href="{{ route('profile.show', $item->id) }}" class="dropdown-item"><i
+                                                class="mdi mdi-account-outline me-2"></i><span>View Profile</span></a>
+                                        @endif
                                         @if($userPerm->edit)
                                             <a href="{{ route('user.edit', $item->id) }}" class="dropdown-item"><i
                                                 class="mdi mdi-pencil-outline me-2"></i><span>Edit</span></a>

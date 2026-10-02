@@ -208,11 +208,6 @@
                     </a>
                 </li>
 
-                <li class="menu-item {{ request()->routeIs('salereport.edit') ? 'active' : '' }}">
-                    <a href="{{ route('salereport.edit') }}" class="menu-link">
-                        <div data-i18n="Yearly Report">Yearly Report</div>
-                    </a>
-                </li>
                 <li class="menu-item {{ request()->routeIs('salereport.update') ? 'active' : '' }}">
                     <a href="{{ route('salereport.update') }}" class="menu-link">
                         <div data-i18n="Support Report">Support Report</div>
