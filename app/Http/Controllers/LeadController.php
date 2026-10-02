@@ -49,7 +49,7 @@ class LeadController extends Controller
     {
         $categories = BusinessCategory::all();
         $roles = Role::whereIn('name', ['Closer', 'Customer Support', 'Manager Customer Support', 'Executives'])->get();
-        $closers = User::whereIn('role_id', $roles->pluck('id'))->get();
+        $closers = User::whereIn('role_id', $roles->pluck('id'))->where('status', 1)->get();
         // dd($closers);
         $company_services = CompanyServices::all();
         return view('pages.lead.create', compact('categories', 'closers', 'company_services'));
