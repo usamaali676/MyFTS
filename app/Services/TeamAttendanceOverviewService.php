@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Attendance;
+use App\Models\Role;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
@@ -14,8 +15,8 @@ use Illuminate\Support\Collection;
  *
  *  - Creator / Executives: every active user in any role, except roles whose
  *    name contains "IT" (case-insensitive) — this already includes users
- *    #3 and #4, no special-casing needed.
- *  - User #4: every active TSR/Closer, minus IT roles, minus their own record.
+ *    #3 and the Closer - Sales Manager role, no special-casing needed.
+ *  - Closer - Sales Manager role: every active TSR/Closer, minus IT roles, minus their own record.
  *  - User #3: every active Customer Support user, minus IT roles, minus
  *    their own record.
  *  - Anyone else: no team view.
@@ -135,12 +136,12 @@ class TeamAttendanceOverviewService
         $roleName = optional($viewer->role)->name;
 
         if (in_array($roleName, ['Creator', 'Executives'], true)) {
-            // null roles = every non-IT role, which already covers users #3 and #4.
+            // null roles = every non-IT role, which already covers user #3 and the Closer - Sales Manager role.
             return ['roles' => null, 'excludeSelf' => false, 'excludeUserIds' => [], 'label' => 'All Departments'];
         }
 
-        if ((int) $viewer->id === 4) {
-            return ['roles' => ['TSR', 'Closer'], 'excludeSelf' => true, 'excludeUserIds' => [], 'label' => 'TSR & Closer'];
+        if ($roleName === Role::CLOSER_SALES_MANAGER) {
+            return ['roles' => ['TSR', Role::CLOSER], 'excludeSelf' => true, 'excludeUserIds' => [], 'label' => 'TSR & Closer'];
         }
 
         if ((int) $viewer->id === 3) {

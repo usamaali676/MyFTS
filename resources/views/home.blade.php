@@ -346,7 +346,7 @@ $user = Auth::user();
                 'smokeBreak' => ['icon' => 'mdi-smoking', 'label' => 'Smoke Break'],
             ];
         @endphp
-        @if ($user->role->name == 'Creator' || $user->role->name == 'Executives' || $user->id == 4 )
+        @if ($user->role->name == 'Creator' || $user->role->name == 'Executives' || $user->role->name == \App\Models\Role::CLOSER_SALES_MANAGER )
             <!-- Project Statistics -->
                     <div class="col-md-6 col-xl-4">
                         <div class="card h-100">
@@ -402,7 +402,7 @@ $user = Auth::user();
                         </div>
                     </div>
             <!--/ Project Statistics -->
-        @elseif ( $user->role->name == 'QA'  || $user->role->name == 'Closer' && $user->id != 4 )
+        @elseif ( $user->role->name == 'QA'  || $user->role->name == 'Closer' )
                     <div class="col-md-6 col-xl-4">
                         <div class="card h-100">
                             <div class="card-header d-flex align-items-center justify-content-between">
@@ -456,7 +456,7 @@ $user = Auth::user();
                             </div>
                         </div>
                     </div>
-        @elseif ( $user->id == 3 && $user->id != 4 )
+        @elseif ( $user->id == 3 )
                     <div class="col-md-6 col-xl-4">
                         <div class="card h-100">
                             <div class="card-header d-flex align-items-center justify-content-between">
@@ -512,7 +512,7 @@ $user = Auth::user();
                     </div>
         @endif
 
-        @if ($user->role->name == 'Creator' || $user->role->name == 'Executives' || $user->role->name == 'Closer' || $user->role->name == 'QA'   )
+        @if ($user->role->name == 'Creator' || $user->role->name == 'Executives' || in_array($user->role->name, \App\Models\Role::CLOSER_ROLES, true) || $user->role->name == 'QA'   )
             <!-- Sales Country Chart -->
             <div class="col-12 col-xl-4 col-md-6">
                 <div class="card " style="height: fit-content">

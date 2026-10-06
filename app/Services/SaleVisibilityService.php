@@ -35,7 +35,7 @@ class SaleVisibilityService
         $roleName = optional($user->role)->name;
 
         return in_array($roleName, self::FULL_ACCESS_ROLES, true)
-            || in_array($roleName, ['Manager Customer Support', 'Customer Support', 'Closer'], true);
+            || in_array($roleName, ['Manager Customer Support', 'Customer Support', ...Role::CLOSER_ROLES], true);
     }
 
     public static function canAccessTeam(User $user): bool
@@ -76,7 +76,7 @@ class SaleVisibilityService
             });
         }
 
-        if ($roleName === 'Closer') {
+        if (in_array($roleName, Role::CLOSER_ROLES, true)) {
             return $query->whereHas('closers', function (Builder $q) use ($user) {
                 $q->where('closer_id', $user->id);
             });

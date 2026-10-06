@@ -35,7 +35,7 @@ class ProfileStatsService
     // A role with a personal sales-attribution section of its own — these
     // users always see their own section (even all-zero, if the selected
     // range has no activity), never the company-wide fallback below.
-    private const OPERATIONAL_ROLES = ['TSR', 'Closer', 'Customer Support', 'Manager Customer Support'];
+    private const OPERATIONAL_ROLES = ['TSR', ...Role::CLOSER_ROLES, 'Customer Support', 'Manager Customer Support'];
 
     // Same set SaleVisibilityService treats as full access to Sales
     // elsewhere in the app — Company Overview (company-wide revenue) is
@@ -53,7 +53,7 @@ class ProfileStatsService
         $isOperational = in_array($roleName, self::OPERATIONAL_ROLES, true);
         $hasFullAccess = (int) $target->role_id === 1 || in_array($roleName, self::FULL_ACCESS_ROLES, true);
 
-        $closer = $this->closerStats($target, $from, $to, $isOperational && $roleName === 'Closer');
+        $closer = $this->closerStats($target, $from, $to, $isOperational && in_array($roleName, Role::CLOSER_ROLES, true));
         $customerSupport = $this->customerSupportStats(
             $target, $from, $to,
             $isOperational && in_array($roleName, ['Customer Support', 'Manager Customer Support'], true)
@@ -343,7 +343,7 @@ class ProfileStatsService
 
         $revenue = (float) Invoice::whereIn('sale_id', $saleIds)->whereHas('payments')->sum('total_amount');
 
-        $operationalRoles = ['TSR', 'Closer', 'Customer Support'];
+        $operationalRoles = ['TSR', ...Role::CLOSER_ROLES, 'Customer Support'];
         $roleCounts = User::where('status', 1)
             ->whereHas('role', fn (Builder $q) => $q->whereIn('name', $operationalRoles))
             ->with('role')
@@ -355,7 +355,7 @@ class ProfileStatsService
             'total_sales' => $saleIds->count(),
             'total_revenue' => $revenue,
             'tsr_count' => $roleCounts->get('TSR', 0),
-            'closer_count' => $roleCounts->get('Closer', 0),
+            'closer_count' => collect(Role::CLOSER_ROLES)->sum(fn ($name) => $roleCounts->get($name, 0)),
             'csr_count' => $roleCounts->get('Customer Support', 0),
         ];
     }

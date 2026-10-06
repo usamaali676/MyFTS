@@ -139,7 +139,7 @@ class HomeController extends Controller
         //         ])->with('breaks');
         //     }
         // ])->get();
-        $roleIds = Role::whereIn('name', ['TSR', 'Closer', 'QA'])->pluck('id');
+        $roleIds = Role::whereIn('name', ['TSR', ...Role::CLOSER_ROLES, 'QA'])->pluck('id');
 
         $users = User::whereIn('role_id', $roleIds)
             ->where('status', 1)

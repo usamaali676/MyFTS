@@ -23,9 +23,14 @@
             .layout-menu-fixed:not(.layout-menu-collapsed) .layout-page, .layout-menu-fixed-offcanvas:not(.layout-menu-collapsed) .layout-page{
                 padding-left: 0px !important;
             }
+            .attendance-user-calendar{
+                page-break-inside: avoid;
+                break-inside: avoid;
+            }
         }
     </style>
     <link rel="stylesheet" href="{{ asset('assets/css/sale-report-enhance.css') }}" />
+    <link rel="stylesheet" href="{{ asset('assets/css/attendance-print.css') }}" />
 
 @endsection
 @section('content')
@@ -33,7 +38,23 @@
     <!-- Content -->
 
     <div class="container-xxl flex-grow-1 container-p-y sale-report-enhanced">
-      <h4 class="py-3 mb-4"><span class="text-muted fw-light">User's /</span> Attendance  </h4>
+      <h4 class="py-3 mb-4 no-print"><span class="text-muted fw-light">User's /</span> Attendance  </h4>
+
+      @if($view === 'calendar' && ($department || $calendarUser))
+      <div class="attendance-print-header">
+          <div>
+              <h2>Attendance Report</h2>
+              <div class="sub">
+                  {{ $department ? $department->name . ' Department' : explode(' -', $calendarUser->name)[0] }}
+                  &middot; {{ $month->format('F Y') }}
+              </div>
+          </div>
+          <div class="meta">
+              <div><strong>MY FTS</strong></div>
+              <div>Generated {{ now('Asia/Karachi')->format('d M Y, h:i A') }}</div>
+          </div>
+      </div>
+      @endif
 
       <!-- Product List Widget -->
 
@@ -187,9 +208,9 @@
                 <input type="hidden" name="month" value="{{ $month->format('Y-m') }}">
                 <div class="col-md-4">
                     <div class="form-floating form-floating-outline">
-                        <select name="agent" class="form-select" onchange="this.form.submit()">
+                        <select name="agent" class="form-select" onchange="this.form.elements['department'].value=''; this.form.submit()">
                             <option value="">Select an agent</option>
-                            @foreach($user as $usr)
+                            @foreach($activeUsers as $usr)
                                 <option value="{{ $usr->id }}" {{ $calendarUser && $calendarUser->id === $usr->id ? 'selected' : '' }}>
                                     {{ explode(' -', $usr->name)[0] }}
                                 </option>
@@ -198,13 +219,74 @@
                         <label>Agent</label>
                     </div>
                 </div>
+                <div class="col-md-4">
+                    <div class="form-floating form-floating-outline">
+                        <select name="department" class="form-select" onchange="this.form.elements['agent'].value=''; this.form.submit()">
+                            <option value="">Select a department</option>
+                            @foreach($departments as $dept)
+                                <option value="{{ $dept->id }}" {{ $department && $department->id === $dept->id ? 'selected' : '' }}>
+                                    {{ $dept->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                        <label>Department (all users)</label>
+                    </div>
+                </div>
             </form>
 
-            @if(!$calendarUser)
-                <p class="text-muted text-center py-5 mb-0">Select an agent above to view their attendance calendar.</p>
+            @if($department)
+                <div class="d-flex justify-content-between align-items-center mb-3 no-print">
+                    <a href="{{ route('attendance.index', ['view' => 'calendar', 'department' => $department->id, 'month' => $month->copy()->subMonth()->format('Y-m')]) }}" class="btn btn-sm btn-outline-secondary">
+                        <i class="mdi mdi-chevron-left"></i> Prev
+                    </a>
+                    <h5 class="mb-0">{{ $department->name }} &mdash; {{ $month->format('F Y') }}</h5>
+                    <a href="{{ route('attendance.index', ['view' => 'calendar', 'department' => $department->id, 'month' => $month->copy()->addMonth()->format('Y-m')]) }}" class="btn btn-sm btn-outline-secondary">
+                        Next <i class="mdi mdi-chevron-right"></i>
+                    </a>
+                </div>
+
+                @forelse($departmentCalendars as $cal)
+                    @php
+                        $calName = explode(' -', $cal['user']->name)[0];
+                        $calInitials = strtoupper(collect(explode(' ', trim($calName)))->map(fn ($p) => mb_substr($p, 0, 1))->take(2)->implode('')) ?: '?';
+                    @endphp
+                    <div class="attendance-user-calendar mb-5">
+                        <div class="attendance-user-head d-flex flex-wrap justify-content-between align-items-center mb-2">
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="attendance-user-initials">{{ $calInitials }}</span>
+                                <h5 class="mb-0">{{ $calName }}
+                                    <small class="text-muted fw-normal">&mdash; {{ $department->name }} &middot; {{ $month->format('F Y') }}</small>
+                                </h5>
+                            </div>
+                            <div class="d-flex gap-3">
+                                <span class="badge bg-label-success">On-Time: {{ $cal['onTimeCount'] }}</span>
+                                <span class="badge bg-label-warning">Late: {{ $cal['lateCount'] }}</span>
+                                <span class="badge bg-label-danger">Absent: {{ $cal['absentCount'] }}</span>
+                                <span class="badge bg-label-info">Half Day: {{ $cal['halfDayCount'] }}</span>
+                            </div>
+                        </div>
+                        @include('pages.partials.attendance-calendar-grid', [
+                            'weeks' => $cal['weeks'], 'records' => $cal['records'], 'month' => $month, 'joinedAt' => $cal['joinedAt'],
+                        ])
+                    </div>
+                @empty
+                    <p class="text-muted text-center py-5 mb-0">No active users in this department.</p>
+                @endforelse
+
+                <div class="d-flex flex-wrap gap-4 no-print">
+                    <div class="d-flex align-items-center gap-2"><span class="badge rounded-pill bg-label-success">&nbsp;</span> On-Time</div>
+                    <div class="d-flex align-items-center gap-2"><span class="badge rounded-pill bg-label-warning">&nbsp;</span> Late</div>
+                    <div class="d-flex align-items-center gap-2"><span class="badge rounded-pill bg-label-danger">&nbsp;</span> Absent</div>
+                    <div class="d-flex align-items-center gap-2"><span class="badge rounded-pill bg-label-secondary">&nbsp;</span> Weekend</div>
+                    <div class="d-flex align-items-center gap-2"><span class="badge bg-info">Half Day</span> Half Day</div>
+                    <div class="d-flex align-items-center gap-2"><span class="badge rounded-pill bg-light border">&nbsp;</span> Outside Month</div>
+                </div>
+            @elseif(!$calendarUser)
+                <p class="text-muted text-center py-5 mb-0">Select an agent or a department above to view attendance calendars.</p>
             @else
+                <div class="attendance-user-calendar">
                 <div class="row mb-4 g-4">
-                    <div class="col-sm-6 col-lg-4">
+                    <div class="col-sm-6 col-lg-3">
                         <div class="card h-100">
                             <div class="card-body d-flex align-items-center gap-3">
                                 <span class="badge rounded-pill bg-label-success p-2"><i class="mdi mdi-check-circle-outline mdi-24px"></i></span>
@@ -215,7 +297,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-sm-6 col-lg-4">
+                    <div class="col-sm-6 col-lg-3">
                         <div class="card h-100">
                             <div class="card-body d-flex align-items-center gap-3">
                                 <span class="badge rounded-pill bg-label-warning p-2"><i class="mdi mdi-clock-alert-outline mdi-24px"></i></span>
@@ -226,13 +308,24 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-sm-6 col-lg-4">
+                    <div class="col-sm-6 col-lg-3">
                         <div class="card h-100">
                             <div class="card-body d-flex align-items-center gap-3">
                                 <span class="badge rounded-pill bg-label-danger p-2"><i class="mdi mdi-close-circle-outline mdi-24px"></i></span>
                                 <div>
                                     <h5 class="mb-0">{{ $absentCount }}</h5>
                                     <small class="text-muted">Absent</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-lg-3">
+                        <div class="card h-100">
+                            <div class="card-body d-flex align-items-center gap-3">
+                                <span class="badge rounded-pill bg-label-info p-2"><i class="mdi mdi-timer-half mdi-24px"></i></span>
+                                <div>
+                                    <h5 class="mb-0">{{ $halfDayCount }}</h5>
+                                    <small class="text-muted">Half Day</small>
                                 </div>
                             </div>
                         </div>
@@ -249,64 +342,7 @@
                     </a>
                 </div>
 
-                <div class="table-responsive">
-                    <table class="table table-bordered text-center align-middle mb-3">
-                        <thead>
-                            <tr>
-                                <th>Sun</th>
-                                <th>Mon</th>
-                                <th>Tue</th>
-                                <th>Wed</th>
-                                <th>Thu</th>
-                                <th>Fri</th>
-                                <th>Sat</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @php $today = now('Asia/Karachi')->startOfDay(); @endphp
-                            @foreach($weeks as $week)
-                                <tr>
-                                    @foreach($week as $day)
-                                        @php
-                                            $key = $day->format('Y-m-d');
-                                            $inMonth = $day->month === $month->month;
-                                            $record = $records->get($key);
-                                            $isToday = $day->isToday();
-
-                                            $cellClass = 'text-muted';
-                                            $label = null;
-                                            if ($inMonth && $record) {
-                                                if ($record->is_late) {
-                                                    $cellClass = 'bg-label-warning';
-                                                    $label = 'Late';
-                                                } else {
-                                                    $cellClass = 'bg-label-success';
-                                                    $label = 'On-Time';
-                                                }
-                                            } elseif ($inMonth && $day->isWeekend()) {
-                                                $cellClass = 'bg-label-secondary';
-                                                $label = 'Weekend';
-                                            } elseif ($inMonth && $joinedAt && $day->lt($joinedAt)) {
-                                                // Not yet a user on this day — not absent, just doesn't apply.
-                                                $cellClass = 'text-muted bg-light';
-                                            } elseif ($inMonth && $day->lt($today)) {
-                                                $cellClass = 'bg-label-danger';
-                                                $label = 'Absent';
-                                            } elseif (!$inMonth) {
-                                                $cellClass = 'text-muted bg-light';
-                                            }
-                                        @endphp
-                                        <td class="{{ $cellClass }}" style="height: 70px; vertical-align: top; {{ $isToday ? 'outline: 2px solid var(--bs-primary); outline-offset: -2px;' : '' }}">
-                                            <div class="fw-semibold">{{ $day->day }}</div>
-                                            @if($label)
-                                                <small class="d-block">{{ $label }}</small>
-                                            @endif
-                                        </td>
-                                    @endforeach
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                @include('pages.partials.attendance-calendar-grid', ['weeks' => $weeks, 'records' => $records, 'month' => $month, 'joinedAt' => $joinedAt])
                 </div>
 
                 <div class="d-flex flex-wrap gap-4 no-print">
@@ -321,6 +357,9 @@
                     </div>
                     <div class="d-flex align-items-center gap-2">
                         <span class="badge rounded-pill bg-label-secondary">&nbsp;</span> Weekend
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge bg-info">Half Day</span> Half Day
                     </div>
                     <div class="d-flex align-items-center gap-2">
                         <span class="badge rounded-pill bg-light border">&nbsp;</span> Outside Month
