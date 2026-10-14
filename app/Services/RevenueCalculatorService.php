@@ -4,6 +4,8 @@ namespace App\Services;
 
 use App\Models\Invoice;
 use App\Models\InvoiceServiceCharges;
+use App\Models\Role;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
@@ -156,6 +158,28 @@ class RevenueCalculatorService
                     'amount' => (float) $invoice->total_amount,
                 ];
             });
+    }
+
+    /**
+     * Names offered in the table's Agent / Closer filter dropdowns: every
+     * TSR, Closer (incl. Closer - Sales Manager), Customer Support and
+     * Manager Customer Support, active or not (former staff's sales are
+     * still in the table, so they stay filterable). Other roles aren't listed.
+     * Names use the same first-name form the table cells show, so the
+     * dropdown value matches the cell text it searches.
+     */
+    public function filterUserNames(): Collection
+    {
+        $roleIds = Role::whereIn('name', [
+            'TSR', ...Role::CLOSER_ROLES, 'Customer Support', 'Manager Customer Support',
+        ])->pluck('id');
+
+        return User::whereIn('role_id', $roleIds)
+            ->pluck('name')
+            ->map(fn ($name) => $this->firstName($name))
+            ->unique()
+            ->sort()
+            ->values();
     }
 
     /**

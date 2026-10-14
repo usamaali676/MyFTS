@@ -31,6 +31,7 @@ class SaleReportController extends Controller
             'kpis' => $revenue->kpis($range['from'], $range['to']),
             'trend' => $revenue->trend($range['from'], $range['to']),
             'invoices' => $revenue->invoiceRows($range['from'], $range['to']),
+            'filterUserNames' => $revenue->filterUserNames(),
         ]);
     }
 

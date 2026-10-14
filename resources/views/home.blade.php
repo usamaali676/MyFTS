@@ -7,6 +7,65 @@ $user = Auth::user();
 @section('styles')
 <link rel="stylesheet" href="{{ asset('assets/css/dashboard-enhance.css') }}" />
 @endsection
+@section('css')
+<style>
+    .break-list-avatar { width: 48px; height: 48px; object-fit: cover; border-radius: 10%; background: #f1f0ff; }
+    .break-list-avatar { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+
+    .break-list-row-link {
+        padding: 0.5rem 0.65rem;
+        margin: 0 -0.65rem 0.5rem !important;
+        border: 1px solid transparent;
+        border-radius: 0.75rem;
+        cursor: pointer;
+        transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+    }
+    /* accent bar that grows in on the left edge */
+    .break-list-row-link::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 18%;
+        bottom: 18%;
+        width: 3px;
+        border-radius: 3px;
+        background: linear-gradient(180deg, #7a7fff, #5f5aec);
+        opacity: 0;
+        transform: scaleY(0.3);
+        transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+    .break-list-row-link:hover,
+    .break-list-row-link:focus-within {
+        background: linear-gradient(90deg, rgba(122, 127, 255, 0.14), rgba(122, 127, 255, 0.03));
+        border-color: rgba(95, 90, 236, 0.2);
+        box-shadow: 0 0.4rem 1rem rgba(95, 90, 236, 0.14);
+        transform: translateX(3px);
+    }
+    .break-list-row-link:hover::before,
+    .break-list-row-link:focus-within::before { opacity: 1; transform: scaleY(1); }
+    .break-list-row-link:hover .break-list-avatar,
+    .break-list-row-link:focus-within .break-list-avatar {
+        transform: scale(1.06);
+        box-shadow: 0 0 0 3px rgba(95, 90, 236, 0.28);
+    }
+    .break-list-row-link h6 { transition: color 0.2s ease; }
+    .break-list-row-link:hover h6,
+    .break-list-row-link:focus-within h6 { color: #5f5aec; }
+    /* "opens profile" cue next to the name */
+    .break-list-go {
+        display: inline-block;
+        font-size: 0.95rem;
+        vertical-align: -2px;
+        opacity: 0;
+        transform: translate(-6px, 4px);
+        transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+    .break-list-row-link:hover .break-list-go,
+    .break-list-row-link:focus-within .break-list-go { opacity: 1; transform: translate(0, 0); }
+    .break-list-row-link .stretched-link:focus-visible { outline: none; }
+    .break-list-row-link:has(.stretched-link:focus-visible) { outline: 2px solid rgba(95, 90, 236, 0.55); outline-offset: 1px; }
+</style>
+@endsection
 @section('content')
 
 <div class="container-xxl flex-grow-1 container-p-y dashboard-enhanced">
@@ -340,6 +399,16 @@ $user = Auth::user();
         </div>
         <!--/ Multiple widgets -->
         @php
+            // Name for the break list. The "opens profile" arrow is glued to the
+            // last word (text-nowrap) so it can never wrap onto its own line.
+            $breakName = function (string $name, bool $withArrow) {
+                $parts = explode(' ', $name);
+                $last = array_pop($parts);
+                $head = $parts ? e(implode(' ', $parts)) . ' ' : '';
+                $arrow = $withArrow ? '<i class="mdi mdi-arrow-top-right break-list-go ms-1"></i>' : '';
+
+                return new \Illuminate\Support\HtmlString($head . '<span class="text-nowrap">' . e($last) . $arrow . '</span>');
+            };
             $breakTypeIcons = [
                 'mealBreak'  => ['icon' => 'mdi-food-fork-drink', 'label' => 'Meal Break'],
                 '2ndBreak'   => ['icon' => 'mdi-coffee', 'label' => '2nd Break'],
@@ -368,18 +437,17 @@ $user = Auth::user();
                                             $onBreak = (bool) $userActiveBreak;
                                             $breakIcon = $onBreak ? ($breakTypeIcons[$userActiveBreak->break_type] ?? null) : null;
                                         @endphp
-                                        <li class="d-flex mb-4">
-                                            <div class="avatar avatar-md flex-shrink-0 me-3">
-                                                <div class="avatar-initial bg-lighter rounded">
-                                                    <div>
-                                                        <img src="{{ asset('assets/img/avatars/5.png') }}" alt="User"
-                                                            class="h-25" style="border-radius: 10%" />
-                                                    </div>
-                                                </div>
-                                            </div>
+                                        @php $canOpenProfile = $user->canViewProfileOf($b_user); @endphp
+                                        <li class="d-flex mb-4 position-relative {{ $canOpenProfile ? 'break-list-row-link' : '' }}">
+                                            @if($canOpenProfile)
+                                                <a href="{{ route('profile.show', $b_user->id) }}" class="stretched-link" title="View profile"
+                                                    aria-label="View {{ $b_user->name }}'s profile"></a>
+                                            @endif
+                                            <img src="{{ $b_user->avatar_url ?? asset('assets/img/avatars/5.png') }}" alt="{{ $b_user->name }}"
+                                                class="flex-shrink-0 me-3 break-list-avatar" />
                                             <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
                                                 <div class="me-2">
-                                                    <h6 class="mb-0">{{ $b_user->name }}</h6>
+                                                    <h6 class="mb-0">{{ $breakName($b_user->name, $canOpenProfile) }}</h6>
                                                     @if ($onBreak && $breakIcon)
                                                         <div class="my-1">
                                                             <span class="badge bg-label-warning rounded-pill d-inline-flex align-items-center gap-1 px-2 py-1"
@@ -423,18 +491,17 @@ $user = Auth::user();
                                             $onBreak = (bool) $userActiveBreak;
                                             $breakIcon = $onBreak ? ($breakTypeIcons[$userActiveBreak->break_type] ?? null) : null;
                                         @endphp
-                                        <li class="d-flex mb-4">
-                                            <div class="avatar avatar-md flex-shrink-0 me-3">
-                                                <div class="avatar-initial bg-lighter rounded">
-                                                    <div>
-                                                        <img src="{{ asset('assets/img/avatars/5.png') }}" alt="User"
-                                                            class="h-25" style="border-radius: 10%" />
-                                                    </div>
-                                                </div>
-                                            </div>
+                                        @php $canOpenProfile = $user->canViewProfileOf($tsr_users); @endphp
+                                        <li class="d-flex mb-4 position-relative {{ $canOpenProfile ? 'break-list-row-link' : '' }}">
+                                            @if($canOpenProfile)
+                                                <a href="{{ route('profile.show', $tsr_users->id) }}" class="stretched-link" title="View profile"
+                                                    aria-label="View {{ $tsr_users->name }}'s profile"></a>
+                                            @endif
+                                            <img src="{{ $tsr_users->avatar_url ?? asset('assets/img/avatars/5.png') }}" alt="{{ $tsr_users->name }}"
+                                                class="flex-shrink-0 me-3 break-list-avatar" />
                                             <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
                                                 <div class="me-2">
-                                                    <h6 class="mb-0">{{ $tsr_users->name }}</h6>
+                                                    <h6 class="mb-0">{{ $breakName($tsr_users->name, $canOpenProfile) }}</h6>
                                                     @if ($onBreak && $breakIcon)
                                                         <div class="my-1">
                                                             <span class="badge bg-label-warning rounded-pill d-inline-flex align-items-center gap-1 px-2 py-1"
@@ -477,18 +544,17 @@ $user = Auth::user();
                                             $onBreak = (bool) $userActiveBreak;
                                             $breakIcon = $onBreak ? ($breakTypeIcons[$userActiveBreak->break_type] ?? null) : null;
                                         @endphp
-                                        <li class="d-flex mb-4">
-                                            <div class="avatar avatar-md flex-shrink-0 me-3">
-                                                <div class="avatar-initial bg-lighter rounded">
-                                                    <div>
-                                                        <img src="{{ asset('assets/img/avatars/5.png') }}" alt="User"
-                                                            class="h-25" style="border-radius: 10%" />
-                                                    </div>
-                                                </div>
-                                            </div>
+                                        @php $canOpenProfile = $user->canViewProfileOf($csr_users); @endphp
+                                        <li class="d-flex mb-4 position-relative {{ $canOpenProfile ? 'break-list-row-link' : '' }}">
+                                            @if($canOpenProfile)
+                                                <a href="{{ route('profile.show', $csr_users->id) }}" class="stretched-link" title="View profile"
+                                                    aria-label="View {{ $csr_users->name }}'s profile"></a>
+                                            @endif
+                                            <img src="{{ $csr_users->avatar_url ?? asset('assets/img/avatars/5.png') }}" alt="{{ $csr_users->name }}"
+                                                class="flex-shrink-0 me-3 break-list-avatar" />
                                             <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
                                                 <div class="me-2">
-                                                    <h6 class="mb-0">{{ $csr_users->name }}</h6>
+                                                    <h6 class="mb-0">{{ $breakName($csr_users->name, $canOpenProfile) }}</h6>
                                                     @if ($onBreak && $breakIcon)
                                                         <div class="my-1">
                                                             <span class="badge bg-label-warning rounded-pill d-inline-flex align-items-center gap-1 px-2 py-1"

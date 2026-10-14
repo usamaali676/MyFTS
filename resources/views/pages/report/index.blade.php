@@ -60,8 +60,8 @@
                 <h5 class="card-header">Sales / Invoices</h5>
                 <div class="card-datatable table-responsive">
                     @php
-                        $agentOptions = $invoices->pluck('agent')->filter()->unique()->sort()->values();
-                        $closerOptions = $invoices->flatMap(fn($r) => collect($r['closers'])->pluck('name'))->filter()->unique()->sort()->values();
+                        $agentOptions = $filterUserNames;
+                        $closerOptions = $filterUserNames;
                         $typeOptions = $invoices->flatMap(fn($r) => $r['types'])->filter()->unique()->sort()->values();
                     @endphp
                     <table id="salesReportTable" class="table table-bordered">
@@ -148,6 +148,15 @@
                                 </tr>
                             @endforeach
                         </tbody>
+                        <tfoot>
+                            <tr class="table-light">
+                                <th colspan="5" class="text-end">
+                                    Total <span class="text-muted fw-normal" id="reportTotalNote"></span>
+                                </th>
+                                <th id="reportTotalAmount">$0.00</th>
+                                <th></th>
+                            </tr>
+                        </tfoot>
                     </table>
                 </div>
             </div>
@@ -174,6 +183,19 @@
     <script>
         var salesReportTable = $('#salesReportTable').DataTable({
             orderCellsTop: true,
+            // Total of the Amount column across every row that passes the
+            // current column filters and the search box (all pages, not just
+            // the visible one), so filtering to one agent/closer/service
+            // shows what that selection adds up to.
+            footerCallback: function () {
+                var api = this.api();
+                var amounts = api.column(5, { search: 'applied' }).data().toArray();
+                var total = amounts.reduce(function (sum, cell) {
+                    return sum + (parseFloat(String(cell).replace(/[^0-9.\-]/g, '')) || 0);
+                }, 0);
+                $('#reportTotalAmount').text('$' + total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+                $('#reportTotalNote').text('(' + amounts.length + ' ' + (amounts.length === 1 ? 'sale' : 'sales') + ')');
+            },
             language: window.rsEmptyStateHTML ? { emptyTable: rsEmptyStateHTML('invoices') } : undefined
         });
 

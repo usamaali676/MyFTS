@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Helpers\GlobalHelper;
 use App\Models\User;
+use App\Services\AvatarService;
 use App\Services\ProfileStatsService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use InvalidArgumentException;
 use RealRashid\SweetAlert\Facades\Alert;
 
 class ProfileController extends Controller
@@ -22,15 +23,7 @@ class ProfileController extends Controller
         $target = $id ? User::findOrFail($id) : $viewer;
 
         if ($id && (int) $id !== (int) $viewer->id) {
-            // Admin/Executives can browse any profile; anyone else who can
-            // view the Sale Report can drill into an agent/closer named
-            // there, since they already see that person's sales and
-            // revenue in that table.
-            $canViewOthers = (int) $viewer->role_id === 1
-                || optional($viewer->role)->name === 'Executives'
-                || GlobalHelper::modulePermission($viewer, 'salereport')->view;
-
-            if (!$canViewOthers) {
+            if (!$viewer->canViewProfileOf($target)) {
                 Alert::error('Oops', "You don't have access to this page");
                 return redirect()->route('home');
             }
@@ -49,5 +42,45 @@ class ProfileController extends Controller
             'customFrom' => $from,
             'customTo' => $to,
         ]));
+    }
+
+    /**
+     * Users change only their own photo. The upload is auto-cropped and
+     * compressed to <= 100 KB server-side, so any photo size is accepted.
+     */
+    public function updateAvatar(Request $request, AvatarService $avatars)
+    {
+        $request->validate([
+            'photo' => ['required', 'file', 'max:20480'],
+        ], [
+            'photo.required' => 'Please choose a photo first.',
+            'photo.max' => 'That file is too large (20 MB max).',
+        ]);
+
+        $user = Auth::user();
+
+        try {
+            $avatars->store($request->file('photo'), $user);
+        } catch (InvalidArgumentException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        } catch (\Throwable $e) {
+            report($e);
+
+            return response()->json([
+                'message' => 'Something went wrong while saving the photo. Please try a different image.',
+            ], 500);
+        }
+
+        return response()->json([
+            'message' => 'Profile photo updated.',
+            'url' => $user->fresh()->avatar_url,
+        ]);
+    }
+
+    public function removeAvatar(AvatarService $avatars)
+    {
+        $avatars->remove(Auth::user());
+
+        return response()->json(['message' => 'Profile photo removed.']);
     }
 }

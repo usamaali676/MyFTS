@@ -212,6 +212,12 @@ Route::controller(RoleController::class)
     Route::get('profile/{id?}', [ProfileController::class, 'show'])
         ->middleware('auth')
         ->name('profile.show');
+    Route::post('profile/avatar', [ProfileController::class, 'updateAvatar'])
+        ->middleware('auth')
+        ->name('profile.avatar.update');
+    Route::post('profile/avatar/remove', [ProfileController::class, 'removeAvatar'])
+        ->middleware('auth')
+        ->name('profile.avatar.remove');
 
     Route::controller(BankAccountController::class)
     ->prefix('settings/bank-account')
