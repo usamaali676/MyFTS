@@ -13,6 +13,15 @@ class Role extends Model
     use HasFactory;
     use SoftDeletes;
     use Searchable;
+
+    public const CLOSER = 'Closer';
+
+    // A Closer with oversight of the TSR and Closer teams. Everywhere the
+    // app treats someone as a closer, this role counts too (CLOSER_ROLES).
+    public const CLOSER_SALES_MANAGER = 'Closer - Sales Manager';
+
+    public const CLOSER_ROLES = [self::CLOSER, self::CLOSER_SALES_MANAGER];
+
     protected $dates = ['deleted_at'];
     protected $gaurd_name = 'web';
 

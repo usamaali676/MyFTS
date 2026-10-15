@@ -1,0 +1,81 @@
+.attendance-print-header { display: none; }
+
+.attendance-user-initials {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: #fff;
+    background: linear-gradient(135deg, #7a7fff, #5f5aec);
+}
+
+@media print {
+    @page { size: A4 landscape; margin: 10mm; }
+
+    * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    body, .layout-page, .content-wrapper { background: #fff !important; }
+    .layout-navbar, #layout-menu, .no-print, .content-backdrop, .layout-overlay, .drag-target { display: none !important; }
+    .layout-page, .layout-content-navbar .layout-page { padding: 0 !important; margin: 0 !important; }
+    .container-p-y { padding: 0 !important; }
+    .container-xxl { max-width: 100% !important; padding: 0 !important; }
+    .sale-report-enhanced > .card { border: 0 !important; box-shadow: none !important; }
+    .sale-report-enhanced .card-body { padding: 0 !important; }
+
+    .attendance-print-header {
+        display: flex !important;
+        justify-content: space-between;
+        align-items: center;
+        padding: 14px 20px;
+        margin-bottom: 14px;
+        border-radius: 10px;
+        color: #fff;
+        background: linear-gradient(120deg, #5f5aec, #8b7bff) !important;
+    }
+    .attendance-print-header h2 { margin: 0; font-size: 20px; font-weight: 700; color: #fff; }
+    .attendance-print-header .sub { font-size: 12px; opacity: 0.9; margin-top: 2px; }
+    .attendance-print-header .meta { text-align: right; font-size: 11px; opacity: 0.95; }
+
+    .attendance-user-calendar {
+        page-break-inside: avoid;
+        break-inside: avoid;
+        border: 1px solid #e3e6f0;
+        border-radius: 10px;
+        overflow: hidden;
+        margin-bottom: 14px !important;
+    }
+    .attendance-user-calendar .attendance-user-head {
+        padding: 8px 14px;
+        background: #f1f0ff !important;
+        border-bottom: 2px solid #5f5aec;
+    }
+    .attendance-user-calendar .attendance-user-head h5 { font-size: 14px; }
+    .attendance-user-calendar .table-responsive { padding: 8px 10px 0; }
+    .attendance-user-calendar table { margin-bottom: 8px !important; }
+    .attendance-user-calendar thead th {
+        background: #5f5aec !important;
+        color: #fff !important;
+        font-size: 10px;
+        padding: 4px 0;
+        border-color: #5f5aec !important;
+    }
+    .attendance-user-calendar td { height: 46px !important; font-size: 11px; padding: 3px !important; outline: none !important; }
+    .attendance-user-calendar td .fw-semibold { font-size: 12px; }
+
+    .bg-label-success { background: #d8f5e3 !important; color: #14803f !important; }
+    .bg-label-warning { background: #ffeccb !important; color: #a35f00 !important; }
+    .bg-label-danger  { background: #fddede !important; color: #b3261e !important; }
+    .bg-label-secondary { background: #e9ebf0 !important; color: #6b7280 !important; }
+    .bg-label-info { background: #d6efff !important; color: #0b6fa8 !important; }
+    .bg-light { background: #f7f8fa !important; }
+    .badge.bg-info { background: #1d9bf0 !important; color: #fff !important; }
+
+    .attendance-user-calendar .badge { font-weight: 700; }
+}

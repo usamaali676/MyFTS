@@ -23,16 +23,38 @@
             .layout-menu-fixed:not(.layout-menu-collapsed) .layout-page, .layout-menu-fixed-offcanvas:not(.layout-menu-collapsed) .layout-page{
                 padding-left: 0px !important;
             }
+            .attendance-user-calendar{
+                page-break-inside: avoid;
+                break-inside: avoid;
+            }
         }
     </style>
+    <link rel="stylesheet" href="{{ asset('assets/css/sale-report-enhance.css') }}" />
+    <link rel="stylesheet" href="{{ asset('assets/css/attendance-print.css') }}" />
 
 @endsection
 @section('content')
 <div class="content-wrapper">
     <!-- Content -->
 
-    <div class="container-xxl flex-grow-1 container-p-y">
-      <h4 class="py-3 mb-4"><span class="text-muted fw-light">User's /</span> Attendance  </h4>
+    <div class="container-xxl flex-grow-1 container-p-y sale-report-enhanced">
+      <h4 class="py-3 mb-4 no-print"><span class="text-muted fw-light">User's /</span> Attendance  </h4>
+
+      @if($view === 'calendar' && ($department || $calendarUser))
+      <div class="attendance-print-header">
+          <div>
+              <h2>Attendance Report</h2>
+              <div class="sub">
+                  {{ $department ? $department->name . ' Department' : explode(' -', $calendarUser->name)[0] }}
+                  &middot; {{ $month->format('F Y') }}
+              </div>
+          </div>
+          <div class="meta">
+              <div><strong>MY FTS</strong></div>
+              <div>Generated {{ now('Asia/Karachi')->format('d M Y, h:i A') }}</div>
+          </div>
+      </div>
+      @endif
 
       <!-- Product List Widget -->
 
@@ -110,11 +132,23 @@
       <!-- Product List Table -->
       <div class="card">
         <div class="card-header no-print">
-            <div class="d-flex" style="justify-content: space-between;">
+            <div class="d-flex flex-wrap gap-3" style="justify-content: space-between;">
                 <h5 class="card-title" style="margin: auto 0px;">Filter</h5>
-                <button id="print" type="btn" onclick="(function() { window.print(); })()" class="btn btn-primary waves-effect waves-light ">Print</button>
+                <div class="d-flex align-items-center gap-3">
+                    <div class="btn-group" role="group" aria-label="View toggle">
+                        <a href="{{ route('attendance.index', array_filter(['view' => 'list', 'agent' => $calendarUserId])) }}"
+                           class="btn btn-sm {{ $view === 'list' ? 'btn-primary' : 'btn-outline-primary' }}">
+                            <i class="mdi mdi-table"></i> List
+                        </a>
+                        <a href="{{ route('attendance.index', array_filter(['view' => 'calendar', 'agent' => $calendarUserId])) }}"
+                           class="btn btn-sm {{ $view === 'calendar' ? 'btn-primary' : 'btn-outline-primary' }}">
+                            <i class="mdi mdi-calendar-month-outline"></i> Calendar
+                        </a>
+                    </div>
+                    <button id="print" type="btn" onclick="(function() { window.print(); })()" class="btn btn-primary waves-effect waves-light ">Print</button>
+                </div>
             </div>
-          <div class="d-flex justify-content-between align-items-center row py-3 gap-3 gap-md-0 no-print">
+          <div class="d-flex justify-content-between align-items-center row py-3 gap-3 gap-md-0 no-print" @if($view === 'calendar') style="display:none !important;" @endif>
             <div class="col-md-4 product_status">
                           <div class="form-floating form-floating-outline">
                             <input type="text" id="flatpickr-range" class="form-control" />
@@ -167,6 +201,173 @@
             </div>
           </div>
         </div>
+        @if($view === 'calendar')
+        <div class="card-body">
+            <form method="GET" action="{{ route('attendance.index') }}" class="row g-3 align-items-end mb-4 no-print">
+                <input type="hidden" name="view" value="calendar">
+                <input type="hidden" name="month" value="{{ $month->format('Y-m') }}">
+                <div class="col-md-4">
+                    <div class="form-floating form-floating-outline">
+                        <select name="agent" class="form-select" onchange="this.form.elements['department'].value=''; this.form.submit()">
+                            <option value="">Select an agent</option>
+                            @foreach($activeUsers as $usr)
+                                <option value="{{ $usr->id }}" {{ $calendarUser && $calendarUser->id === $usr->id ? 'selected' : '' }}>
+                                    {{ explode(' -', $usr->name)[0] }}
+                                </option>
+                            @endforeach
+                        </select>
+                        <label>Agent</label>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-floating form-floating-outline">
+                        <select name="department" class="form-select" onchange="this.form.elements['agent'].value=''; this.form.submit()">
+                            <option value="">Select a department</option>
+                            @foreach($departments as $dept)
+                                <option value="{{ $dept->id }}" {{ $department && $department->id === $dept->id ? 'selected' : '' }}>
+                                    {{ $dept->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                        <label>Department (all users)</label>
+                    </div>
+                </div>
+            </form>
+
+            @if($department)
+                <div class="d-flex justify-content-between align-items-center mb-3 no-print">
+                    <a href="{{ route('attendance.index', ['view' => 'calendar', 'department' => $department->id, 'month' => $month->copy()->subMonth()->format('Y-m')]) }}" class="btn btn-sm btn-outline-secondary">
+                        <i class="mdi mdi-chevron-left"></i> Prev
+                    </a>
+                    <h5 class="mb-0">{{ $department->name }} &mdash; {{ $month->format('F Y') }}</h5>
+                    <a href="{{ route('attendance.index', ['view' => 'calendar', 'department' => $department->id, 'month' => $month->copy()->addMonth()->format('Y-m')]) }}" class="btn btn-sm btn-outline-secondary">
+                        Next <i class="mdi mdi-chevron-right"></i>
+                    </a>
+                </div>
+
+                @forelse($departmentCalendars as $cal)
+                    @php
+                        $calName = explode(' -', $cal['user']->name)[0];
+                        $calInitials = strtoupper(collect(explode(' ', trim($calName)))->map(fn ($p) => mb_substr($p, 0, 1))->take(2)->implode('')) ?: '?';
+                    @endphp
+                    <div class="attendance-user-calendar mb-5">
+                        <div class="attendance-user-head d-flex flex-wrap justify-content-between align-items-center mb-2">
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="attendance-user-initials">{{ $calInitials }}</span>
+                                <h5 class="mb-0">{{ $calName }}
+                                    <small class="text-muted fw-normal">&mdash; {{ $department->name }} &middot; {{ $month->format('F Y') }}</small>
+                                </h5>
+                            </div>
+                            <div class="d-flex gap-3">
+                                <span class="badge bg-label-success">On-Time: {{ $cal['onTimeCount'] }}</span>
+                                <span class="badge bg-label-warning">Late: {{ $cal['lateCount'] }}</span>
+                                <span class="badge bg-label-danger">Absent: {{ $cal['absentCount'] }}</span>
+                                <span class="badge bg-label-info">Half Day: {{ $cal['halfDayCount'] }}</span>
+                            </div>
+                        </div>
+                        @include('pages.partials.attendance-calendar-grid', [
+                            'weeks' => $cal['weeks'], 'records' => $cal['records'], 'month' => $month, 'joinedAt' => $cal['joinedAt'],
+                        ])
+                    </div>
+                @empty
+                    <p class="text-muted text-center py-5 mb-0">No active users in this department.</p>
+                @endforelse
+
+                <div class="d-flex flex-wrap gap-4 no-print">
+                    <div class="d-flex align-items-center gap-2"><span class="badge rounded-pill bg-label-success">&nbsp;</span> On-Time</div>
+                    <div class="d-flex align-items-center gap-2"><span class="badge rounded-pill bg-label-warning">&nbsp;</span> Late</div>
+                    <div class="d-flex align-items-center gap-2"><span class="badge rounded-pill bg-label-danger">&nbsp;</span> Absent</div>
+                    <div class="d-flex align-items-center gap-2"><span class="badge rounded-pill bg-label-secondary">&nbsp;</span> Weekend</div>
+                    <div class="d-flex align-items-center gap-2"><span class="badge bg-info">Half Day</span> Half Day</div>
+                    <div class="d-flex align-items-center gap-2"><span class="badge rounded-pill bg-light border">&nbsp;</span> Outside Month</div>
+                </div>
+            @elseif(!$calendarUser)
+                <p class="text-muted text-center py-5 mb-0">Select an agent or a department above to view attendance calendars.</p>
+            @else
+                <div class="attendance-user-calendar">
+                <div class="row mb-4 g-4">
+                    <div class="col-sm-6 col-lg-3">
+                        <div class="card h-100">
+                            <div class="card-body d-flex align-items-center gap-3">
+                                <span class="badge rounded-pill bg-label-success p-2"><i class="mdi mdi-check-circle-outline mdi-24px"></i></span>
+                                <div>
+                                    <h5 class="mb-0">{{ $onTimeCount }}</h5>
+                                    <small class="text-muted">On-Time</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-lg-3">
+                        <div class="card h-100">
+                            <div class="card-body d-flex align-items-center gap-3">
+                                <span class="badge rounded-pill bg-label-warning p-2"><i class="mdi mdi-clock-alert-outline mdi-24px"></i></span>
+                                <div>
+                                    <h5 class="mb-0">{{ $lateCount }}</h5>
+                                    <small class="text-muted">Late</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-lg-3">
+                        <div class="card h-100">
+                            <div class="card-body d-flex align-items-center gap-3">
+                                <span class="badge rounded-pill bg-label-danger p-2"><i class="mdi mdi-close-circle-outline mdi-24px"></i></span>
+                                <div>
+                                    <h5 class="mb-0">{{ $absentCount }}</h5>
+                                    <small class="text-muted">Absent</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-lg-3">
+                        <div class="card h-100">
+                            <div class="card-body d-flex align-items-center gap-3">
+                                <span class="badge rounded-pill bg-label-info p-2"><i class="mdi mdi-timer-half mdi-24px"></i></span>
+                                <div>
+                                    <h5 class="mb-0">{{ $halfDayCount }}</h5>
+                                    <small class="text-muted">Half Day</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mb-3 no-print">
+                    <a href="{{ route('attendance.index', ['view' => 'calendar', 'agent' => $calendarUser->id, 'month' => $month->copy()->subMonth()->format('Y-m')]) }}" class="btn btn-sm btn-outline-secondary">
+                        <i class="mdi mdi-chevron-left"></i> Prev
+                    </a>
+                    <h5 class="mb-0">{{ explode(' -', $calendarUser->name)[0] }} &mdash; {{ $month->format('F Y') }}</h5>
+                    <a href="{{ route('attendance.index', ['view' => 'calendar', 'agent' => $calendarUser->id, 'month' => $month->copy()->addMonth()->format('Y-m')]) }}" class="btn btn-sm btn-outline-secondary">
+                        Next <i class="mdi mdi-chevron-right"></i>
+                    </a>
+                </div>
+
+                @include('pages.partials.attendance-calendar-grid', ['weeks' => $weeks, 'records' => $records, 'month' => $month, 'joinedAt' => $joinedAt])
+                </div>
+
+                <div class="d-flex flex-wrap gap-4 no-print">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge rounded-pill bg-label-success">&nbsp;</span> On-Time
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge rounded-pill bg-label-warning">&nbsp;</span> Late
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge rounded-pill bg-label-danger">&nbsp;</span> Absent
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge rounded-pill bg-label-secondary">&nbsp;</span> Weekend
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge bg-info">Half Day</span> Half Day
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge rounded-pill bg-light border">&nbsp;</span> Outside Month
+                    </div>
+                </div>
+            @endif
+        </div>
+        @else
         <div class="card-datatable table-responsive">
             {{-- <div class="dt-buttons btn-group flex-wrap"> <div class="btn-group"><button class="btn buttons-collection btn-label-primary dropdown-toggle me-4 waves-effect border-none" tabindex="0" aria-controls="attendance-table" type="button" aria-haspopup="dialog" aria-expanded="false"><span><span class="d-flex align-items-center gap-2"><i class="icon-base ri ri-external-link-line icon-18px"></i> <span class="d-none d-sm-inline-block">Export</span></span></span></button></div> <button class="btn create-new btn-primary" tabindex="0" aria-controls="DataTables_Table_0" type="button"><span><span class="d-flex align-items-center"><i class="icon-base ri ri-add-line icon-18px me-sm-1"></i><span class="d-none d-sm-inline-block">Add New Record</span></span></span></button> </div> --}}
 
@@ -203,13 +404,26 @@
                         }}</td>
                         {{-- <td>{{ $attendance->logout_time }}</td> --}}
                         <td>{{ $hours }} hours : {{ $remainingMinutes }} minutes</td>
-                        <td>{{ $attendance->is_late ? 'Yes' : 'No' }}</td>
-                        <td>{{ $attendance->half_day ? 'Yes' : 'No' }}</
+                        <td>
+                            @if($attendance->is_late)
+                                <span class="badge bg-label-danger">Yes</span>
+                            @else
+                                <span class="text-muted">No</span>
+                            @endif
+                        </td>
+                        <td>
+                            @if($attendance->half_day)
+                                <span class="badge bg-label-warning">Yes</span>
+                            @else
+                                <span class="text-muted">No</span>
+                            @endif
+                        </td>
                     </tr>
                 @endforeach
             </tbody>
           </table>
         </div>
+        @endif
       </div>
     </div>
     <!-- / Content -->
@@ -375,7 +589,10 @@
                             function formatTime(time) {
                                 if (!time) return '-';
 
-                                const dateObj = new Date('1970-01-01T' + time);
+                                // login_time/logout_time now come back as full
+                                // "YYYY-MM-DD HH:MM:SS" datetimes, not bare "HH:MM:SS"
+                                const timePart = time.includes(' ') ? time.split(' ')[1] : time;
+                                const dateObj = new Date('1970-01-01T' + timePart);
                                 return dateObj.toLocaleTimeString('en-US', {
                                     hour: '2-digit',
                                     minute: '2-digit',

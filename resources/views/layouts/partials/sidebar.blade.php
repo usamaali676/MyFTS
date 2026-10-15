@@ -1,7 +1,34 @@
 @php
     $user = auth()->user();
-    $salereport_perm = App\Models\Permission::where('role_id', $user->role_id)->where('name', "salereport")->first();
-    $attendance_perm = App\Models\Permission::where('role_id', $user->role_id)->where('name', "attendance")->first();
+    $salereport_perm = $user ? App\Models\Permission::where('role_id', $user->role_id)->where('name', "salereport")->first() : null;
+    $attendance_perm = $user ? App\Models\Permission::where('role_id', $user->role_id)->where('name', "attendance")->first() : null;
+    $calltranscription_perm = $user ? App\Models\Permission::where('role_id', $user->role_id)->where('name', "calltranscription")->first() : null;
+    $trainee_perm = $user ? App\Models\Permission::where('role_id', $user->role_id)->where('name', "trainee")->first() : null;
+    // Uses the admin-bypassing helper (unlike the raw lookups above) so
+    // admin never loses this link just because no Permission row exists yet.
+    $lead_perm = $user ? App\Helpers\GlobalHelper::modulePermission($user, 'lead') : (object) ['view' => false, 'create' => false];
+
+    // Settings: simple lookup/reference tables, each independently permission-gated.
+    $settingsModules = [
+        'bankaccount' => ['route' => 'bankaccount.index', 'label' => 'Bank Accounts'],
+        'businesscategory' => ['route' => 'businesscategory.index', 'label' => 'Business Categories'],
+        'subcategory' => ['route' => 'subcategory.index', 'label' => 'Sub Categories'],
+        'cashapp' => ['route' => 'cashapp.index', 'label' => 'CashApp Accounts'],
+        'companyservice' => ['route' => 'companyservice.index', 'label' => 'Company Services'],
+        'holiday' => ['route' => 'holiday.index', 'label' => 'Holidays'],
+        'merchantaccount' => ['route' => 'merchantaccount.index', 'label' => 'Merchant Accounts'],
+        'zelleaccount' => ['route' => 'zelleaccount.index', 'label' => 'Zelle Accounts'],
+    ];
+    $settingsPerms = [];
+    $settingsVisible = false;
+    if ($user) {
+        foreach ($settingsModules as $key => $module) {
+            $settingsPerms[$key] = App\Helpers\GlobalHelper::modulePermission($user, $key);
+            if ($settingsPerms[$key]->view) {
+                $settingsVisible = true;
+            }
+        }
+    }
 @endphp
 <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
     <div class="app-brand demo">
@@ -73,15 +100,18 @@
             $user = Auth::user();
         @endphp
     </div>
-    <span class="badge rounded-pill bg-primary" style="text-align: center; width: fit-content; margin: auto; padding: 7px 10px">{{ $user->name }}</span>
-    <p style="text-align: center; margin-bottom: 0px;" >{{ $user->role->name }}</p>
+    <div class="sidebar-user-card">
+        {{-- <div class="sidebar-user-avatar">{{ strtoupper(substr($user->name, 0, 1)) }}</div> --}}
+        <span class="sidebar-user-name">{{  explode(' -',   $user->name )[0]  }}</span>
+        <span class="sidebar-user-role">{{ $user->role->name }}</span>
+    </div>
 
 
     <div class="menu-inner-shadow"></div>
 
     <ul class="menu-inner py-1">
         <!-- Dashboards -->
-        <li class="menu-item active ">
+        <li class="menu-item {{ request()->routeIs('home') ? 'active' : '' }}">
             <a href="{{ route('home') }}" class="menu-link ">
                 <i class="menu-icon tf-icons mdi mdi-home-outline"></i>
                 <div data-i18n="Dashboards">Dashboards</div>
@@ -96,18 +126,18 @@
             <span class="menu-header-text" data-i18n="Apps & Pages">Apps &amp; Pages</span>
         </li>
         @if(isset($user) && $user->role_id == 1)
-        <li class="menu-item">
+        <li class="menu-item {{ request()->routeIs(['role.*', 'user.*']) ? 'active open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons mdi mdi-shield-outline"></i>
                 <div data-i18n="Roles & Permissions">Roles & Permissions</div>
             </a>
             <ul class="menu-sub">
-                <li class="menu-item">
+                <li class="menu-item {{ request()->routeIs('role.*') ? 'active' : '' }}">
                     <a href="{{ route('role.index') }}" class="menu-link">
                         <div data-i18n="Roles">Roles</div>
                     </a>
                 </li>
-                <li class="menu-item">
+                <li class="menu-item {{ request()->routeIs('user.*') ? 'active' : '' }}">
                     <a href="{{ route('user.index') }}" class="menu-link">
                         <div data-i18n="Users">Users</div>
                     </a>
@@ -120,44 +150,65 @@
             </ul>
         </li>
         @endif
-        <li class="menu-item">
+        @if($lead_perm->view)
+        <li class="menu-item {{ request()->routeIs('lead.*') ? 'active open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons mdi mdi-table"></i>
                 <div data-i18n="Leads">Leads</div>
             </a>
             <ul class="menu-sub">
-                <li class="menu-item">
+                <li class="menu-item {{ request()->routeIs('lead.index') ? 'active' : '' }}">
                     <a href="{{ route('lead.index') }}" class="menu-link">
                         <div data-i18n="View">View</div>
                     </a>
                 </li>
 
-                <li class="menu-item">
+                @if($lead_perm->create)
+                <li class="menu-item {{ request()->routeIs('lead.create') ? 'active' : '' }}">
                     <a href="{{ route('lead.create') }}" class="menu-link">
                         <div data-i18n="Create">Create</div>
                     </a>
                 </li>
+                @endif
             </ul>
         </li>
-         @if(isset($salereport_perm) && $salereport_perm->view == 1)
-        <li class="menu-item">
+        @endif
+        @if(isset($user) && \App\Services\SaleVisibilityService::canAccess($user))
+        <li class="menu-item {{ request()->routeIs('sale.index', 'sale.team') ? 'active open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
-                <i class="menu-icon icon-base ri ri-bar-chart-2-line"></i>
+                <i class="menu-icon tf-icons mdi mdi-cash-multiple"></i>
+                <div data-i18n="Sales">Sales</div>
+            </a>
+            <ul class="menu-sub">
+                <li class="menu-item {{ request()->routeIs('sale.index') ? 'active' : '' }}">
+                    <a href="{{ route('sale.index') }}" class="menu-link">
+                        <div data-i18n="View">View</div>
+                    </a>
+                </li>
+                @if(\App\Services\SaleVisibilityService::canAccessTeam($user))
+                <li class="menu-item {{ request()->routeIs('sale.team') ? 'active' : '' }}">
+                    <a href="{{ route('sale.team') }}" class="menu-link">
+                        <div data-i18n="Team Sales">Team Sales</div>
+                    </a>
+                </li>
+                @endif
+            </ul>
+        </li>
+        @endif
+         @if(isset($salereport_perm) && $salereport_perm->view == 1)
+        <li class="menu-item {{ request()->routeIs('salereport.*') ? 'active open' : '' }}">
+            <a href="javascript:void(0);" class="menu-link menu-toggle">
+                <i class="menu-icon icon-base mdi mdi-chart-line"></i>
                 <div data-i18n="Reports">Reports</div>
             </a>
             <ul class="menu-sub">
-                <li class="menu-item">
+                <li class="menu-item {{ request()->routeIs('salereport.index') ? 'active' : '' }}">
                     <a href="{{ route('salereport.index') }}" class="menu-link">
                         <div data-i18n="Sale Report">Sale Report</div>
                     </a>
                 </li>
 
-                <li class="menu-item">
-                    <a href="{{ route('salereport.edit') }}" class="menu-link">
-                        <div data-i18n="Yearly Report">Yearly Report</div>
-                    </a>
-                </li>
-                <li class="menu-item">
+                <li class="menu-item {{ request()->routeIs('salereport.update') ? 'active' : '' }}">
                     <a href="{{ route('salereport.update') }}" class="menu-link">
                         <div data-i18n="Support Report">Support Report</div>
                     </a>
@@ -191,7 +242,7 @@
             </ul>
         </li> --}}
         @if(isset($attendance_perm) && $attendance_perm->view == 1)
-        <li class="menu-item">
+        <li class="menu-item {{ request()->routeIs('attendance.*') ? 'active' : '' }}">
             <a href="{{ route('attendance.index') }}" class="menu-link ">
                 <i class="menu-icon tf-icons mdi mdi-calendar"></i>
                 <div data-i18n="Attendance">Attendance</div>
@@ -200,14 +251,42 @@
         </li>
         @endif
 
-        {{-- <li class="menu-item">
+        <li class="menu-item {{ request()->routeIs('ai.*') ? 'active' : '' }}">
             <a href="{{ route('ai.index') }}" class="menu-link">
                 <i class="menu-icon tf-icons mdi mdi-robot-outline"></i>
                 <div data-i18n="AI Assistant">AI Assistant</div>
             </a>
-        </li> --}}
+        </li>
 
+        @if(isset($calltranscription_perm) && $calltranscription_perm->view == 1)
+        <li class="menu-item {{ request()->routeIs('calltranscription.*') ? 'active' : '' }}">
+            <a href="{{ route('calltranscription.index') }}" class="menu-link">
+                <i class="menu-icon tf-icons mdi mdi-file-sign"></i>
+                <div data-i18n="Call Transcription">Call Transcription</div>
+            </a>
+        </li>
+        @endif
 
+        @if(isset($trainee_perm) && $trainee_perm->view == 1)
+        <li class="menu-item {{ request()->routeIs('trainee.*') ? 'active' : '' }}">
+            <a href="{{ route('trainee.index') }}" class="menu-link">
+                <i class="menu-icon tf-icons mdi mdi-school-outline"></i>
+                <div data-i18n="Trainees">Trainees</div>
+            </a>
+        </li>
+        @endif
+
+        @if($settingsVisible)
+        <li class="menu-header fw-medium mt-4">
+            <span class="menu-header-text" data-i18n="Settings">Settings</span>
+        </li>
+        <li class="menu-item {{ request()->routeIs('settings.index') || request()->routeIs(array_map(fn($m) => $m['route'], $settingsModules)) ? 'active' : '' }}">
+            <a href="{{ route('settings.index') }}" class="menu-link">
+                <i class="menu-icon tf-icons mdi mdi-cog-outline"></i>
+                <div data-i18n="Settings">Settings</div>
+            </a>
+        </li>
+        @endif
 
 
 

@@ -1,0 +1,153 @@
+/*
+  Visual-only enhancement layer for the Trainee module
+  (resources/views/pages/trainee/index.blade.php, create.blade.php,
+  edit.blade.php). Scoped under .trainee-enhanced so no other page is
+  affected. No form validation, table, or attendance-marking logic is
+  touched here.
+*/
+
+.trainee-enhanced .card {
+  border: 1px solid rgba(102, 108, 255, 0.09);
+  border-radius: 12px;
+  box-shadow: 0 4px 18px -10px rgba(76, 78, 100, 0.16), 0 1px 3px rgba(76, 78, 100, 0.05);
+}
+
+.trainee-enhanced .card-header {
+  border-left: 4px solid #666cff;
+  border-bottom-color: rgba(102, 108, 255, 0.1);
+  background-color: rgba(102, 108, 255, 0.04);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+/* ---------- buttons ---------- */
+.trainee-enhanced .btn-primary {
+  background: linear-gradient(135deg, #7a7fff, #5f5aec);
+  border-color: transparent;
+  box-shadow: 0 8px 18px -10px rgba(102, 108, 255, 0.6);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.trainee-enhanced .btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 22px -10px rgba(102, 108, 255, 0.7);
+}
+
+.trainee-enhanced .btn-outline-secondary:hover {
+  border-color: rgba(102, 108, 255, 0.5);
+  color: #5f5aec;
+}
+
+/* ---------- inputs (create / edit) ---------- */
+.trainee-enhanced .form-floating-outline > .form-control,
+.trainee-enhanced .form-floating-outline > .form-select,
+.trainee-enhanced .select2-container .select2-selection {
+  border-radius: 9px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.trainee-enhanced .form-control:focus,
+.trainee-enhanced .form-select:focus {
+  border-color: #666cff !important;
+  box-shadow: 0 0 0 0.15rem rgba(102, 108, 255, 0.18) !important;
+}
+
+.trainee-enhanced .form-control:hover,
+.trainee-enhanced .form-select:hover {
+  border-color: rgba(102, 108, 255, 0.45);
+}
+
+/* ---------- trainee table ---------- */
+.trainee-enhanced table.dataTable thead th {
+  background-color: rgba(102, 108, 255, 0.06);
+  color: #5f5aec;
+  font-weight: 600;
+  font-size: 12.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  border-bottom: none;
+}
+
+.trainee-enhanced table.dataTable tbody tr:hover {
+  background-color: rgba(102, 108, 255, 0.035);
+}
+
+.trainee-enhanced .badge.rounded-pill {
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding-top: 0.45em;
+  padding-bottom: 0.45em;
+  box-shadow: 0 3px 8px -4px rgba(46, 38, 61, 0.3);
+}
+
+.trainee-enhanced .btn-icon.btn-text-secondary:hover {
+  background-color: rgba(102, 108, 255, 0.12);
+  color: #5f5aec;
+}
+
+.trainee-enhanced .dataTables_filter input,
+.trainee-enhanced .dataTables_length select {
+  border-radius: 8px;
+  border-color: rgba(102, 108, 255, 0.25);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.trainee-enhanced .dataTables_filter input:focus,
+.trainee-enhanced .dataTables_length select:focus {
+  border-color: #666cff;
+  box-shadow: 0 0 0 0.15rem rgba(102, 108, 255, 0.18);
+  outline: none;
+}
+
+.trainee-enhanced .page-link {
+  border-radius: 8px !important;
+  margin: 0 2px;
+}
+
+.trainee-enhanced .page-item.active .page-link {
+  background: linear-gradient(135deg, #7a7fff, #5f5aec);
+  border-color: transparent;
+  box-shadow: 0 6px 14px -8px rgba(102, 108, 255, 0.55);
+}
+
+/* ---------- mark-attendance modal ---------- */
+.trainee-enhanced .modal-content {
+  border-radius: 12px;
+  border: none;
+  box-shadow: 0 20px 50px -20px rgba(46, 38, 61, 0.35);
+}
+
+/* these two modals sit outside the .trainee-enhanced wrapper in the DOM,
+   so they're targeted directly by id instead of relying on the ancestor scope */
+#addComment .modal-content,
+[id^="markAttendance"] .modal-content {
+  border-radius: 12px;
+  border: none;
+  box-shadow: 0 20px 50px -20px rgba(46, 38, 61, 0.35);
+}
+
+/* ---------- attendance summary stat cards ---------- */
+.trainee-enhanced .card-body > .badge.rounded-pill.p-2 {
+  box-shadow: 0 6px 14px -6px rgba(46, 38, 61, 0.35);
+}
+
+.trainee-enhanced .card-body > .badge.rounded-pill.p-2.bg-label-success { box-shadow: 0 6px 14px -6px rgba(113, 221, 55, 0.45); }
+.trainee-enhanced .card-body > .badge.rounded-pill.p-2.bg-label-warning { box-shadow: 0 6px 14px -6px rgba(255, 171, 0, 0.45); }
+.trainee-enhanced .card-body > .badge.rounded-pill.p-2.bg-label-danger { box-shadow: 0 6px 14px -6px rgba(255, 77, 73, 0.45); }
+.trainee-enhanced .card-body > .badge.rounded-pill.p-2.bg-label-primary { box-shadow: 0 6px 14px -6px rgba(102, 108, 255, 0.45); }
+
+.trainee-enhanced .card-body > div > h5.mb-0 {
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- attendance calendar ---------- */
+.trainee-enhanced .card-body table.text-center > :not(caption) > * > * {
+  border-color: rgba(102, 108, 255, 0.1);
+}
+
+/* ---------- comments ---------- */
+.trainee-enhanced .card-body .border-bottom {
+  border-color: rgba(102, 108, 255, 0.1) !important;
+}

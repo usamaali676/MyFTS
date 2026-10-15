@@ -29,11 +29,16 @@ class LeadController extends Controller
      */
     public function index()
     {
-        $leads = Lead::with('closers') // Eager load the closers relationship directly in the query
-        ->orderBy('id', 'DESC')
-        ->get();
-        // dd($leads);
-        // $sale = Sale::where('lead_id', $leads->id)->first();
+        // Leads and Sales are mutually exclusive lists — once a lead's sale
+        // is active or has had a payment charged, it moves to the Sales
+        // menu (see SaleVisibilityService) and drops out of here.
+        $leads = Lead::with('closers')
+            ->whereDoesntHave('sale', function ($query) {
+                $query->where('status', 1)->orWhereHas('invoice.payments');
+            })
+            ->orderBy('id', 'DESC')
+            ->get();
+
         return view('pages.lead.index', compact('leads'));
     }
 
@@ -43,8 +48,8 @@ class LeadController extends Controller
     public function create()
     {
         $categories = BusinessCategory::all();
-        $roles = Role::whereIn('name', ['Closer', 'Customer Support','Executives'])->get();
-        $closers = User::whereIn('role_id', $roles->pluck('id'))->get();
+        $roles = Role::whereIn('name', [...Role::CLOSER_ROLES, 'Customer Support', 'Manager Customer Support', 'Executives'])->get();
+        $closers = User::whereIn('role_id', $roles->pluck('id'))->where('status', 1)->get();
         // dd($closers);
         $company_services = CompanyServices::all();
         return view('pages.lead.create', compact('categories', 'closers', 'company_services'));
@@ -138,11 +143,20 @@ class LeadController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Display the specified resource. Used as the "Preview" target for a
+     * lead that doesn't have a sale yet (once a sale exists, the dropdown
+     * links to sale.detail instead) — same page layout as sale/view, built
+     * from the lead's own fields.
      */
-    public function show(Lead $lead)
+    public function show($id)
     {
-        //
+        // The route param is {id}, not {lead} — type-hinting Lead $lead here
+        // would silently skip implicit binding and hand us an empty, unsaved
+        // model (id === null) instead of erroring, so look it up explicitly.
+        $lead = Lead::with(['closers.user', 'company_services', 'saler'])->findOrFail($id);
+        $comments = Comments::where('lead_id', $lead->id)->orderBy('id', 'DESC')->get();
+
+        return view('pages.lead.view', compact('lead', 'comments'));
     }
 
     /**
@@ -155,7 +169,7 @@ class LeadController extends Controller
         $sub_categories = $lead->sub_categories;
         $categories = BusinessCategory::all();
         $sub_categories_id = $lead->sub_categories->pluck('id')->toArray();
-        $roles = Role::whereIn('name', ['Closer', 'Customer Support', 'Executives'])->get();
+        $roles = Role::whereIn('name', [...Role::CLOSER_ROLES, 'Customer Support', 'Manager Customer Support', 'Executives'])->get();
         $closers = User::whereIn('role_id', $roles->pluck('id'))->get();
         $selected_company_services = $lead->company_services;
         $company_services = CompanyServices::all();

@@ -4,10 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class CompanyServices extends Model
 {
     use HasFactory;
+    use SoftDeletes;
+
+    protected $fillable = ['name', 'price', 'category', 'created_by', 'updated_by', 'deleted_by'];
 
     public function clientServicesForSale($saleId)
     {

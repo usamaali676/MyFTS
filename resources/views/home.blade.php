@@ -5,11 +5,70 @@ $user = Auth::user();
 @endauth
 @extends('layouts.dashboard')
 @section('styles')
+<link rel="stylesheet" href="{{ asset('assets/css/dashboard-enhance.css') }}" />
+@endsection
+@section('css')
+<style>
+    .break-list-avatar { width: 48px; height: 48px; object-fit: cover; border-radius: 10%; background: #f1f0ff; }
+    .break-list-avatar { transition: transform 0.2s ease, box-shadow 0.2s ease; }
 
+    .break-list-row-link {
+        padding: 0.5rem 0.65rem;
+        margin: 0 -0.65rem 0.5rem !important;
+        border: 1px solid transparent;
+        border-radius: 0.75rem;
+        cursor: pointer;
+        transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+    }
+    /* accent bar that grows in on the left edge */
+    .break-list-row-link::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 18%;
+        bottom: 18%;
+        width: 3px;
+        border-radius: 3px;
+        background: linear-gradient(180deg, #7a7fff, #5f5aec);
+        opacity: 0;
+        transform: scaleY(0.3);
+        transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+    .break-list-row-link:hover,
+    .break-list-row-link:focus-within {
+        background: linear-gradient(90deg, rgba(122, 127, 255, 0.14), rgba(122, 127, 255, 0.03));
+        border-color: rgba(95, 90, 236, 0.2);
+        box-shadow: 0 0.4rem 1rem rgba(95, 90, 236, 0.14);
+        transform: translateX(3px);
+    }
+    .break-list-row-link:hover::before,
+    .break-list-row-link:focus-within::before { opacity: 1; transform: scaleY(1); }
+    .break-list-row-link:hover .break-list-avatar,
+    .break-list-row-link:focus-within .break-list-avatar {
+        transform: scale(1.06);
+        box-shadow: 0 0 0 3px rgba(95, 90, 236, 0.28);
+    }
+    .break-list-row-link h6 { transition: color 0.2s ease; }
+    .break-list-row-link:hover h6,
+    .break-list-row-link:focus-within h6 { color: #5f5aec; }
+    /* "opens profile" cue next to the name */
+    .break-list-go {
+        display: inline-block;
+        font-size: 0.95rem;
+        vertical-align: -2px;
+        opacity: 0;
+        transform: translate(-6px, 4px);
+        transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+    .break-list-row-link:hover .break-list-go,
+    .break-list-row-link:focus-within .break-list-go { opacity: 1; transform: translate(0, 0); }
+    .break-list-row-link .stretched-link:focus-visible { outline: none; }
+    .break-list-row-link:has(.stretched-link:focus-visible) { outline: 2px solid rgba(95, 90, 236, 0.55); outline-offset: 1px; }
+</style>
 @endsection
 @section('content')
 
-<div class="container-xxl flex-grow-1 container-p-y">
+<div class="container-xxl flex-grow-1 container-p-y dashboard-enhanced">
     <div class="row gy-4">
         <!-- Gamification Card -->
         <div class="col-md-6 col-lg-6">
@@ -36,7 +95,7 @@ $user = Auth::user();
 
         <!-- Statistics Total Order -->
         <div class="col-lg-3 col-sm-6">
-            <div class="card h-100">
+            <div class="card h-100 hover-lift">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
                         <div class="avatar">
@@ -51,7 +110,7 @@ $user = Auth::user();
                     </div>
                     <div class="card-info mt-4 pt-1 mt-lg-1 mt-xl-4">
                         @if(isset($sale_count))
-                        <h5 class="mb-2">{{ $sale_count }}</h5>
+                        <h5 class="mb-2" id="statSalesCount" data-countup="{{ $sale_count }}">0</h5>
                         @else
                         <h5 class="mb-2">0</h5>
                         @endif
@@ -65,10 +124,10 @@ $user = Auth::user();
 
         <!-- Sessions line chart -->
         <div class="col-lg-3 col-sm-6">
-            <div class="card h-100">
+            <div class="card h-100 hover-lift">
                 <div class="card-header pb-0">
                     <div class="d-flex align-items-end mb-1 flex-wrap gap-2">
-                        <h4 class="mb-0 me-2">${{ $total }}</h4>
+                        <h4 class="mb-0 me-2" id="statRevenueTotal" data-countup="{{ $total }}" data-countup-prefix="$" data-countup-decimals="2">$0.00</h4>
                     </div>
                     <span class="d-block mb-2 text-body">Revenue </span>
                 </div>
@@ -183,7 +242,7 @@ $user = Auth::user();
         <div class="col-md-6 col-xl-4">
             <div class="row g-4">
                 <div class="col-xl-12">
-          <div class="card h-100">
+          <div class="card h-100 hover-lift">
             <div class="card-body d-flex justify-content-between">
               <div class="d-flex flex-column">
                 <div class="card-title mb-auto">
@@ -191,12 +250,30 @@ $user = Auth::user();
                   <p class="mb-0">This Month</p>
                 </div>
                 <div class="chart-statistics">
-                  <h3 class="card-title mb-0">{{ $lates }} Lates</h3>
+                  <h3 class="card-title mb-0"><span id="statLatesCount" data-countup="{{ $lates }}">0</span> Lates</h3>
                   {{-- <p class="text-success text-nowrap mb-0"><i class="icon-base ti tabler-chevron-up me-1"></i> 15.8%</p> --}}
                 </div>
               </div>
               <div id="generatedLeadsChart" style="min-height: 132px;" class=""><div id="apexchartsc81ehgxzg" class="apexcharts-canvas apexchartsc81ehgxzg apexcharts-theme-" style="width: 120px; height: 132px;"><svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" class="apexcharts-svg" xmlns:data="ApexChartsNS" transform="translate(0, 0)" width="120" height="132"><foreignObject x="0" y="0" width="120" height="132"><div class="apexcharts-legend" xmlns="http://www.w3.org/1999/xhtml"></div>
                 </foreignObject><g class="apexcharts-inner apexcharts-graphical" transform="translate(-20, 15)"><defs><clipPath id="gridRectMaskc81ehgxzg"><rect width="160" height="110" x="0" y="0" rx="0" ry="0" opacity="1" stroke-width="0" stroke="none" stroke-dasharray="0" fill="#fff"></rect></clipPath><clipPath id="gridRectBarMaskc81ehgxzg"><rect width="164" height="114" x="-2" y="-2" rx="0" ry="0" opacity="1" stroke-width="0" stroke="none" stroke-dasharray="0" fill="#fff"></rect></clipPath><clipPath id="gridRectMarkerMaskc81ehgxzg"><rect width="160" height="110" x="0" y="0" rx="0" ry="0" opacity="1" stroke-width="0" stroke="none" stroke-dasharray="0" fill="#fff"></rect></clipPath><clipPath id="forecastMaskc81ehgxzg"></clipPath><clipPath id="nonForecastMaskc81ehgxzg"></clipPath></defs><g class="apexcharts-pie"><g transform="translate(0, 0) scale(1)"><circle r="34.7609756097561" cx="80" cy="55" fill="transparent"></circle><g class="apexcharts-slices"><g class="apexcharts-series apexcharts-pie-series" seriesName="Electronic" rel="1" data:realIndex="0"><path d="M 80 5.341463414634141 A 49.65853658536586 49.65853658536586 0 0 1 129.64207316729613 53.72139628776691 L 114.74945121710729 54.104977401436834 A 34.7609756097561 34.7609756097561 0 0 0 80 20.239024390243898 L 80 5.341463414634141 z " fill="rgba(36,179,100,1)" fill-opacity="1" stroke="#ffffff" stroke-opacity="1" stroke-linecap="butt" stroke-width="0" stroke-dasharray="0" class="apexcharts-pie-area apexcharts-donut-slice-0" index="0" j="0" data:angle="88.52459016393442" data:startAngle="0" data:strokeWidth="0" data:value="45" data:pathOrig="M 80 5.341463414634141 A 49.65853658536586 49.65853658536586 0 0 1 129.64207316729613 53.72139628776691 L 114.74945121710729 54.104977401436834 A 34.7609756097561 34.7609756097561 0 0 0 80 20.239024390243898 L 80 5.341463414634141 z "></path></g><g class="apexcharts-series apexcharts-pie-series" seriesName="Sports" rel="2" data:realIndex="1"><path d="M 129.64207316729613 53.72139628776691 A 49.65853658536586 49.65853658536586 0 0 1 60.89809407308648 100.8376204199069 L 66.62866585116053 87.08633429393483 A 34.7609756097561 34.7609756097561 0 0 0 114.74945121710729 54.104977401436834 L 129.64207316729613 53.72139628776691 z " fill="rgba(83,210,140,1)" fill-opacity="1" stroke="#ffffff" stroke-opacity="1" stroke-linecap="butt" stroke-width="0" stroke-dasharray="0" class="apexcharts-pie-area apexcharts-donut-slice-1" index="0" j="1" data:angle="114.09836065573771" data:startAngle="88.52459016393442" data:strokeWidth="0" data:value="58" data:pathOrig="M 129.64207316729613 53.72139628776691 A 49.65853658536586 49.65853658536586 0 0 1 60.89809407308648 100.8376204199069 L 66.62866585116053 87.08633429393483 A 34.7609756097561 34.7609756097561 0 0 0 114.74945121710729 54.104977401436834 L 129.64207316729613 53.72139628776691 z "></path></g><g class="apexcharts-series apexcharts-pie-series" seriesName="Decor" rel="3" data:realIndex="2"><path d="M 60.89809407308648 100.8376204199069 A 49.65853658536586 49.65853658536586 0 0 1 30.869213831510372 62.220533655227136 L 45.60844968205726 60.054373558658995 A 34.7609756097561 34.7609756097561 0 0 0 66.62866585116053 87.08633429393483 L 60.89809407308648 100.8376204199069 z " fill="rgba(126,221,169,1)" fill-opacity="1" stroke="#ffffff" stroke-opacity="1" stroke-linecap="butt" stroke-width="0" stroke-dasharray="0" class="apexcharts-pie-area apexcharts-donut-slice-2" index="0" j="2" data:angle="59.016393442622956" data:startAngle="202.62295081967213" data:strokeWidth="0" data:value="30" data:pathOrig="M 60.89809407308648 100.8376204199069 A 49.65853658536586 49.65853658536586 0 0 1 30.869213831510372 62.220533655227136 L 45.60844968205726 60.054373558658995 A 34.7609756097561 34.7609756097561 0 0 0 66.62866585116053 87.08633429393483 L 60.89809407308648 100.8376204199069 z "></path></g><g class="apexcharts-series apexcharts-pie-series" seriesName="Fashion" rel="4" data:realIndex="3"><path d="M 30.869213831510372 62.220533655227136 A 49.65853658536586 49.65853658536586 0 0 1 79.99133295039263 5.341464170976899 L 79.99393306527485 20.23902491968383 A 34.7609756097561 34.7609756097561 0 0 0 45.60844968205726 60.054373558658995 L 30.869213831510372 62.220533655227136 z " fill="rgba(169,233,197,1)" fill-opacity="1" stroke="#ffffff" stroke-opacity="1" stroke-linecap="butt" stroke-width="0" stroke-dasharray="0" class="apexcharts-pie-area apexcharts-donut-slice-3" index="0" j="3" data:angle="98.36065573770492" data:startAngle="261.6393442622951" data:strokeWidth="0" data:value="50" data:pathOrig="M 30.869213831510372 62.220533655227136 A 49.65853658536586 49.65853658536586 0 0 1 79.99133295039263 5.341464170976899 L 79.99393306527485 20.23902491968383 A 34.7609756097561 34.7609756097561 0 0 0 45.60844968205726 60.054373558658995 L 30.869213831510372 62.220533655227136 z "></path></g></g></g><g class="apexcharts-datalabels-group" transform="translate(0, 0) scale(1)"><text x="80" y="75" text-anchor="middle" dominant-baseline="auto" font-size=".8125rem" font-family="fontFamily" font-weight="400" fill="var(--bs-success)" class="apexcharts-text apexcharts-datalabel-label" style="font-family: fontFamily;">Total</text><text x="80" y="56" text-anchor="middle" dominant-baseline="auto" font-size="1.5rem" font-family="fontFamily" font-weight="500" fill="var(--bs-heading-color)" class="apexcharts-text apexcharts-datalabel-value" style="font-family: fontFamily;">{{ $lates }}</text></g></g><line x1="0" y1="0" x2="160" y2="0" stroke="#b6b6b6" stroke-dasharray="0" stroke-width="1" stroke-linecap="butt" class="apexcharts-ycrosshairs"></line><line x1="0" y1="0" x2="160" y2="0" stroke="#b6b6b6" stroke-dasharray="0" stroke-width="0" stroke-linecap="butt" class="apexcharts-ycrosshairs-hidden"></line></g><g class="apexcharts-datalabels-group" transform="translate(0, 0) scale(1)"></g></svg><div class="apexcharts-tooltip apexcharts-theme-false" style="left: 51.3984px; top: -12.75px;"><div class="apexcharts-tooltip-series-group apexcharts-tooltip-series-group-0 apexcharts-active" style="order: 1; display: flex; background-color: rgb(36, 179, 100);"><span class="apexcharts-tooltip-marker" style="background-color: rgb(36, 179, 100); display: none;"></span><div class="apexcharts-tooltip-text" style="font-family: Helvetica, Arial, sans-serif; font-size: 12px;"><div class="apexcharts-tooltip-y-group"><span class="apexcharts-tooltip-text-y-label">Electronic: </span><span class="apexcharts-tooltip-text-y-value">45</span></div><div class="apexcharts-tooltip-goals-group"><span class="apexcharts-tooltip-text-goals-label"></span><span class="apexcharts-tooltip-text-goals-value"></span></div><div class="apexcharts-tooltip-z-group"><span class="apexcharts-tooltip-text-z-label"></span><span class="apexcharts-tooltip-text-z-value"></span></div></div></div><div class="apexcharts-tooltip-series-group apexcharts-tooltip-series-group-1" style="order: 2; display: none; background-color: rgb(36, 179, 100);"><span class="apexcharts-tooltip-marker" style="background-color: rgb(36, 179, 100); display: none;"></span><div class="apexcharts-tooltip-text" style="font-family: Helvetica, Arial, sans-serif; font-size: 12px;"><div class="apexcharts-tooltip-y-group"><span class="apexcharts-tooltip-text-y-label">Electronic: </span><span class="apexcharts-tooltip-text-y-value">45</span></div><div class="apexcharts-tooltip-goals-group"><span class="apexcharts-tooltip-text-goals-label"></span><span class="apexcharts-tooltip-text-goals-value"></span></div><div class="apexcharts-tooltip-z-group"><span class="apexcharts-tooltip-text-z-label"></span><span class="apexcharts-tooltip-text-z-value"></span></div></div></div><div class="apexcharts-tooltip-series-group apexcharts-tooltip-series-group-2" style="order: 3; display: none; background-color: rgb(36, 179, 100);"><span class="apexcharts-tooltip-marker" style="background-color: rgb(36, 179, 100); display: none;"></span><div class="apexcharts-tooltip-text" style="font-family: Helvetica, Arial, sans-serif; font-size: 12px;"><div class="apexcharts-tooltip-y-group"><span class="apexcharts-tooltip-text-y-label">Electronic: </span><span class="apexcharts-tooltip-text-y-value">45</span></div><div class="apexcharts-tooltip-goals-group"><span class="apexcharts-tooltip-text-goals-label"></span><span class="apexcharts-tooltip-text-goals-value"></span></div><div class="apexcharts-tooltip-z-group"><span class="apexcharts-tooltip-text-z-label"></span><span class="apexcharts-tooltip-text-z-value"></span></div></div></div><div class="apexcharts-tooltip-series-group apexcharts-tooltip-series-group-3" style="order: 4; display: none; background-color: rgb(36, 179, 100);"><span class="apexcharts-tooltip-marker" style="background-color: rgb(36, 179, 100); display: none;"></span><div class="apexcharts-tooltip-text" style="font-family: Helvetica, Arial, sans-serif; font-size: 12px;"><div class="apexcharts-tooltip-y-group"><span class="apexcharts-tooltip-text-y-label">Electronic: </span><span class="apexcharts-tooltip-text-y-value">45</span></div><div class="apexcharts-tooltip-goals-group"><span class="apexcharts-tooltip-text-goals-label"></span><span class="apexcharts-tooltip-text-goals-value"></span></div><div class="apexcharts-tooltip-z-group"><span class="apexcharts-tooltip-text-z-label"></span><span class="apexcharts-tooltip-text-z-value"></span></div></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="col-xl-12">
+          <div class="card h-100 hover-lift">
+            <div class="card-body d-flex justify-content-between">
+              <div class="d-flex flex-column">
+                <div class="card-title mb-auto">
+                  <h5 class="mb-0 text-nowrap">Total Absents</h5>
+                  <p class="mb-0">This Month</p>
+                </div>
+                <div class="chart-statistics">
+                  <h3 class="card-title mb-0"><span id="statAbsentsCount" data-countup="{{ $absents }}">0</span> Absents</h3>
+                </div>
+              </div>
+              <div class="d-flex align-items-center">
+                <span class="badge rounded-pill bg-label-danger p-3"><i class="mdi mdi-calendar-remove-outline mdi-24px"></i></span>
+              </div>
             </div>
           </div>
         </div>
@@ -278,10 +355,67 @@ $user = Auth::user();
                     </div>
                 </div> --}}
                 <!--/ overview Radial chart -->
+                @if($isTeamView)
+                <div class="col-xl-12">
+                    <div class="card h-100 hover-lift" style="cursor: pointer;" role="button" tabindex="0"
+                         data-bs-toggle="modal" data-bs-target="#teamLatesDetailModal">
+                        <div class="card-body d-flex justify-content-between">
+                            <div class="d-flex flex-column">
+                                <div class="card-title mb-auto">
+                                    <h5 class="mb-0 text-nowrap">Team Lates</h5>
+                                    <p class="mb-0">{{ $teamLabel }} &middot; This Month</p>
+                                </div>
+                                <div class="chart-statistics">
+                                    <h3 class="card-title mb-0"><span id="statTeamLatesCount" data-countup="{{ $teamLates }}">0</span> Lates</h3>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <span class="badge rounded-pill bg-label-warning p-3"><i class="mdi mdi-account-clock-outline mdi-24px"></i></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-12">
+                    <div class="card h-100 hover-lift" style="cursor: pointer;" role="button" tabindex="0"
+                         data-bs-toggle="modal" data-bs-target="#teamAbsentsDetailModal">
+                        <div class="card-body d-flex justify-content-between">
+                            <div class="d-flex flex-column">
+                                <div class="card-title mb-auto">
+                                    <h5 class="mb-0 text-nowrap">Team Absents</h5>
+                                    <p class="mb-0">{{ $teamLabel }} &middot; This Month</p>
+                                </div>
+                                <div class="chart-statistics">
+                                    <h3 class="card-title mb-0"><span id="statTeamAbsentsCount" data-countup="{{ $teamAbsents }}">0</span> Absents</h3>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <span class="badge rounded-pill bg-label-danger p-3"><i class="mdi mdi-account-off-outline mdi-24px"></i></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @endif
             </div>
         </div>
         <!--/ Multiple widgets -->
-        @if ($user->role->name == 'Creator' || $user->role->name == 'Executives' || $user->role->name == 'Closer' || $user->role->name == 'QA')
+        @php
+            // Name for the break list. The "opens profile" arrow is glued to the
+            // last word (text-nowrap) so it can never wrap onto its own line.
+            $breakName = function (string $name, bool $withArrow) {
+                $parts = explode(' ', $name);
+                $last = array_pop($parts);
+                $head = $parts ? e(implode(' ', $parts)) . ' ' : '';
+                $arrow = $withArrow ? '<i class="mdi mdi-arrow-top-right break-list-go ms-1"></i>' : '';
+
+                return new \Illuminate\Support\HtmlString($head . '<span class="text-nowrap">' . e($last) . $arrow . '</span>');
+            };
+            $breakTypeIcons = [
+                'mealBreak'  => ['icon' => 'mdi-food-fork-drink', 'label' => 'Meal Break'],
+                '2ndBreak'   => ['icon' => 'mdi-coffee', 'label' => '2nd Break'],
+                'smokeBreak' => ['icon' => 'mdi-smoking', 'label' => 'Smoke Break'],
+            ];
+        @endphp
+        @if ($user->role->name == 'Creator' || $user->role->name == 'Executives' || $user->role->name == \App\Models\Role::CLOSER_SALES_MANAGER )
             <!-- Project Statistics -->
                     <div class="col-md-6 col-xl-4">
                         <div class="card h-100">
@@ -295,26 +429,36 @@ $user = Auth::user();
                             <div class="card-body">
                                 <ul class="p-0 m-0">
                                     @foreach ($users as $b_user)
-                                        <li class="d-flex mb-4">
-                                            <div class="avatar avatar-md flex-shrink-0 me-3">
-                                                <div class="avatar-initial bg-lighter rounded">
-                                                    <div>
-                                                        <img src="{{ asset('assets/img/avatars/5.png') }}" alt="User"
-                                                            class="h-25" style="border-radius: 10%" />
-                                                    </div>
-                                                </div>
-                                            </div>
+                                        @php
+                                            $todayBreaks = $b_user->attendances
+                                                ->where('shift_date', $shiftDate)
+                                                ->flatMap->breaks;
+                                            $userActiveBreak = $todayBreaks->whereNull('break_end')->first();
+                                            $onBreak = (bool) $userActiveBreak;
+                                            $breakIcon = $onBreak ? ($breakTypeIcons[$userActiveBreak->break_type] ?? null) : null;
+                                        @endphp
+                                        @php $canOpenProfile = $user->canViewProfileOf($b_user); @endphp
+                                        <li class="d-flex mb-4 position-relative {{ $canOpenProfile ? 'break-list-row-link' : '' }}">
+                                            @if($canOpenProfile)
+                                                <a href="{{ route('profile.show', $b_user->id) }}" class="stretched-link" title="View profile"
+                                                    aria-label="View {{ $b_user->name }}'s profile"></a>
+                                            @endif
+                                            <img src="{{ $b_user->avatar_url ?? asset('assets/img/avatars/5.png') }}" alt="{{ $b_user->name }}"
+                                                class="flex-shrink-0 me-3 break-list-avatar" />
                                             <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
                                                 <div class="me-2">
-                                                    <h6 class="mb-0">{{ $b_user->name }}</h6>
+                                                    <h6 class="mb-0">{{ $breakName($b_user->name, $canOpenProfile) }}</h6>
+                                                    @if ($onBreak && $breakIcon)
+                                                        <div class="my-1">
+                                                            <span class="badge bg-label-warning rounded-pill d-inline-flex align-items-center gap-1 px-2 py-1"
+                                                                title="{{ $breakIcon['label'] }}">
+                                                                <i class="mdi {{ $breakIcon['icon'] }}"></i> {{ $breakIcon['label'] }}
+                                                            </span>
+                                                        </div>
+                                                    @endif
                                                     <small>{{ $b_user->role->name }}</small>
                                                 </div>
                                                 <div class="badge bg-label-primary rounded-pill">
-                                                    @php
-                                                        $todayBreaks = $b_user->attendances
-                                                            ->where('shift_date', $shiftDate)
-                                                            ->flatMap->breaks;
-                                                    @endphp
                                                     {{ gmdate('H:i:s', $todayBreaks->sum('duration')) }}
                                                 </div>
                                             </div>
@@ -326,29 +470,136 @@ $user = Auth::user();
                         </div>
                     </div>
             <!--/ Project Statistics -->
+        @elseif ( $user->role->name == 'QA'  || $user->role->name == 'Closer' )
+                    <div class="col-md-6 col-xl-4">
+                        <div class="card h-100">
+                            <div class="card-header d-flex align-items-center justify-content-between">
+                                <h5 class="card-title m-0 me-2">Today's Break Duration</h5>
+                            </div>
+                            <div class="d-flex justify-content-between py-2 px-4 border-bottom">
+                                <h6 class="mb-0 small">NAME</h6>
+                                <h6 class="mb-0 small">Duration</h6>
+                            </div>
+                            <div class="card-body">
+                                <ul class="p-0 m-0">
+                                    @foreach ($tsrusers as $tsr_users)
+                                        @php
+                                            $todayBreaks = $tsr_users->attendances
+                                                ->where('shift_date', $shiftDate)
+                                                ->flatMap->breaks;
+                                            $userActiveBreak = $todayBreaks->whereNull('break_end')->first();
+                                            $onBreak = (bool) $userActiveBreak;
+                                            $breakIcon = $onBreak ? ($breakTypeIcons[$userActiveBreak->break_type] ?? null) : null;
+                                        @endphp
+                                        @php $canOpenProfile = $user->canViewProfileOf($tsr_users); @endphp
+                                        <li class="d-flex mb-4 position-relative {{ $canOpenProfile ? 'break-list-row-link' : '' }}">
+                                            @if($canOpenProfile)
+                                                <a href="{{ route('profile.show', $tsr_users->id) }}" class="stretched-link" title="View profile"
+                                                    aria-label="View {{ $tsr_users->name }}'s profile"></a>
+                                            @endif
+                                            <img src="{{ $tsr_users->avatar_url ?? asset('assets/img/avatars/5.png') }}" alt="{{ $tsr_users->name }}"
+                                                class="flex-shrink-0 me-3 break-list-avatar" />
+                                            <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+                                                <div class="me-2">
+                                                    <h6 class="mb-0">{{ $breakName($tsr_users->name, $canOpenProfile) }}</h6>
+                                                    @if ($onBreak && $breakIcon)
+                                                        <div class="my-1">
+                                                            <span class="badge bg-label-warning rounded-pill d-inline-flex align-items-center gap-1 px-2 py-1"
+                                                                title="{{ $breakIcon['label'] }}">
+                                                                <i class="mdi {{ $breakIcon['icon'] }}"></i> {{ $breakIcon['label'] }}
+                                                            </span>
+                                                        </div>
+                                                    @endif
+                                                    <small>{{ $tsr_users->role->name }}</small>
+                                                </div>
+                                                <div class="badge bg-label-primary rounded-pill">
+                                                    {{ gmdate('H:i:s', $todayBreaks->sum('duration')) }}
+                                                </div>
+                                            </div>
+                                        </li>
+                                    @endforeach
+
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+        @elseif ( $user->id == 3 )
+                    <div class="col-md-6 col-xl-4">
+                        <div class="card h-100">
+                            <div class="card-header d-flex align-items-center justify-content-between">
+                                <h5 class="card-title m-0 me-2">Today's Break Duration</h5>
+                            </div>
+                            <div class="d-flex justify-content-between py-2 px-4 border-bottom">
+                                <h6 class="mb-0 small">NAME</h6>
+                                <h6 class="mb-0 small">Duration</h6>
+                            </div>
+                            <div class="card-body">
+                                <ul class="p-0 m-0">
+                                    @foreach ($csrusers as $csr_users)
+                                        @php
+                                            $todayBreaks = $csr_users->attendances
+                                                ->where('shift_date', $shiftDate)
+                                                ->flatMap->breaks;
+                                            $userActiveBreak = $todayBreaks->whereNull('break_end')->first();
+                                            $onBreak = (bool) $userActiveBreak;
+                                            $breakIcon = $onBreak ? ($breakTypeIcons[$userActiveBreak->break_type] ?? null) : null;
+                                        @endphp
+                                        @php $canOpenProfile = $user->canViewProfileOf($csr_users); @endphp
+                                        <li class="d-flex mb-4 position-relative {{ $canOpenProfile ? 'break-list-row-link' : '' }}">
+                                            @if($canOpenProfile)
+                                                <a href="{{ route('profile.show', $csr_users->id) }}" class="stretched-link" title="View profile"
+                                                    aria-label="View {{ $csr_users->name }}'s profile"></a>
+                                            @endif
+                                            <img src="{{ $csr_users->avatar_url ?? asset('assets/img/avatars/5.png') }}" alt="{{ $csr_users->name }}"
+                                                class="flex-shrink-0 me-3 break-list-avatar" />
+                                            <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+                                                <div class="me-2">
+                                                    <h6 class="mb-0">{{ $breakName($csr_users->name, $canOpenProfile) }}</h6>
+                                                    @if ($onBreak && $breakIcon)
+                                                        <div class="my-1">
+                                                            <span class="badge bg-label-warning rounded-pill d-inline-flex align-items-center gap-1 px-2 py-1"
+                                                                title="{{ $breakIcon['label'] }}">
+                                                                <i class="mdi {{ $breakIcon['icon'] }}"></i> {{ $breakIcon['label'] }}
+                                                            </span>
+                                                        </div>
+                                                    @endif
+                                                    <small>{{ $csr_users->role->name }}</small>
+                                                </div>
+                                                <div class="badge bg-label-primary rounded-pill">
+                                                    {{ gmdate('H:i:s', $todayBreaks->sum('duration')) }}
+                                                </div>
+                                            </div>
+                                        </li>
+                                    @endforeach
+
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
         @endif
 
-        @if ($user->role->name == 'Creator' || $user->role->name == 'Executives' || $user->role->name == 'Closer' || $user->role->name == 'QA')
+        @if ($user->role->name == 'Creator' || $user->role->name == 'Executives' || in_array($user->role->name, \App\Models\Role::CLOSER_ROLES, true) || $user->role->name == 'QA'   )
             <!-- Sales Country Chart -->
             <div class="col-12 col-xl-4 col-md-6">
-                <div class="card h-100">
+                <div class="card " style="height: fit-content">
                     <div class="card-header">
-                        <div class="d-flex justify-content-between">
+                        <div class="d-flex justify-content-between align-items-start">
                             <h5 class="mb-1">Service Leads</h5>
+                            <div class="avatar avatar-sm">
+                                <div class="avatar-initial bg-label-primary rounded">
+                                    <i class="mdi mdi-chart-bar mdi-20px"></i>
+                                </div>
+                            </div>
                         </div>
-                        <p class="mb-0 text-body">Total {{ $services->sum('leads_count') }} Leads</p>
+                        <p class="mb-0 text-body">Total <span class="fw-bold text-primary">{{ $services->sum('leads_count') }}</span> Leads</p>
                     </div>
-                    <div class="card-body pb-1 px-0">
+                    <div class="card-body pb-1 px-0" style="    padding-left: 6px !important;">
                         <div id="salescategoryChart"></div>
                     </div>
                 </div>
             </div>
             <!--/ Sales Country Chart -->
         @endif
-
-
-
-
 
     </div>
 </div>
@@ -358,7 +609,9 @@ $user = Auth::user();
 
             <div class="text-center">
                 <img src="{{asset('assets/img/coffee-break-pana.svg')}}" style="width: 100%; height: 400px;">
-                <h1 style="padding-top: 20px; color: #636578" class="mb-4">{{$user->name}} is On Break</h1>
+                <i id="breakTypeIcon" class="mdi mdi-food-fork-drink" style="font-size: 40px; color: #666cff;"></i>
+                <h1 style="padding-top: 10px; color: #636578" class="mb-1">{{$user->name}} is On Break</h1>
+                <p id="breakTypeLabel" class="mb-4" style="color: #8a8d93;">Meal Break</p>
 
                 <h2 id="breakTimer" style="font-size: 60px; color: #666cff">
                     00:00:00
@@ -381,15 +634,18 @@ $user = Auth::user();
                 <h1 style="padding-top: 20px; color: #636578" class="mb-4">Select Break Type</h1>
                 <div class="d-flex justify-content-center gap-4">
                     <input type="radio" class="btn-check" name="breakType" id="mealBreak" autocomplete="off" checked>
-                    <label class="btn  btn-primary mt-5 px-5 py-3" for="mealBreak">
+                    <label class="btn btn-primary mt-5 px-5 py-3 d-flex flex-column align-items-center gap-2" for="mealBreak">
+                        <i class="mdi mdi-food-fork-drink mdi-24px"></i>
                         Meal Break
                     </label>
                     <input type="radio" class="btn-check" name="breakType" id="2ndBreak" autocomplete="off">
-                    <label class="btn  btn-primary mt-5 px-5 py-3" for="2ndBreak">
+                    <label class="btn btn-primary mt-5 px-5 py-3 d-flex flex-column align-items-center gap-2" for="2ndBreak">
+                        <i class="mdi mdi-coffee mdi-24px"></i>
                         2nd Break
                     </label>
                     <input type="radio" class="btn-check" name="breakType" id="smokeBreak" autocomplete="off">
-                    <label class="btn  btn-primary mt-5 px-5 py-3" for="smokeBreak">
+                    <label class="btn btn-primary mt-5 px-5 py-3 d-flex flex-column align-items-center gap-2" for="smokeBreak">
+                        <i class="mdi mdi-smoking mdi-24px"></i>
                         Smoke Break
                     </label>
                 </div>
@@ -398,13 +654,242 @@ $user = Auth::user();
         </div>
     </div>
 </div>
+@if($isTeamView)
+<div class="modal fade lates-modal" id="teamLatesDetailModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="lates-modal-icon">
+                        <i class="mdi mdi-clock-alert-outline"></i>
+                    </div>
+                    <div>
+                        <h5 class="modal-title mb-0">Team Late Arrivals</h5>
+                        <p class="text-muted mb-0 small">This month, {{ $teamLabel }}</p>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body pt-2">
+                @if($teamLatesByUser->isEmpty())
+                    <div class="lates-empty text-center py-4">
+                        <i class="mdi mdi-emoticon-happy-outline"></i>
+                        <p class="mb-0 mt-2 fw-semibold">No late check-ins this month</p>
+                        <p class="text-muted small mb-0">The whole team is on time!</p>
+                    </div>
+                @else
+                    @php
+                        $lateRoles = $teamLatesByUser->pluck('user.role.name')->unique()->sort()->values();
+                        $chipPalette = ['green', 'amber', 'red', 'blue', 'teal', 'pink'];
+                    @endphp
+                    @if($lateRoles->count() > 1)
+                        <div class="lates-role-chips mb-3" data-modal="teamLatesDetailModal">
+                            <button type="button" class="lates-role-chip lates-role-chip--purple active" data-role="">
+                                <i class="mdi mdi-view-grid-outline"></i> All Roles
+                            </button>
+                            @foreach($lateRoles as $roleName)
+                                <button type="button" class="lates-role-chip lates-role-chip--{{ $chipPalette[$loop->index % count($chipPalette)] }}" data-role="{{ $roleName }}">{{ $roleName }}</button>
+                            @endforeach
+                        </div>
+                    @endif
+                    <div class="mb-3">
+                        <span class="badge rounded-pill lates-role-count" data-noun="lates">{{ $teamLatesByUser->count() }} member{{ $teamLatesByUser->count() === 1 ? '' : 's' }} with lates</span>
+                    </div>
+                    <p class="lates-role-empty text-muted text-center py-3 mb-0" style="display: none;">No members with that role have any lates this month.</p>
+                    @foreach($teamLatesByUser as $entry)
+                        @php $userSeverity = $entry->count >= 3 ? 'severe' : ($entry->count >= 2 ? 'warn' : 'mild'); @endphp
+                        <div class="lates-group mb-3" data-role="{{ $entry->user->role->name }}">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <div>
+                                    <strong>{{ explode(' -', $entry->user->name)[0] }}</strong>
+                                    <small class="text-muted d-block">{{ $entry->user->role->name }}</small>
+                                </div>
+                                <span class="badge rounded-pill lates-badge lates-badge--{{ $userSeverity }}">
+                                    {{ $entry->count }} late{{ $entry->count === 1 ? '' : 's' }}
+                                </span>
+                            </div>
+                            <div class="lates-list">
+                                @foreach($entry->records as $record)
+                                    @php
+                                        $mins = $record->late_minutes;
+                                        $rowSeverity = $record->half_day ? 'severe' : ($mins !== null && $mins >= 60 ? 'warn' : 'mild');
+                                    @endphp
+                                    <div class="lates-row lates-row--{{ $rowSeverity }}">
+                                        <div class="lates-row-date">
+                                            <span class="lates-row-dow">{{ \Carbon\Carbon::parse($record->shift_date)->format('D') }}</span>
+                                            <span class="lates-row-day">{{ \Carbon\Carbon::parse($record->shift_date)->format('d') }}</span>
+                                        </div>
+                                        <div class="lates-row-body">
+                                            <div class="lates-row-title">{{ \Carbon\Carbon::parse($record->shift_date)->format('d M, Y') }}</div>
+                                            <div class="lates-row-time">
+                                                <i class="mdi mdi-clock-outline"></i>
+                                                {{ $record->login_time ? $record->formatted_login_time : '—' }}
+                                            </div>
+                                        </div>
+                                        <div class="lates-row-badges">
+                                            @if($mins !== null)
+                                                <span class="badge rounded-pill lates-badge lates-badge--{{ $rowSeverity }}">
+                                                    {{ intdiv($mins, 60) > 0 ? intdiv($mins, 60) . 'h ' : '' }}{{ $mins % 60 }}m late
+                                                </span>
+                                            @endif
+                                            @if($record->half_day)
+                                                <span class="badge rounded-pill lates-badge lates-badge--severe">Half Day</span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endforeach
+                @endif
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade lates-modal" id="teamAbsentsDetailModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="lates-modal-icon lates-modal-icon--absent">
+                        <i class="mdi mdi-calendar-remove-outline"></i>
+                    </div>
+                    <div>
+                        <h5 class="modal-title mb-0">Team Absent Days</h5>
+                        <p class="text-muted mb-0 small">This month, {{ $teamLabel }}</p>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body pt-2">
+                @if($teamAbsentsByUser->isEmpty())
+                    <div class="lates-empty text-center py-4">
+                        <i class="mdi mdi-emoticon-happy-outline"></i>
+                        <p class="mb-0 mt-2 fw-semibold">No absences this month</p>
+                        <p class="text-muted small mb-0">The whole team showed up!</p>
+                    </div>
+                @else
+                    @php
+                        $absentRoles = $teamAbsentsByUser->pluck('user.role.name')->unique()->sort()->values();
+                        $chipPalette = ['green', 'amber', 'red', 'blue', 'teal', 'pink'];
+                    @endphp
+                    @if($absentRoles->count() > 1)
+                        <div class="lates-role-chips mb-3" data-modal="teamAbsentsDetailModal">
+                            <button type="button" class="lates-role-chip lates-role-chip--purple active" data-role="">
+                                <i class="mdi mdi-view-grid-outline"></i> All Roles
+                            </button>
+                            @foreach($absentRoles as $roleName)
+                                <button type="button" class="lates-role-chip lates-role-chip--{{ $chipPalette[$loop->index % count($chipPalette)] }}" data-role="{{ $roleName }}">{{ $roleName }}</button>
+                            @endforeach
+                        </div>
+                    @endif
+                    <div class="mb-3">
+                        <span class="badge rounded-pill lates-role-count" data-noun="absences">{{ $teamAbsentsByUser->count() }} member{{ $teamAbsentsByUser->count() === 1 ? '' : 's' }} with absences</span>
+                    </div>
+                    <p class="lates-role-empty text-muted text-center py-3 mb-0" style="display: none;">No members with that role have any absences this month.</p>
+                    @foreach($teamAbsentsByUser as $entry)
+                        <div class="lates-group mb-3" data-role="{{ $entry->user->role->name }}">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <div>
+                                    <strong>{{ explode(' -', $entry->user->name)[0] }}</strong>
+                                    <small class="text-muted d-block">{{ $entry->user->role->name }}</small>
+                                </div>
+                                <span class="badge rounded-pill lates-badge lates-badge--severe">
+                                    {{ $entry->count }} absent{{ $entry->count === 1 ? '' : 's' }}
+                                </span>
+                            </div>
+                            <div class="lates-list">
+                                @foreach($entry->dates as $date)
+                                    <div class="lates-row lates-row--severe">
+                                        <div class="lates-row-date">
+                                            <span class="lates-row-dow">{{ $date->format('D') }}</span>
+                                            <span class="lates-row-day">{{ $date->format('d') }}</span>
+                                        </div>
+                                        <div class="lates-row-body">
+                                            <div class="lates-row-title">{{ $date->format('d M, Y') }}</div>
+                                            <div class="lates-row-time">
+                                                <i class="mdi mdi-close-circle-outline"></i>
+                                                No punch recorded
+                                            </div>
+                                        </div>
+                                        <div class="lates-row-badges">
+                                            <span class="badge rounded-pill lates-badge lates-badge--severe">Absent</span>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endforeach
+                @endif
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+@endif
 @endsection
 @section('custom-js')
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+    // Team Lates / Team Absents modals: filter the per-member groups by role
+    // using a row of clickable chips instead of a plain <select>.
+    document.querySelectorAll('.lates-role-chips').forEach(function (chipRow) {
+        const modal = document.getElementById(chipRow.dataset.modal);
+        if (!modal) return;
+
+        const chips = chipRow.querySelectorAll('.lates-role-chip');
+        const groups = modal.querySelectorAll('.lates-group[data-role]');
+        const emptyState = modal.querySelector('.lates-role-empty');
+        const countBadge = modal.querySelector('.lates-role-count');
+        const noun = countBadge ? countBadge.dataset.noun : '';
+
+        chips.forEach(function (chip) {
+            chip.addEventListener('click', function () {
+                chips.forEach(function (c) { c.classList.remove('active'); });
+                chip.classList.add('active');
+
+                const role = chip.dataset.role;
+                let visibleCount = 0;
+
+                groups.forEach(function (group) {
+                    const match = !role || group.dataset.role === role;
+                    group.style.display = match ? '' : 'none';
+                    if (match) visibleCount++;
+                });
+
+                if (emptyState) {
+                    emptyState.style.display = visibleCount === 0 ? '' : 'none';
+                }
+
+                if (countBadge) {
+                    countBadge.textContent = visibleCount + ' member' + (visibleCount === 1 ? '' : 's') + ' with ' + noun;
+                }
+            });
+        });
+    });
+});
+
+document.addEventListener('DOMContentLoaded', function () {
     let timerInterval;
     let seconds = 0;
     let isOnBreak = false;
+
+    const BREAK_TYPES = {
+        mealBreak: { icon: 'mdi-food-fork-drink', label: 'Meal Break' },
+        '2ndBreak': { icon: 'mdi-coffee', label: '2nd Break' },
+        smokeBreak: { icon: 'mdi-smoking', label: 'Smoke Break' }
+    };
+
+    function setBreakTypeUI(type) {
+        const info = BREAK_TYPES[type] || BREAK_TYPES.mealBreak;
+        document.getElementById('breakTypeIcon').className = 'mdi ' + info.icon;
+        document.getElementById('breakTypeLabel').innerText = info.label;
+    }
 
     // Init Bootstrap Modal
     const breakModalEl = document.getElementById('breakModal');
@@ -454,6 +939,21 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    // RESUME IN-PROGRESS BREAK ON LOAD
+    // Server tells us if a break is still open (break_end null) and how many
+    // seconds have elapsed. Without this, a page refresh mid-break (e.g. after
+    // a session/CSRF token expiry) hides the End Break button with no way
+    // back in, since "Start Break" is also blocked while a break is open.
+    @if($activeBreak)
+        isOnBreak = true;
+        seconds = {{ (int) $activeBreakElapsedSeconds }};
+        document.getElementById('breakTimer').innerText = formatTime(seconds);
+        setBreakTypeUI('{{ $activeBreak->break_type }}');
+        breakModal.show();
+        openFullscreen();
+        startTimer();
+    @endif
+
         // START BREAK
         document.getElementById('startBreakBtn').addEventListener('click', function () {
             // 1. Show the break type selection modal first
@@ -464,6 +964,8 @@ document.addEventListener('DOMContentLoaded', function () {
             document.querySelectorAll('input[name="breakType"]').forEach((elem) => {
                 elem.addEventListener('click', function () {
                     const val = document.querySelector('input[name="breakType"]:checked').id;
+                    var csrf = document.querySelector('meta[name="csrf-token"]').content;
+                    console.log('CSRF Token:', csrf);
                     console.log('Selected break type:', val);
                     // 3. Hide the type selection modal
                     breakModaltype.hide();
@@ -472,16 +974,35 @@ document.addEventListener('DOMContentLoaded', function () {
                         method: 'POST',
                         headers: {
                             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                            'Content-Type': 'application/json'   // changed
+                            'Content-Type': 'application/json',   // changed
+                            'Accept': 'application/json'
                         },
                             body: JSON.stringify({ break_type: val })
                     })
-                    .then(response => response.text())
-                    .then(data => {
-                        console.log(data);
-                        // 5. Only start the break UI after successful response
+                    .then(response => response.json().then(data => ({ ok: response.ok, status: response.status, data })))
+                    .then(({ ok, status, data }) => {
+                        // Only start the break UI once the server confirms the
+                        // Breaks row was actually created — previously this ran
+                        // even on a failed (e.g. CSRF 419) response, showing a
+                        // "phantom" break with nothing saved server-side.
+                        if (!ok) {
+                            if (status === 419) {
+                                // The tab sat open past the session lifetime, so the
+                                // csrf-token meta tag baked into this page is stale.
+                                // Retrying with the same token would just 419 again —
+                                // reload to pick up a fresh token (or the login page,
+                                // if the session is truly gone).
+                                alert('Your session has expired. The page will refresh.');
+                                location.reload();
+                                return;
+                            }
+                            alert(data.error || data.message || 'Error starting break. Please try again.');
+                            return;
+                        }
+
                         isOnBreak = true;
                         seconds = 0;
+                        setBreakTypeUI(val);
                         breakModal.show();
                         openFullscreen();
                         startTimer();
@@ -502,23 +1023,41 @@ document.addEventListener('DOMContentLoaded', function () {
             fetch('{{ route('front.endBreak') }}', {
                 method: 'POST',
                 headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Accept': 'application/json'
                 }
+            })
+            .then(response => response.json().then(data => ({ ok: response.ok, status: response.status, data })))
+            .then(({ ok, status, data }) => {
+                // Only clear the break UI once the server confirms break_end
+                // was actually saved — previously this ran unconditionally,
+                // so a failed request still looked like a successful end-break.
+                if (!ok) {
+                    if (status === 419) {
+                        alert('Your session has expired. The page will refresh.');
+                        location.reload();
+                        return;
+                    }
+                    alert(data.error || data.message || 'Error ending break. Please try again.');
+                    return;
+                }
+
+                isOnBreak = false;
+                stopTimer();
+                breakModal.hide();
+                exitFullscreen();
+                location.reload();
+            })
+            .catch(error => {
+                alert('Error ending break. Please try again.');
+                console.error(error);
             });
-
-            isOnBreak = false;
-
-            stopTimer();
-            breakModal.hide();
-            exitFullscreen();
-            location.reload();
         });
 
         // Prevent leaving tab (basic)
         document.addEventListener('visibilitychange', function () {
             if (isOnBreak && document.hidden) {
-                alert('⚠️ You are on break. Please stay on this screen.');
-                {{-- location.reload(); --}}
+                // alert('⚠️ You are on break. Please stay on this screen.');
                 // strict handling
             }
         });
@@ -733,8 +1272,15 @@ const salesCountryChartEl = document.querySelector('#salescategoryChart');
 const salesCountryChartConfig = {
   chart: {
     type: 'bar',
-    height: 368,
-    toolbar: { show: false }
+    height: 380,
+    toolbar: { show: false },
+    dropShadow: {
+      enabled: true,
+      top: 3,
+      left: 0,
+      blur: 4,
+      opacity: 0.1
+    }
   },
 
   series: [
@@ -748,13 +1294,39 @@ const salesCountryChartConfig = {
     bar: {
       horizontal: true,
       distributed: true,
-      borderRadius: 10,
-      barHeight: '60%'
+      borderRadius: 8,
+      borderRadiusApplication: 'end',
+      barHeight: '55%',
+      dataLabels: {
+        position: 'center'
+      }
     }
   },
 
+  fill: {
+    type: 'gradient',
+    gradient: {
+      shade: 'light',
+      type: 'horizontal',
+      shadeIntensity: 0.35,
+      opacityFrom: 1,
+      opacityTo: 0.88,
+      stops: [0, 100]
+    }
+  },
+
+  stroke: {
+    width: 0
+  },
+
   dataLabels: {
-    enabled: true
+    enabled: true,
+    style: {
+      fontSize: '12.5px',
+      fontWeight: 700,
+      fontFamily: 'Inter',
+      colors: ['#fff']
+    }
   },
 
   colors: [
@@ -764,13 +1336,61 @@ const salesCountryChartConfig = {
     config.colors.info,
     config.colors.danger
   ],
-    // borderColor = config.colors.borderColor;
+
   xaxis: {
-    categories: categories
+    categories: categories,
+    labels: {
+      style: {
+        fontSize: '12.5px',
+        colors: labelColor,
+        fontFamily: 'Inter'
+      }
+    },
+    axisBorder: { show: false },
+    axisTicks: { show: false }
+  },
+
+  yaxis: {
+    labels: {
+      style: {
+        fontSize: '12.5px',
+        fontWeight: 500,
+        colors: headingColor,
+        fontFamily: 'Inter'
+      }
+    }
   },
 
   grid: {
-    borderColor: borderColor
+    borderColor: borderColor,
+    strokeDashArray: 6,
+    xaxis: { lines: { show: true } },
+    yaxis: { lines: { show: false } },
+    padding: { top: -10, right: 24 }
+  },
+
+  legend: {
+    position: 'bottom',
+    fontSize: '12.5px',
+    fontFamily: 'Inter',
+    labels: { colors: labelColor },
+    markers: { radius: 12 },
+    itemMargin: { horizontal: 10, vertical: 4 }
+  },
+
+  tooltip: {
+    theme: currentTheme,
+    y: {
+      formatter: function (val) {
+        return val + ' leads';
+      }
+    }
+  },
+
+  states: {
+    hover: {
+      filter: { type: 'darken', value: 0.9 }
+    }
   }
 };
 

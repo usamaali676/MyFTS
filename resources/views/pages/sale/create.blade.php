@@ -32,6 +32,7 @@
 <link rel="stylesheet" href="{{ asset('assets/vendor/libs/quill/katex.css') }}" />
 <link rel="stylesheet" href="{{ asset('assets/vendor/libs/quill/editor.css') }}" />
 {{-- <link rel="stylesheet" href="{{ asset('assets/vendor/libs/dropzone/dropzone.css') }}" /> --}}
+<link rel="stylesheet" href="{{ asset('assets/css/sale-create-enhance.css') }}" />
 
 <link
     href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css"
@@ -85,7 +86,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
 <div class="content-wrapper">
     <!-- Content -->
 
-    <div class="container-xxl flex-grow-1 container-p-y">
+    <div class="container-xxl flex-grow-1 container-p-y sale-create-enhanced">
         <div class="d-flex">
             <h4 class="py-3 mb-4"><span class="text-muted fw-light">Sale /</span> Client Details</h4>
         </div>
@@ -696,7 +697,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                         <input type="checkbox" class="switch-input" name="sale_status"
                                                             @if(isset($sale) &&
                                                             $sale->status == 1) checked
-                                                                @if($user->role_id == 1 || $user->role->name == "Customer Support")
+                                                                @if($user->role_id == 1 || in_array($user->role->name, ['Customer Support', 'Manager Customer Support']))
                                                                 {{-- <p>{{ $user->role_id }}</p> --}}
                                                                     @readonly(false)
                                                                 @else
@@ -2623,6 +2624,9 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
 
                                                                                     class="dropdown-item delete-record"><i
                                                                                     class="mdi mdi-eye me-2"></i><span>Preview</span></a>
+                                                                                <a type="button" href="{{ route('clientReport.editReport', $item->id) }}" target="_blank"
+                                                                                    class="dropdown-item"><i
+                                                                                    class="mdi mdi-pencil-outline me-2"></i><span>Edit</span></a>
                                                                                 <form id="verify_report" action="{{ route('clientReport.edit', $item->id) }}" method="POST">
                                                                                     @csrf
                                                                                     <button type="submit"
@@ -5157,12 +5161,12 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                         var dispatch_at = report.dispatch_at ? formatDate(report.dispatch_at) : 'N/A';
 
                         var statusBadge = '';
-                        if (report.report_type === "draft") {
-                            statusBadge = '<span class="badge rounded-pill bg-danger">' + report.report_status + '</span>';
-                        } else if (report.report_type === "verified") {
-                            statusBadge = '<span class="badge rounded-pill bg-info">' + report.report_status + '</span>';
+                        if (report.status === 'draft') {
+                            statusBadge = '<span class="badge rounded-pill bg-danger">' + report.status + '</span>';
+                        } else if (report.status === 'verified') {
+                            statusBadge = '<span class="badge rounded-pill bg-info">' + report.status + '</span>';
                         } else {
-                            statusBadge = '<span class="badge rounded-pill bg-success">' + report.report_status + '</span>';
+                            statusBadge = '<span class="badge rounded-pill bg-success">' + report.status + '</span>';
                         }
                         let url = "{{ route('clientReport.update', ':id') }}".replace(':id', report.id);
 
@@ -5191,8 +5195,11 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                     <i class="mdi mdi-dots-vertical mdi-20px"></i>\
                                                 </button>\
                                                 <div class="dropdown-menu dropdown-menu-end m-0">\
-                                                    <a type="button" href="'+'/reports/report/' + report.report_file +'" target="_blank" class="dropdown-item delete-record">\
+                                                    <a type="button" href="'+'/report/view/' + report.uuid +'" target="_blank" class="dropdown-item delete-record">\
                                                         <i class="mdi mdi-eye me-2"></i><span>Preview</span>\
+                                                    </a>\
+                                                    <a type="button" href="/clientReport/edit-report/' + report.id + '" target="_blank" class="dropdown-item">\
+                                                        <i class="mdi mdi-pencil-outline me-2"></i><span>Edit</span>\
                                                     </a>\
                                                     <form id="verify_report" action="{{ route('clientReport.edit', ' + report.id + ') }}" method="POST">\
                                                         @csrf\
@@ -5200,7 +5207,7 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                             <i class="mdi mdi-check-decagram me-2"></i><span>Verify</span>\
                                                         </button>\
                                                     </form>\
-                                                    <a type="button" id="'+ report.id +'" data-confirm="Are you sure to delete this item?" class="dropdown-item delete-record delete_report">\
+                                                    <a type="button" id=" ' + report.id + ' " data-confirm="Are you sure to delete this item?" class="dropdown-item delete-record delete_report">\
                                                         <i class="mdi mdi-delete-outline me-2"></i><span>Delete</span>\
                                                     </a>\
                                                 </div>\
@@ -5352,6 +5359,9 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                 <div class="dropdown-menu dropdown-menu-end m-0">\
                                                     <a type="button" href="'+'/reports/report/' + report.report_file +'" target="_blank" class="dropdown-item delete-record">\
                                                         <i class="mdi mdi-eye me-2"></i><span>Preview</span>\
+                                                    </a>\
+                                                    <a type="button" href="/clientReport/edit-report/' + report.id + '" target="_blank" class="dropdown-item">\
+                                                        <i class="mdi mdi-pencil-outline me-2"></i><span>Edit</span>\
                                                     </a>\
                                                     <form id="verify_report" action="{{ route('clientReport.edit', ' + report.id + ') }}" method="POST">\
                                                         @csrf\
@@ -5509,8 +5519,12 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                 </button>\
                                             \
                                                 <div class="dropdown-menu dropdown-menu-end m-0">\
-                                                    <a href="/reports/report/' + report.report_file + '" target="_blank" class="dropdown-item">\
+                                                    <a href="/report/view/' + report.uuid + '" target="_blank" class="dropdown-item">\
                                                         <i class="mdi mdi-eye me-2"></i><span>Preview</span>\
+                                                    </a>\
+                                            \
+                                                    <a href="/clientReport/edit-report/' + report.id + '" target="_blank" class="dropdown-item">\
+                                                        <i class="mdi mdi-pencil-outline me-2"></i><span>Edit</span>\
                                                     </a>\
                                             \
                                                     <form id="verify_report" action="/clientReport/edit/' + report.id + '" method="POST">\
@@ -5520,11 +5534,11 @@ ul.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front li{
                                                         </button>\
                                                     </form>\
                                             \
-                                                    <a id="' + report.id + '" class="dropdown-item delete-record delete_report">\
+                                                   <a id="' + report.id + '" class="dropdown-item delete-record delete_report">\
                                                         <i class="mdi mdi-delete-outline me-2"></i><span>Delete</span>\
                                                     </a>\
                                                 </div>\
-                                            </div>
+                                            </div>\
                                         </td>\
                                         </tr>';
                     });

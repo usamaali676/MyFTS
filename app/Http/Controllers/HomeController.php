@@ -4,12 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Helpers\GlobalHelper;
 use App\Models\Attendance;
+use App\Models\Breaks;
 use App\Models\CompanyServices;
+use Carbon\Carbon;
 use App\Models\Invoice;
 use App\Models\Lead;
 use App\Models\Role;
 use App\Models\Sale;
 use App\Models\User;
+use App\Services\TeamAttendanceOverviewService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -52,6 +55,30 @@ class HomeController extends Controller
         ->where('is_late', true)
         ->count();
         // dd($lates);
+
+        // Days this month, up to (not including) today, with no attendance
+        // punch at all and not a weekend — same "absent" rule as the
+        // Attendance calendar view. Never mark a day absent before the
+        // user's account even existed.
+        $monthStart = now('Asia/Karachi')->startOfMonth();
+        $today = now('Asia/Karachi')->startOfDay();
+        $markedDates = Attendance::where('user_id', $user->id)
+            ->whereYear('shift_date', $monthStart->year)
+            ->whereMonth('shift_date', $monthStart->month)
+            ->pluck('shift_date')
+            ->map(fn ($d) => Carbon::parse($d)->format('Y-m-d'))
+            ->flip();
+
+        $absents = 0;
+        $createdAt = Carbon::parse($user->created_at, 'Asia/Karachi')->startOfDay();
+        $cursor = $monthStart->gt($createdAt) ? $monthStart->copy() : $createdAt->copy();
+        while ($cursor->lt($today)) {
+            if (!$cursor->isWeekend() && !$markedDates->has($cursor->format('Y-m-d'))) {
+                $absents++;
+            }
+            $cursor->addDay();
+        }
+
         $totalRevenue =
         $notifications = Auth::user()->notifications;
         $notifications->each(function ($notification) {
@@ -96,28 +123,96 @@ class HomeController extends Controller
         $total += Invoice::where('sale_id', $s->id)
                         ->whereMonth('created_at', now()->month)
                         ->whereYear('created_at', now()->year)
-                        ->sum('total_amout');
+                        ->sum('total_amount');
 
+        // dd($total );
 
 
         }
         // $user = User::all();
-        $role = Role::where('name', 'TSR')->first();
-        $users = User::where('role_id', $role->id)->where('status', 1)->with([
-            'attendances' => function ($query) {
-                $query->whereBetween('created_at', [
-                    now()->startOfMonth(),
-                    now()->endOfMonth()
-                ])->with('breaks');
-            }
-        ])->get();
+        // $role = Role::whereIn('name', ['TSR', 'Closer', 'QA'])->first();
+        // $users = User::where('role_id', $role->id)->where('status', 1)->with([
+        //     'attendances' => function ($query) {
+        //         $query->whereBetween('created_at', [
+        //             now()->startOfMonth(),
+        //             now()->endOfMonth()
+        //         ])->with('breaks');
+        //     }
+        // ])->get();
+        $roleIds = Role::whereIn('name', ['TSR', ...Role::CLOSER_ROLES, 'QA'])->pluck('id');
+
+        $users = User::whereIn('role_id', $roleIds)
+            ->where('status', 1)
+            ->with([
+                'attendances' => function ($query) {
+                    $query->whereBetween('created_at', [
+                        now()->startOfMonth(),
+                        now()->endOfMonth()
+                    ])->with('breaks');
+                }
+            ])
+            ->get();
+        $tsrrole = Role::where('name', 'TSR')->first('id');
+
+        $tsrusers = User::where('role_id', $tsrrole->id)
+            ->where('status', 1)
+            ->with([
+                'attendances' => function ($query) {
+                    $query->whereBetween('created_at', [
+                        now()->startOfMonth(),
+                        now()->endOfMonth()
+                    ])->with('breaks');
+                }
+            ])
+            ->get();
+            $csrRoleIds = Role::whereIn('name', ['Customer Support', 'Manager Customer Support'])->pluck('id');
+            $csrusers = User::whereIn('role_id', $csrRoleIds)
+                ->where('status', 1)
+                ->with([
+                    'attendances' => function ($query) {
+                        $query->whereBetween('created_at', [
+                            now()->startOfMonth(),
+                            now()->endOfMonth()
+                        ])->with('breaks');
+                    }
+                ])
+                ->get();
+
+        // Team-wide lates/absents for the dashboard cards. Who can see whose
+        // attendance (Creator/Executives see everyone non-IT, user #4 sees
+        // TSR+Closer, user #3 sees Customer Support, IT roles are always
+        // excluded, #3/#4 never see their own record) is centralized in
+        // TeamAttendanceOverviewService so it isn't duplicated/drifting here.
+        $teamOverview = (new TeamAttendanceOverviewService())->forViewer($user, $monthStart, $today);
+        $isTeamView = $teamOverview['visible'];
+        $teamLabel = $teamOverview['label'];
+        $teamLates = $teamOverview['lates'];
+        $teamAbsents = $teamOverview['absents'];
+        $teamLatesByUser = $teamOverview['latesByUser'];
+        $teamAbsentsByUser = $teamOverview['absentsByUser'];
+
         $shiftDate = $this->getShiftDate();
 
         $services = CompanyServices::withCount('leads')->get();
+
+        // Resume an in-progress break on page load instead of relying on
+        // client-only state, so a page refresh (e.g. after a session/CSRF
+        // expiry) doesn't strand the user with no way to end their break.
+        $todayAttendance = Attendance::where('user_id', $user->id)
+            ->where('shift_date', $shiftDate)
+            ->first();
+
+        $activeBreak = $todayAttendance
+            ? Breaks::where('attendance_id', $todayAttendance->id)->whereNull('break_end')->first()
+            : null;
+
+        $activeBreakElapsedSeconds = $activeBreak
+            ? Carbon::parse($activeBreak->break_start, 'Asia/Karachi')->diffInSeconds(now('Asia/Karachi'))
+            : 0;
         // dd($services);
         // dd($users[1]->attendances->pluck('breaks')->flatten());
         // dd($total);
-        return view('home', compact('route', 'notifications', 'totalRevenue', 'sale_count', 'last_sale_count', 'total', 'lates', 'users', 'shiftDate', 'services'));
+        return view('home', compact('route', 'notifications', 'totalRevenue', 'sale_count', 'last_sale_count', 'total', 'lates', 'absents', 'isTeamView', 'teamLabel', 'teamLates', 'teamAbsents', 'teamLatesByUser', 'teamAbsentsByUser', 'users', 'shiftDate', 'services', 'tsrusers', 'activeBreak', 'activeBreakElapsedSeconds', 'csrusers'));
     }
     // public function breaksduration()
     // {

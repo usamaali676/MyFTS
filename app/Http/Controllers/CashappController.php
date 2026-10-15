@@ -4,62 +4,48 @@ namespace App\Http\Controllers;
 
 use App\Models\Cashapp;
 use Illuminate\Http\Request;
+use RealRashid\SweetAlert\Facades\Alert;
 
 class CashappController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        $cashapps = Cashapp::orderBy('name')->get();
+
+        return view('pages.settings.cashapp', compact('cashapps'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'name' => 'required|string|max:255|unique:cashapps,name,NULL,id,deleted_at,NULL',
+        ]);
+
+        Cashapp::create(['name' => $request->name]);
+
+        Alert::success('Success', 'CashApp account added successfully');
+        return redirect()->route('cashapp.index');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Cashapp $cashapp)
+    public function update(Request $request, $id)
     {
-        //
+        $cashapp = Cashapp::findOrFail($id);
+
+        $request->validate([
+            'name' => 'required|string|max:255|unique:cashapps,name,' . $cashapp->id . ',id,deleted_at,NULL',
+        ]);
+
+        $cashapp->update(['name' => $request->name]);
+
+        Alert::success('Success', 'CashApp account updated successfully');
+        return redirect()->route('cashapp.index');
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Cashapp $cashapp)
+    public function destroy($id)
     {
-        //
-    }
+        Cashapp::findOrFail($id)->delete();
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Cashapp $cashapp)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Cashapp $cashapp)
-    {
-        //
+        Alert::success('Success', 'CashApp account deleted successfully');
+        return redirect()->route('cashapp.index');
     }
 }

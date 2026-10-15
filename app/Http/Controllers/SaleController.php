@@ -21,20 +21,62 @@ use App\Models\SaleCS;
 use App\Models\SocialLink;
 use App\Models\User;
 use App\Notifications\NewSaleNotification;
+use App\Services\SaleVisibilityService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
+use RealRashid\SweetAlert\Facades\Alert;
 
 class SaleController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Display a listing of the resource: every lead whose sale is active or
+     * has had a payment charged against it, scoped per SaleVisibilityService's
+     * role rules. Not part of the Permission-row system (see
+     * PermissionMiddelware's ignore list) — access is checked here instead.
      */
     public function index()
     {
-        //
+        $user = Auth::user();
+
+        if (!SaleVisibilityService::canAccess($user)) {
+            Alert::error('Oops', "You don't have access to this page");
+            return redirect()->route('home');
+        }
+
+        $sales = SaleVisibilityService::forViewer($user)->get();
+
+        return view('pages.sale.index', compact('sales'));
+    }
+
+    /**
+     * Manager Customer Support's separate team-wide view: every sale
+     * assigned to any Customer Support rep, with an optional filter down to
+     * one specific rep. Not part of the Permission-row system (see
+     * PermissionMiddelware's ignore list) — access is checked here instead.
+     */
+    public function teamSales(Request $request)
+    {
+        $user = Auth::user();
+
+        if (!SaleVisibilityService::canAccessTeam($user)) {
+            Alert::error('Oops', "You don't have access to this page");
+            return redirect()->route('home');
+        }
+
+        $csRoleId = Role::where('name', 'Customer Support')->value('id');
+        $csUsers = User::where('role_id', $csRoleId)
+            ->where('status', 1)
+            ->orderBy('name')
+            ->get();
+
+        $selectedCsId = $request->query('cs_id');
+
+        $sales = SaleVisibilityService::forTeam($selectedCsId)->get();
+
+        return view('pages.sale.team', compact('sales', 'csUsers', 'selectedCsId'));
     }
 
     /**
@@ -56,7 +98,7 @@ class SaleController extends Controller
         $social_links = DB::select("SHOW COLUMNS FROM social_links LIKE 'social_name'");
         $social_links = $social_links[0]->Type; // Get the type string
         $social_links = explode("','", substr($social_links, 6, -2));
-        $roles = Role::whereIn('name', ['Closer', 'Customer Support', 'Executives'])->get();
+        $roles = Role::whereIn('name', [...Role::CLOSER_ROLES, 'Customer Support', 'Manager Customer Support', 'Executives'])->get();
         $closers = User::whereIn('role_id', $roles->pluck('id'))->get();
         // $csrole = Role::where('name', "Customer Support")->first();
         $csr = User::whereIn('role_id', $roles->pluck('id'))
@@ -126,7 +168,7 @@ class SaleController extends Controller
         if (isset($request->sale_id)) {
             $sale = Sale::find($request->sale_id);
             $user = Auth::user();
-            if($user->role_id == 1 || $user->role->name == "Customer Support"){
+            if($user->role_id == 1 || in_array($user->role->name, ['Customer Support', 'Manager Customer Support'], true)){
                 $sale->update([
                     'signup_date' => $request->signup_date,
                     'status' => $request->sale_status  ? 1 : 0,

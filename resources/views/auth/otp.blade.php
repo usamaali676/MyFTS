@@ -141,8 +141,14 @@
             </p>
             <form class="d-inline" method="POST" action="{{ route('front.otp.verify.post') }}">
                 @csrf
+                @include('auth.partials.robot-sentry', [
+                    'botId' => 'otpRobotSentry',
+                    'mode' => 'otp',
+                    'target' => '#otp',
+                    'length' => 6,
+                ])
                 <div class="form-floating form-floating-outline mb-3">
-                    <input type="text" name="otp" id="otp" class="form-control" required>
+                    <input type="text" name="otp" id="otp" class="form-control" inputmode="numeric" maxlength="6" autocomplete="one-time-code" required>
                     <label for="otp">Enter OTP</label>
                     @error('otp') <span class="text-danger">{{ $message }}</span> @enderror
                 </div>

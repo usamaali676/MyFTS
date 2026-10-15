@@ -3,28 +3,26 @@
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css') }}" />
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css') }}" />
     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css" rel="stylesheet" />
+    <link rel="stylesheet" href="{{ asset('assets/css/leads-index-enhance.css') }}" />
 @endsection
 @section('content')
+    @php $leadPerm = \App\Helpers\GlobalHelper::modulePermission(auth()->user(), 'lead'); @endphp
     <!-- Content wrapper -->
     <div class="content-wrapper">
         <!-- Content -->
 
-        <div class="container-xxl flex-grow-1">
+        <div class="container-xxl flex-grow-1 lead-index-enhanced">
             <h4 class="py-3 mb-4"><span class="text-muted fw-light">Lead/</span> All</h4>
             <!-- Responsive Datatable -->
             <div class="card">
-                <div class="card-header border-bottom">
-                    <h5 class="card-title">Leads</h5>
-                    <div class="d-flex justify-content-between align-items-center row py-3 gap-3 gap-md-0">
-                        <div class="col-md-4 user_role">&nbsp;</div>
-                        <div class="col-md-4 user_plan">&nbsp;</div>
-                        <div class="col-md-2 user_status">
-                            <a class="dt-button add-new btn btn-primary waves-effect waves-light" tabindex="0"
-                                href="{{ route('lead.create') }}" style="color: #fff"><span><i
-                                        class="mdi mdi-plus me-0 me-sm-1"></i><span class="d-none d-sm-inline-block">Add
-                                        Lead</span></span></a>
-                        </div>
-                    </div>
+                <div class="card-header border-bottom d-flex justify-content-between align-items-center flex-wrap gap-2 py-3">
+                    <h5 class="card-title mb-0">Leads</h5>
+                    @if($leadPerm->create)
+                        <a class="dt-button add-new btn btn-primary waves-effect waves-light" tabindex="0"
+                            href="{{ route('lead.create') }}" style="color: #fff"><span><i
+                                    class="mdi mdi-plus me-0 me-sm-1"></i><span class="d-none d-sm-inline-block">Add
+                                    Lead</span></span></a>
+                    @endif
                 </div>
                 <div class="card-datatable table-responsive">
                     <table id="recodetable" class="table table-bordered">
@@ -120,29 +118,33 @@
                                                         class="btn btn-sm btn-icon btn-text-secondary rounded-pill dropdown-toggle hide-arrow"
                                                         data-bs-toggle="dropdown" aria-expanded="false"><i
                                                             class="mdi mdi-dots-vertical mdi-20px"></i></button>
-                                                    <div class="dropdown-menu dropdown-menu-end m-0" style=""><a
-                                                            href="{{ route('lead.edit', $item->id) }}" class="dropdown-item"><i
+                                                    <div class="dropdown-menu dropdown-menu-end m-0" style="">
+                                                        @if($leadPerm->edit)
+                                                            <a href="{{ route('lead.edit', $item->id) }}" class="dropdown-item"><i
                                                                 class="mdi mdi-pencil-outline me-2"></i><span>Edit</span></a>
+                                                        @endif
                                                         @if (isset($item) && isset($item->sale))
                                                             <a href="{{ route('sale.detail', $item->sale->id) }}"
                                                                 class="dropdown-item" target="_blank"><i
                                                                     class="mdi mdi-eye me-2"></i><span>Preview</span></a>
                                                         @else
-                                                            <a href="#" class="dropdown-item" disable><i
+                                                            <a href="{{ route('lead.detail', $item->id) }}" class="dropdown-item"><i
                                                                     class="mdi mdi-eye me-2"></i><span>Preview</span></a>
                                                         @endif
                                                         {{-- <button type="button" class="btn btn-primary" id="confirm-color">Alert</button> --}}
-                                                        <a type="button" data-id="{{ $item->id }}" data-route="lead"
-                                                            data-bs-toggle="modal" data-bs-target="#basicModal"
-                                                            class="dropdown-item delete-record"><i
-                                                                class="mdi mdi-delete-outline me-2"></i><span>Delete</span></a>
+                                                        @if($leadPerm->delete)
+                                                            <a type="button" data-id="{{ $item->id }}" data-route="lead"
+                                                                data-bs-toggle="modal" data-bs-target="#basicModal"
+                                                                class="dropdown-item delete-record"><i
+                                                                    class="mdi mdi-delete-outline me-2"></i><span>Delete</span></a>
+                                                        @endif
                                                     </div>
                                                 </div>
                                             </td>
                                         </tr>
 
                                     @endforeach
-                                @elseif ($user->role->name == 'Customer Support')
+                                @elseif (in_array($user->role->name, ['Customer Support', 'Manager Customer Support']))
                                     @foreach ($leads as $item)
                                         @if (isset($item->sale) && $item->sale->Customer_support->contains('cs_id', $user->id) || $item->saler_id == $user->id || $item->closers->contains('closer_id', $user->id) )
                                             <tr>
@@ -195,14 +197,6 @@
                                                     @endif
                                                 </td>
                                                 <td>
-                                                    {{-- <p>{{ $item->sale }}</p> --}}
-                                                    @if (isset($item->sale) && $item->sale->status == 1)
-                                                        <span class="badge rounded-pill bg-success">Active</span>
-                                                    @else
-                                                        <span class="badge rounded-pill bg-danger">Inactive</span>
-                                                    @endif
-                                                </td>
-                                                <td>
                                                     <div class="d-inline-block text-nowrap">
                                                         <a href="{{ route('sale.create', $item->id) }}"
                                                             class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect"
@@ -212,23 +206,27 @@
                                                             class="btn btn-sm btn-icon btn-text-secondary rounded-pill dropdown-toggle hide-arrow"
                                                             data-bs-toggle="dropdown" aria-expanded="false"><i
                                                                 class="mdi mdi-dots-vertical mdi-20px"></i></button>
-                                                        <div class="dropdown-menu dropdown-menu-end m-0" style=""><a
-                                                                href="{{ route('lead.edit', $item->id) }}"
+                                                        <div class="dropdown-menu dropdown-menu-end m-0" style="">
+                                                            @if($leadPerm->edit)
+                                                                <a href="{{ route('lead.edit', $item->id) }}"
                                                                 class="dropdown-item"><i
                                                                     class="mdi mdi-pencil-outline me-2"></i><span>Edit</span></a>
+                                                            @endif
                                                             @if (isset($item) && isset($item->sale))
                                                                 <a href="{{ route('sale.detail', $item->sale->id) }}"
                                                                     class="dropdown-item" target="_blank"><i
                                                                         class="mdi mdi-eye me-2"></i><span>Preview</span></a>
                                                             @else
-                                                                <a href="#" class="dropdown-item" disable><i
+                                                                <a href="{{ route('lead.detail', $item->id) }}" class="dropdown-item"><i
                                                                         class="mdi mdi-eye me-2"></i><span>Preview</span></a>
                                                             @endif
                                                             {{-- <button type="button" class="btn btn-primary" id="confirm-color">Alert</button> --}}
-                                                            <a type="button" data-id="{{ $item->id }}" data-route="lead"
+                                                            @if($leadPerm->delete)
+                                                                <a type="button" data-id="{{ $item->id }}" data-route="lead"
                                                                 data-bs-toggle="modal" data-bs-target="#basicModal"
                                                                 class="dropdown-item delete-record"><i
                                                                     class="mdi mdi-delete-outline me-2"></i><span>Delete</span></a>
+                                                            @endif
                                                         </div>
                                                     </div>
                                                 </td>
@@ -287,23 +285,106 @@
                                                             data-bs-toggle="dropdown" aria-expanded="false"><i
                                                                 class="mdi mdi-dots-vertical mdi-20px"></i></button>
                                                         <div class="dropdown-menu dropdown-menu-end m-0" style="">
-                                                            <a href="{{ route('lead.edit', $item->id) }}"
+                                                            @if($leadPerm->edit)
+                                                                <a href="{{ route('lead.edit', $item->id) }}"
                                                                 class="dropdown-item"><i
                                                                     class="mdi mdi-pencil-outline me-2"></i><span>Edit</span></a>
+                                                            @endif
                                                             @if (isset($item) && isset($item->sale))
                                                                 <a href="{{ route('sale.detail', $item->sale->id) }}"
                                                                     class="dropdown-item"><i
                                                                         class="mdi mdi-eye me-2"></i><span>Preview</span></a>
                                                             @else
-                                                                <a href="#" class="dropdown-item"><i
+                                                                <a href="{{ route('lead.detail', $item->id) }}" class="dropdown-item"><i
                                                                         class="mdi mdi-eye me-2"></i><span>Preview</span></a>
                                                             @endif
                                                             {{-- <button type="button" class="btn btn-primary" id="confirm-color">Alert</button> --}}
-                                                            <a type="button" data-id="{{ $item->id }}"
+                                                            @if($leadPerm->delete)
+                                                                <a type="button" data-id="{{ $item->id }}"
                                                                 data-route="lead" data-bs-toggle="modal"
                                                                 data-bs-target="#basicModal"
                                                                 class="dropdown-item delete-record"><i
                                                                     class="mdi mdi-delete-outline me-2"></i><span>Delete</span></a>
+                                                            @endif
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        @endif
+                                    @endforeach
+                                    @elseif($user->role->name == 'IT - Q/A')
+                                        @foreach ($leads as $item)
+                                        @if ($item->sale != null && $item->sale->status == 1 && !isset($item->chargeback))
+                                            <tr>
+                                                <td>{{ $loop->index + 1 }}</td>
+                                                <td>{{ $item->business_name_adv }}</td>
+                                                <td>{{ $item->business_number_adv }}</td>
+                                                @if (isset($item->off_email))
+                                                    <td>{{ $item->off_email }}</td>
+                                                @else
+                                                    <td>N/A</td>
+                                                @endif
+                                                <td>
+                                                    @foreach ($item->category as $cat)
+                                                    <span class="badge rounded-pill bg-label-primary me-1">{{$cat->name }}</span>
+                                                    @endforeach
+                                                </td>
+                                                @if(isset($item->saler->name))
+                                                <td>{{ explode(' -',   $item->saler->name )[0] }}</td>
+                                                @endif                                                {{-- <td>{{ $item->call_status }}</td> --}}
+                                                <td>
+                                                    {{-- <p>{{ $item->closers }}</p> --}}
+                                                    @if (isset($item->closers) && count($item->closers) > 0)
+                                                        <div class="d-flex" style="gap: 10px; flex-direction: column;">
+                                                            @foreach ($item->closers as $list)
+                                                            <span
+                                                                class="badge rounded-pill bg-label-primary me-1">{{ explode(' -',  $list->user->name)[0] }}</span>
+                                                            @endforeach
+                                                        </div>
+                                                    @else
+                                                        N/A
+                                                    @endif
+                                                </td>
+                                                <td>N/A</td>
+                                                <td>
+                                                    @if (isset($item->sale) && $item->sale->status == 1)
+                                                        <span class="badge rounded-pill bg-success">Active</span>
+                                                    @else
+                                                        <span class="badge rounded-pill bg-danger">Inactive</span>
+                                                    @endif
+                                                </td>
+                                                <td>
+                                                    <div class="d-inline-block text-nowrap">
+                                                        <a href="{{ route('sale.create', $item->id) }}"
+                                                            class="btn btn-sm btn-icon btn-text-secondary rounded-pill waves-effect"
+                                                            data-bs-toggle="tooltip" title="Active"><i
+                                                                class="ri-send-plane-2-line ri-20px"></i></a>
+                                                        <button
+                                                            class="btn btn-sm btn-icon btn-text-secondary rounded-pill dropdown-toggle hide-arrow"
+                                                            data-bs-toggle="dropdown" aria-expanded="false"><i
+                                                                class="mdi mdi-dots-vertical mdi-20px"></i></button>
+                                                        <div class="dropdown-menu dropdown-menu-end m-0" style="">
+                                                            @if($leadPerm->edit)
+                                                                <a href="{{ route('lead.edit', $item->id) }}"
+                                                                class="dropdown-item"><i
+                                                                    class="mdi mdi-pencil-outline me-2"></i><span>Edit</span></a>
+                                                            @endif
+                                                            @if (isset($item) && isset($item->sale))
+                                                                <a href="{{ route('sale.detail', $item->sale->id) }}"
+                                                                    class="dropdown-item"><i
+                                                                        class="mdi mdi-eye me-2"></i><span>Preview</span></a>
+                                                            @else
+                                                                <a href="{{ route('lead.detail', $item->id) }}" class="dropdown-item"><i
+                                                                        class="mdi mdi-eye me-2"></i><span>Preview</span></a>
+                                                            @endif
+                                                            {{-- <button type="button" class="btn btn-primary" id="confirm-color">Alert</button> --}}
+                                                            @if($leadPerm->delete)
+                                                                <a type="button" data-id="{{ $item->id }}"
+                                                                data-route="lead" data-bs-toggle="modal"
+                                                                data-bs-target="#basicModal"
+                                                                class="dropdown-item delete-record"><i
+                                                                    class="mdi mdi-delete-outline me-2"></i><span>Delete</span></a>
+                                                            @endif
                                                         </div>
                                                     </div>
                                                 </td>
@@ -364,23 +445,27 @@
                                                             data-bs-toggle="dropdown" aria-expanded="false"><i
                                                                 class="mdi mdi-dots-vertical mdi-20px"></i></button>
                                                         <div class="dropdown-menu dropdown-menu-end m-0" style="">
-                                                            <a href="{{ route('lead.edit', $item->id) }}"
+                                                            @if($leadPerm->edit)
+                                                                <a href="{{ route('lead.edit', $item->id) }}"
                                                                 class="dropdown-item"><i
                                                                     class="mdi mdi-pencil-outline me-2"></i><span>Edit</span></a>
+                                                            @endif
                                                             @if (isset($item) && isset($item->sale))
                                                                 <a href="{{ route('sale.detail', $item->sale->id) }}"
                                                                     class="dropdown-item"><i
                                                                         class="mdi mdi-eye me-2"></i><span>Preview</span></a>
                                                             @else
-                                                                <a href="#" class="dropdown-item"><i
+                                                                <a href="{{ route('lead.detail', $item->id) }}" class="dropdown-item"><i
                                                                         class="mdi mdi-eye me-2"></i><span>Preview</span></a>
                                                             @endif
                                                             {{-- <button type="button" class="btn btn-primary" id="confirm-color">Alert</button> --}}
-                                                            <a type="button" data-id="{{ $item->id }}"
+                                                            @if($leadPerm->delete)
+                                                                <a type="button" data-id="{{ $item->id }}"
                                                                 data-route="lead" data-bs-toggle="modal"
                                                                 data-bs-target="#basicModal"
                                                                 class="dropdown-item delete-record"><i
                                                                     class="mdi mdi-delete-outline me-2"></i><span>Delete</span></a>
+                                                            @endif
                                                         </div>
                                                     </div>
                                                 </td>
@@ -418,6 +503,15 @@
     <script src="{{ asset('assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js') }}"></script>
     <script src="{{ asset('assets/js/tables-datatables-advanced.js') }}"></script>
     <script>
-        $('#recodetable').DataTable();
+        var leadsTable = $('#recodetable').DataTable({
+            autoWidth: false,
+            language: window.rsEmptyStateHTML ? { emptyTable: rsEmptyStateHTML('leads') } : undefined
+        });
+
+        // Coming from a notification click (?search=Business Name) - apply it as the table's global search.
+        var leadSearchParam = new URLSearchParams(window.location.search).get('search');
+        if (leadSearchParam) {
+            leadsTable.search(leadSearchParam).draw();
+        }
     </script>
 @endsection

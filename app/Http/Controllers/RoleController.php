@@ -52,19 +52,21 @@ class RoleController extends Controller
             'created_by' => Auth::user()->id,
         ]);
 
-        // Save permissions
-        if(isset($request->permissions)){
-            foreach ($request->permissions as $permName => $permData) {
-                Permission::create([
-                    'role_id' => $role->id,
-                    'name' => $permName,
-                    'create' => isset($permData['create']) ? ($permData['create'] ? 1 : 0) : 0,
-                    'view' => isset($permData['view']) ? ($permData['view'] ? 1 : 0) : 0,
-                    'edit' => isset($permData['edit']) ? ($permData['edit'] ? 1 : 0) : 0,
-                    'delete' => isset($permData['delete']) ? ($permData['delete'] ? 1 : 0) : 0,
-                ]);
-
-            }
+        // Save permissions -- create a row for every known module, not just
+        // the ones with at least one checked box (unchecked checkboxes
+        // don't submit in the POST at all, so a module left fully
+        // unchecked would otherwise get no row -- indistinguishable from
+        // "not enforced yet" instead of "explicitly denied").
+        foreach (GlobalHelper::Permissions() as $permName) {
+            $permData = $request->permissions[$permName] ?? [];
+            Permission::create([
+                'role_id' => $role->id,
+                'name' => $permName,
+                'create' => isset($permData['create']) ? ($permData['create'] ? 1 : 0) : 0,
+                'view' => isset($permData['view']) ? ($permData['view'] ? 1 : 0) : 0,
+                'edit' => isset($permData['edit']) ? ($permData['edit'] ? 1 : 0) : 0,
+                'delete' => isset($permData['delete']) ? ($permData['delete'] ? 1 : 0) : 0,
+            ]);
         }
         return redirect()->back();
 
@@ -97,6 +99,23 @@ class RoleController extends Controller
         $rolePermissions = [];
         foreach ($role->permissions as $permission) {
             $rolePermissions[$permission->name] = $permission; // Use the permission's name as the key
+        }
+
+        // Backfill deny-all rows for any module that doesn't have one yet
+        // (e.g. a module added after this role was last saved). Without
+        // this, the role is silently denied that module until someone
+        // manually opens this page and clicks Save -- and the same is
+        // true even for the admin role.
+        $missing = array_diff($permissions, array_keys($rolePermissions));
+        foreach ($missing as $permName) {
+            $rolePermissions[$permName] = Permission::create([
+                'role_id' => $role->id,
+                'name' => $permName,
+                'create' => 0,
+                'view' => 0,
+                'edit' => 0,
+                'delete' => 0,
+            ]);
         }
 
         return view('pages.role.edit', compact('role', 'permissions', 'rolePermissions'));

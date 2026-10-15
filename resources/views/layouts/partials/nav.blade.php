@@ -214,6 +214,10 @@ id="layout-navbar">
     <!-- Quick links -->
 
     <!-- Notification -->
+    @php
+        $recentNotifications = auth()->user()->notifications()->latest()->take(15)->get();
+        $unreadNotifCount = auth()->user()->unreadNotifications->count();
+    @endphp
     <li class="nav-item dropdown-notifications navbar-dropdown dropdown me-2 me-xl-1">
       <a
         class="nav-link btn btn-text-secondary rounded-pill btn-icon dropdown-toggle hide-arrow"
@@ -221,9 +225,9 @@ id="layout-navbar">
         data-bs-toggle="dropdown"
         data-bs-auto-close="outside"
         aria-expanded="false">
-        <i class="mdi mdi-bell-outline mdi-24px"></i>
-        @if(isset(auth()->user()->unreadNotifications ) && count(auth()->user()->unreadNotifications) > 0)
-            <span
+        <i id="bellIcon" class="mdi mdi-bell-outline mdi-24px @if($unreadNotifCount > 0) bell-pulse @endif"></i>
+        @if($unreadNotifCount > 0)
+            <span id="bellDot"
             class="position-absolute top-0 start-50 translate-middle-y badge badge-dot bg-danger mt-2 border"></span>
         @endif
       </a>
@@ -231,14 +235,17 @@ id="layout-navbar">
         <li class="dropdown-menu-header border-bottom">
           <div class="dropdown-header d-flex align-items-center py-3">
             <h6 class="mb-0 me-auto">Notification</h6>
-            <span class="badge rounded-pill bg-label-primary">{{ count(auth()->user()->unreadNotifications) }} New</span>
+            <span id="notifUnreadBadge" class="badge rounded-pill bg-label-primary">{{ $unreadNotifCount }} New</span>
           </div>
         </li>
 
                     <li class="dropdown-notifications-list scrollable-container">
                         <ul class="list-group list-group-flush">
-                            @foreach (auth()->user()->unreadNotifications as $notification)
-                            <li class="list-group-item list-group-item-action dropdown-notifications-item">
+                            @foreach ($recentNotifications as $notification)
+                            <li class="list-group-item list-group-item-action dropdown-notifications-item @if(is_null($notification->read_at)) notif-unread @endif"
+                                data-notification-id="{{ $notification->id }}"
+                                data-lead-id="{{ $notification->data['lead_id'] ?? '' }}"
+                                data-lead-name="{{ $notification->data['lead_name'] ?? '' }}">
                                 <div class="d-flex gap-2">
                                     <div class="flex-shrink-0">
                                         <div class="avatar me-1">
@@ -263,19 +270,60 @@ id="layout-navbar">
                     </li>
 
         <li class="dropdown-menu-footer border-top p-2">
-          <a href="javascript:void(0);" class="btn btn-primary d-flex justify-content-center">
+          <a id="viewAllNotificationsBtn" href="{{ route('front.notifications.index') }}" class="btn btn-primary d-flex justify-content-center">
             View all notifications
           </a>
         </li>
       </ul>
     </li>
     <!--/ Notification -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            if (window.rsInitNotifications) {
+                rsInitNotifications({
+                    selector: '.dropdown-notifications-item[data-notification-id]',
+                    readUrlTemplate: "{{ route('front.notifications.read', ['id' => 'NOTIF_ID']) }}",
+                    leadEditUrlTemplate: "{{ route('lead.edit', ['id' => 'LEAD_ID']) }}",
+                    leadIndexUrl: "{{ route('lead.index') }}",
+                    onRead: function (count) {
+                        var badge = document.getElementById('notifUnreadBadge');
+                        if (badge) badge.textContent = count + ' New';
+
+                        if (count <= 0) {
+                            var dot = document.getElementById('bellDot');
+                            var icon = document.getElementById('bellIcon');
+                            if (dot) dot.remove();
+                            if (icon) icon.classList.remove('bell-pulse');
+                        }
+                    }
+                });
+            }
+
+            // A pre-existing global handler on .navbar-nav calls preventDefault()
+            // on every click in this area (for the search dropdown), which blocks
+            // this link's default navigation - so navigate explicitly instead.
+            var viewAllBtn = document.getElementById('viewAllNotificationsBtn');
+            if (viewAllBtn) {
+                viewAllBtn.addEventListener('click', function () {
+                    window.location.href = viewAllBtn.getAttribute('href');
+                });
+            }
+
+            // Same preventDefault issue affects the user dropdown too.
+            var myProfileLink = document.getElementById('myProfileLink');
+            if (myProfileLink) {
+                myProfileLink.addEventListener('click', function () {
+                    window.location.href = myProfileLink.getAttribute('href');
+                });
+            }
+        });
+    </script>
 
     <!-- User -->
     <li class="nav-item navbar-dropdown dropdown-user dropdown">
       <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
         <div class="avatar avatar-online">
-          <img src="../../assets/img/avatars/1.png" alt class="w-px-40 h-auto rounded-circle" />
+          <img src="{{ optional(Auth::user())->avatar_url ?? asset('assets/img/avatars/1.png') }}" alt class="js-user-avatar w-px-40 h-px-40 rounded-circle" style="object-fit: cover;" />
         </div>
       </a>
       <ul class="dropdown-menu dropdown-menu-end">
@@ -284,7 +332,7 @@ id="layout-navbar">
             <div class="d-flex">
               <div class="flex-shrink-0 me-3">
                 <div class="avatar avatar-online">
-                  <img src="../../assets/img/avatars/1.png" alt class="w-px-40 h-auto rounded-circle" />
+                  <img src="{{ optional(Auth::user())->avatar_url ?? asset('assets/img/avatars/1.png') }}" alt class="js-user-avatar w-px-40 h-px-40 rounded-circle" style="object-fit: cover;" />
                 </div>
               </div>
               <div class="flex-grow-1">
@@ -301,7 +349,7 @@ id="layout-navbar">
           <div class="dropdown-divider"></div>
         </li>
         <li>
-          <a class="dropdown-item" href="#">
+          <a id="myProfileLink" class="dropdown-item" href="{{ route('profile.show') }}">
             <i class="mdi mdi-account-outline me-2"></i>
             <span class="align-middle">My Profile</span>
           </a>

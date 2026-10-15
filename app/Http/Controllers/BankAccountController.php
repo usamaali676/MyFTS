@@ -4,62 +4,48 @@ namespace App\Http\Controllers;
 
 use App\Models\BankAccount;
 use Illuminate\Http\Request;
+use RealRashid\SweetAlert\Facades\Alert;
 
 class BankAccountController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        $bankAccounts = BankAccount::orderBy('name')->get();
+
+        return view('pages.settings.bank-account', compact('bankAccounts'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'name' => 'required|string|max:255|unique:bank_accounts,name,NULL,id,deleted_at,NULL',
+        ]);
+
+        BankAccount::create(['name' => $request->name]);
+
+        Alert::success('Success', 'Bank account added successfully');
+        return redirect()->route('bankaccount.index');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(BankAccount $bankAccount)
+    public function update(Request $request, $id)
     {
-        //
+        $bankAccount = BankAccount::findOrFail($id);
+
+        $request->validate([
+            'name' => 'required|string|max:255|unique:bank_accounts,name,' . $bankAccount->id . ',id,deleted_at,NULL',
+        ]);
+
+        $bankAccount->update(['name' => $request->name]);
+
+        Alert::success('Success', 'Bank account updated successfully');
+        return redirect()->route('bankaccount.index');
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(BankAccount $bankAccount)
+    public function destroy($id)
     {
-        //
-    }
+        BankAccount::findOrFail($id)->delete();
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, BankAccount $bankAccount)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(BankAccount $bankAccount)
-    {
-        //
+        Alert::success('Success', 'Bank account deleted successfully');
+        return redirect()->route('bankaccount.index');
     }
 }
