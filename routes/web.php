@@ -215,6 +215,9 @@ Route::controller(RoleController::class)
     Route::post('profile/avatar', [ProfileController::class, 'updateAvatar'])
         ->middleware('auth')
         ->name('profile.avatar.update');
+    Route::get('profile/avatar/diagnose', [ProfileController::class, 'diagnoseAvatar'])
+        ->middleware('auth')
+        ->name('profile.avatar.diagnose');
     Route::post('profile/avatar/remove', [ProfileController::class, 'removeAvatar'])
         ->middleware('auth')
         ->name('profile.avatar.remove');

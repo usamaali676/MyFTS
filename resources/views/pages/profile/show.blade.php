@@ -517,12 +517,16 @@
 
             modalEl.addEventListener('hidden.bs.modal', resetModal);
 
-            // Big phone photos are shrunk in the browser first so they upload
-            // fast; the server still does the real crop + 100 KB compression.
+            // Photos are shrunk in the browser first (max 1200 px) so the server
+            // never has to decode a huge image — keeps uploads fast and safe on
+            // small hosts. The server still does the real crop + 100 KB
+            // compression. Small, light images are sent untouched.
             function prepareForUpload(file) {
-                if (file.size < 1500000 || !window.createImageBitmap) { return Promise.resolve(file); }
+                if (!window.createImageBitmap) { return Promise.resolve(file); }
                 return createImageBitmap(file, { imageOrientation: 'from-image' }).then(function (bitmap) {
-                    var scale = Math.min(1, 1600 / Math.max(bitmap.width, bitmap.height));
+                    var biggest = Math.max(bitmap.width, bitmap.height);
+                    if (biggest <= 1200 && file.size <= 600000) { return file; }
+                    var scale = Math.min(1, 1200 / biggest);
                     var canvas = document.createElement('canvas');
                     canvas.width = Math.round(bitmap.width * scale);
                     canvas.height = Math.round(bitmap.height * scale);

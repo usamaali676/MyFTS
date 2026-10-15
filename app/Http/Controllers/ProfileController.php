@@ -66,8 +66,11 @@ class ProfileController extends Controller
         } catch (\Throwable $e) {
             report($e);
 
+            // Always logged; the real reason is only shown when APP_DEBUG is on.
             return response()->json([
-                'message' => 'Something went wrong while saving the photo. Please try a different image.',
+                'message' => config('app.debug')
+                    ? 'Photo could not be saved: ' . class_basename($e) . ' - ' . $e->getMessage()
+                    : 'Something went wrong while saving the photo. Please try a different image.',
             ], 500);
         }
 
@@ -75,6 +78,17 @@ class ProfileController extends Controller
             'message' => 'Profile photo updated.',
             'url' => $user->fresh()->avatar_url,
         ]);
+    }
+
+    /**
+     * Admin-only server self-check: environment facts plus a real run of the
+     * photo compressor, to pinpoint why uploads fail on a given host.
+     */
+    public function diagnoseAvatar(AvatarService $avatars)
+    {
+        abort_unless((int) Auth::user()->role_id === 1, 403);
+
+        return response()->json($avatars->diagnose(), 200, [], JSON_PRETTY_PRINT);
     }
 
     public function removeAvatar(AvatarService $avatars)
