@@ -108,20 +108,23 @@ class AttendanceController extends Controller
                 ->get();
         }
 
-        // Only finished breaks with a sensible (positive) duration count
-        // toward totals; anything else is surfaced as a data issue instead
-        // of silently skewing the numbers.
-        $valid = $breaks->filter(fn ($b) => $b->break_end && $b->duration > 0);
+        // Lengths come from the break's clock times (Breaks::effective_duration),
+        // wrapping past midnight, not the saved `duration` column — older rows
+        // saved a wrong value for any break that crossed midnight. Only
+        // finished, believable breaks count toward totals; the rest are
+        // surfaced as data issues instead of silently skewing the numbers.
+        $valid = $breaks->filter(fn ($b) => $b->is_countable);
+        $seconds = fn ($b) => $b->effective_duration;
         $stats = [
             'count' => $breaks->count(),
-            'total_seconds' => (int) $valid->sum('duration'),
-            'longest_seconds' => (int) ($valid->max('duration') ?? 0),
-            'average_seconds' => $valid->isNotEmpty() ? (int) round($valid->sum('duration') / $valid->count()) : 0,
+            'total_seconds' => (int) $valid->sum($seconds),
+            'longest_seconds' => (int) ($valid->max($seconds) ?? 0),
+            'average_seconds' => $valid->isNotEmpty() ? (int) round($valid->sum($seconds) / $valid->count()) : 0,
             'open' => $breaks->filter(fn ($b) => !$b->break_end)->count(),
-            'invalid' => $breaks->filter(fn ($b) => $b->break_end && $b->duration <= 0)->count(),
+            'invalid' => $breaks->filter(fn ($b) => $b->break_end && !$b->is_countable)->count(),
             'by_type' => $valid->groupBy('break_type')->map(fn ($g) => [
                 'count' => $g->count(),
-                'seconds' => (int) $g->sum('duration'),
+                'seconds' => (int) $g->sum($seconds),
             ]),
         ];
 

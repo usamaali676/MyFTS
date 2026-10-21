@@ -11,46 +11,39 @@ class RepairNegativeBreaks extends Command
 {
     protected $signature = 'breaks:repair-negative {--apply : Actually write the fixes (without this it is a dry run)}';
 
-    protected $description = 'Fix breaks saved with a negative duration (break_end stamped on the wrong calendar day)';
-
-    // A break longer than this isn't plausible, so such a row is left alone
-    // for a human to look at rather than "repaired" into a wrong number.
-    private const MAX_PLAUSIBLE_SECONDS = 4 * 3600;
+    protected $description = 'Fix breaks saved with a wrong duration (negative, or ~24h) because break_end got the wrong calendar day';
 
     public function handle(): int
     {
         $apply = (bool) $this->option('apply');
 
-        $rows = Breaks::where('duration', '<', 0)->whereNotNull('break_end')->orderBy('id')->get();
-
-        if ($rows->isEmpty()) {
-            $this->info('No breaks with a negative duration. Nothing to do.');
-
-            return self::SUCCESS;
-        }
-
         $fixable = [];
         $skipped = [];
 
-        foreach ($rows as $break) {
-            $start = Carbon::parse($break->break_start);
-            $end = Carbon::parse($break->break_end);
+        // The saved duration is wrong whenever it disagrees with the real
+        // length, which is the gap between the two clock times wrapping past
+        // midnight (see Breaks::effective_duration). That covers both the
+        // negative values and the "23h 19m" ones for a 41-minute break.
+        Breaks::whereNotNull('break_end')->orderBy('id')->chunkById(500, function ($rows) use (&$fixable, &$skipped) {
+            foreach ($rows as $break) {
+                $real = $break->effective_duration;
 
-            // The end has the right time of day but the wrong date: put it on
-            // the start's date, and roll to the next day if that lands before
-            // the start (the break crossed midnight).
-            $fixedEnd = $start->copy()->setTimeFrom($end);
-            if ($fixedEnd->lt($start)) {
-                $fixedEnd->addDay();
+                if (abs((int) $break->duration - $real) <= 2) {
+                    continue; // already correct
+                }
+
+                if ($break->is_countable) {
+                    $fixable[] = [$break, Carbon::parse($break->break_start)->addSeconds($real), $real];
+                } else {
+                    $skipped[] = $break;
+                }
             }
+        });
 
-            $seconds = $fixedEnd->getTimestamp() - $start->getTimestamp();
+        if (!$fixable && !$skipped) {
+            $this->info('Every break already has a correct duration. Nothing to do.');
 
-            if ($seconds > 0 && $seconds <= self::MAX_PLAUSIBLE_SECONDS) {
-                $fixable[] = [$break, $fixedEnd, $seconds];
-            } else {
-                $skipped[] = $break;
-            }
+            return self::SUCCESS;
         }
 
         $this->table(
@@ -62,7 +55,7 @@ class RepairNegativeBreaks extends Command
         );
 
         foreach ($skipped as $break) {
-            $this->warn("Skipped #{$break->id}: not a plausible break after correction, check it by hand.");
+            $this->warn("Skipped #{$break->id}: length works out to " . round($break->effective_duration / 3600, 1) . ' h, not a believable break. Check it by hand.');
         }
 
         if (!$apply) {

@@ -459,7 +459,7 @@ $user = Auth::user();
                                                     <small>{{ $b_user->role->name }}</small>
                                                 </div>
                                                 <div class="badge bg-label-primary rounded-pill">
-                                                    {{ gmdate('H:i:s', $todayBreaks->sum('duration')) }}
+                                                    {{ gmdate('H:i:s', $todayBreaks->filter->is_countable->sum('effective_duration')) }}
                                                 </div>
                                             </div>
                                         </li>
@@ -513,7 +513,7 @@ $user = Auth::user();
                                                     <small>{{ $tsr_users->role->name }}</small>
                                                 </div>
                                                 <div class="badge bg-label-primary rounded-pill">
-                                                    {{ gmdate('H:i:s', $todayBreaks->sum('duration')) }}
+                                                    {{ gmdate('H:i:s', $todayBreaks->filter->is_countable->sum('effective_duration')) }}
                                                 </div>
                                             </div>
                                         </li>
@@ -566,7 +566,7 @@ $user = Auth::user();
                                                     <small>{{ $csr_users->role->name }}</small>
                                                 </div>
                                                 <div class="badge bg-label-primary rounded-pill">
-                                                    {{ gmdate('H:i:s', $todayBreaks->sum('duration')) }}
+                                                    {{ gmdate('H:i:s', $todayBreaks->filter->is_countable->sum('effective_duration')) }}
                                                 </div>
                                             </div>
                                         </li>

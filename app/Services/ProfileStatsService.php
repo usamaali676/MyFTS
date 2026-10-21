@@ -115,14 +115,16 @@ class ProfileStatsService
         $absents = $this->absentDays($user, $from, $to);
 
         $attendanceIds = (clone $query)->pluck('id');
-        // duration > 0 (not just whereNotNull): a handful of rows have a
-        // break_end recorded a calendar day before break_start (an
-        // overnight-shift data-entry bug), producing a large negative
-        // duration that would otherwise swamp the average/total for any
-        // user whose range only has a few real breaks.
-        $breaks = Breaks::whereIn('attendance_id', $attendanceIds)->where('duration', '>', 0)->get();
+        // Lengths come from the break's clock times (Breaks::effective_duration),
+        // not the saved `duration` column: older rows saved a negative or
+        // ~24-hour value for any break that crossed midnight on the night
+        // shift. Open or implausible (over 4 h) breaks are left out.
+        $breaks = Breaks::whereIn('attendance_id', $attendanceIds)
+            ->whereNotNull('break_end')
+            ->get()
+            ->filter(fn ($break) => $break->is_countable);
         $breakCount = $breaks->count();
-        $totalBreakSeconds = (int) $breaks->sum('duration');
+        $totalBreakSeconds = (int) $breaks->sum(fn ($break) => $break->effective_duration);
         // "Avg Break Duration" means per day (all breaks taken across a
         // shift, added up, then averaged over the days that had any) — not
         // the average length of a single break session, which reads much

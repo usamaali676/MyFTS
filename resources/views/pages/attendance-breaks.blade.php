@@ -137,7 +137,7 @@
                         <div class="alert alert-warning">
                             <i class="mdi mdi-alert-outline me-1"></i>
                             @if($stats['open']) {{ $stats['open'] }} break(s) were never ended. @endif
-                            @if($stats['invalid']) {{ $stats['invalid'] }} break(s) were saved with an invalid (zero/negative) duration. @endif
+                            @if($stats['invalid']) {{ $stats['invalid'] }} break(s) have an implausible length (zero, or over 4 hours). @endif
                             These are shown below but left out of the totals.
                         </div>
                     @endif
@@ -159,7 +159,7 @@
                                         @php
                                             $type = $typeOf($break->break_type);
                                             $open = !$break->break_end;
-                                            $bad = $break->break_end && $break->duration <= 0;
+                                            $bad = $break->break_end && !$break->is_countable;
                                         @endphp
                                         <tr>
                                             <td>{{ $i + 1 }}</td>
@@ -176,9 +176,9 @@
                                                 @if($open)
                                                     &mdash;
                                                 @elseif($bad)
-                                                    <span class="badge bg-label-danger" title="Saved duration: {{ $break->duration }}s">Invalid</span>
+                                                    <span class="badge bg-label-danger" title="Computed length: {{ $fmt($break->effective_duration) }} (over 4h, or zero)">Suspect</span>
                                                 @else
-                                                    {{ $fmt($break->duration) }}
+                                                    {{ $fmt($break->effective_duration) }}
                                                 @endif
                                             </td>
                                         </tr>
