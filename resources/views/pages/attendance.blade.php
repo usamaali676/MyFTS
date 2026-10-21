@@ -145,6 +145,9 @@
                             <i class="mdi mdi-calendar-month-outline"></i> Calendar
                         </a>
                     </div>
+                    <a href="{{ route('attendance.detail') }}" class="btn btn-outline-primary">
+                        <i class="mdi mdi-coffee-outline"></i> Daily Breaks
+                    </a>
                     <button id="print" type="btn" onclick="(function() { window.print(); })()" class="btn btn-primary waves-effect waves-light ">Print</button>
                 </div>
             </div>

@@ -374,6 +374,8 @@ Route::controller(RoleController::class)
     ->middleware(PermissionMiddelware::class)
     ->group(function () {
         Route::get('/index', 'index')->name('index');
+        // "detail" maps to the Attendance *view* permission in PermissionMiddelware.
+        Route::get('/breaks', 'dailyBreaks')->name('detail');
     });
 
     Route::controller(AIController::class)

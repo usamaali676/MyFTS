@@ -145,17 +145,26 @@ class ProfileStatsService
      * Weekdays with no attendance punch at all, in [start, end) — same rule
      * used on the Home dashboard and Attendance calendar, generalized to an
      * arbitrary range. Never counts today (attendance may not be in yet) or
-     * any day before the user's account existed.
+     * any day before the user's FIRST attendance record — absences only
+     * start counting from the day they first actually clocked in, not from
+     * when their account was created (accounts are often set up days or
+     * weeks before the person starts).
      */
     private function absentDays(User $user, ?Carbon $from, ?Carbon $to): int
     {
         $tz = config('app.shift_timezone');
-        $createdAt = Carbon::parse($user->created_at, $tz)->startOfDay();
+
+        $firstAttendance = Attendance::where('user_id', $user->id)->min('shift_date');
+        if (!$firstAttendance) {
+            return 0;
+        }
+
+        $firstDay = Carbon::parse($firstAttendance, $tz)->startOfDay();
         $today = now($tz)->startOfDay();
 
-        $start = $from ? $from->copy()->startOfDay() : $createdAt->copy();
-        if ($start->lt($createdAt)) {
-            $start = $createdAt->copy();
+        $start = $from ? $from->copy()->startOfDay() : $firstDay->copy();
+        if ($start->lt($firstDay)) {
+            $start = $firstDay->copy();
         }
 
         $endBoundary = $to ? $to->copy()->startOfDay() : $today->copy();

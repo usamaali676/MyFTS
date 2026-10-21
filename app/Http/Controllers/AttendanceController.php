@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\GlobalHelper;
 use App\Models\Attendance;
+use App\Models\Breaks;
 use App\Models\Role;
 use App\Models\User;
 use App\Services\AttendanceCalendarService;
@@ -72,6 +74,60 @@ class AttendanceController extends Controller
             'onTimeCount', 'lateCount', 'absentCount', 'halfDayCount', 'joinedAt',
             'departments', 'department', 'departmentCalendars'
         ));
+    }
+
+    /**
+     * Every break one user took on one date. "Date" means the SHIFT date
+     * (the night shift runs 7 PM -> 4 AM, so breaks after midnight belong to
+     * the shift that started the evening before), matching the Attendance
+     * list and calendar.
+     */
+    public function dailyBreaks(Request $request)
+    {
+        $users = User::orderBy('name')->get(['id', 'name', 'status', 'role_id']);
+
+        try {
+            $date = $request->query('date')
+                ? Carbon::createFromFormat('Y-m-d', $request->query('date'))->format('Y-m-d')
+                : GlobalHelper::getShiftDate();
+        } catch (\Throwable $e) {
+            $date = GlobalHelper::getShiftDate();
+        }
+
+        $target = $request->query('user') ? $users->firstWhere('id', (int) $request->query('user')) : null;
+
+        $attendance = null;
+        $breaks = collect();
+
+        if ($target) {
+            $attendance = Attendance::where('user_id', $target->id)->where('shift_date', $date)->first();
+
+            $breaks = Breaks::where('user_id', $target->id)
+                ->whereHas('attendance', fn ($q) => $q->where('shift_date', $date))
+                ->orderBy('break_start')
+                ->get();
+        }
+
+        // Only finished breaks with a sensible (positive) duration count
+        // toward totals; anything else is surfaced as a data issue instead
+        // of silently skewing the numbers.
+        $valid = $breaks->filter(fn ($b) => $b->break_end && $b->duration > 0);
+        $stats = [
+            'count' => $breaks->count(),
+            'total_seconds' => (int) $valid->sum('duration'),
+            'longest_seconds' => (int) ($valid->max('duration') ?? 0),
+            'average_seconds' => $valid->isNotEmpty() ? (int) round($valid->sum('duration') / $valid->count()) : 0,
+            'open' => $breaks->filter(fn ($b) => !$b->break_end)->count(),
+            'invalid' => $breaks->filter(fn ($b) => $b->break_end && $b->duration <= 0)->count(),
+            'by_type' => $valid->groupBy('break_type')->map(fn ($g) => [
+                'count' => $g->count(),
+                'seconds' => (int) $g->sum('duration'),
+            ]),
+        ];
+
+        $dateCarbon = Carbon::createFromFormat('Y-m-d', $date);
+
+        return view('pages.attendance-breaks', compact('users', 'target', 'date', 'dateCarbon', 'attendance', 'breaks', 'stats'));
     }
 
     /**

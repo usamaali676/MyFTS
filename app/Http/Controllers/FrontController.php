@@ -394,7 +394,10 @@ public function generate(Request $request)
                 'user_id'       => $user->id,
                 'attendance_id' => $attendance->id,
                 'break_type'    => $breakType,
-                'break_start'   => Carbon::parse($shiftDate)->setTimeFrom(now('Asia/Karachi')),
+                // The real moment the break began. (Not shift date + clock time:
+                // on a 7 PM-4 AM shift that stamps every after-midnight break
+                // with the wrong calendar day.)
+                'break_start'   => now('Asia/Karachi'),
             ]);
 
             return response()->json(['success' => true, 'break_type' => $breakType]);
@@ -433,11 +436,15 @@ public function generate(Request $request)
                             return response()->json(['error' => 'No active break found'], 404);
                         }
 
+                        // Real start/end moments, so the duration is a true elapsed
+                        // time. The old "shift date + clock time" stamping gave an
+                        // end earlier than the start whenever a break crossed
+                        // midnight, saving a large negative duration.
                         $breakStart = Carbon::parse($break->break_start, 'Asia/Karachi');
-                        $breakEnd = Carbon::parse($shiftDate)->setTimeFrom(now('Asia/Karachi'));
+                        $breakEnd = now('Asia/Karachi');
 
                         $break->break_end = $breakEnd;
-                        $break->duration = $breakStart->diffInSeconds($breakEnd);
+                        $break->duration = max(0, $breakEnd->getTimestamp() - $breakStart->getTimestamp());
                         $break->save();
 
                         return response()->json(['success' => true, 'duration' => $break->duration]);
