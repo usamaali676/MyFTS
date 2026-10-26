@@ -277,6 +277,37 @@ $user = Auth::user();
             </div>
           </div>
         </div>
+        <!-- Today's breaks: total duration + count in one box -->
+        <div class="col-xl-12">
+          <div class="card h-100 hover-lift">
+            <div class="card-body d-flex justify-content-between">
+              <div class="d-flex flex-column">
+                <div class="card-title mb-auto">
+                  <h5 class="mb-0 text-nowrap">Today's Breaks</h5>
+                  <p class="mb-0">
+                    Current shift
+                    @if($activeBreak)
+                      <span class="badge rounded-pill bg-label-warning ms-1"><i class="mdi mdi-circle-medium"></i>On break</span>
+                    @endif
+                  </p>
+                </div>
+                <div class="chart-statistics d-flex flex-wrap align-items-end column-gap-3 row-gap-2">
+                  <div class="text-nowrap">
+                    <small class="text-muted d-block">Duration</small>
+                    <h4 class="card-title mb-0">{{ \App\Helpers\GlobalHelper::formatSeconds($myBreakSeconds) }}</h4>
+                  </div>
+                  <div class="text-nowrap border-start ps-3">
+                    <small class="text-muted d-block">Breaks</small>
+                    <h4 class="card-title mb-0">{{ $myBreakCount }}</h4>
+                  </div>
+                </div>
+              </div>
+              <div class="d-flex align-items-center">
+                <span class="badge rounded-pill bg-label-info p-3"><i class="mdi mdi-coffee-outline mdi-24px"></i></span>
+              </div>
+            </div>
+          </div>
+        </div>
                 <!-- Total Revenue chart -->
                 {{-- <div class="col-md-6 col-sm-6">
                     <div class="card h-100">

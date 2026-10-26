@@ -209,10 +209,20 @@ class HomeController extends Controller
         $activeBreakElapsedSeconds = $activeBreak
             ? Carbon::parse($activeBreak->break_start, 'Asia/Karachi')->diffInSeconds(now('Asia/Karachi'))
             : 0;
+
+        // This user's breaks for the current shift, for the "Today's Breaks"
+        // card. Lengths come from the clock times (Breaks::effective_duration)
+        // so a break crossing midnight on the night shift counts correctly;
+        // the count includes a break that is still running.
+        $myTodayBreaks = $todayAttendance
+            ? Breaks::where('attendance_id', $todayAttendance->id)->get()
+            : collect();
+        $myBreakCount = $myTodayBreaks->count();
+        $myBreakSeconds = (int) $myTodayBreaks->filter->is_countable->sum('effective_duration');
         // dd($services);
         // dd($users[1]->attendances->pluck('breaks')->flatten());
         // dd($total);
-        return view('home', compact('route', 'notifications', 'totalRevenue', 'sale_count', 'last_sale_count', 'total', 'lates', 'absents', 'isTeamView', 'teamLabel', 'teamLates', 'teamAbsents', 'teamLatesByUser', 'teamAbsentsByUser', 'users', 'shiftDate', 'services', 'tsrusers', 'activeBreak', 'activeBreakElapsedSeconds', 'csrusers'));
+        return view('home', compact('route', 'notifications', 'totalRevenue', 'sale_count', 'last_sale_count', 'total', 'lates', 'absents', 'isTeamView', 'teamLabel', 'teamLates', 'teamAbsents', 'teamLatesByUser', 'teamAbsentsByUser', 'users', 'shiftDate', 'services', 'tsrusers', 'activeBreak', 'activeBreakElapsedSeconds', 'csrusers', 'myBreakCount', 'myBreakSeconds'));
     }
     // public function breaksduration()
     // {
