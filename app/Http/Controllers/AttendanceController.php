@@ -8,8 +8,10 @@ use App\Models\Breaks;
 use App\Models\Role;
 use App\Models\User;
 use App\Services\AttendanceCalendarService;
+use App\Services\AttendanceVisibilityService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class AttendanceController extends Controller
 {
@@ -19,8 +21,17 @@ class AttendanceController extends Controller
     public function index(Request $request, AttendanceCalendarService $calendar)
     {
         $sr = 1;
-        $user = User::all();
-        $attendances = Attendance::orderBy('id', 'desc')->get();
+
+        // null = may see everyone; otherwise only these users (see
+        // AttendanceVisibilityService). Scoping $user also scopes the agent
+        // and department pickers, and an ?agent= id outside the scope simply
+        // resolves to nothing below.
+        $visibleIds = AttendanceVisibilityService::visibleUserIds(Auth::user());
+
+        $user = $visibleIds === null ? User::all() : User::whereIn('id', $visibleIds)->get();
+        $attendances = Attendance::orderBy('id', 'desc')
+            ->when($visibleIds !== null, fn ($q) => $q->whereIn('user_id', $visibleIds))
+            ->get();
 
         $view = $request->query('view') === 'calendar' ? 'calendar' : 'list';
 
@@ -84,7 +95,11 @@ class AttendanceController extends Controller
      */
     public function dailyBreaks(Request $request)
     {
-        $users = User::orderBy('name')->get(['id', 'name', 'status', 'role_id']);
+        $visibleIds = AttendanceVisibilityService::visibleUserIds(Auth::user());
+
+        $users = User::orderBy('name')
+            ->when($visibleIds !== null, fn ($q) => $q->whereIn('id', $visibleIds))
+            ->get(['id', 'name', 'status', 'role_id']);
 
         try {
             $date = $request->query('date')
