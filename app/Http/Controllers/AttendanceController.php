@@ -111,6 +111,11 @@ class AttendanceController extends Controller
 
         $target = $request->query('user') ? $users->firstWhere('id', (int) $request->query('user')) : null;
 
+        // The picker only offers active users. A link to an inactive user
+        // still works (they stay selectable while viewed) so old bookmarks
+        // and history aren't lost.
+        $pickerUsers = $users->filter(fn ($u) => $u->status == 1 || ($target && $u->id === $target->id))->values();
+
         $attendance = null;
         $breaks = collect();
 
@@ -145,7 +150,7 @@ class AttendanceController extends Controller
 
         $dateCarbon = Carbon::createFromFormat('Y-m-d', $date);
 
-        return view('pages.attendance-breaks', compact('users', 'target', 'date', 'dateCarbon', 'attendance', 'breaks', 'stats'));
+        return view('pages.attendance-breaks', compact('users', 'pickerUsers', 'target', 'date', 'dateCarbon', 'attendance', 'breaks', 'stats'));
     }
 
     /**

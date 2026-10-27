@@ -162,9 +162,9 @@
                 <div class="form-floating form-floating-outline">
                     <select id="agnet_select" name="agent" class="select2 form-select"
                         data-allow-clear="true">
-                        @if(isset($user))
+                        @if(isset($activeUsers))
                         <option value="">Please Select</option>
-                        @foreach($user as $usr)
+                        @foreach($activeUsers as $usr)
                             <option value="{{ $usr->id }}">{{ explode(' -', $usr->name )[0] }}</option>
                         @endforeach
                         @endif
