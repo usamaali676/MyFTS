@@ -22,16 +22,14 @@ class AttendanceController extends Controller
     {
         $sr = 1;
 
-        // null = may see everyone; otherwise only these users (see
-        // AttendanceVisibilityService). Scoping $user also scopes the agent
-        // and department pickers, and an ?agent= id outside the scope simply
-        // resolves to nothing below.
+        // Only active users (and, for a Closer - Sales Manager, only their
+        // teams) — see AttendanceVisibilityService. Scoping $user also scopes
+        // the agent and department pickers, and an ?agent= id outside the
+        // scope simply resolves to nothing below.
         $visibleIds = AttendanceVisibilityService::visibleUserIds(Auth::user());
 
-        $user = $visibleIds === null ? User::all() : User::whereIn('id', $visibleIds)->get();
-        $attendances = Attendance::orderBy('id', 'desc')
-            ->when($visibleIds !== null, fn ($q) => $q->whereIn('user_id', $visibleIds))
-            ->get();
+        $user = User::whereIn('id', $visibleIds)->get();
+        $attendances = Attendance::orderBy('id', 'desc')->whereIn('user_id', $visibleIds)->get();
 
         $view = $request->query('view') === 'calendar' ? 'calendar' : 'list';
 
@@ -95,10 +93,8 @@ class AttendanceController extends Controller
      */
     public function dailyBreaks(Request $request)
     {
-        $visibleIds = AttendanceVisibilityService::visibleUserIds(Auth::user());
-
         $users = User::orderBy('name')
-            ->when($visibleIds !== null, fn ($q) => $q->whereIn('id', $visibleIds))
+            ->whereIn('id', AttendanceVisibilityService::visibleUserIds(Auth::user()))
             ->get(['id', 'name', 'status', 'role_id']);
 
         try {
@@ -110,11 +106,6 @@ class AttendanceController extends Controller
         }
 
         $target = $request->query('user') ? $users->firstWhere('id', (int) $request->query('user')) : null;
-
-        // The picker only offers active users. A link to an inactive user
-        // still works (they stay selectable while viewed) so old bookmarks
-        // and history aren't lost.
-        $pickerUsers = $users->filter(fn ($u) => $u->status == 1 || ($target && $u->id === $target->id))->values();
 
         $attendance = null;
         $breaks = collect();
@@ -150,7 +141,7 @@ class AttendanceController extends Controller
 
         $dateCarbon = Carbon::createFromFormat('Y-m-d', $date);
 
-        return view('pages.attendance-breaks', compact('users', 'pickerUsers', 'target', 'date', 'dateCarbon', 'attendance', 'breaks', 'stats'));
+        return view('pages.attendance-breaks', compact('users', 'target', 'date', 'dateCarbon', 'attendance', 'breaks', 'stats'));
     }
 
     /**

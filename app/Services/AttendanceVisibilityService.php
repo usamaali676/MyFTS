@@ -10,10 +10,11 @@ use Illuminate\Support\Collection;
  * Whose attendance and breaks a viewer may see in the Attendance module
  * (list, calendar, Daily Breaks, and the list's filter endpoint).
  *
- * Everyone who has the Attendance permission keeps seeing everyone — that is
- * unchanged. The one scoped role is the Closer - Sales Manager: they get the
- * module, but only for the teams they oversee (TSR, Closer, Customer Support
- * and QA), never other departments, other managers, or themselves.
+ * Only ACTIVE users (status = 1) ever appear on these screens, for every
+ * viewer — dropdowns, table rows and direct links alike. On top of that, the
+ * Closer - Sales Manager is limited to the teams they oversee (TSR, Closer,
+ * Customer Support and QA), never other departments, other managers, or
+ * themselves.
  */
 class AttendanceVisibilityService
 {
@@ -25,18 +26,18 @@ class AttendanceVisibilityService
     }
 
     /**
-     * The user ids this viewer may see, or null when they may see everyone.
+     * The (active) user ids this viewer may see.
      *
-     * @return Collection<int, int>|null
+     * @return Collection<int, int>
      */
-    public static function visibleUserIds(User $viewer): ?Collection
+    public static function visibleUserIds(User $viewer): Collection
     {
-        if (!self::isScoped($viewer)) {
-            return null;
+        $query = User::where('status', 1);
+
+        if (self::isScoped($viewer)) {
+            $query->whereIn('role_id', Role::whereIn('name', self::SALES_MANAGER_VISIBLE_ROLES)->pluck('id'));
         }
 
-        $roleIds = Role::whereIn('name', self::SALES_MANAGER_VISIBLE_ROLES)->pluck('id');
-
-        return User::whereIn('role_id', $roleIds)->pluck('id');
+        return $query->pluck('id');
     }
 }

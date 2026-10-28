@@ -40,9 +40,9 @@
                             <label class="form-label" for="breaksUser">User</label>
                             <select id="breaksUser" name="user" class="select2 form-select">
                                 <option value="">Select a user</option>
-                                @foreach($pickerUsers as $u)
+                                @foreach($users as $u)
                                     <option value="{{ $u->id }}" {{ $target && $target->id === $u->id ? 'selected' : '' }}>
-                                        {{ $shortName($u->name) }}{{ $u->status ? '' : ' (inactive)' }}
+                                        {{ $shortName($u->name) }}
                                     </option>
                                 @endforeach
                             </select>

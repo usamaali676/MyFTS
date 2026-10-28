@@ -251,10 +251,8 @@ public function generate(Request $request)
                     // Base query
                     $query = Attendance::query();
 
-                    // Scoped viewers (Closer - Sales Manager) only get their teams' rows.
-                    if (($visibleIds = \App\Services\AttendanceVisibilityService::visibleUserIds(Auth::user())) !== null) {
-                        $query->whereIn('user_id', $visibleIds);
-                    }
+                    // Only active users' rows (and, for a Closer - Sales Manager, only their teams').
+                    $query->whereIn('user_id', \App\Services\AttendanceVisibilityService::visibleUserIds(Auth::user()));
 
                     // Filter by agent if provided
                     if (!empty($agentId)) {
